@@ -1,0 +1,16 @@
+<div
+    #tooltipContentBox
+    class="mat-tooltip rich-tooltip {{positionClass}}"
+    [ngClass]="tooltipClass"
+    [class.mat-tooltip-handset]="(_isHandset | async)?.matches"
+    [@state]="_visibility"
+    (@state.start)="_animationStart()"
+    (@state.done)="_animationDone($event)"
+>
+    <div class="message-container" [attr.aria-label]="message" [innerHTML]="message"></div>
+    <span
+        class="pointer-arrow"
+        [ngStyle]="{'left.px': arrowPosition && arrowPosition.left, 'right.px':arrowPosition && arrowPosition.right}"
+        [hidden]="!isArrowVisible"
+    ></span>
+</div>

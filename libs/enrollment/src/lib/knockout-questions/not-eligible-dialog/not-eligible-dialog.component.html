@@ -1,0 +1,55 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onClose()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <ng-container *ngIf="data.knockout.type === knockout.KNOCKOUT && isProducer">
+            <h1 mat-dialog-title language="primary.portal.knockout.applicantIneligible"></h1>
+            <div class="dialog-paragraph-text">
+                <p language="primary.portal.knockout.applicant"></p>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="data.knockout.type === knockout.KNOCKOUT && !isProducer">
+            <h1 mat-dialog-title language="primary.portal.knockout.youareIneligible"></h1>
+            <div class="dialog-paragraph-text">
+                <p language="primary.portal.knockout.applicant"></p>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="data.knockout.type === knockout.SPOUSE_KNOCKOUT && isProducer">
+            <h1 mat-dialog-title language="primary.portal.knockout.spouseIneligible"></h1>
+            <div class="dialog-paragraph-text">
+                <p language="primary.portal.knockout.ineligibleSpouse"></p>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="data.knockout.type === knockout.SPOUSE_KNOCKOUT && !isProducer">
+            <h1 mat-dialog-title language="primary.portal.knockout.spouseIneligible"></h1>
+            <div class="dialog-paragraph-text">
+                <p language="primary.portal.knockout.notProducerSpouseIneligible"></p>
+            </div>
+        </ng-container>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            (click)="onEdit()"
+            class="mon-btn-secondary mon-mr-20"
+            [attr.aria-label]="languageStrings['primary.portal.knockout.editResponses']"
+        >
+            {{languageStrings['primary.portal.knockout.editResponses']}}
+        </button>
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            (click)="onOK()"
+            class="mon-btn-primary mon-px-30"
+            [attr.aria-label]="languageStrings['primary.portal.common.ok']"
+        >
+            {{languageStrings['primary.portal.common.ok']}}
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,16 @@
+export enum PolicyTransactionForms {
+    ADDRESS = "Change address",
+    NAME = "Change name",
+    BILLING_MODE_CHANGE = "Transfer to Payroll/Union/Association Billing",
+    TRANSFER_TO_DIRECT = "Transfer to direct billing",
+    DELETION = "Remove dependent",
+    BENEFICIARY_INFORMATION = "Change beneficiary info",
+    OCCUPATION_CLASS_CHANGE = "Change occupation class",
+    ACCIDENTAL_DOWNGRADE = "Downgrade accident",
+    DISABILITY_DOWNGRADE = "Downgrade disability",
+    CANCER_RIDER_DOWNGRADE = "Cancer rider downgrade",
+    REMOVE_RIDER = "Remove rider",
+    GENDER_CHANGE = "Change gender",
+    EMAIL_CHANGE = "Change email",
+    PHONE_CHANGE = "Change phone",
+}

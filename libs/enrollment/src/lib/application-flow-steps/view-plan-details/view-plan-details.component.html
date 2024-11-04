@@ -1,0 +1,75 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.shoppingExperience.planDetails']}}
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            class="mon-btn-primary"
+            (click)="closeModal()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </empowered-modal-footer>
+    <div class="plan-details">
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.planName']}}
+            </mat-label>
+            <div>{{viewPlanDetails.plan.name}}</div>
+        </div>
+        <div *ngIf="viewPlanDetails.benefitAmount">
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.activityHistory.benefitAmount']}}
+            </mat-label>
+            <div>{{viewPlanDetails.benefitAmount}}</div>
+        </div>
+        <div *ngIf="viewPlanDetails.coverageLevel.eliminationPeriod">
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.shoppingExperience.eliminationPeriod']}}
+            </mat-label>
+            <div>{{viewPlanDetails.coverageLevel.eliminationPeriod}}</div>
+        </div>
+        <div *ngIf="viewPlanDetails.riders">
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.tpiEnrollment.riders']}}
+            </mat-label>
+            <div *ngFor="let rider of viewPlanDetails.riders">
+                {{rider.name}} {{languageStrings['primary.portal.viewPlanDetails.with']}} {{rider.benefitAmount}}
+                {{languageStrings['primary.portal.shoppingExperience.benefitAmount']}}
+            </div>
+        </div>
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.tpiEnrollment.taxStatus']}}
+            </mat-label>
+            <div>{{viewPlanDetails.taxStatus}}</div>
+        </div>
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.shoppingExperience.coveredIndividuals']}}
+            </mat-label>
+            <div *ngIf="!isCoverageLevelNameMatch">
+                {{memberFullName}}
+            </div>
+            <div *ngIf="viewPlanDetails.dependents && isCoverageLevelNameMatch">
+                <div *ngFor="let dependent of viewPlanDetails.dependents">
+                    {{dependent.name}}
+                </div>
+            </div>
+            <div *ngIf="!viewPlanDetails.dependents && isCoverageLevelNameMatch">
+                {{languageStrings['primary.portal.coverage.allEligibleDependents']}}
+            </div>
+        </div>
+
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.benefitsOffering.coverageStartDate']}}
+            </mat-label>
+            <div class="ag-data">
+                {{viewPlanDetails.validity.effectiveStarting}}
+            </div>
+        </div>
+    </div>
+</empowered-modal>

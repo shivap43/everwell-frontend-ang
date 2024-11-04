@@ -1,0 +1,358 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="!isLoaded"></empowered-mon-spinner>
+<div class="quasi-modal content-scroll">
+    <div class="modal-header">
+        <div>
+            <h2>{{data.title}}</h2>
+        </div>
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div class="stepper-sidebar">
+                <mat-vertical-stepper
+                    #progressIndicator
+                    class="side-nav-stepper employee-stepper"
+                    linear="true"
+                    (selectionChange)="stepChanged($event.selectedIndex)"
+                    [selectedIndex]="selectedIndex"
+                >
+                    <mat-step [completed]="stepPosition>0">
+                        <ng-template matStepLabel>
+                            <p>{{languageStrings["primary.portal.member.terminate.termreason"]}}</p>
+                        </ng-template>
+                    </mat-step>
+                    <mat-step
+                        [completed]="stepPosition>step1"
+                        [stepControl]="productList?.length>0"
+                        *ngIf="productList?.length>0"
+                    >
+                        <ng-template matStepLabel>
+                            <p *ngIf="changeCoverageHeading else changeHeading">
+                                {{languageStrings["primary.portal.member.terminate.coveragedate"]}}
+                            </p>
+                            <ng-template #changeHeading>
+                                {{languageStrings["primary.portal.member.terminate.coveragedates"]}}
+                            </ng-template>
+                        </ng-template>
+                    </mat-step>
+                    <mat-step [completed]="stepPosition>step2" *ngIf="!editMode">
+                        <ng-template matStepLabel>
+                            <p>{{languageStrings["primary.portal.member.terminate.confirmation"]}}</p>
+                        </ng-template>
+                    </mat-step>
+
+                    <ng-template matStepperIcon="done">
+                        <mon-icon [iconSize]="10" iconName="check"></mon-icon> </ng-template
+                ></mat-vertical-stepper>
+            </div>
+            <div class="stepper-content">
+                <div class="content-wrapper">
+                    <form [formGroup]="terminationForm" *ngIf="changeStepper === step1">
+                        <div *ngIf="editMode; else headerElseBlock">
+                            <h2>{{languageStrings["primary.portal.member.editterminate.heading"]}}</h2>
+                        </div>
+                        <ng-template #headerElseBlock>
+                            <h2>{{languageStrings["primary.portal.member.terminate.terminationdetails"]}}</h2>
+                        </ng-template>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper reason-notes-width">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings["primary.portal.member.terminate.reason"]}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        placeholder="Select"
+                                        formControlName="reason"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let item of terminationList" [value]="item.id"
+                                            >{{item.name}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error
+                                        >{{languageStrings["primary.portal.commission.producer.addSplit.required"]}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings["primary.portal.member.terminate.date"]}}</mat-label
+                                >
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [attr.aria-label]="languageStrings['primary.portal.member.terminate.date']"
+                                        [matDatepicker]="picker"
+                                        matInput
+                                        [min]="terminationForm.get('displayValidPastDate').value"
+                                        [max]="terminationForm.get('displayValidFutureDate').value"
+                                        formControlName="date"
+                                        empoweredDateTransform
+                                        #datePickerInput
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                        <mon-icon
+                                            iconName="calendar-date"
+                                            [iconSize]="20"
+                                            matDatepickerToggleIcon
+                                            (click)="picker.open()"
+                                        ></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+
+                                    <mat-hint>{{languageStrings["primary.portal.common.dateHint"]}}</mat-hint>
+                                    <mat-error
+                                        *ngIf="terminationForm.get('date').hasError('required');else matDateError"
+                                        >{{languageStrings["primary.portal.commission.producer.addSplit.required"]}}</mat-error
+                                    >
+                                    <ng-template #matDateError>
+                                        <mat-error
+                                            *ngIf="terminationForm.get('date').hasError('matDatepickerMax') || terminationForm.get('date').hasError('matDatepickerMin') || terminationForm.get('date').hasError('invalid')"
+                                            >{{dateError}}
+                                        </mat-error>
+                                        <mat-error *ngIf="terminationForm.get('date').hasError('matDatepickerParse')"
+                                            >{{invalidDateError}}
+                                        </mat-error>
+                                    </ng-template>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper reason-notes-width">
+                                <mat-label class="mat-label">{{notesHeading}}</mat-label>
+                                <mat-form-field>
+                                    <textarea
+                                        [attr.aria-label]="languageStrings['primary.portal.member.terminate.notes']"
+                                        formControlName="notes"
+                                        matInput
+                                        class="mon-input"
+                                        class="textarea"
+                                    >
+                                    </textarea>
+                                    <mat-error *ngIf="terminationForm.get('notes').hasError('maxlength')"
+                                        >{{invalidComment}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </form>
+                    <div *ngIf="changeStepper === step2 && productList?.length>0">
+                        <form [formGroup]="coverageForm">
+                            <div *ngIf="!readOnly; else elseBlock">
+                                <h2>{{languageStrings["primary.portal.member.terminate.coveragedateheading"]}}</h2>
+                                <div class="mon-mt-30" *ngIf="productList?.length>1">
+                                    <mat-checkbox formControlName="coverageEnd" (change)="coverageChanged($event)">
+                                        <span>{{languageStrings["primary.portal.member.terminate.samedayend"]}}</span>
+                                    </mat-checkbox>
+                                </div>
+                                <div *ngIf="showCoverages">
+                                    <div class="field-wrapper coverage-date mon-mt-20">
+                                        <mat-label class="mat-label"
+                                            >{{languageStrings["primary.portal.member.terminate.coveragedate"]}}</mat-label
+                                        >
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [attr.aria-label]="languageStrings['primary.portal.member.terminate.coveragedate']"
+                                                [matDatepicker]="picker"
+                                                matInput
+                                                formControlName="endDate"
+                                                #datePickerInput
+                                                [min]="terminationForm.get('date').value"
+                                                [max]="fetchMaxDate()"
+                                                (dateChange)="coverageEndChange($event.target.value)"
+                                                empoweredDateTransform
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="picker">
+                                                <mon-icon
+                                                    iconName="calendar-date"
+                                                    [iconSize]="20"
+                                                    matDatepickerToggleIcon
+                                                    (click)="picker.open()"
+                                                ></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                            <mat-error
+                                                *ngIf="coverageForm.get('endDate').hasError('required');else matDateError"
+                                                >{{languageStrings["primary.portal.commission.producer.addSplit.required"]}}</mat-error
+                                            >
+                                            <ng-template #matDateError>
+                                                <mat-error
+                                                    *ngIf="coverageForm.get('endDate').hasError('matDatepickerMax') || coverageForm.get('endDate').hasError('matDatepickerMin') || coverageForm.get('endDate').hasError('invalid')"
+                                                    >{{dateError}}
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="coverageForm.get('endDate').hasError('matDatepickerParse')"
+                                                    >{{invalidDateError}}
+                                                </mat-error>
+                                            </ng-template>
+                                            <mat-hint>{{languageStrings["primary.portal.common.dateHint"]}}</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="field-wrapper" *ngIf="productList?.length>0">
+                                        <span
+                                            >{{languageStrings["primary.portal.member.terminate.affectedcoverage"]}}</span
+                                        >:
+                                    </div>
+                                    <ul *ngIf="productList?.length>0">
+                                        <li *ngFor="let product of productList">{{product.name}}</li>
+                                    </ul>
+                                </div>
+
+                                <div *ngIf="!showCoverages">
+                                    <table class="product-dates" formArrayName="productEndDates">
+                                        <thead>
+                                            <tr class="header">
+                                                <th>
+                                                    <span
+                                                        >{{languageStrings["primary.portal.member.terminate.coverage"]}}</span
+                                                    >
+                                                </th>
+                                                <th>
+                                                    <span
+                                                        >{{languageStrings["primary.portal.member.terminate.coveragedate"]}}</span
+                                                    >
+                                                    <span *ngIf="productList?.length>2"
+                                                        >(<span *ngIf="productList?.length>2"
+                                                            >{{languageStrings["primary.portal.common.dateHint"]}}</span
+                                                        >)</span
+                                                    >
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let productEndDate of coverageForm.get('productEndDates')['controls']; let i = index"
+                                                [formGroupName]="i"
+                                            >
+                                                <td><p>{{productEndDate.controls.name.value}}</p></td>
+                                                <td>
+                                                    <mat-form-field class="mon-date-field">
+                                                        <input
+                                                            [attr.aria-label]="languageStrings['primary.portal.member.terminate.date']"
+                                                            [matDatepicker]="picker1"
+                                                            matInput
+                                                            [min]="terminationForm.get('date').value"
+                                                            [max]="fetchMaxDate()"
+                                                            formControlName="date"
+                                                            #datePickerInput
+                                                            empoweredDateTransform
+                                                            (dateChange)="coverageDateChange(coverageForm.controls.productEndDates.controls[i].get('date').valid,coverageForm.controls.productEndDates.controls[i].get('date').value,i)"
+                                                        />
+                                                        <mat-datepicker-toggle matSuffix [for]="picker1">
+                                                            <mon-icon
+                                                                iconName="calendar-date"
+                                                                [iconSize]="20"
+                                                                matDatepickerToggleIcon
+                                                                (click)="picker1.open()"
+                                                            ></mon-icon>
+                                                        </mat-datepicker-toggle>
+                                                        <mat-datepicker #picker1></mat-datepicker>
+                                                        <mat-error
+                                                            *ngIf="coverageForm.controls.productEndDates.controls[i].get('date').hasError('invalid') || coverageForm.controls.productEndDates.controls[i].get('date').hasError('matDatepickerMin') || coverageForm.controls.productEndDates.controls[i].get('date').hasError('matDatepickerMax')"
+                                                        >
+                                                            {{productsError}}</mat-error
+                                                        >
+                                                        <mat-error
+                                                            *ngIf="coverageForm.controls.productEndDates.controls[i].get('date').hasError('matDatepickerParse') && coverageForm.controls.productEndDates.controls[i].get('date').value != null"
+                                                        >
+                                                            {{invalidDateError}}
+                                                        </mat-error>
+                                                        <mat-error
+                                                            *ngIf="coverageForm.controls.productEndDates.controls[i].get('date').value === null"
+                                                            >{{languageStrings["primary.portal.commission.producer.addSplit.required"]}}
+                                                        </mat-error>
+                                                        <mat-hint *ngIf="productList?.length==2"
+                                                            >{{languageStrings["primary.portal.common.dateHint"]}}</mat-hint
+                                                        >
+                                                    </mat-form-field>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <ng-template #elseBlock>
+                                <h2>{{languageStrings["primary.portal.member.terminate.reviewcoveragedate"]}}</h2>
+                                <div class="field-wrapper"><span>{{reviewCoverageHeader}}</span>:</div>
+                                <ul *ngIf="productList?.length>0">
+                                    <li *ngFor="let product of productList">{{product.name}} {{product.date}}</li>
+                                </ul>
+                            </ng-template>
+                        </form>
+                    </div>
+                    <div *ngIf="changeStepper === step3 && !editMode">
+                        <h2>
+                            {{confirmationheading}}
+                        </h2>
+                        <div [innerHtml]="confirmContent"></div>
+                    </div>
+                    <div>
+                        <mon-alert alertType="danger" *ngIf="errorMessage">
+                            <span>{{ errorMessage }}</span>
+                        </mon-alert>
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <div class="divider"></div>
+                    <div class="d-flex justify-content-between flex-fill align-items-center">
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                class="mon-btn-link"
+                                mat-dialog-close
+                                (click)="closeForm()"
+                                cdkFocusInitial
+                                >{{languageStrings["primary.portal.common.cancel"]}}</a
+                            >
+                        </div>
+                        <div>
+                            <button
+                                *ngIf="!(changeStepper === step1)"
+                                class="mon-btn-secondary"
+                                type="button"
+                                mat-flat-button
+                                (click)="onClickBack()"
+                            >
+                                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                                <span>{{languageStrings["primary.portal.common.back"]}}</span>
+                            </button>
+                            <span *ngIf="!editMode && (changeStepper === step1 || changeStepper === step2)">
+                                <button (click)="buttonClicked()" class="mon-btn-primary" type="button" mat-flat-button>
+                                    <span>{{languageStrings["primary.portal.common.next"]}}</span>
+                                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                                </button>
+                            </span>
+                            <span *ngIf="editMode && (changeStepper === step1) && productList?.length>0">
+                                <button (click)="buttonClicked()" class="mon-btn-primary" type="button" mat-flat-button>
+                                    <span>{{languageStrings["primary.portal.common.next"]}}</span>
+                                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                                </button>
+                            </span>
+                            <span *ngIf="editMode && productList?.length===0">
+                                <button class="mon-btn-primary" mat-flat-button (click)="onSubmit()">
+                                    {{languageStrings["primary.portal.common.save"]}}
+                                </button>
+                            </span>
+                            <span *ngIf="!editMode && changeStepper === step3">
+                                <button class="mon-btn-danger" mat-flat-button (click)="onSubmit()">
+                                    {{languageStrings["primary.portal.member.terminate.heading"]}}
+                                </button>
+                            </span>
+                            <span *ngIf="editMode && changeStepper === step2">
+                                <button class="mon-btn-primary" mat-flat-button (click)="onSubmit()">
+                                    {{languageStrings["primary.portal.common.save"]}}
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-dialog-content>
+    </div>
+</div>

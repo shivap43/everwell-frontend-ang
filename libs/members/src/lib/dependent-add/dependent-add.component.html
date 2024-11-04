@@ -1,0 +1,36 @@
+<div>
+    <div>
+        <div class="mon-px-30 mon-mt-30">
+            <a
+                href="javascript:void(0)"
+                (click)="backClick()"
+                class="mon-btn-link"
+                [attr.aria-label]="languageStrings.ariaBack"
+            >
+                {{languageStrings.ariaBack}}</a
+            >
+            <h1>
+                {{ dependentName }}
+            </h1>
+        </div>
+        <mat-tab-group #tabs [@.disabled]="true" (selectedIndexChange)="isTabChange($event)">
+            <mat-tab [label]="languageStrings.personal">
+                <ng-template matTabContent>
+                    <empowered-dependent-personal-info
+                        [routeMemberId]="memberId"
+                        [routeDependentId]="dependentId"
+                        (updateName)="updateName($event)"
+                        (dependentSaved)="enableContactTab($event)"
+                    >
+                    </empowered-dependent-personal-info>
+                </ng-template>
+            </mat-tab>
+            <mat-tab [label]="languageStrings.contact" [attr.disabled]="!isDependentSaved">
+                <ng-template matTabContent>
+                    <empowered-dependent-contact-info [isContactTab]="isContactTab"> </empowered-dependent-contact-info>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+        <router-outlet></router-outlet>
+    </div>
+</div>

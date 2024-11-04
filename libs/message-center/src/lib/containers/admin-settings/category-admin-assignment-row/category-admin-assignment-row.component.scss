@@ -1,0 +1,23 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: row;
+
+    .row {
+        width: 100%;
+
+        .col-8 {
+            display: flex;
+            align-items: center;
+
+            span {
+                padding-left: map-get($spacers, 20);
+            }
+        }
+    }
+
+    .remove-button {
+        color: get("color.info.danger.500");
+    }
+}

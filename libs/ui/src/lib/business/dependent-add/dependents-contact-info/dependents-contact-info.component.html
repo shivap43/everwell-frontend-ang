@@ -1,0 +1,321 @@
+<form [formGroup]="contactPreferenceForm">
+    <div class="flex-form-wrapper" [ngClass]="{'contact-info' : !isTpi}">
+        <h2>{{languageStrings.mainHeading}}</h2>
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+        <div class="flex-form-item mon-pb-40">
+            <div class="d-md-flex justify-content-between align-items-center">
+                <mat-label class="mat-label" for="phone-numbers" language="primary.portal.members.dependent.contactInfo.phoneNumbers">
+                </mat-label>
+                <div
+                    [matTooltipDisabled]="!(dependentContactPhoneNumbers && dependentContactPhoneNumbers['_value'].length >= 2)"
+                    [richTooltip]="languageStrings.phoneTooltip"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                >
+                    <button
+                        mat-flat-button
+                        class="mon-btn-link"
+                        (click)="openDialog('Phone','Add')"
+                        [attr.aria-label]="languageStrings.addPhone"
+                        [disabled]="dependentContactPhoneNumbers && dependentContactPhoneNumbers['_value'].length >= 2"
+                        *ngIf="dependentContactPhoneNumbers && dependentContactPhoneNumbers['_value'].length"
+                    >
+                        {{languageStrings.addPhone}}
+                    </button>
+                </div>
+            </div>
+            <button
+                mat-flat-button
+                class="mon-btn-link"
+                [attr.aria-label]="languageStrings.addPhone"
+                (click)="openDialog('Phone','Add')"
+                *ngIf="!(dependentContactPhoneNumbers && dependentContactPhoneNumbers['_value'].length)"
+            >
+                {{languageStrings.addPhone}}
+            </button>
+            <div>
+                <table
+                    mat-table
+                    [dataSource]="dependentContactPhoneNumbers"
+                    *ngIf="dependentContactPhoneNumbers && dependentContactPhoneNumbers['_value'].length"
+                >
+                    <ng-container matColumnDef="phoneNumber">
+                        <th *matHeaderCellDef mat-header-cell language="primary.portal.members.dependent.contactInfo.numberColumn"></th>
+                        <td *matCellDef="let phoneelement" mat-cell>{{phoneelement.phoneNumber | phone: country}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="extension">
+                        <th *matHeaderCellDef mat-header-cell language="primary.portal.members.dependent.contactInfo.extensionColumn"></th>
+                        <td *matCellDef="let phoneelement" mat-cell>{{phoneelement.extension}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="phoneType">
+                        <th *matHeaderCellDef mat-header-cell language="primary.portal.members.dependent.contactInfo.typeColumn"></th>
+                        <td *matCellDef="let phoneelement" mat-cell>{{phoneelement.type | titlecase}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="mobile">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.members.dependent.contactInfo.mobileColumn"></th>
+                        <td mat-cell *matCellDef="let phoneelement">
+                            <span *ngIf="phoneelement.isMobile">
+                                <mon-icon iconName="check" [iconSize]="15"></mon-icon>
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="verified">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.verifiedColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let phoneelement" mat-cell class="text-center"></td>
+                    </ng-container>
+                    <ng-container matColumnDef="isPrimary">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.primaryColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let phoneelement" mat-cell class="text-center">
+                            <mon-icon iconName="check" *ngIf="phoneelement.primary == true"></mon-icon>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="manage">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.manageColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let phoneelement; let i=index;" mat-cell class="text-center">
+                            <button [attr.aria-label]="languageStrings.ariaShowMenu" mat-icon-button [matMenuTriggerFor]="beforeMenu">
+                                <mon-icon
+                                    iconName="ellipsis"
+                                    class="more-option icon-primary"
+                                    [iconSize]="20"
+                                    [attr.aria-label]="languageStrings.ariaShowMenu"
+                                >
+                                </mon-icon>
+                            </button>
+                            <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                <button mat-menu-item mat-row (click)="openDialog('Phone','Edit',phoneelement,i)">
+                                    {{manageOptions[0]}}
+                                </button>
+                                <!-- Verify Manage option is temporarly hide its in TBD -->
+
+                                <!-- <button mat-menu-item mat-row>{{manageOptions[1]}}</button> -->
+                                <button
+                                    *ngIf="!phoneelement.primary"
+                                    mat-menu-item
+                                    mat-row
+                                    class="text-danger"
+                                    (click)="openDialog('Phone','Delete',phoneelement,i)"
+                                >
+                                    {{manageOptions[2]}}
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </ng-container>
+
+                    <tr *matHeaderRowDef="displayedPhoneColumns" mat-header-row></tr>
+                    <tr *matRowDef="let row; columns: displayedPhoneColumns;" mat-row></tr>
+                </table>
+
+                <!-- New zero state is introduced in MON-16217 so below code is commented -->
+
+                <!-- <div *ngIf="phoneData.length === 0" class="text-center mon-py-20"
+                    language="primary.portal.members.noRecord"></div> -->
+            </div>
+            <div class="d-md-flex justify-content-between mon-mt-30 align-items-center">
+                <mat-label class="mat-label" for="email" language="primary.portal.members.dependent.contactInfo.email"></mat-label>
+                <div
+                    [matTooltipDisabled]="!(dependentContactEmails && dependentContactEmails['_value'].length >= 2)"
+                    [richTooltip]="languageStrings.emailTooltip"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                >
+                    <button
+                        mat-flat-button
+                        class="mon-btn-link"
+                        (click)="openDialog('Email','Add')"
+                        [attr.aria-label]="languageStrings.addEmail"
+                        [disabled]="dependentContactEmails && dependentContactEmails['_value'].length >= 2"
+                        *ngIf="dependentContactEmails && dependentContactEmails['_value'].length"
+                    >
+                        {{languageStrings.addEmail}}
+                    </button>
+                </div>
+            </div>
+            <button
+                mat-flat-button
+                class="mon-btn-link"
+                (click)="openDialog('Email','Add')"
+                [attr.aria-label]="languageStrings.addEmail"
+                *ngIf="!(dependentContactEmails && dependentContactEmails['_value'].length)"
+            >
+                {{languageStrings.addEmail}}
+            </button>
+            <div>
+                <table
+                    [dataSource]="dependentContactEmails"
+                    mat-table
+                    *ngIf="dependentContactEmails && dependentContactEmails['_value'].length"
+                >
+                    <ng-container matColumnDef="emailAddress">
+                        <th *matHeaderCellDef mat-header-cell language="primary.portal.members.dependent.contactInfo.addressColumn"></th>
+                        <td *matCellDef="let emailelement" mat-cell>{{emailelement.email}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="emailType">
+                        <th *matHeaderCellDef mat-header-cell language="primary.portal.members.dependent.contactInfo.typeColumn"></th>
+                        <td *matCellDef="let emailelement" mat-cell>{{emailelement.type | titlecase}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="verified">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.verifiedColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let emailelement" mat-cell class="text-center"></td>
+                    </ng-container>
+                    <ng-container matColumnDef="isPrimary">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.primaryColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let emailelement" mat-cell class="text-center">
+                            <mon-icon iconName="check" *ngIf="emailelement.primary == true"></mon-icon>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="manage">
+                        <th
+                            *matHeaderCellDef
+                            mat-header-cell
+                            language="primary.portal.members.dependent.contactInfo.manageColumn"
+                            class="text-center"
+                        ></th>
+                        <td *matCellDef="let emailelement; let i=index;" mat-cell class="text-center">
+                            <button mat-icon-button [matMenuTriggerFor]="beforeMenu" [attr.aria-label]="languageStrings.ariaShowMenu">
+                                <mon-icon
+                                    iconName="ellipsis"
+                                    [iconSize]="20"
+                                    class="more-option icon-primary"
+                                    [attr.aria-label]="languageStrings.ariaShowMenu"
+                                >
+                                </mon-icon>
+                            </button>
+                            <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                <button mat-menu-item mat-row (click)="openDialog('Email','Edit',emailelement,i)">
+                                    {{manageOptions[0]}}
+                                </button>
+                                <!-- Verify Manage option is temporarly hide its in TBD -->
+
+                                <!-- <button mat-menu-item mat-row>{{manageOptions[1]}}</button> -->
+                                <button
+                                    *ngIf="!emailelement.primary"
+                                    mat-menu-item
+                                    mat-row
+                                    class="text-danger"
+                                    (click)="openDialog('Email','Delete',emailelement,i)"
+                                >
+                                    {{manageOptions[2]}}
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </ng-container>
+                    <tr *matHeaderRowDef="displayedEmailColumns" mat-header-row></tr>
+                    <tr *matRowDef="let row; columns: displayedEmailColumns;" mat-row></tr>
+                </table>
+
+                <!-- New zero state is introduced in MON-16217 so below code is commented -->
+
+                <!-- <div *ngIf="emailData.length === 0" class="text-center mon-py-20"
+                    language="primary.portal.members.noRecord"></div> -->
+            </div>
+        </div>
+        <div class="divider"></div>
+        <h2>{{languageStrings.contactPreferences}}</h2>
+        <div class="flex-form-item">
+            <div class="d-md-flex mon-mb-40">
+                <div class="flex-item w-200" *ngIf="hideFieldElementSetting.dependentContactPreference">
+                    <mat-label class="mat-label">
+                        <span language="primary.portal.members.dependent.contactInfo.method"></span>
+                        <span
+                            *ngIf="requiredFields && !isRequiredField('contactMethod')"
+                            class="optional-text"
+                            language="primary.portal.common.optional"
+                        ></span>
+                    </mat-label>
+                    <mat-form-field>
+                        <mat-select
+                            formControlName="contactMethod"
+                            [placeholder]="languageStrings.select"
+                            disableOptionCentering="true"
+                            [disabled]="readOnlyFieldElementSetting.dependentContactPreference"
+                        >
+                            <mat-option *ngFor="let contactpref of communicationPreference" value="{{ contactpref }}">
+                                {{ contactpref }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error
+                            *ngIf="contactPreferenceForm.get('contactMethod').hasError('required')"
+                            language="secondary.portal.members.selectionRequired"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item" *ngIf="hideFieldElementSetting.dependentTypeOfContact">
+                    <mat-label class="mat-label" *ngIf="contactFormControls.contactMethod.value == 'PHONE'">
+                        <span language="primary.portal.members.dependent.contactInfo.timeOfDay"></span>
+                        <span
+                            *ngIf="requiredFields && !isRequiredField('timeOfDay')"
+                            class="optional-text"
+                            language="primary.portal.common.optional"
+                        ></span>
+                    </mat-label>
+                    <mat-form-field *ngIf="contactFormControls.contactMethod.value == 'PHONE'">
+                        <mat-select
+                            formControlName="timeOfDay"
+                            [placeholder]="languageStrings.select"
+                            disableOptionCentering="true"
+                            [disabled]="readOnlyFieldElementSetting.dependentTypeOfContact"
+                        >
+                            <mat-option *ngFor="let contactTime of contactTimeOfDay" value="{{ contactTime }}">
+                                {{ contactTime }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error
+                            *ngIf="contactPreferenceForm.get('timeOfDay').hasError('required')"
+                            language="secondary.portal.members.selectionRequired"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="flex-form-footer fixed-position" *ngIf="!isTpi">
+        <button
+            type="button"
+            class="mon-btn-secondary mon-mr-30"
+            *ngIf="contactPreferenceForm.dirty && !isSaved"
+            mat-flat-button
+            (click)="revertForm()"
+            [attr.aria-label]="languageStrings.undoChanges"
+        >
+            {{languageStrings.undoChanges}}
+        </button>
+        <button
+            *ngIf="!isSaved"
+            class="mon-btn-primary"
+            [disabled]="!contactPreferenceForm.dirty"
+            [attr.aria-label]="languageStrings.ariaSave"
+            (click)="saveDependentContact()"
+            mat-flat-button
+            language="primary.portal.common.save"
+        ></button>
+        <button type="button" *ngIf="isSaved" mat-button class="mon-btn-success" [attr.aria-label]="languageStrings.ariaSaved">
+            <span><mon-icon class="check-icon" iconName="check" [iconSize]="19"></mon-icon></span>
+            <span language="primary.portal.common.saved"></span>
+        </button>
+    </footer>
+</form>

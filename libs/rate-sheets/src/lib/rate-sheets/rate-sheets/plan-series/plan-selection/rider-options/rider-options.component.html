@@ -1,0 +1,111 @@
+<form class="riders-container" [formGroup]="ridersForm">
+    <div *ngIf="options?.length > 0">
+        <span *ngIf="!options" class="default-section-text" language="primary.portal.ratesheet.defaultText"></span>
+        <ng-container *ngIf="(enableRiders$ | async) as enableRiders">
+            <div *ngFor="let riderData of options; let i = index" formArrayName="riders">
+                <div [formGroupName]="i">
+                    <mat-checkbox
+                        class="plans"
+                        [value]="riderData.planName"
+                        [disabled]="enableRiders[riderData.planName] === undefined"
+                        [richTooltip]="enableRiders[riderData.planName] === undefined ? (riderDisabledTooltip$ | async) : ''"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        formControlName="selected"
+                    >
+                        {{ riderData.planName }}
+                    </mat-checkbox>
+
+                    <div
+                        *ngIf="checkIfSpouseRiderSelected(riderData.planId); else otherPlans"
+                        class="rider-multiple-coverage-level-section"
+                    >
+                        <mat-label language="primary.portal.quoteShop.coverageLevel"></mat-label>
+
+                        <mat-radio-group class="multiple-riders" formControlName="coverageLevelOption">
+                            <mat-radio-button
+                                [value]="riderOptionSelected.COMBINED"
+                                checked
+                                class="radio-option"
+                                [disabled]="disableCombined"
+                                >{{riderOptionSelected.COMBINED}}</mat-radio-button
+                            >
+
+                            <mat-radio-button [value]="riderOptionSelected.CUSTOM" class="radio-option" [disabled]="disableCustom"
+                                >{{riderOptionSelected.CUSTOM}}</mat-radio-button
+                            >
+                        </mat-radio-group>
+                        <ng-container *ngIf="(planValueChanges | async) as plans">
+                            <div
+                                formArrayName="spouseCoverageLevel"
+                                *ngIf="plans.length > 0 && showRiderCoverageLevels"
+                                class="spouse-rider-custom-option"
+                            >
+                                <div *ngFor="let plan of plans;let i = index" class="rider-multiple-coverage-level-section">
+                                    <mat-label>{{plan.shortName}}</mat-label>
+                                    <ng-container *ngFor="let rider of selectedPlansWithRiders[i]?.riders">
+                                        <mat-form-field *ngIf="checkIfSpouseRiderSelected(rider.planId)" class="width-fit-rider-name">
+                                            <mat-select formControlName="{{i}}" [disabled]="rider?.coverageLevelOptions?.length === 1">
+                                                <mat-option *ngFor="let riderData of rider.coverageLevelOptions" [value]="riderData.name">
+                                                    <span>{{ riderData.name }}</span>
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <ng-template #otherPlans>
+                        <div class="rider-params-container">
+                            <div *ngIf="riderData.coverageLevelOptions?.length > 1">
+                                <mat-label language="primary.portal.quoteShop.coverageLevel"></mat-label>
+                                <mat-form-field>
+                                    <mat-select formControlName="coverageLevel">
+                                        <mat-option *ngFor="let option of riderData.coverageLevelOptions" [value]="option.name">
+                                            <span>{{ option.name }}</span>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <div *ngIf="riderData.benefitAmounts?.length > 1" class="rider-multiple-coverage-level-section">
+                        <mat-label language="primary.portal.editCoverage.benefitamount"></mat-label>
+                        <mat-form-field>
+                            <mat-select formControlName="benefitAmount" [placeholder]="riderData.benefitAmounts[0].amount | currency">
+                                <mat-option *ngFor="let option of riderData.benefitAmounts" [value]="option.amount">
+                                    <span>{{ option.amount | currency }}</span>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="riderData.spouseGenders?.length > 1" class="rider-multiple-coverage-level-section">
+                        <mat-label language="primary.portal.quickQuote.missingInfo.SPOUSE_GENDER"></mat-label>
+                        <mat-form-field>
+                            <mat-select formControlName="spouseGender">
+                                <mat-option *ngFor="let option of riderData.spouseGenders" [value]="option">
+                                    <span>{{ option }}</span>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="riderData.spouseTobaccoStatuses?.length > 1" class="rider-multiple-coverage-level-section">
+                        <mat-label language="primary.portal.ratesheet.tobaccoStatus"></mat-label>
+                        <mat-form-field>
+                            <mat-select formControlName="spouseTobaccoStatus">
+                                <mat-option *ngFor="let option of riderData.spouseTobaccoStatuses" [value]="option">
+                                    <span>{{ option }}</span>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</form>

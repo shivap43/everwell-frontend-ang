@@ -1,0 +1,89 @@
+@import "shared";
+
+.plan-selection {
+    margin-left: map-get($spacers, 30);
+    margin-right: map-get($spacers, 30);
+    .added-text {
+        color: get("color.white");
+    }
+}
+.plans-container,
+.coverage-level-container,
+.elimination-period-container,
+.benefit-amount-container,
+.plan-type-container {
+    width: max-content;
+    margin-bottom: map-get($spacers, 20);
+
+    .plans {
+        font-size: convert-unit(16px, "rem");
+        margin-bottom: map-get($spacers, 10);
+        ::ng-deep .mat-list-option {
+            width: fit-content;
+            pointer-events: all;
+            .mat-list-item-content {
+                .mat-pseudo-checkbox-checked {
+                    background-color: get("color.gray.800");
+                }
+                .mat-pseudo-checkbox-disabled {
+                    background-color: get("color.gray.300");
+                }
+            }
+            &.mat-list-item-disabled {
+                background: none;
+                .mat-list-text {
+                    color: get("color.gray.600");
+                }
+            }
+            &:hover {
+                background: none;
+            }
+            &:focus {
+                background: none;
+            }
+            &.error {
+                .mat-list-item-content {
+                    .mat-pseudo-checkbox {
+                        background-color: get("color.info.danger.500") !important;
+                    }
+                    color: get("color.info.danger.500") !important;
+                }
+            }
+        }
+    }
+}
+
+.default-section-text {
+    font-weight: 400;
+    font-size: convert-unit(16px, "rem");
+    line-height: convert-unit(22px, "rem");
+    color: get("color.gray.700");
+}
+
+.mat-expansion-panel-header-title {
+    margin-right: map-get($spacers, 0);
+    margin-left: map-get($spacers, 10);
+}
+
+.mat-expanded {
+    border-top: convert-unit(1px, "rem") solid get("color.black");
+    border-bottom: convert-unit(1px, "rem") solid get("color.black");
+}
+
+.elimination-period-list {
+    font-size: convert-unit(16px, "rem");
+    margin-bottom: map-get($spacers, 10);
+}
+
+.benefit-amount-list {
+    font-size: convert-unit(16px, "rem");
+    margin-bottom: map-get($spacers, 10);
+}
+
+.plans-container {
+    margin-top: map-get($spacers, 20);
+}
+
+.error-alert {
+    margin-bottom: map-get($spacers, 10);
+}

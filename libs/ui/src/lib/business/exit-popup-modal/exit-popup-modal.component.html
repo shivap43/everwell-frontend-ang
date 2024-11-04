@@ -1,0 +1,16 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span>{{languageStrings['primary.portal.tpi.exitTitle']}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div class="done-btn">
+            <button mat-flat-button class="mon-btn-primary" (click)="onExitConfirm()">
+                {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <ng-container *ngIf="modalData.ssoToShop"> {{languageStrings['primary.portal.tpiEnrollment.selectionsSaved']}} </ng-container>
+        <ng-container *ngIf="!modalData.ssoToShop"> {{languageStrings['primary.portal.tpiEnrollment.selectionsNotSaved']}} </ng-container>
+    </div>
+</empowered-modal>

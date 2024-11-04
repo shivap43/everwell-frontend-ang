@@ -1,0 +1,126 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="row" *ngIf="apiError">
+    <div class="col top-padding">
+        <h2></h2>
+        <mon-alert alertType="danger" class="error-block" iconAltText="Error" closeButton="true" iconAltText="Close error alert">
+            <span>{{languageStrings[languageKeys.genericAPIError]}}</span>
+        </mon-alert>
+    </div>
+</div>
+
+<form [formGroup]="formGroup" (ngSubmit)="onSaveAndSubmit()" #paymentSettingForm="ngForm">
+    <h2 [attr.aria-label]="languageStrings[languageKeys.paymentSettings]" *ngIf="!isModalMode">
+        {{ languageStrings[languageKeys.paymentSettings] }}
+    </h2>
+    <h3 [attr.aria-label]="languageStrings[languageKeys.paymentSettings]" *ngIf="isModalMode" class="mon-mt-0 mb-30">
+        {{ languageStrings[languageKeys.paymentSettings] }}
+    </h3>
+
+    <div class="row">
+        <div class="col-3">
+            <empowered-deduction-frequency
+                [formControlName]="formKeys.deductionFrequency"
+                ngDefaultControl
+                (inputChange)="onDeductionFrequencyChange($event)"
+            >
+                <mat-error *ngIf="formGroup.controls[formKeys.deductionFrequency].errors?.required"
+                    >{{languageStrings[languageKeys.requiredField]}}</mat-error
+                >
+            </empowered-deduction-frequency>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <empowered-payment-date [formControlName]="formKeys.paymentDate" ngDefaultControl (inputChange)="onPaymentDateChange($event)">
+                <mat-error *ngIf="formGroup.controls[formKeys.paymentDate].errors?.required"
+                    >{{languageStrings[languageKeys.requiredField]}}</mat-error
+                >
+                <mat-error
+                    *ngIf="formGroup.controls[formKeys.paymentDate].errors?.min || formGroup.controls[formKeys.paymentDate].errors?.max"
+                >
+                    {{languageStrings[languageKeys.invalidDate]}}</mat-error
+                >
+            </empowered-payment-date>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mon-mb-5">
+            <empowered-payment-acknowledgement-checkbox
+                [formControlName]="formKeys.paymentAcknowledgement"
+                ngDefaultControl
+                (inputChange)="onCheckboxChange($event)"
+            >
+            </empowered-payment-acknowledgement-checkbox>
+            <mat-error *ngIf="formGroup.controls[formKeys.paymentAcknowledgement].errors?.required"
+                >{{languageStrings[languageKeys.selectionRequired]}}
+            </mat-error>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-3">
+            <empowered-esignature
+                *ngIf="isFaceToFace"
+                [control]="formGroup.controls.eSignature"
+                [label]="languageStrings[languageKeys.eSignature]"
+                [formControlName]="formKeys.eSignature"
+                ngDefaultControl
+                (inputChange)="onSignatureChange($event)"
+            >
+                <mat-error *ngIf="formGroup.controls[formKeys.eSignature].errors?.required"
+                    >{{languageStrings[languageKeys.eSignatureRequired]}}</mat-error
+                >
+                <mat-error
+                    *ngIf="formGroup.controls[formKeys.eSignature]?.errors?.minlength && !formGroup.controls[formKeys.eSignature]?.errors?.pattern"
+                >
+                    {{languageStrings[languageKeys.leastChar]}}
+                </mat-error>
+                <mat-error
+                    *ngIf="formGroup.controls[formKeys.eSignature]?.errors?.maxlength && !formGroup.controls[formKeys.eSignature]?.errors?.pattern"
+                >
+                    {{languageStrings[languageKeys.maxChar]}}
+                </mat-error>
+                <mat-error *ngIf="formGroup.controls[formKeys.eSignature]?.errors?.pattern">
+                    {{languageStrings[languageKeys.invalidFormat]}}</mat-error
+                >
+            </empowered-esignature>
+            <empowered-esignature
+                *ngIf="isPinSignature"
+                [control]="formGroup.controls.pinSignature"
+                [label]="languageStrings[languageKeys.pinSignature]"
+                [formControlName]="formKeys.pinSignature"
+                ngDefaultControl
+                (inputChange)="onSignatureChange($event)"
+            >
+                <mat-error *ngIf="formGroup.controls[formKeys.pinSignature].errors?.required"
+                    >{{languageStrings[languageKeys.pinRequired]}}</mat-error
+                >
+                <mat-error
+                    *ngIf="formGroup.controls[formKeys.pinSignature]?.errors?.minlength && !formGroup.controls[formKeys.pinSignature]?.errors?.pattern"
+                >
+                    {{languageStrings[languageKeys.leastChar]}}
+                </mat-error>
+                <mat-error
+                    *ngIf="formGroup.controls[formKeys.pinSignature]?.errors?.maxlength && !formGroup.controls[formKeys.pinSignature]?.errors?.pattern"
+                >
+                    {{languageStrings[languageKeys.pinMaxChar]}}
+                </mat-error>
+                <mat-error *ngIf="formGroup.controls[formKeys.pinSignature]?.errors?.pattern">
+                    {{languageStrings[languageKeys.pinInvalidFormat]}}</mat-error
+                >
+            </empowered-esignature>
+            <empowered-esignature
+                *ngIf="isHeadset"
+                [control]="formGroup.controls.eSignature"
+                [label]="languageStrings[languageKeys.eSignature]"
+                [formControlName]="formKeys.eSignature"
+                ngDefaultControl
+                (inputChange)="onSignatureChange($event)"
+                [disabled]="isHeadset"
+            >
+            </empowered-esignature>
+            <p *ngIf="isHeadset" language="primary.portal.applicationFlow.signatureLater"></p>
+        </div>
+    </div>
+</form>

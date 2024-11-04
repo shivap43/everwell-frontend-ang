@@ -1,0 +1,32 @@
+<div class="dialog-content effective-date">
+    <h2>{{languageStrings['primary.portal.maintenanceBenefitsOffering.effectiveDate.title']}}</h2>
+    <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.effectiveDate.subTitle']}}</p>
+    <div class="date-wrapper">
+        <mat-label class="mat-label"
+            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.effectiveDate.effectiveDateLabel']}}</mat-label
+        >
+        <mat-form-field class="mon-date-field">
+            <input
+                [matDatepicker]="effectiveDate"
+                matInput
+                empoweredDateTransform
+                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.effectiveDate.effectiveDateLabel']"
+            />
+            <mat-datepicker #effectiveDate></mat-datepicker>
+            <mat-datepicker-toggle matSuffix (click)="effectiveDate.open()">
+                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+            </mat-datepicker-toggle>
+            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+        </mat-form-field>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <button class="mon-btn-link" mat-flat-button>
+        {{languageStrings['primary.portal.common.cancel']}}
+    </button>
+    <button mat-flat-button class="mon-btn-primary" type="button" (click)="onNext()">
+        <span>{{languageStrings['primary.portal.common.next']}}</span>
+        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+    </button>
+</div>

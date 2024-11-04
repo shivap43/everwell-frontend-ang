@@ -1,0 +1,66 @@
+@import "shared";
+
+:host {
+    padding-right: map-get($spacers, 20);
+}
+
+.pill-filter-label-active {
+    &:focus {
+        background-color: get("color.gray.900");
+    }
+    &.pill-filter-label-pressed {
+        background-color: get("color.gray.1000");
+    }
+}
+
+.pill-filter-label-inactive {
+    &:focus {
+        background-color: get("color.gray.300");
+    }
+    &.pill-filter-label-pressed {
+        background-color: get("color.gray.500");
+        @include fontFace("primary.light");
+        color: get("color.black");
+    }
+}
+
+.pill-filter-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pill-filter-panel-panels {
+    flex: 0 1 auto;
+    overflow: auto;
+    padding: map-get($spacers, 20);
+    padding-bottom: map-get($spacers, 0);
+}
+
+.mat-divider {
+    margin-top: map-get($spacers, 20) !important;
+    padding-bottom: map-get($spacers, 20) !important;
+}
+
+.pill-filter-panel-controls {
+    display: flex;
+    flex-direction: row-reverse;
+    padding: map-get($spacers, 20);
+    padding-top: map-get($spacers, 25);
+
+    &.can-reset {
+        justify-content: space-between;
+    }
+
+    &:not(.can-reset) {
+        justify-content: flex-start;
+    }
+
+    &.multi {
+        padding-top: map-get($spacers, 15);
+    }
+
+    .filter-reset {
+        font-size: convert-unit(14px, "rem");
+    }
+}

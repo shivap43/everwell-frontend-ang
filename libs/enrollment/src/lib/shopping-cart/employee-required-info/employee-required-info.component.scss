@@ -1,0 +1,115 @@
+@import "shared";
+
+.quasi-modal {
+    .modal-header {
+        h2 {
+            margin: 0;
+        }
+    }
+
+    .mat-dialog-content {
+        .content-wrapper {
+            height: calc(100vh - 352px) !important;
+
+            h3 {
+                margin-bottom: 0;
+            }
+
+            p {
+                margin-bottom: convert-unit(30px, "rem");
+            }
+
+            .mat-radio-group {
+                display: flex;
+                flex-flow: column wrap;
+                margin-bottom: convert-unit(20px, "rem");
+
+                .mat-radio-button {
+                    &:first-child {
+                        margin-top: convert-unit(5px, "rem");
+                    }
+
+                    margin-top: convert-unit(10px, "rem");
+                }
+            }
+
+            .policy-delivery-hint {
+                font-size: convert-unit(14px, "rem");
+                line-height: normal;
+                margin-top: map-get($spacers, 5);
+            }
+
+            .isMobileCheckbox {
+                display: flex;
+                align-items: center;
+            }
+
+            .mon-icon {
+                margin: 0;
+                vertical-align: sub;
+                height: convert-unit(17px, "rem");
+            }
+        }
+
+        .consent-hdr {
+            font-size: convert-unit(22px, "rem");
+            @include fontFace("primary.light");
+            color: get("color.gray.700");
+            margin-bottom: map-get($spacers, 15);
+        }
+
+        .mon-consent-content {
+            height: convert-unit(250px, "rem");
+            overflow: auto;
+            margin-bottom: map-get($spacers, 20);
+        }
+
+        .applicant-email-wrp {
+            display: inline-flex;
+
+            ::ng-deep .mat-form-field-flex {
+                width: convert-unit(300px, "rem");
+                margin-right: map-get($spacers, 20);
+            }
+        }
+
+        .field-wrapper-ssn {
+            margin-top: convert-unit(17px, "rem");
+        }
+
+        .acknowledgement-checkbox {
+            ::ng-deep .mat-checkbox-layout {
+                white-space: normal;
+                margin-top: map-get($spacers, 20);
+                .mat-checkbox-inner-container {
+                    margin-top: map-get($spacers, 5);
+                }
+            }
+        }
+    }
+
+    .mat-dialog-actions {
+        .footer-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1 1 auto;
+        }
+    }
+
+    .consent-email-sent {
+        ::ng-deep .mat-icon.mat-primary {
+            color: get("color.info.success");
+            vertical-align: bottom;
+        }
+    }
+
+    .job-duties {
+        background-color: get("color.gray.300");
+        text-overflow: ellipsis;
+
+        &::placeholder {
+            color: get("color.gray.700");
+        }
+    }
+}

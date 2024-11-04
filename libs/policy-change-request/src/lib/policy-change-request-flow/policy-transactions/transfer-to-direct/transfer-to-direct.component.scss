@@ -1,0 +1,115 @@
+@import "shared";
+
+.transfer-direct-checkbox {
+    display: flex;
+    ::ng-deep .mat-checkbox-layout {
+        white-space: normal;
+    }
+}
+
+.divider {
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+}
+.alert-message {
+    width: fit-content;
+    margin-top: map-get($spacers, 0);
+    ::ng-deep .alert-danger {
+        margin-top: map-get($spacers, 0);
+    }
+}
+.policy-checkbox {
+    flex: 1;
+}
+.view-details {
+    .bank-draft,
+    .credit-card {
+        display: flex;
+        align-items: baseline;
+        padding-bottom: map-get($spacers, 10);
+        .label {
+            font-size: convert-unit(16px, "rem");
+            width: convert-unit(120px, "rem");
+            color: get("color.black");
+            @include fontFace("primary.bold");
+            line-height: convert-unit(22px, "rem");
+        }
+        .view-data {
+            width: convert-unit(195px, "rem");
+            padding-left: convert-unit(30px, "rem");
+        }
+    }
+
+    .section-container {
+        .header {
+            h2 {
+                line-height: map-get($spacers, 35);
+            }
+        }
+    }
+}
+.edit-account {
+    margin-top: map-get($spacers, 10);
+    margin-bottom: map-get($spacers, 15);
+}
+.delete-account {
+    color: get("color.info.danger.500");
+    margin-bottom: map-get($spacers, 20);
+}
+
+.card-expiration-error {
+    color: get("color.info.danger.500");
+    position: relative;
+    top: 1px;
+}
+
+.card-expired-block {
+    width: convert-unit(654px, "rem");
+    height: convert-unit(44px, "rem");
+    margin-bottom: map-get($spacers, 20);
+
+    ::ng-deep .mon-alert {
+        margin-top: map-get($spacers, 0);
+    }
+}
+
+.card-expired-message {
+    font-size: convert-unit(14px, "rem");
+}
+.authorized-agreement {
+    margin-bottom: map-get($spacers, 25);
+}
+.icon-danger {
+    position: relative;
+    top: 2px;
+}
+@media (min-width: 992px) {
+    .street-address {
+        width: convert-unit(440px, "rem");
+    }
+    .state,
+    .zip {
+        width: convert-unit(100px, "rem");
+        margin-left: map-get($spacers, 10);
+    }
+    .billing-mode {
+        width: convert-unit(110px, "rem");
+    }
+    .deduction-date-per-period {
+        margin-left: map-get($spacers, 10);
+    }
+}
+:host {
+    ::ng-deep {
+        .flex-form-wrapper .mon-alert {
+            margin-top: 0;
+        }
+    }
+}
+.ach-information-alert {
+    width: convert-unit(530px, "rem");
+    margin-bottom: convert-unit(16px, "rem");
+}
+.radio-wrapper {
+    display: flex;
+    flex-direction: row;
+}

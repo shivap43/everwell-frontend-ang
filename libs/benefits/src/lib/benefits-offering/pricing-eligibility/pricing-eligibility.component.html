@@ -1,0 +1,59 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="plan-heading mon-m-30">
+    <span>
+        <mon-icon class="icon-left icon-primary" iconName="left" [iconSize]="12"></mon-icon>
+    </span>
+    <a
+        mat-flat-button
+        class="mon-btn-link"
+        (click)="gotoPlanList()"
+        [attr.aria-label]="languageStrings['primary.portal.planList.title']"
+        >{{languageStrings['primary.portal.planList.title']}}</a
+    >
+    <h2 class="planname">{{planName}}</h2>
+    <p>{{effectiveStarting | date :'MM/dd/yyyy'}} - {{expiresAfter | date :'MM/dd/yyyy'}}</p>
+</div>
+<empowered-set-classes-regions
+    [regionList]="allRegions"
+    [classList]="allClasses"
+    [riskClassList]="allRiskClasses"
+    [undoOrCancel]="undoOrCancel"
+    (emitNewEmployeeCombinations)="createEmployeeCombinations($event)"
+    (emitEmployeeCombinations)="storeEmployeeCombinations($event)"
+    (emitdisplaySetPricing)="displaySetPricingState($event)"
+    (emitshowCombinationPopup)="showCombinationPopup($event)"
+    [isEditPricesFlag]="isEditPricesFlag"
+>
+</empowered-set-classes-regions>
+<empowered-set-pricing
+    [isPopupRequired]="isPopupRequired"
+    *ngIf="isDisplaySetPricing"
+    [employeeCategoryCombinations]="employeeCombinations"
+    [newEmployeeCategoryCombinations]="newEmployeeCombinations"
+    (emitCancelAction)="revertCombinations($event)"
+    (emitEditActionFlag)="setEditFlag($event)"
+>
+</empowered-set-pricing>
+
+<div *ngIf="isDisplaySetPricing" class="pricing-elibigility-btn d-flex justify-content-end mon-m-30">
+    <button
+        class="mon-btn-secondary"
+        *ngIf="isPreviousDisplay"
+        (click)="previousPlan()"
+        mat-flat-button
+        [attr.aria-label]="languageStrings['primary.portal.common.previousPlan']"
+    >
+        <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+        {{languageStrings['primary.portal.common.previousPlan']}}
+    </button>
+    <button
+        (click)="nextPlan()"
+        *ngIf="isNextDisplay"
+        class="mon-btn-primary mon-ml-20"
+        mat-flat-button
+        [attr.aria-label]="languageStrings['primary.portal.common.nextPlan']"
+    >
+        {{languageStrings['primary.portal.common.nextPlan']}}
+        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+    </button>
+</div>

@@ -1,0 +1,106 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<empowered-tpi-secondary-header>
+    {{languageStrings['primary.portal.tpiEnrollment.commissionSplit']}}
+</empowered-tpi-secondary-header>
+<form [formGroup]="commisionSplitForm" class="tpi-content-wrapper">
+    <div class="tpi-content">
+        <div *ngIf="errorMessage" class="mon-mb-20">
+            <mon-alert alertType="danger">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+        </div>
+        <div class="flex-form-wrapper">
+            <div class="info-text">{{languageStrings['primary.portal.tpiEnrollment.commissionPercentage']}}</div>
+            <div class="split-text">
+                {{commissionName}} {{languageStrings['primary.portal.tpiEnrollment.defaultSplit']}}
+            </div>
+            <div class="split-text">{{languageStrings['primary.portal.tpiEnrollment.split']}}</div>
+            <div class="split-wrapper">
+                <div class="flex-item">
+                    <mat-label id="producer">{{languageStrings['primary.portal.tpiEnrollment.producer']}}</mat-label>
+                    <mat-form-field>
+                        <mat-select
+                            formControlName="producerName"
+                            [disableOptionCentering]="true"
+                            aria-labelledby="producer"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        >
+                            <mat-option *ngFor="let default of defaultCommision" value="{{default.defaultFor.name}}">
+                                {{default.defaultFor.name}}</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label id="percent">{{languageStrings['primary.portal.tpiEnrollment.percentage']}}</mat-label>
+                    <mat-form-field>
+                        <mat-select
+                            formControlName="percentage"
+                            [disableOptionCentering]="true"
+                            aria-labelledby="percent"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        >
+                            <mat-option
+                                *ngFor="let default of defaultCommision"
+                                value="{{default.assignments[0].percent}}%"
+                            >
+                                {{default.assignments[0].percent}}%</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label id="writing-number"
+                        >{{languageStrings['primary.portal.tpiEnrollment.writingNumber']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            formControlName="writingNumber"
+                            [disableOptionCentering]="true"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            aria-labelledby="writing-number"
+                            (selectionChange)="mapSitCodeInDropdown($event)"
+                        >
+                            <mat-option *ngFor="let writing of writingNumbers" value="{{writing.number}}"
+                                >{{writing.number}}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error>{{languageStrings['primary.portal.tpiEnrollment.selectionRequired']}}</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label id="sit-code">{{languageStrings['primary.portal.tpiEnrollment.sitCode']}}</mat-label>
+                    <mat-form-field>
+                        <mat-select
+                            formControlName="sitCode"
+                            [disableOptionCentering]="true"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            aria-labelledby="sit-code"
+                        >
+                            <mat-option *ngFor="let item of sitCodes" [value]="item.id">{{item.code}}</mat-option>
+                        </mat-select>
+                        <mat-error>{{languageStrings['primary.portal.tpiEnrollment.selectionRequired']}}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <empowered-tpi-footer class="tpi-footer">
+        <div *ngIf="!tpiLnlMode">
+            <a
+                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-flat-button
+                (click)="onExit()"
+            >
+                {{languageStrings['primary.portal.tpiEnrollment.exit']}}
+            </a>
+        </div>
+        <div>
+            <button mat-button class="mon-btn-primary" (click)="onSumbit()">
+                {{languageStrings['primary.portal.common.continue']}}
+            </button>
+        </div>
+    </empowered-tpi-footer>
+</form>

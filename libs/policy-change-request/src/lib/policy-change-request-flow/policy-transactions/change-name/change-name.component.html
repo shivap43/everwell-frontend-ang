@@ -1,0 +1,411 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content change-name">
+    <form [formGroup]="changeNameForm">
+        <div class="flex-form-wrapper mon-px-30 mon-mb-20">
+            <h3>{{languageStrings["primary.portal.policyChangeRequest.transactions.changeName.header"]}}</h3>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.changeName.title"></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select class="mon-input" placeholder="Select" formControlName="title">
+                                <mat-option *ngFor="let item of titleList" value="{{item}}" title="{{item}}">
+                                    {{item}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div formGroupName="name" class="d-md-flex">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeName.firstName"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    formControlName="firstName"
+                                    (blur)="setValidationOnNameChange()"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.firstName']"
+                                />
+                                <mat-error *ngIf="nameControl['firstName'].hasError('required')">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['firstName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(nameControl['firstName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['firstName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(nameControl['firstName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['firstName'].errors?.length"
+                                    language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.policyChangeRequest.transactions.changeName.mi"></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    formControlName="middleName"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.mi']"
+                                />
+                            </mat-form-field>
+                            <mat-error
+                                *ngIf="nameControl['middleName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(nameControl['middleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="nameControl['middleName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(nameControl['middleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="nameControl['middleName'].errors?.length"
+                                language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                            >
+                            </mat-error>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeName.lastName"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    formControlName="lastName"
+                                    (blur)="setValidationOnNameChange()"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.lastName']"
+                                />
+                                <mat-error *ngIf="nameControl['lastName'].hasError('required')">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['lastName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(nameControl['lastName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['lastName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(nameControl['lastName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="nameControl['lastName'].errors?.length"
+                                    language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeName.suffix"
+                                ></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select placeholder="Select" class="mon-input" formControlName="suffix">
+                                    <mat-option
+                                        *ngFor="let item of suffixes$ | async"
+                                        value="{{item}}"
+                                        title="{{item}}"
+                                    >
+                                        {{item}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.header"
+                            >
+                            </span>
+                        </mat-label>
+                        <mat-checkbox
+                            [value]="isBillingNameSame"
+                            [checked]="isBillingNameSame"
+                            id="isCheckBox"
+                            (change)="addBillingName($event.checked, true)"
+                        >
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.sameAsAbove"
+                            ></span>
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!isBillingNameSame" class="mon-mt-20">
+                <div formGroupName="billingName" class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.firstName"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="billingFirstName"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.billingName.firstName']"
+                            />
+                            <mat-error *ngIf="(billingNameControl['billingFirstName'].errors?.required)">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingFirstName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingNameControl['billingFirstName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingFirstName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingNameControl['billingFirstName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingFirstName'].errors?.length"
+                                language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.mi"
+                            ></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="billingMiddleName"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.billingName.mi']"
+                            />
+                            <mat-error
+                                *ngIf="billingNameControl['billingMiddleName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingNameControl['billingMiddleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingMiddleName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingNameControl['billingMiddleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingMiddleName'].errors?.length"
+                                language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.lastName"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="billingLastName"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.billingName.lastName']"
+                            />
+                            <mat-error *ngIf="(billingNameControl['billingLastName'].errors?.required)">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingLastName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingNameControl['billingLastName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingLastName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingNameControl['billingLastName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingNameControl['billingLastName'].errors?.length"
+                                language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.billingName.suffix"
+                            ></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" class="mon-input" formControlName="billingSuffix">
+                                <mat-option *ngFor="let item of suffixes$ | async" value="{{item}}" title="{{item}}">
+                                    {{item}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex mon-mt-20">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.reasonForChange"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" class="mon-input" formControlName="reasonForChange">
+                                <mat-option *ngFor="let item of reasonForChangeList" value="{{item}}" title="{{item}}">
+                                    {{item}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="(formControl['reasonForChange'].errors?.required)">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.selectionRequired"
+                                ></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.supportiveDocs"
+                            ></span>
+                            <div
+                                *ngIf="(formControl['documentIds'].errors?.required || isShowTooltip); then requiredDocs else optionalDocs"
+                            ></div>
+                            <ng-template #optionalDocs>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </ng-template>
+                            <ng-template #requiredDocs>
+                                <span>
+                                    <a
+                                        href="javascript:void(0)"
+                                        [richTooltip]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.supportiveDocsTooltip']"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeName.supportiveDocsTooltip']"
+                                    >
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            [iconSize]="17"
+                                            class="username-info-icon icon-primary"
+                                        >
+                                        </mon-icon>
+                                    </a>
+                                </span>
+                            </ng-template>
+                            <div class="pcr-fileupload">
+                                <empowered-pcr-file-upload
+                                    [uploadApi]="uploadApi"
+                                    [isFileUploadFromTransaction]="true"
+                                    [documentIds]="documentIds"
+                                    [newDocumentIds]="documentIdArray"
+                                    [formId]="formId"
+                                    [mpGroup]="mpGroup"
+                                    [memberId]="memberId"
+                                    [cifNumber]="cifNumber"
+                                    (getDocumentId)="getDocumentId($event)"
+                                    (removeDocument)="removeDocument($event)"
+                                >
+                                </empowered-pcr-file-upload>
+                            </div>
+                        </mat-label>
+                        <mat-error
+                            *ngIf="isSupportiveDocumentsRequired && (formControl['documentIds'].errors?.required)"
+                        >
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeName.validationError.supportiveDocsRequired"
+                            ></span>
+                        </mat-error>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-md-flex mon-mt-20">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeName.effectiveDate"
+                                ></span>
+                            </mat-label>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span>{{formControl["effectiveDate"].value | date: 'MM/dd/yyyy'}}</span>
+                            </mat-label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="submitChangeNameRequest()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

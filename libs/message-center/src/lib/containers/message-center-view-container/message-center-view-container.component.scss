@@ -1,0 +1,45 @@
+@import "shared";
+
+:host {
+    flex: 1;
+    & > div {
+        padding: map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 30) map-get($spacers, 30)
+    }
+}
+
+::ng-deep h1 {
+    display: flex;
+
+    .cls-1 {
+        fill: get("color.gray.600");
+    }
+}
+
+.hide {
+    display: none;
+}
+
+.function-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.function-bar-filter {
+    display: flex;
+    flex-direction: column;
+
+    &.search-bar {
+        padding-top: map-get($spacers, 15);
+    }
+
+    &.pill-container {
+        justify-content: center;
+        padding-left: map-get($spacers, 30);
+    }
+}
+
+.manage-menu {
+    cursor: pointer;
+}

@@ -1,0 +1,165 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+}
+
+::ng-deep .census-manual-entry {
+    .mat-dialog-container {
+        overflow: auto;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+
+    h2 {
+        margin: 0;
+    }
+}
+
+:host ::ng-deep .mat-vertical-stepper-header.mat-step-header {
+    padding-left: convert-unit(43px, "rem");
+}
+
+:host ::ng-deep .mat-stepper-vertical .mat-vertical-content-container {
+    margin-left: convert-unit(50px, "rem");
+    margin-bottom: 0;
+
+    &:before {
+        height: convert-unit(18px, "rem");
+    }
+}
+
+.content-wrapper {
+    flex-grow: 1;
+    height: calc(100vh - 283px) !important;
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: convert-unit(30px, "rem");
+        color: get("color.black");
+    }
+
+    .w-420 {
+        width: convert-unit(415px, "rem");
+    }
+
+    .field-wrapper {
+        width: convert-unit(200px, "rem");
+        margin-right: convert-unit(20px, "rem");
+
+        &.field-wrapper-email {
+            width: max-content;
+        }
+    }
+
+    .field-wrapper-dropdown {
+        width: convert-unit(95px, "rem");
+        margin-right: convert-unit(10px, "rem");
+    }
+
+    .work-state,
+    .work-zip {
+        width: convert-unit(132px, "rem");
+        margin-right: convert-unit(20px, "rem");
+    }
+
+    .field-wrapper-check {
+        margin-top: convert-unit(25px, "rem");
+    }
+
+    .divider {
+        margin-bottom: convert-unit(10px, "rem");
+    }
+
+    .seperator {
+        background-image: linear-gradient(to right, get("color.gray.600") 33%, rgba(255, 255, 255, 0) 0%);
+        background-position: bottom;
+        background-repeat: repeat-x;
+        background-size: convert-unit(3px, "rem") convert-unit(1px, "rem");
+        margin: convert-unit(20px, "rem") 0 convert-unit(30px, "rem");
+        border: 0;
+        height: 1px;
+        width: 100%;
+        display: block;
+    }
+
+    .mat-button.mat-primary {
+        padding: 0;
+    }
+
+    .mat-warn {
+        margin: convert-unit(20px, "rem");
+        color: get("color.info.danger.500");
+    }
+}
+
+.work-info-container {
+    h2 {
+        margin-bottom: convert-unit(14px, "rem");
+
+        & + p {
+            margin-bottom: convert-unit(28px, "rem");
+        }
+    }
+}
+
+.dialog-footer {
+    .mon-btn-regular {
+        padding: 0;
+    }
+
+    button {
+        ::ng-deep .mon-icon {
+            .mat-icon .cls-1 {
+                fill: get("color.white");
+            }
+        }
+    }
+
+    .mon-btn-secondary {
+        margin-right: convert-unit(20px, "rem");
+
+        ::ng-deep .mon-icon {
+            .mat-icon .cls-1 {
+                fill: get("color.primary.500");
+            }
+        }
+    }
+}
+
+.mat-form-field {
+    ::ng-deep .mat-form-field-prefix {
+        top: 0;
+        color: get("color.gray.400");
+    }
+}
+
+.mat-dialog-actions {
+    padding: 0;
+    align-items: baseline;
+    margin: 0;
+}
+
+:host ::ng-deep label.mat-radio-label {
+    margin: convert-unit(8px, "rem") convert-unit(20px, "rem") convert-unit(8px, "rem") 0;
+}
+
+:host ::ng-deep .mon-alert {
+    margin: convert-unit(20px, "rem") 0;
+    width: convert-unit(415px, "rem");
+}
+
+.policy-delivery-hint {
+    font-size: convert-unit(14px, "rem");
+    line-height: normal;
+    margin-top: map-get($spacers, 5);
+}
+
+.email-tooltip {
+    margin: map-get($spacers, 0) map-get($spacers, 5);
+    vertical-align: middle;
+}

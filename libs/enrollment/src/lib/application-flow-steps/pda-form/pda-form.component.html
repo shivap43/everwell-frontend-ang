@@ -1,0 +1,952 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<!-- PDA form start -->
+<div class="mon-m-30" *ngIf="isConfigAvailable">
+    <form [formGroup]="pdaForm" (ngSubmit)="onSubmit()">
+        <div class="flex-form-wrapper">
+            <div class="flex-form-item">
+                <h2 class="mon-mt-0">{{languageStrings['primary.portal.pda.form.pdaTitle']}}</h2>
+                <mat-divider class="submit-app-flow-form"></mat-divider>
+                <mon-alert *ngIf="errorFlag" alertType="danger">
+                    <span>{{errorMessage}}</span>
+                </mon-alert>
+                <mon-alert
+                    class="message-block"
+                    *ngIf="enrollmentMethod === enrollmentMethodEnum.VIRTUAL_FACE_TO_FACE"
+                    alertType="info"
+                >
+                    <span>{{languageStrings['primary.portal.pda.form.webexDisclaimer']}}</span>
+                </mon-alert>
+                <!-- Payment information start -->
+                <div class="mon-mb-30">
+                    <h3>{{languageStrings['primary.portal.pda.form.paymentInfo']}}</h3>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.departmentNum']}}</span>
+                                    <span class="optional-text"
+                                        >{{languageStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field class="w-300">
+                                    <input
+                                        type="text"
+                                        class="mon-input"
+                                        id="departmentNum"
+                                        formControlName="departmentNumber"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.departmentNum']"
+                                        matInput
+                                    />
+                                    <mat-error
+                                        *ngIf="(pdaForm.controls.departmentNumber?.touched || isSubmitted) && pdaForm.controls.departmentNumber?.invalid"
+                                        >{{languageStrings['primary.portal.pda.form.invalidDepartmentNumber']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.location']}}</span>
+                                    <span class="optional-text"
+                                        >{{languageStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field class="w-300">
+                                    <input
+                                        type="text"
+                                        class="mon-input"
+                                        formControlName="location"
+                                        [maxlength]="locationMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.location']"
+                                        matInput
+                                    />
+                                    <mat-error
+                                        *ngIf="(pdaForm.controls.location?.touched || isSubmitted) && pdaForm.controls.location?.invalid"
+                                        >{{languageStrings['primary.portal.pda.location.validationMsg']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.deductionDate']}}</span>
+                                </mat-label>
+                                <mat-form-field class="mon-date-field w-200">
+                                    <input
+                                        formControlName="firstDeductionDate"
+                                        [matDatepicker]="firstDeductionDate"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.deductionDate']"
+                                        [min]="minDate"
+                                        matInput
+                                        readonly
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="firstDeductionDate">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                        </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #firstDeductionDate></mat-datepicker>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error
+                                        *ngIf="pdaForm.get('firstDeductionDate').hasError('required') && isSubmitted"
+                                    >
+                                        {{languageStrings['primary.portal.common.requiredField']}}.
+                                    </mat-error>
+                                    <!-- <mat-error *ngIf="notePopUpForm.get('noteData').get('enrollmentComment').hasError('required')" langauge="secondary.portal.accountEnrollments.required"></mat-error> -->
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label" id="pdaformpayrollMode">
+                                    <span>{{languageStrings['primary.portal.pda.form.payrollMode']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <mat-select
+                                        [(ngModel)]="payrollMode"
+                                        disabled="true"
+                                        class="mon-input"
+                                        disableOptionCentering="true"
+                                        [ngModelOptions]="{standalone: true}"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                        aria-labelledby="pdaformpayrollMode"
+                                    >
+                                        <mat-option [value]="payrollMode">{{payrollMode}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="policy-table">
+                        <ng-container>
+                            <table mat-table [dataSource]="dataSource" width="100%">
+                                <ng-container matColumnDef="policy">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{languageStrings['primary.portal.pda.form.policyName']}}
+                                    </th>
+                                </ng-container>
+                                <ng-container matColumnDef="old">
+                                    <th mat-header-cell *matHeaderCellDef colspan="2">
+                                        {{languageStrings['primary.portal.pda.form.policyOld']}}
+                                    </th>
+                                </ng-container>
+                                <ng-container matColumnDef="new">
+                                    <th mat-header-cell *matHeaderCellDef colspan="2">
+                                        {{languageStrings['primary.portal.pda.form.policyNew']}}
+                                    </th>
+                                </ng-container>
+                                <ng-container matColumnDef="remove">
+                                    <th mat-header-cell *matHeaderCellDef></th>
+                                </ng-container>
+
+                                <ng-container matColumnDef="policyName">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <mat-label
+                                            class="mat-label"
+                                            *ngIf="element.subPolicyName == null || element.subPolicyName == undefined;else subPolicy"
+                                        >
+                                            <span>{{ element.policyName }}</span>
+                                        </mat-label>
+                                        <ng-template #subPolicy>
+                                            <mat-label class="mat-label">
+                                                <span>{{ element.subPolicyName }}</span>
+                                            </mat-label>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldPreTax">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label">
+                                            <span
+                                                >{{languageStrings['primary.portal.pda.form.pretax']}}
+                                                {{languageStrings['primary.portal.setPrices.dollar']}}</span
+                                            >
+                                        </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.oldPreTax"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                    (keyup)="onOldPreTaxChange()"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                            </mat-form-field>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.oldPreTax"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                        (keyup)="onOldPreTaxChange()"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldPostTax">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label">
+                                            <span
+                                                >{{languageStrings['primary.portal.pda.form.afterTax']}}
+                                                {{languageStrings['primary.portal.setPrices.dollar']}}</span
+                                            >
+                                        </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.oldPostTax"
+                                                    (keyup)="onOldPostTaxChange()"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                            </mat-form-field>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.oldPostTax"
+                                                        (keyup)="onOldPostTaxChange()"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="newPreTax">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label">
+                                            <span
+                                                >{{languageStrings['primary.portal.pda.form.pretax']}}
+                                                {{languageStrings['primary.portal.setPrices.dollar']}}</span
+                                            >
+                                        </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-label
+                                                class="mat-label"
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                            >
+                                                <span>{{element.newPreTax | currency}}</span>
+                                            </mat-label>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-label class="mat-label">
+                                                    <span>{{element.newPreTax | currency}}</span>
+                                                </mat-label>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="newPostTax">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label">
+                                            <span
+                                                >{{languageStrings['primary.portal.pda.form.afterTax']}}
+                                                {{languageStrings['primary.portal.setPrices.dollar']}}</span
+                                            >
+                                        </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-label
+                                                class="mat-label"
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                            >
+                                                <span>{{element.newPostTax | currency}}</span>
+                                            </mat-label>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-label class="mat-label">
+                                                    <span>{{element.newPostTax | currency}}</span>
+                                                </mat-label>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="removeRow">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-label class="mat-label"> </mat-label>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <mat-label class="mat-label"> </mat-label>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="['policy', 'old', 'new', 'remove']"></tr>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr
+                                    mat-row
+                                    *matRowDef="let row; columns: displayedColumns;"
+                                    [ngClass]="{'life' : row.policyName == 'Life' && (row.subPolicyName == null || row.subPolicyName == undefined), 'employee'
+                        : row.subPolicyName == 'Employee', 'dependent' : row.subPolicyName == 'Dependent'}"
+                                ></tr>
+                            </table>
+                        </ng-container>
+                        <ng-container>
+                            <table
+                                mat-table
+                                [dataSource]="dataSource2"
+                                width="100%"
+                                [ngClass]="{'oddLength' : (dataSource.data.length%2) != 0}"
+                            >
+                                <ng-container matColumnDef="policyName">
+                                    <td mat-cell *matCellDef="let element;">
+                                        <mat-form-field
+                                            *ngIf="element.subPolicyName == null || element.subPolicyName == undefined;else subPolicy"
+                                        >
+                                            <mat-select
+                                                class="mon-input"
+                                                disabled
+                                                [(ngModel)]="element.policyName"
+                                                disableOptionCentering="true"
+                                                [ngModelOptions]="{standalone: true}"
+                                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                            >
+                                                <mat-option [value]="element.policyName"
+                                                    >{{element.policyName}}</mat-option
+                                                >
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <ng-template #subPolicy>
+                                            <mat-label class="mat-label">
+                                                <span>{{ element.subPolicyName }}</span>
+                                            </mat-label>
+                                        </ng-template>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-form-field>
+                                            <mat-select
+                                                class="mon-input"
+                                                formControlName="pdaPolicy"
+                                                disableOptionCentering="true"
+                                                (selectionChange)="onPolicySelection($event.value)"
+                                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let pdaPolicy of allowedPdaPolicyNames"
+                                                    [value]="pdaPolicy"
+                                                    >{{pdaPolicy}}</mat-option
+                                                >
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldPreTax">
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                                [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.oldPreTax"
+                                                    (keyup)="onOldPreTaxChange()"
+                                                    (change)="updateErrorField()"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                            </mat-form-field>
+                                            <mat-error *ngIf="element.oneFieldReqError">
+                                                {{languageStrings['primary.portal.pda.form.atleastOneField']}}.
+                                            </mat-error>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field
+                                                    [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                                >
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.oldPreTax"
+                                                        (keyup)="onOldPreTaxChange()"
+                                                        (change)="updateErrorField()"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                                <mat-error *ngIf="element.oneFieldReqError">
+                                                    {{languageStrings['primary.portal.pda.form.atleastOneField']}}.
+                                                </mat-error>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldPostTax">
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                                [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.oldPostTax"
+                                                    (keyup)="onOldPostTaxChange()"
+                                                    (change)="updateErrorField()"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                                <mat-error *ngIf="element.oneFieldReqError"> </mat-error>
+                                            </mat-form-field>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field
+                                                    [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                                >
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.oldPostTax"
+                                                        (keyup)="onOldPostTaxChange()"
+                                                        (change)="updateErrorField()"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                    <mat-error *ngIf="element.oneFieldReqError"> </mat-error>
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="newPreTax">
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                                [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.newPreTax"
+                                                    (keyup)="onNewPreTaxChange()"
+                                                    (change)="updateErrorField()"
+                                                    [ngModelOptions]="{standalone: true} "
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                            </mat-form-field>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field
+                                                    [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                                >
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.newPreTax"
+                                                        (keyup)="onNewPreTaxChange()"
+                                                        (change)="updateErrorField()"
+                                                        [ngModelOptions]="{standalone: true} "
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.pretax']"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="newPostTax">
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.policyName == 'Life';else notLife">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName != null && element.subPolicyName != undefined"
+                                                [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                            >
+                                                <input
+                                                    type="number"
+                                                    empoweredNumberValidation
+                                                    [allowDashes]="false"
+                                                    [allowDecimals]="true"
+                                                    [(ngModel)]="element.newPostTax "
+                                                    (keyup)="onNewPostTaxChange()"
+                                                    (change)="updateErrorField()"
+                                                    [ngModelOptions]="{standalone: true} "
+                                                    [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                    class="mon-input"
+                                                    matInput
+                                                />
+                                            </mat-form-field>
+                                        </ng-container>
+                                        <ng-template #notLife>
+                                            <ng-container>
+                                                <mat-form-field
+                                                    [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']"
+                                                >
+                                                    <input
+                                                        type="number"
+                                                        empoweredNumberValidation
+                                                        [allowDashes]="false"
+                                                        [allowDecimals]="true"
+                                                        [(ngModel)]="element.newPostTax "
+                                                        (keyup)="onNewPostTaxChange()"
+                                                        (change)="updateErrorField()"
+                                                        [ngModelOptions]="{standalone: true} "
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.afterTax']"
+                                                        class="mon-input"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-template>
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="removeRow">
+                                    <td mat-cell *matCellDef="let element; let i = index">
+                                        <a
+                                            *ngIf="element.subPolicyName == null || element.subPolicyName == undefined"
+                                            href="javascript:void(0)"
+                                            (click)="removePolicy(i, element)"
+                                            >{{languageStrings['primary.portal.common.remove']}}</a
+                                        >
+                                    </td>
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        <mat-label class="mat-label">
+                                            <span></span>
+                                        </mat-label>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="total">
+                                    <td mat-footer-cell *matFooterCellDef>
+                                        {{languageStrings['primary.portal.common.total']}}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldpre">
+                                    <td mat-footer-cell *matFooterCellDef>{{totalOldPreCost | currency}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="oldpost">
+                                    <td mat-footer-cell *matFooterCellDef>{{totalOldPostCost | currency}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="newpre">
+                                    <td mat-footer-cell *matFooterCellDef>{{totalNewPreCost | currency}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="newpost">
+                                    <td mat-footer-cell *matFooterCellDef>{{totalNewPostCost | currency}}</td>
+                                </ng-container>
+
+                                <tr
+                                    mat-row
+                                    *matRowDef="let row; columns: displayedColumns;"
+                                    [ngClass]="{'life' : row.policyName == 'Life' && (row.subPolicyName == null || row.subPolicyName == undefined), 'employee'
+                                    : row.subPolicyName == 'Employee', 'dependent' : row.subPolicyName == 'Dependent'}"
+                                ></tr>
+                                <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr> -->
+                                <tr
+                                    mat-footer-row
+                                    *matFooterRowDef="displayedColumns"
+                                    [ngClass]="{'oddFooter' : ((dataSource.data.length + dataSource2.data.length) % 2) != 0, 'evenFooter' : ((dataSource.data.length + dataSource2.data.length) % 2) == 0}"
+                                ></tr>
+                                <tr
+                                    mat-footer-row
+                                    *matFooterRowDef="['total','oldpre','oldpost','newpre','newpost']"
+                                ></tr>
+                            </table>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <p>{{languageStrings['primary.portal.pda.form.deductionFrequencyPara']}}</p>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Payment information end -->
+                <!-- Employee information start -->
+                <div>
+                    <h3>{{languageStrings['primary.portal.pda.form.employeeInfo']}}</h3>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.firstName']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="firstName"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.firstName']"
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.mi']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-50">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="mi"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.mi']"
+                                        matInput
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.lastName']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="lastName"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.lastName']"
+                                        matInput
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employeeSSN']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="ssn"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employeeSSN']"
+                                        matInput
+                                        readonly
+                                        [mask]="SSN_FORMAT"
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employerName']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="employerName"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employerName']"
+                                        matInput
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employerAccount']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="employerPayrollAccountNumber"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employerAccount']"
+                                        matInput
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <p class="mon-my-10">
+                                    {{languageStrings['primary.portal.pda.form.herebyAuthorizeText']}}
+                                </p>
+                                <p class="mon-my-10">
+                                    {{languageStrings['primary.portal.pda.form.additionUnderstandText']}}
+                                </p>
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employeeSign']}}</span>
+                                </mat-label>
+                                <mat-form-field
+                                    class="w-200 mon-my-0"
+                                    [ngClass]="{'employee-sign':isHeadset, 'highlight-required': enrollmentMethod === enrollmentMethodEnum.VIRTUAL_FACE_TO_FACE}"
+                                >
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="eSignature"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employeeSign']"
+                                        matInput
+                                    />
+                                    <mat-error *ngIf="pdaForm.get( 'eSignature').hasError( 'required') && isSubmitted ">
+                                        {{languageStrings['primary.portal.pda.form.signRequired']}}.
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="pdaForm.get('eSignature').hasError('minlength') && !pdaForm.get('eSignature').hasError('pattern')"
+                                    >
+                                        {{languageStrings['primary.portal.applicationFlow.oneCharacter']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="pdaForm.controls.eSignature?.errors?.maxlength && !pdaForm.controls.eSignature?.errors?.pattern"
+                                    >
+                                        {{secondaryLanguageStrings['secondary.portal.common.maxLength50']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="pdaForm.get('eSignature').hasError('pattern')">
+                                        {{secondaryLanguageStrings['secondary.portal.common.pattern.signature']}}
+                                    </mat-error>
+                                </mat-form-field>
+
+                                <ng-container *ngIf="isHeadset">
+                                    <p>{{languageStrings['primary.portal.pda.form.customerSignLater']}}</p>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Employee information end -->
+                <!-- Waiver of participation start -->
+                <div class="waiver-participation">
+                    <h3 class="mon-mb-0">{{languageStrings['primary.portal.pda.form.waiverPart']}}</h3>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <p class="mon-my-10">
+                                    {{languageStrings['primary.portal.pda.form.certifyFeaturesText']}}
+                                </p>
+                                <p class="mon-my-10">
+                                    {{languageStrings['primary.portal.pda.form.understandPoliciesText']}}
+                                </p>
+                                <div class="radio-button-container mon-my-20">
+                                    <div class="radio-group">
+                                        <mat-radio-group formControlName="isAflac">
+                                            <mat-radio-button
+                                                value="false"
+                                                class="form-radio-button d-md-flex mon-my-10"
+                                            >
+                                                <span
+                                                    >{{languageStrings['primary.portal.pda.form.notAflacRadioText']}}</span
+                                                >
+                                            </mat-radio-button>
+                                            <mat-radio-button
+                                                value="true"
+                                                class="form-radio-button d-md-flex mon-my-10"
+                                            >
+                                                <span
+                                                    >{{languageStrings['primary.portal.pda.form.aflacRadioText']}}</span
+                                                >
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+                                </div>
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employeeSign']}}</span>
+                                </mat-label>
+                                <mat-form-field
+                                    class="w-200 mon-my-0"
+                                    [ngClass]="{'highlight-required': enrollmentMethod === enrollmentMethodEnum.VIRTUAL_FACE_TO_FACE}"
+                                >
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="eSignature2"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employeeSign']"
+                                        matInput
+                                    />
+                                    <mat-error
+                                        *ngIf="pdaForm.get( 'eSignature2').hasError( 'required')
+                                                        && isSubmitted "
+                                    >
+                                        {{languageStrings['primary.portal.pda.form.signWaiverRequired']}}.
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="pdaForm.get('eSignature2').hasError('minlength') && !pdaForm.get('eSignature2').hasError('pattern')"
+                                    >
+                                        {{languageStrings['primary.portal.applicationFlow.oneCharacter']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="pdaForm.controls.eSignature2?.errors?.maxlength && !pdaForm.controls.eSignature2?.errors?.pattern"
+                                    >
+                                        {{secondaryLanguageStrings['secondary.portal.common.maxLength50']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="pdaForm.get('eSignature2').hasError('pattern')">
+                                        {{secondaryLanguageStrings['secondary.portal.common.pattern.signature']}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <ng-container *ngIf="isHeadset">
+                                    <p>{{languageStrings['primary.portal.pda.form.customerSignLater']}}</p>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Waiver of participation end -->
+                <!-- Producer information start -->
+                <div class="producer-info">
+                    <h3>{{languageStrings['primary.portal.pda.form.producerInfo']}}</h3>
+                    <div class="info-container">
+                        <ng-container>
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.producerName']}}</span>
+                                </mat-label>
+                            </div>
+                            <div *ngIf="producerName" class="flex-item">
+                                <span>{{producerName}}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="info-container">
+                        <ng-container>
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.date']}}</span>
+                                </mat-label>
+                            </div>
+                            <div *ngIf="minDate" class="flex-item">
+                                <span>{{minDate | date: dateFormat}}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="info-container">
+                        <ng-container>
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.writingNumber']}}</span>
+                                </mat-label>
+                            </div>
+                            <div *ngIf="writingNumber" class="flex-item">
+                                <span>{{writingNumber}}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="info-container">
+                        <ng-container>
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.telephoneNumber']}}</span>
+                                </mat-label>
+                            </div>
+                            <div *ngIf="telephoneNumber " class="flex-item">
+                                <span>{{telephoneNumber|phone}}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Producer information end -->
+            </div>
+        </div>
+        <footer class="flex-form-footer submit-app-flow-form">
+            <button id="submitAppFlowForm" mat-button class="mon-btn-primary" type="submit">
+                {{languageStrings['primary.portal.common.next']}}
+            </button>
+        </footer>
+    </form>
+</div>
+<!-- PDA form end -->

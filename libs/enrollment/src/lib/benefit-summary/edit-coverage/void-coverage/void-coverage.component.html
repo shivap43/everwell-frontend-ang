@@ -1,0 +1,55 @@
+<empowered-mon-spinner enableSpinner="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="voidCoverageForm" (ngSubmit)="closeVoidPopup()">
+    <empowered-modal type="POPUP" size="LG">
+        <empowered-modal-header>
+            <span
+                >{{ "primary.portal.voidCoverage.withdrawApplication" | replaceTag: { "##planname##": data.planName }
+                }}</span
+            >
+        </empowered-modal-header>
+        <empowered-modal-footer>
+            <div>
+                <button
+                    mat-flat-button
+                    *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION"
+                    class="mon-btn-danger"
+                    type="submit"
+                >
+                    {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                </button>
+            </div>
+        </empowered-modal-footer>
+        <div class="content-area">
+            <p class="mon-pb-10">{{languageStrings['primary.portal.voidCoverage.applicationNotBeProcessed']}}</p>
+            <div class="w-200" *configEnabled="'general.feature.policy.void.reason.enable'">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.editCoverage.reason']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="voidReasons"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        (selectionChange)="setReasonsValue($event)"
+                        [disableOptionCentering]="true"
+                    >
+                        <mat-option *ngFor="let reason of voidCoverageReasons" [value]="reason">
+                            {{reason}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="notes-txt" *configEnabled="'general.feature.policy.void.comment.enable'">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.editCoverage.notes']}}
+                    <span class="optional-text" language="primary.portal.common.optional"></span
+                ></mat-label>
+                <mat-form-field class="mon-mb-0 notes-desc">
+                    <textarea
+                        class="notes-height"
+                        matInput
+                        formControlName="notes"
+                        [attr.aria-label]="languageStrings['primary.portal.editCoverage.notes']"
+                    ></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </empowered-modal>
+</form>

@@ -1,0 +1,59 @@
+@import "shared";
+
+:host {
+    display: block;
+}
+
+mon-alert {
+    margin-bottom: map-get($spacers, 10);
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    padding-right: map-get($spacers, 30);
+}
+.column.form-field-wrapper {
+    padding-right: map-get($spacers, 20);
+}
+.column.last {
+    padding-right: 0;
+}
+
+.modal-header {
+    margin-bottom: map-get($spacers, 20);
+}
+
+.content-heading {
+    color: get("color.gray.700");
+    margin-bottom: map-get($spacers, 10);
+}
+
+.label {
+    font-size: convert-unit(14px, "rem");
+    line-height: convert-unit(16px, "rem");
+    font-weight: bold;
+    @include fontFace("primary.bold");
+    color: get("color.black");
+    margin-bottom: map-get($spacers, 5);
+}
+
+mat-form-field {
+    width: convert-unit(200px, "rem");
+    margin-bottom: map-get($spacers, 20);
+
+    &.age {
+        width: convert-unit(70px, "rem");
+    }
+
+    &.gender {
+        width: convert-unit(110px, "rem");
+    }
+}
+
+mat-checkbox {
+    margin-bottom: map-get($spacers, 30);
+}

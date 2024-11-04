@@ -1,0 +1,149 @@
+<div *ngIf="grandFatherPlan">
+    <p class="current-coverage">
+        {{languageStrings["primary.portal.shoppingExperience.currentCoverageText"]}}
+    </p>
+    <p class="current-coverage-text">
+        {{languageStrings["primary.portal.shoppingExperience.currentCoveragePara"]}}
+    </p>
+
+    <mat-accordion class="card-list">
+        <mat-expansion-panel *ngIf="grandFatherPlan" [expanded]="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <mon-icon
+                        [iconName]="grandFatherPlan.productOffering.product.adminName"
+                        class="plan-icon"
+                        [iconSize]="32"
+                    ></mon-icon>
+                    <div>{{grandFatherPlan.plan.name}}</div>
+                    <div class="plan-coverage">{{grandFatherPlan.coverageLevel.name}}</div>
+                    <hr class="dotted-border-bottom bottom-spliter" />
+                </mat-panel-title>
+                <mat-panel-description>
+                    <span *ngIf="grandFatherPlan.status === 'APPROVED'" class="status-icon">
+                        <mon-icon iconName="Filled-check" class="icon-success" [iconSize]="16"></mon-icon>
+                        <span>
+                            {{languageStrings["primary.portal.shoppingExperience.approvalActive"]}}
+                        </span>
+                    </span>
+                    <div class="plan-rates dotted-border-left">
+                        <div class="plan-cost">{{grandFatherPlan.totalCost | currency}}</div>
+                        <div class="plan-frequency">{{payFrequency?.name}}</div>
+                    </div>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <!-- expanded panel code -->
+            <div class="expansion-content your-selection">
+                <div class="content-column">
+                    <div *ngIf="grandFatherPlan.benefitAmount" class="plan-details-panel">
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.shoppingExperience.benefitAmount"]}}
+                        </span>
+                        <span class="content-value">{{grandFatherPlan.benefitAmount | currency}}</span>
+                    </div>
+                    <div *ngIf="grandFatherPlan.coverageLevel.eliminationPeriod" class="plan-details-panel">
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.shoppingExperience.eliminationPeriod"]}}
+                        </span>
+                        <span class="content-value">{{grandFatherPlan.coverageLevel.eliminationPeriod}}</span>
+                    </div>
+                    <div *ngIf="grandFatherPlan.riders?.length" class="plan-details-panel">
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.benefitsOffering.filterRiders"]}}
+                        </span>
+                        <div class="rider-list">
+                            <span *ngFor="let rider of grandFatherPlan.riders; let i of index" class="content-value"
+                                ><span *ngIf="i !== grandFatherPlan.riders - 1">{{rider.name}},&nbsp;</span>
+                                <span *ngIf="i == grandFatherPlan.riders - 1">{{rider.name}}</span></span
+                            >
+                        </div>
+                    </div>
+                    <div
+                        *ngIf="grandFatherPlan.taxStatus!=='UNKNOWN' && grandFatherPlan.taxStatus!==undefined"
+                        class="plan-details-panel"
+                    >
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.shoppingExperience.taxStatus"]}}
+                        </span>
+                        <span class="tax-title" *ngIf="grandFatherPlan.taxStatus==='POSTTAX'">
+                            {{languageStrings["primary.portal.shoppingExperience.postTax"]}}</span
+                        >
+                        <span class="tax-title" *ngIf="grandFatherPlan.taxStatus==='PRETAX'">
+                            {{languageStrings["primary.portal.shoppingExperience.preTax"]}}</span
+                        >
+                    </div>
+                    <div *ngIf="grandFatherPlan?.dependents?.length" class="plan-details-panel">
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.shoppingExperience.coveredIndividuals"]}}
+                        </span>
+                        <div class="dependent-name">
+                            <span>{{memberInfo.name.firstName}} {{memberInfo.name.lastName}} (primary insured) </span>
+                            <span
+                                class="dependent-name content-value"
+                                *ngFor="let dependent of grandFatherPlan.dependents"
+                                >{{dependent.name}}</span
+                            >
+                        </div>
+                    </div>
+                    <div
+                        *ngIf="grandFatherPlan?.validity || grandFatherPlan?.validity.effectiveStarting"
+                        class="plan-details-panel"
+                    >
+                        <span class="content-label">
+                            {{languageStrings["primary.portal.grandfatheredPlan.coverageDate"]}}
+                        </span>
+                        <p *ngIf="checkForCoverageEndDate(grandFatherPlan) && checkIfPastDate(grandFatherPlan)">
+                            {{languageStrings["primary.portal.quoteShop.grandfatheredPlan.Began"]}}
+                        </p>
+                        <p *ngIf="checkForCoverageEndDate(grandFatherPlan) && !checkIfPastDate(grandFatherPlan)">
+                            {{languageStrings["primary.portal.quoteShop.starts"]}}
+                        </p>
+                        <span>{{grandFatherPlan.validity.effectiveStarting | date:'MM/dd/yyyy'}}</span>
+                        <span *ngIf="grandFatherPlan.validity.expiresAfter">
+                            - {{grandFatherPlan.validity.expiresAfter | date:'MM/dd/yyyy'}}</span
+                        >
+                    </div>
+                </div>
+                <div class="content-column cost-adjustment-panel">
+                    <div *ngIf="grandFatherPlan?.memberCost != null" class="cost-adjustments">
+                        <span class="cost-label">
+                            {{languageStrings["primary.portal.shoppingExperience.baseCost"]}}</span
+                        >
+                        <span class="cost-value">{{grandFatherPlan?.memberCost | currency}}</span>
+                    </div>
+                    <div
+                        *ngIf="grandFatherPlan?.memberCost != null && grandFatherPlan?.totalCost != null"
+                        class="cost-adjustments"
+                    >
+                        <span class="cost-label">
+                            {{languageStrings["primary.portal.shoppingExperience.adjustments"]}}</span
+                        >
+                        <span class="cost-value"
+                            >{{grandFatherPlan?.totalCost - grandFatherPlan?.memberCost | currency}}</span
+                        >
+                    </div>
+                    <div *ngIf="grandFatherPlan?.totalCost != null" class="final-cost cost-adjustments">
+                        <span class="cost-label">
+                            {{languageStrings["primary.portal.shoppingExperience.yourCost"]}}
+                        </span>
+                        <span class="cost-value">
+                            {{ grandFatherPlan.totalCost | currency }}
+                        </span>
+                    </div>
+                    <div class="content-action cost-adjustments">
+                        <a
+                            href="javascript:void(0)"
+                            (click)="showEndCoverageDialog(grandFatherPlan?.plan.name, this.expiryDate)"
+                            class="mon-btn-link"
+                        >
+                            {{languageStrings["primary.portal.shoppingExperience.cancelCoverage"]}}</a
+                        >
+                        <a href="javascript:void(0)" class="mon-btn-link">
+                            {{languageStrings["primary.portal.planDetails.title"]}}</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

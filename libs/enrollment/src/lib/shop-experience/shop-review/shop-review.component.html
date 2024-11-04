@@ -1,0 +1,109 @@
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<div *ngIf="isSpinnerLoading">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</div>
+<div class="tpi-shop-content" *ngIf="!isSpinnerLoading">
+    <div class="review-selection" *ngIf="tpiLnlMode">
+        {{languageStrings['primary.portal.lnl.reviewYourSelections'].replace("##cartCount##",this.cartCount)}}
+    </div>
+    <div *ngIf="isCartEmpty" class="zero-state" [ngClass]="{'lnl-zero-state':tpiLnlMode}">
+        {{languageStrings['primary.portal.tpi.reviewEmpty']}}
+    </div>
+    <div *ngIf="!isCartEmpty">
+        <div *ngFor="let item of cartLoop" class="product-list">
+            <div *ngIf="item.productOfferingId">
+                <div class="shopping-review-container">
+                    <div>
+                        <h4 class="plan-name" [innerHTML]="item.planName"></h4>
+                        <p class="coverage-level-name" *ngIf="item.coverageLevelName">
+                            {{item.coverageLevelName}}
+                        </p>
+                        <div *ngIf="item.riderNameCost && item.riderNameCost.length">
+                            <p *ngFor="let rider of item.riderNameCost">
+                                {{rider.name}}: {{rider.cost | currency}}
+                            </p>
+                        </div>
+                        <div *ngIf="item.flexDollars?.length">
+                            <p *ngFor="let flexDollar of item.flexDollars">
+                                {{"primary.portal.shoppingCart.flexDiscountAmount" | replaceTag:{ "##name##":
+                                flexDollar.flexDollarOrIncentiveName , "##amount##":
+                                (flexDollar.flexDollarOrIncentiveAmount | payrollFrequencyCalculator: pfPipeObj |
+                                currency) } }}
+                            </p>
+                        </div>
+                        <p *ngIf="item.coverageDateEnds">
+                            <span>{{languageStrings['primary.portal.tpi.shopReview.coverageFrom']}}</span>
+                            {{item.coverageDateStarts| date: "MM/dd/yyyy"}} to {{item.coverageDateEnds| date:
+                            "MM/dd/yyyy"}}
+                        </p>
+                        <p *ngIf="!item.coverageDateEnds">
+                            <span>{{languageStrings['primary.portal.tpi.shopReview.coverageStarts']}}</span>
+                            {{item.coverageDateStarts| date: "MM/dd/yyyy"}}
+                        </p>
+                        <p *ngIf="item.benefitAmount">
+                            <span>{{languageStrings['primary.portal.tpi.shopReview.benefitAmount']}}</span>
+                            {{item.benefitAmount | currency : 'USD' : 'symbol' : '1.0'}}
+                        </p>
+                        <a
+                            (click)="onRemove(item.id,item.productOfferingId,item.planOfferingId)"
+                            class="mon-btn-link"
+                            mat-flat-button
+                            [disabled]="locked"
+                        >
+                            {{languageStrings['primary.portal.tpi.shopReview.remove']}}
+                        </a>
+                    </div>
+                    <div class="price-listing" *ngIf="item.productOfferingId">
+                        <p class="cost">
+                            {{ item.memberCost | currency }}
+                        </p>
+                        <p class="tax-status-text"><span>{{item.taxStatus}}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="total-cost" [ngClass]="{'mon-mb-50':tpiLnlMode}">
+    <div>
+        <h3>{{languageStrings['primary.portal.tpi.shopReview.total']}}</h3>
+        <p>{{languageStrings['primary.portal.tpi.shopReview.enrollment']}}</p>
+    </div>
+    <div>
+        <h3 class="price">
+            {{(totalCost > -totalFlexCost ? ((totalCost + totalFlexCost) | payrollFrequencyCalculator: pfPipeObj) : 0) |
+            currency}}<sup>{{languageStrings['primary.portal.common.star']}}</sup>
+        </h3>
+        <p>{{payfrequencyName}}</p>
+    </div>
+</div>
+<div class="tpi-footer">
+    <div *ngIf="isTpi && !tpiLnlMode">
+        <a
+            [attr.aria-label]="languageStrings['primary.portal.tpi.shopReview.exit']"
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-flat-button
+            (click)="onExit()"
+        >
+            {{languageStrings['primary.portal.tpi.shopReview.exit']}}
+        </a>
+    </div>
+    <div>
+        <button mat-flat-button class="mon-btn-secondary mon-mr-20" color="primary" type="button" (click)="onBack()">
+            <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+            {{languageStrings['primary.portal.tpi.shopReview.back']}}
+        </button>
+        <button
+            class="mon-btn-primary"
+            mat-flat-button
+            [disabled]="isCartEmpty || locked || disableApply"
+            (click)="navigateToTpiAppFlow()"
+        >
+            {{languageStrings['primary.portal.tpi.shopReview.applyBenefits']}}
+        </button>
+    </div>
+</div>

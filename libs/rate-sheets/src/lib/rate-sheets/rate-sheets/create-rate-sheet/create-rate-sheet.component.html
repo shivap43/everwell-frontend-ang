@@ -1,0 +1,59 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<form *ngIf="createRateSheetForm" [formGroup]="createRateSheetForm" (ngSubmit)="downloadRateSheetAndClose()" class="create-wrapper">
+    <empowered-sheet>
+        <empowered-sheet-header>
+            <span language="primary.portal.rateSheets.createRateSheet"></span>
+        </empowered-sheet-header>
+        <div class="content">
+            <div class="flex-form-wrapper">
+                <div class="form-fields">
+                    <mat-label class="mat-label">
+                        <span language="primary.portal.rateSheets.rateSheetName"></span>
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="rateSheetTitle"
+                            maxlength="50"
+                            [placeholder]="languageStrings['primary.portal.rateSheets.yourRateSheet']"
+                            [attr.aria-label]="languageStrings['primary.portal.rateSheets.rateSheetName']"
+                        />
+                    </mat-form-field>
+                </div>
+                <div class="form-labels">
+                    <mat-label class="mat-label inline">
+                        <span language="primary.portal.rateSheets.selectedPlans"></span>
+                    </mat-label>
+                    <a
+                        *ngIf="(enableEditPlanOrder$ | async)"
+                        language="primary.portal.rateSheets.editPlanOrder"
+                        (click)="editPlanOrder()"
+                    ></a>
+                </div>
+                <div class="plans-table">
+                    <table mat-table [dataSource]="planOrder">
+                        <ng-container matColumnDef="product">
+                            <th mat-header-cell *matHeaderCellDef>{{ languageStrings['primary.portal.rateSheets.productHeader'] }}</th>
+                            <td mat-cell *matCellDef="let element">{{ element.product }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="plan">
+                            <th mat-header-cell *matHeaderCellDef>{{ languageStrings['primary.portal.rateSheets.planHeader'] }}</th>
+                            <td mat-cell *matCellDef="let element">{{ element.plan }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="riders">
+                            <th mat-header-cell *matHeaderCellDef>{{ languageStrings['primary.portal.rateSheets.ridersHeader'] }}</th>
+                            <td mat-cell *matCellDef="let element">{{ element.riders }}</td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <empowered-sheet-footer>
+            <button mat-button class="mon-btn-primary" type="submit">
+                <span language="primary.portal.rateSheets.downloadRateSheet"></span>
+            </button>
+        </empowered-sheet-footer>
+    </empowered-sheet>
+</form>

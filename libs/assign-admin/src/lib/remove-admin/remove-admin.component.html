@@ -1,0 +1,42 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            <span>{{languageStrings['primary.portal.common.remove']}}</span>
+            <span> {{this.data.selectedAdmin.name.firstName +" "+ this.data.selectedAdmin.name.lastName}} ?</span>
+        </h2>
+
+        <p class="subtitle">
+            <span>{{this.data.selectedAdmin.name.firstName +" "+ this.data.selectedAdmin.name.lastName}}</span
+            ><span> {{languageStrings['primary.portal.administrators.remove.removedFromAdminList']}}</span><br />
+            <span>{{languageStrings['primary.portal.administrators.remove.infoRemainInSystem']}}</span>
+        </p>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            class="mon-btn-link mon-px-0"
+            mat-button
+            mat-dialog-close
+            (click)="closeForm()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button
+            class="mon-btn-danger"
+            [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+            mat-flat-button
+            (click)="remove()"
+        >
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </mat-dialog-actions>
+</div>

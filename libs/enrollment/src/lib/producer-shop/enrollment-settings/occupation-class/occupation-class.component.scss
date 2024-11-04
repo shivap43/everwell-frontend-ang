@@ -1,0 +1,32 @@
+@import "shared";
+
+:host {
+    display: block;
+}
+
+.label {
+    font-size: convert-unit(14px, "rem");
+    line-height: convert-unit(16px, "rem");
+    font-weight: bold;
+    @include fontFace("primary.bold");
+    color: get("color.black");
+    margin-bottom: map-get($spacers, 5);
+}
+
+mat-radio-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: map-get($spacers, 20);
+
+    & > mat-radio-button {
+        margin-bottom: map-get($spacers, 10);
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+}

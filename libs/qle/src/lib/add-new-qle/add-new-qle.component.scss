@@ -1,0 +1,83 @@
+@import "shared";
+
+.enrollment-wrapper {
+    width: convert-unit(500px, "rem");
+
+    .qle-title {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+
+    .enroll-date {
+        border-bottom: convert-unit(1px, "rem") dotted get("color.gray.500");
+
+        &-end {
+            margin-left: convert-unit(20px, "rem");
+        }
+    }
+
+    .product-detail-text {
+        margin: convert-unit(20px, "rem") 0;
+    }
+
+    .mat-radio-group,
+    .mat-radio-button {
+        margin-bottom: convert-unit(10px, "rem");
+    }
+
+    .divider {
+        margin: convert-unit(10px, "rem") convert-unit(-50px, "rem") convert-unit(20px, "rem")
+            convert-unit(-50px, "rem");
+    }
+
+    .specific-product {
+        flex-wrap: wrap;
+
+        & > div {
+            margin-right: convert-unit(20px, "rem");
+        }
+    }
+
+    &.second-step {
+        .mon-date-field {
+            width: convert-unit(145px, "rem");
+        }
+    }
+}
+
+.file-upload-info {
+    margin: 0 convert-unit(5px, "rem");
+    vertical-align: middle;
+}
+
+.scroll-content {
+    padding: 0 convert-unit(50px, "rem") convert-unit(30px, "rem");
+    overflow-y: auto;
+    max-height: calc(100vh - 400px);
+}
+
+::ng-deep .select-event-type.mat-select-panel {
+    min-width: calc(100% + 12px) !important;
+    margin-left: convert-unit(6px, "rem");
+    transform: none !important;
+
+    .mat-option[aria-disabled="true"] span {
+        color: get("color.gray.400") !important;
+        cursor: not-allowed;
+    }
+}
+
+:host ::ng-deep .mon-date-field {
+    .mat-form-field-flex {
+        .mat-form-field-suffix {
+            .mat-icon-button {
+                height: convert-unit(30px, "rem") !important;
+                width: convert-unit(30px, "rem") !important;
+
+                .mon-icon {
+                    margin-top: convert-unit(3px, "rem") !important;
+                    vertical-align: top !important;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,65 @@
+@import "shared";
+.sent-wrapper {
+    margin: map-get($spacers, 30);
+}
+.enrollments-header {
+    margin: convert-unit(20px, "rem") 0 convert-unit(15px, "rem");
+    color: get("color.gray.700");
+    font-size: 28px;
+    font-weight: normal;
+}
+
+::ng-deep .mat-select-panel-wrap .list-grid-filter.mat-select-panel .no-mat-pseudo-checkbox .mat-pseudo-checkbox {
+    display: none;
+}
+
+::ng-deep {
+    .commissions-split-tooltip-content {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.message-block {
+    margin-top: convert-unit(20px, "rem");
+    display: block;
+}
+
+.search-filter-wraper {
+    align-items: normal;
+    .search-wrapper {
+        width: 100%;
+        div {
+            margin-bottom: convert-unit(5px, "rem");
+        }
+        .search-label {
+            @include fontFace("primary.bold");
+            width: convert-unit(140px, "rem");
+            margin-right: 10px;
+            display: inline-block;
+        }
+    }
+    .filter-wrapper {
+        min-width: convert-unit(485px, "rem");
+        @include media-min("l") {
+            min-width: convert-unit(575px, "rem");
+        }
+    }
+}
+.sent-container ::ng-deep {
+    .mat-row {
+        .mat-cell {
+            vertical-align: top;
+            &.mat-column-enrollment > div,
+            &.mat-column-sendDate > div {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+        &:last-child {
+            .mat-cell {
+                width: auto;
+            }
+        }
+    }
+}

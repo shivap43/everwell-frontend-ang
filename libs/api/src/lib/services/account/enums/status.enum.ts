@@ -1,0 +1,7 @@
+export enum STATUS {
+    SET_UP = "SET_UP",
+    ACTIVE = "ACTIVE",
+    PROCESSING = "PROCESSING",
+    INVITATION = "INVITATION",
+    INACTIVE = "INACTIVE",
+}

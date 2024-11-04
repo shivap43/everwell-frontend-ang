@@ -1,0 +1,535 @@
+<div class="call-center-form-wrapper" *ngIf="manageForm" class="call-center-form-wrapper">
+    <form [formGroup]="manageForm" (ngSubmit)="onSubmit()">
+        <empowered-sheet>
+            <empowered-sheet-header
+                >{{ languageStrings[data.isAdd ? 'primary.portal.callCenter.addcallcenter' : 'primary.portal.callCenter.editcallcenter']
+                }}</empowered-sheet-header
+            >
+            <empowered-sheet-footer>
+                <button
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    [attr.aria-label]="languageStrings[data.isAdd ? 'primary.portal.common.add' : 'primary.portal.common.save']"
+                    [disabled]="employeesLessThan200 || enrollmentNotAllowed || isLoading"
+                    (click)="checkEmployees()"
+                >
+                    {{languageStrings[data.isAdd ? 'primary.portal.common.add' : 'primary.portal.common.save']}}
+                </button>
+            </empowered-sheet-footer>
+
+            <div class="content-wrapper" empoweredScrollTop [trigger$]="apiError$">
+                <div class="api-error-message">
+                    <mon-alert alertType="danger" *ngIf="apiError$ | async">
+                        <span>
+                            {{ this.errorMessage }}
+                            <a href="mailto:{{ callCenter8x8Configs.enrollmentSupportEmail }}" *ngIf="showSupportEmail">
+                                {{ callCenter8x8Configs.enrollmentSupportEmail }}
+                            </a>
+                        </span>
+                    </mon-alert>
+                </div>
+                <div [ngClass]="{ 'required-fields-vcc': is8x8CallCenterSelected, 'required-fields': !is8x8CallCenterSelected }">
+                    <div class="mon-mb-20 mon-mt-20">
+                        <mon-alert class="message-block" alertType="danger" *ngIf="employeesLessThan200">
+                            <span>
+                                {{languageStrings['primary.portal.callCenter.eligibleEmployees'] | replaceTag:{"##employees##":
+                                selectedCallCenter.minSubscriberCount } }}
+                            </span>
+                        </mon-alert>
+                    </div>
+
+                    <!-- Call center name  -->
+                    <div>
+                        <div class="mon-mb-10">
+                            <mat-label class="mat-label">{{languageStrings['primary.portal.callCenter.name']}} </mat-label>
+                            <mat-form-field class="mon-mb-10">
+                                <mat-select formControlName="nameControl" placeholder="Select" disableOptionCentering="true">
+                                    <mat-option *ngFor="let callCenter of callCenters" [value]="callCenter.id">
+                                        {{callCenter.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="mon-mb-20 mon-mt-20">
+                        <div class="d-flex mon-mb-20" *ngFor="let message of callCenterAlerts">
+                            <mon-alert class="message-block" [alertType]="message.alertType">
+                                <span> {{ message.content }} </span>
+                            </mon-alert>
+                        </div>
+                        <div class="d-flex mon-mb-20" *ngIf="is8x8CallCenterSelected && vccCannotEnrollDisability && !enrollmentNotAllowed">
+                            <mon-alert class="message-block" alertType="info">
+                                <span
+                                    >{{ languageStrings['primary.portal.callCenter.8x8.form.alert.cannotEnrollDisability'] | replaceTag: {
+                                    '##name##': selectedCallCenter?.name } }}
+                                    <a href="mailto:{{ callCenter8x8Configs.disabilityEnrollmentSupportEmail }}"
+                                        >{{ callCenter8x8Configs.disabilityEnrollmentSupportEmail }}</a
+                                    >
+                                </span>
+                            </mon-alert>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="!enrollmentNotAllowed">
+                    <!-- Dates -->
+                    <div [ngClass]="{ 'required-fields-vcc': is8x8CallCenterSelected, 'required-fields': !is8x8CallCenterSelected }">
+                        <div class="mon-mb-10 date-range">
+                            <div class="date-picker mon-mr-20">
+                                <mat-label class="mat-label">{{languageStrings['primary.portal.callCenter.startdate']}} </mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        matInput
+                                        [min]="minStartDate"
+                                        [matDatepicker]="startDatePicker"
+                                        formControlName="startDateControl"
+                                        name="startDatePicker"
+                                        (dateChange)="onStartDateChange()"
+                                        [attr.aria-label]="languageStrings['primary.portal.callCenter.startdate']"
+                                        empoweredDateTransform
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker" (click)="startDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #startDatePicker> </mat-datepicker>
+                                    <mat-hint language="primary.portal.accountEnrollments.filterEnrollment.dateFormatHint"> </mat-hint>
+                                    <mat-error
+                                        *ngIf="manageForm.controls.startDateControl.errors?.required
+                                            && !manageForm.controls.startDateControl.errors?.matDatepickerParse?.text"
+                                    >
+                                        <span language="primary.portal.callCenter.errors.startDateRequired"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="manageForm.controls.startDateControl.errors?.matDatepickerMin">
+                                        <span language="primary.portal.member.qle.validationErrorCannotBePast"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="manageForm.controls.startDateControl.errors?.matDatepickerParse?.text">
+                                        <span language="secondary.portal.common.invalidDateFormat"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="date-picker">
+                                <mat-label class="mat-label">
+                                    {{languageStrings['primary.portal.callCenter.enddate']}}<span class="optional-text"
+                                        >{{languageStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        matInput
+                                        [min]="minEndDate"
+                                        [matDatepicker]="endDatePicker"
+                                        formControlName="endDateControl"
+                                        name="endDatePicker"
+                                        (dateChange)="onEndDateChange()"
+                                        [attr.aria-label]="languageStrings['primary.portal.callCenter.enddate']"
+                                        empoweredDateTransform
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="endDatePicker" (click)="endDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #endDatePicker></mat-datepicker>
+                                    <mat-hint language="primary.portal.accountEnrollments.filterEnrollment.dateFormatHint"> </mat-hint>
+                                    <mat-error *ngIf="manageForm.controls.endDateControl.errors?.matDatepickerMin">
+                                        <span language="primary.portal.callCenter.errors.endDateMin"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="manageForm.controls.endDateControl.errors?.matDatepickerParse?.text">
+                                        <span language="secondary.portal.common.invalidDateFormat"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mon-mb-10" *ngIf="isShowStartDateWarning && ((!buildingBlocksRole) || (buildingBlocksRole && selectedCallCenter?.name !== 'Building Blocks'))">
+                            <mon-alert class="message-block" alertType="info">
+                                <span
+                                    >{{ languageStrings['primary.portal.callCenter.errors.startDateMin'] | replaceTag: { "##min##":
+                                    callCenter8x8Configs.callCenterStartDateFromMinDays} }}</span
+                                >
+                            </mon-alert>
+                        </div>
+
+                        <div class="d-flex mon-mb-10" *ngIf="isShowDateOverlapRemove && overlappingRemoveCallCenter.length === 1">
+                            <mon-alert class="message-block" alertType="warning">
+                                <span>
+                                    {{ languageStrings['primary.portal.callCenter.errors.overlappingCallCenters.single'] | replaceTag: {
+                                    '##callcenter##': overlappingRemoveCallCenter[0].callCenter.name } }}
+                                </span>
+                            </mon-alert>
+                        </div>
+
+                        <div class="d-flex mon-mb-10" *ngIf="isShowDateOverlapRemove && overlappingRemoveCallCenter.length > 1">
+                            <mon-alert class="message-block" alertType="warning">
+                                <span>
+                                    <span language="primary.portal.callCenter.errors.overlappingCallCenters.multiple"></span>
+                                    <ul>
+                                        <li *ngFor="let item of overlappingRemoveCallCenter">{{ item.callCenter.name }}</li>
+                                    </ul>
+                                </span>
+                            </mon-alert>
+                        </div>
+
+                        <div class="d-flex mon-mb-10" *ngIf="isShowDateOverlapAdjustEnd">
+                            <mon-alert class="message-block" alertType="warning">
+                                <span>
+                                    {{ languageStrings['primary.portal.callCenter.errors.overlappingCallCenters.adjustDates'] | replaceTag:
+                                    { '##callcenter##': overlappingAdjustEndCallCenter.callCenter.name, '##startdate##':
+                                    overlappingAdjustEndCallCenter.validity.effectiveStarting | date: DateFormats.MONTH_DAY_YEAR,
+                                    '##enddate##': newEndDate | date: DateFormats.MONTH_DAY_YEAR } }}
+                                </span>
+                            </mon-alert>
+                        </div>
+                    </div>
+                    <!-- Special instructions -->
+                    <ng-container *ngIf="manageForm.controls.specialInstructionsControl">
+                        <div class="d-flex mon-mb-10">
+                            <div class="instructions">
+                                <mat-label class="mat-label">
+                                    {{languageStrings['primary.portal.callCenter.specialinstructions']}}<span class="optional-text"
+                                        >{{languageStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <textarea
+                                        matInput
+                                        formControlName="specialInstructionsControl"
+                                        [attr.aria-label]="languageStrings['primary.portal.callCenter.specialinstructions']"
+                                        class="special-instructions-input"
+                                    ></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Toll-free number options (Create new / Use existing) -->
+                    <ng-container *ngIf="manageForm.controls.tollFreeNumberOptions">
+                        <div class="d-flex mon-mb-10">
+                            <div>
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.callCenter.8x8.form.tollFreeNumber.label"></span>
+                                </mat-label>
+                                <mat-radio-group class="mon-mb-10 columns" formControlName="tollFreeNumberOptions">
+                                    <mat-radio-button class="mon-mb-10" [value]="TollFreeNumberOptions.NEW"
+                                        ><span language="primary.portal.callCenter.8x8.form.tollFreeNumber.options.createNew"></span>
+                                    </mat-radio-button>
+                                    <mat-radio-button [value]="TollFreeNumberOptions.EXISTING">
+                                        <span language="primary.portal.callCenter.8x8.form.tollFreeNumber.options.useExisting"></span>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+
+                                <!-- Toll-free number (enabled when 'Use existing' is selected) -->
+                                <div class="mon-ml-30">
+                                    <empowered-toll-free-number
+                                        formControlName="tollFreeNumber"
+                                        [hint]="languageStrings['primary.portal.callCenter.8x8.form.tollFreeNumber.hint']"
+                                    >
+                                    </empowered-toll-free-number>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Call center type -->
+                    <ng-container *ngIf="manageForm.controls.callCenterType">
+                        <div class="mon-mb-40 columns">
+                            <div class="call-center-type">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.callCenter.8x8.form.callCenterTypes.label"></span>
+                                </mat-label>
+                                <mat-radio-group formControlName="callCenterType">
+                                    <mat-radio-button
+                                        [value]="CallCenterType.INBOUND"
+                                        [disabled]="data.numberOfMembers < callCenter8x8Configs.inboundCallCenterMinEligibleEmployees"
+                                    >
+                                        <span language="primary.portal.callCenter.8x8.form.callCenterTypes.options.inbound"></span>
+                                    </mat-radio-button>
+                                    <mat-radio-button [value]="CallCenterType.OUTBOUND">
+                                        <span language="primary.portal.callCenter.8x8.form.callCenterTypes.options.outbound"></span>
+                                    </mat-radio-button>
+                                    <mat-radio-button
+                                        [value]="CallCenterType.BOTH"
+                                        [disabled]="data.numberOfMembers < callCenter8x8Configs.inboundCallCenterMinEligibleEmployees"
+                                    >
+                                        <span language="primary.portal.callCenter.8x8.form.callCenterTypes.options.both"></span>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <mat-hint
+                                *ngIf="data.numberOfMembers < callCenter8x8Configs.inboundCallCenterMinEligibleEmployees
+                && manageForm.controls.tollFreeNumberOptions.value === TollFreeNumberOptions.NEW"
+                                ><span language="primary.portal.callCenter.8x8.form.callCenterTypes.inbound.hint"></span>
+                            </mat-hint>
+                            <mat-hint *ngIf="manageForm.controls.tollFreeNumberOptions?.value === TollFreeNumberOptions.EXISTING">
+                                <span language="primary.portal.callCenter.8x8.form.callCenterTypes.hint"></span>
+                            </mat-hint>
+                        </div>
+                    </ng-container>
+
+                    <!-- Call center availability -->
+                    <ng-container *ngIf="manageForm.controls.callSchedule">
+                        <div class="mon-mb-40 mon-mt-40">
+                            <h2>
+                                <span language="primary.portal.callCenter.8x8.form.section.availability.subheading"></span>
+                            </h2>
+                        </div>
+
+                        <empowered-call-center-availability
+                            [callSchedule]="manageForm.controls.callSchedule"
+                            [callCenterAvailabilityStartTimes]="callCenterAvailabilityStartTimes"
+                            [callCenterAvailabilityEndTimes]="callCenterAvailabilityEndTimes"
+                            [timeZones]="timeZones$ | async"
+                        ></empowered-call-center-availability>
+                    </ng-container>
+
+                    <!-- Messaging  -->
+                    <ng-container *ngIf="is8x8CallCenterSelected && manageForm.controls.messaging">
+                        <div formGroupName="messaging">
+                            <div class="mon-mb-40 mon-mt-40">
+                                <h2>
+                                    <span language="primary.portal.callCenter.8x8.form.section.messaging.subheading"></span>
+                                </h2>
+                            </div>
+                            <div class="mon-mb-30">
+                                <mat-checkbox formControlName="spanishIndicator"
+                                    ><span language="primary.portal.callCenter.8x8.form.section.messaging.spanishIndicator.label"></span>
+                                </mat-checkbox>
+                            </div>
+
+                            <div class="mon-mb-30">
+                                <mat-label
+                                    ><span
+                                        language="primary.portal.callCenter.8x8.form.section.messaging.standardRecordingAccountName.label"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field class="call-center-input mon-mb-10">
+                                    <input
+                                        matInput
+                                        formControlName="standardRecordingAccountName"
+                                        [maxlength]="callCenter8x8Configs.accountNameMaxLength"
+                                    />
+                                    <mat-error *ngIf="manageForm.controls.messaging.controls.standardRecordingAccountName.errors?.required">
+                                        <span language="primary.portal.common.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="manageForm.controls.messaging.controls.standardRecordingAccountName.errors?.minlength as minLengthError"
+                                    >
+                                        {{ languageStrings['primary.portal.common.minLength'] | replaceTag: { '##num##':
+                                        minLengthError.requiredLength } }}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="manageForm.controls.messaging.controls.standardRecordingAccountName.errors?.invalidName as patternError"
+                                    >
+                                        <span
+                                            *ngIf="patternError && !patternError.startsWithInvalidCharacter"
+                                            language="secondary.portal.profile.editAccountInfo.useOnlyletterNoHYpenError"
+                                        ></span>
+                                        <span
+                                            *ngIf="patternError && patternError.startsWithInvalidCharacter"
+                                            language="secondary.portal.profile.editAccountInfo.hypenApostropeCannotFirstError"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                                <p
+                                    [innerHTML]="languageStrings['primary.portal.callCenter.8x8.form.section.messaging.standardRecordingAccountName.preview']
+                          .replace(
+                              '##accountname##',manageForm.controls.messaging.controls.standardRecordingAccountName?.value || previewEmptyAccountName
+                          )"
+                                ></p>
+                            </div>
+                            <div class="mon-mb-30">
+                                <mat-label
+                                    ><span
+                                        language="primary.portal.callCenter.8x8.form.section.messaging.firstMessageAccountName.label"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field class="call-center-input mon-mb-10">
+                                    <input
+                                        matInput
+                                        formControlName="firstMessageAfterHourAccountName"
+                                        [maxlength]="callCenter8x8Configs.accountNameMaxLength"
+                                    />
+                                    <mat-error
+                                        *ngIf="manageForm.controls.messaging.controls.firstMessageAfterHourAccountName.errors?.required"
+                                    >
+                                        <span language="primary.portal.common.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="manageForm.controls.messaging.controls.firstMessageAfterHourAccountName.errors?.minlength as minLengthError"
+                                    >
+                                        {{ languageStrings['primary.portal.common.minLength'] | replaceTag: { '##num##':
+                                        minLengthError.requiredLength } }}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="manageForm.controls.messaging.controls.firstMessageAfterHourAccountName.errors?.invalidName as patternError"
+                                    >
+                                        <span
+                                            *ngIf="patternError && !patternError.startsWithInvalidCharacter"
+                                            language="secondary.portal.profile.editAccountInfo.useOnlyletterNoHYpenError"
+                                        ></span>
+                                        <span
+                                            *ngIf="patternError && patternError.startsWithInvalidCharacter"
+                                            language="secondary.portal.profile.editAccountInfo.hypenApostropeCannotFirstError"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                                <p
+                                    [innerHTML]="languageStrings['primary.portal.callCenter.8x8.form.section.messaging.firstMessageAccountName.preview']
+                          .replace(
+                              '##accountname##', manageForm.controls.messaging.controls.firstMessageAfterHourAccountName?.value || previewEmptyAccountName
+                          )"
+                                ></p>
+                            </div>
+
+                            <div class="mon-mb-30">
+                                <mat-label
+                                    ><span language="primary.portal.callCenter.8x8.form.section.messaging.customRecording.label"></span
+                                    ><span class="optional-text" language="primary.portal.common.optional"> </span>
+                                </mat-label>
+                                <mat-form-field class="call-center-input custom-recording">
+                                    <textarea
+                                        matInput
+                                        formControlName="customRecordingMessage"
+                                        [maxlength]="callCenter8x8Configs.customRecordingMaxCharacters"
+                                    ></textarea>
+                                    <mat-hint
+                                        ><span
+                                            [innerHTML]="languageStrings['primary.portal.callCenter.8x8.form.section.messaging.customRecording.hint']"
+                                        ></span>
+                                    </mat-hint>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Voicemail routing  -->
+                    <ng-container *ngIf="is8x8CallCenterSelected && manageForm.controls.voicemailRouting">
+                        <div formGroupName="voicemailRouting">
+                            <div class="mon-mb-40 mon-mt-40">
+                                <h2>
+                                    <span language="primary.portal.callCenter.8x8.form.section.voicemailRouting.subheading"></span>
+                                </h2>
+                            </div>
+                            <div>
+                                <mat-label
+                                    ><span language="primary.portal.callCenter.8x8.form.section.voicemailRouting.contactAgent.label"></span>
+                                </mat-label>
+                                <mat-form-field class="call-center-input">
+                                    <ng-template #other>
+                                        <span language="primary.portal.callCenter.8x8.form.section.voicemailRouting.producers.other"></span>
+                                    </ng-template>
+                                    <mat-select formControlName="selectedProducer">
+                                        <mat-select-trigger>
+                                            <span
+                                                *ngIf="manageForm.controls.voicemailRouting.controls.selectedProducer?.value as producer; else other"
+                                                >{{ producer.name.firstName }} {{ producer.name.lastName }}</span
+                                            >
+                                        </mat-select-trigger>
+                                        <mat-option
+                                            class="producer-option"
+                                            *ngFor="let producer of data.producers.content"
+                                            [value]="producer"
+                                        >
+                                            <div>
+                                                <div>{{ producer.name.firstName }} {{ producer.name.lastName }}</div>
+                                                <div class="producer-email">{{ producer.email }}</div>
+                                            </div>
+                                        </mat-option>
+                                        <mat-option [value]="0">
+                                            <ng-container *ngTemplateOutlet="other"></ng-container>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <!-- Name -->
+                                <div class="d-flex" *ngIf="!manageForm.controls.voicemailRouting.controls.selectedProducer.value">
+                                    <div>
+                                        <mat-label
+                                            ><span
+                                                language="primary.portal.callCenter.8x8.form.section.voicemailRouting.producers.name.label"
+                                            ></span>
+                                        </mat-label>
+                                        <mat-form-field class="call-center-input mon-mr-40"
+                                            ><input formControlName="contactAgentName" matInput />
+                                            <mat-error
+                                                *ngIf="manageForm.controls.voicemailRouting.controls.contactAgentName.errors?.required"
+                                            >
+                                                <span language="primary.portal.common.requiredField"></span>
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="manageForm.controls.voicemailRouting.controls.contactAgentName.errors?.invalidName as patternError"
+                                            >
+                                                <span
+                                                    *ngIf="patternError && !patternError.startsWithInvalidCharacter"
+                                                    language="secondary.portal.members.personalValidationMsg.firstNameMsg1"
+                                                ></span>
+                                                <span
+                                                    *ngIf="patternError && patternError.startsWithInvalidCharacter"
+                                                    language="secondary.portal.members.personalValidationMsg.firstNameMsg2"
+                                                ></span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Email -->
+                                    <div>
+                                        <mat-label
+                                            ><span
+                                                language="primary.portal.callCenter.8x8.form.section.voicemailRouting.producers.email.label"
+                                            ></span>
+                                        </mat-label>
+                                        <mat-form-field class="call-center-input mon-mr-40"
+                                            ><input formControlName="contactAgentEmail" matInput />
+                                            <mat-error
+                                                *ngIf="manageForm.controls.voicemailRouting.controls.contactAgentEmail.errors?.required"
+                                            >
+                                                <span language="primary.portal.common.requiredField"></span>
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="manageForm.controls.voicemailRouting.controls.contactAgentEmail.errors?.pattern"
+                                            >
+                                                <span
+                                                    language="primary.portal.callCenter.8x8.form.section.voicemailRouting.email.errors.format"
+                                                ></span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Co-producers listing -->
+                    <ng-container
+                        *ngIf="is8x8CallCenterSelected && manageForm.controls.tollFreeNumberOptions?.value === TollFreeNumberOptions.NEW"
+                    >
+                        <div class="mon-mb-40 mon-mt-40">
+                            <h2>
+                                <span language="primary.portal.callCenter.8x8.form.section.accountCoProducers.subheading"></span>
+                            </h2>
+                        </div>
+
+                        <table class="account-co-producers mon-mt-40">
+                            <tbody>
+                                <tr *ngFor="let producer of data.producers.content">
+                                    <td>{{ producer.name.firstName }} {{ producer.name.lastName }}</td>
+                                    <td>{{ producer.email }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="disclaimer mon-mb-30 mon-mt-20">
+                            <p language="primary.portal.callCenter.8x8.form.section.accountCoProducers.disclaimer.common.content"></p>
+                            <p
+                                [language]="
+                      account?.aflacGroupNumber
+                          ? 'primary.portal.callCenter.8x8.form.section.accountCoProducers.disclaimer.group.content'
+                          : 'primary.portal.callCenter.8x8.form.section.accountCoProducers.disclaimer.individual.content'
+                      "
+                            ></p>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </empowered-sheet>
+    </form>
+</div>

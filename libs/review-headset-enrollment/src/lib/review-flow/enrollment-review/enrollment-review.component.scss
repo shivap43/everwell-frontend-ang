@@ -1,0 +1,359 @@
+@import "shared";
+
+.header {
+    h1 {
+        @include fontFace("secondary.light");
+        color: get("color.black");
+        margin: map-get($spacers, 30) map-get($spacers, 0) map-get($spacers, 15) map-get($spacers, 0);
+    }
+    h4 {
+        margin: 0 0 convert-unit(5px, "rem");
+        font-size: convert-unit(14px, "rem");
+        @include fontFace("primary.bold");
+    }
+    .content {
+        width: 100%;
+        font-size: convert-unit(14px, "rem");
+        .description {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    p {
+        font-size: convert-unit(16px, "rem");
+        margin-top: map-get($spacers, 20);
+        color: get("color.gray.700");
+    }
+}
+
+.action-btn {
+    margin: map-get($spacers, 30) map-get($spacers, 0);
+}
+
+.total-cost {
+    display: flex;
+    justify-content: flex-end;
+    padding: map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 0) map-get($spacers, 0);
+    @include fontFace("primary.regular");
+
+    .content-label {
+        font-size: convert-unit(22px, "rem");
+        margin-right: map-get($spacers, 50);
+    }
+
+    .amount {
+        @include fontFace("primary.bold");
+        font-size: convert-unit(22px, "rem");
+    }
+
+    .frequency {
+        font-size: convert-unit(16px, "rem");
+    }
+
+    .total-amount {
+        color: get("color.black");
+    }
+
+    span {
+        min-width: convert-unit(160px, "rem");
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+
+        .amount {
+            font-size: convert-unit(22px, "rem");
+            @include fontFace("primary.bold");
+        }
+    }
+}
+
+.payment-details {
+    h3 {
+        margin-bottom: map-get($spacers, 20);
+    }
+
+    .payment-card,
+    .payment-bank-draft {
+        margin-bottom: map-get($spacers, 20);
+
+        .draft,
+        .credit-debit-card {
+            display: flex;
+
+            .label {
+                font-size: convert-unit(14px, "rem");
+                width: convert-unit(105px, "rem");
+                color: get("color.black");
+                @include fontFace("primary.bold");
+                line-height: convert-unit(17px, "rem");
+                padding-top: map-get($spacers, 10);
+                padding-bottom: map-get($spacers, 10);
+                padding-right: map-get($spacers, 10);
+            }
+
+            .view-data {
+                width: convert-unit(160px, "rem");
+                line-height: convert-unit(17px, "rem");
+                padding: map-get($spacers, 10);
+            }
+        }
+    }
+}
+
+.normal-white-space {
+    white-space: normal;
+}
+
+.acknowledgement-checker {
+    margin-bottom: map-get($spacers, 15);
+}
+
+.frequency {
+    color: get("color.gray.700");
+    font-size: convert-unit(16px, "rem");
+    font-weight: normal;
+}
+
+.verify-summary {
+    > div {
+        border: convert-unit(1px, "rem") solid get("color.gray.300");
+        border-left: convert-unit(15px, "rem") solid get("color.gray.300");
+        border-radius: convert-unit(5px, "rem");
+        display: flex;
+        align-items: flex-start;
+        padding: map-get($spacers, 20) map-get($spacers, 30);
+        justify-content: space-between;
+        margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 0);
+
+        .plan-coverage {
+            display: flex;
+            flex-direction: column;
+
+            span {
+                color: get("color.gray.700");
+            }
+        }
+
+        .plan-icon {
+            width: convert-unit(100px, "rem");
+        }
+
+        .plan-name {
+            font-size: convert-unit(22px, "rem");
+        }
+
+        .plan-rates {
+            max-width: convert-unit(300px, "rem");
+            margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 10);
+            width: convert-unit(150px, "rem");
+            height: convert-unit(95px, "rem");
+            text-align: right;
+
+            .plan-amount {
+                font-size: convert-unit(22px, "rem");
+            }
+
+            .plan-value {
+                color: get("color.gray.700");
+            }
+        }
+
+        .status {
+            width: convert-unit(176px, "rem");
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+
+            .status-icon {
+                .mon-icon {
+                    margin: 0 convert-unit(5px, "rem");
+                }
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .mat-icon {
+                    margin: map-get($spacers, 5) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+                }
+            }
+
+            .edit {
+                margin-left: map-get($spacers, 30);
+            }
+
+            .review {
+                text-align: center;
+            }
+        }
+    }
+}
+
+.action-btn {
+    margin: map-get($spacers, 30) map-get($spacers, 0);
+}
+
+.content-column {
+    > div {
+        display: flex;
+        font-size: convert-unit(16px, "rem");
+        justify-content: flex-start;
+
+        > span.content-label {
+            @include fontFace("primary.bold");
+            min-width: convert-unit(200px, "rem");
+        }
+
+        .covered-values {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .dependent {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.links {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-modal {
+    width: convert-unit(600px, "rem");
+    max-width: 100%;
+}
+
+.acknowledge {
+    margin: map-get($spacers, 20) map-get($spacers, 0);
+    color: get("color.gray.700");
+}
+
+.mobile-show {
+    display: none;
+}
+
+.hippa-checkbox {
+    ::ng-deep .mat-checkbox-layout {
+        white-space: inherit;
+    }
+}
+
+.icon-vertical-middle {
+    vertical-align: middle;
+}
+
+::ng-deep {
+    .empowered .mat-snack-bar-container {
+        margin-top: 4em !important;
+    }
+}
+
+.text-right-margin-space {
+    margin-right: map-get($spacers, 5);
+}
+
+@include media-max("s") {
+    .align-sm-success {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .total-cost {
+        .content-label {
+            margin-right: map-get($spacers, 0);
+        }
+    }
+
+    .icon-success {
+        display: flex;
+    }
+
+    .mobile-width-100 {
+        width: 100%;
+    }
+
+    .mon-btn-block {
+        margin: map-get($spacers, 10) map-get($spacers, 0);
+        display: block;
+        width: 100%;
+    }
+
+    .verify-summary {
+        > div {
+            padding: map-get($spacers, 10) map-get($spacers, 20);
+
+            .plan-rates {
+                color: get("color.gray.700");
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: auto;
+
+                .plan-amount {
+                    @include fontFace("primary.bold");
+                    font-size: convert-unit(16px, "rem") !important;
+                }
+
+                .frequency {
+                    font-size: convert-unit(12px, "rem");
+                }
+            }
+
+            .status {
+                width: 100%;
+            }
+
+            .review {
+                width: 100%;
+            }
+
+            .mobile {
+                &-hide {
+                    display: none;
+                }
+
+                &-show {
+                    display: flex;
+                }
+            }
+        }
+
+        .plan-coverage {
+            font-size: convert-unit(14px, "rem");
+
+            .plan-name {
+                display: flex;
+                font-size: convert-unit(14px, "rem");
+            }
+        }
+    }
+
+    .flex-sm-column {
+        flex-direction: column;
+    }
+}
+.legal-name {
+    display: flex;
+    flex-direction: column;
+    font-size: convert-unit(16px, "rem");
+    column-width: convert-unit(280px, "rem");
+    @include fontFace("primary.bold");
+    color: get("color.black") !important;
+}
+
+.ebs-plan-status {
+    padding-right: map-get($spacers, 20);
+}
+
+.aflac-always {
+    padding: 40px 0px 20px 0px;
+}
+
+.mrg-btm {
+    margin-bottom: map-get($spacers, 40);
+}

@@ -1,0 +1,47 @@
+<footer class="primary-footer" [ngStyle]="{'border-top-color': customBrandingColor$ | async}">
+    <!--Everwell logo-->
+    <div>
+        <ng-container *ngIf="customBranding$ | async">
+            <a class="branding-link" href="javascript:void(0);" [attr.aria-label]="languageStrings['primary.portal.branding.logo']">
+                <img [src]="logoPublic" [alt]="languageStrings['primary.portal.branding.logo']" class="branding-logo" />
+            </a>
+        </ng-container>
+        <div class="primary-footer-content">
+            <p>
+                {{languageStrings["primary.portal.everwell.support"]}}
+                <a
+                    [attr.aria-label]="languageStrings['primary.portal.footer.contact']"
+                    class="primary-footer-link"
+                    href="tel:{{phoneNumber}}"
+                    >{{phoneNumber}}</a
+                >
+            </p>
+        </div>
+    </div>
+    <div class="primary-footer-nav">
+        <!-- TODO: Once we get Site map content uncomment below code and add content to Site map page. -->
+        <!-- <p>
+            <a
+                *ngIf="isAuthenticated && !smallFooterRoutes.includes(this.currentRoute)"
+                class="primary-footer-link"
+                routerLink="/footer/site-map"
+                language="primary.portal.siteMap.title"
+            ></a>
+        </p> -->
+        <p>
+            <a class="primary-footer-link" routerLink="/footer/privacy-policy" language="primary.portal.privacyPolicy.title"></a>
+        </p>
+        <p *ngIf="isAuthenticated && !smallFooterRoutes.includes(this.currentRoute)">
+            <a class="primary-footer-link" routerLink="/footer/terms-conditions" language="primary.portal.termsConditions.title"></a>
+        </p>
+        <p>
+            <a class="primary-footer-link" routerLink="/footer/consent-statement" language="primary.portal.consentStatement.title"></a>
+        </p>
+        <p *ngIf="showAccessibility">
+            <a tabindex="0" role="contentinfo" class="primary-footer-link" (click)="onAccessibilityLinkClick();">
+                {{ languageStrings["primary.portal.accessibilityStatement.title"]}}
+                <mon-icon iconSize="12" iconName="Icon-right" class="footer-icon"></mon-icon
+            ></a>
+        </p>
+    </div>
+</footer>

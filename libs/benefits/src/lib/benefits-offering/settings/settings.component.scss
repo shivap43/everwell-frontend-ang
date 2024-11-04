@@ -1,0 +1,151 @@
+@import "shared";
+
+.settings-page-wrapper {
+    h3 {
+        color: get("color.black");
+    }
+
+    .state-input {
+        width: convert-unit(350px, "rem");
+    }
+
+    .state-name-title {
+        font-weight: bold;
+        color: get("color.black");
+    }
+
+    .eligible-input {
+        padding-top: map-get($spacers, 5);
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        margin-bottom: map-get($spacers, 5);
+
+        ::ng-deep .mat-form-field-wrapper {
+            width: convert-unit(300px, "rem");
+        }
+    }
+
+    .update-settings-form {
+        padding: 0 convert-unit(20px, "rem");
+    }
+
+    .third-party-container {
+        padding-bottom: map-get($spacers, 30);
+    }
+}
+
+:host ::ng-deep .state-input {
+    .mat-form-field-infix,
+    .mat-form-field-flex {
+        padding: 0;
+    }
+
+    .mat-form-field-infix {
+        display: -ms-flexbox;
+    }
+
+    .mat-chip-list-wrapper {
+        margin: 0;
+        padding: convert-unit(6px, "rem");
+        cursor: text;
+    }
+}
+
+.mat-option.selected-state {
+    background: get("color.primary.500");
+    color: get("color.white");
+
+    &:hover {
+        background: get("color.primary.600");
+    }
+}
+
+.mat-standard-chip .mat-chip-remove,
+.mat-standard-chip .mat-chip-trailing-icon {
+    margin-top: convert-unit(8px, "rem");
+}
+
+.self-service-enrollment {
+    width: convert-unit(300px, "rem");
+    font-size: convert-unit(14px, "rem");
+    margin-bottom: map-get($spacers, 30);
+}
+
+.display-inline-block {
+    display: inline-block;
+}
+
+.message-block {
+    margin-top: map-get($spacers, 10);
+    display: block;
+}
+label {
+    @include fontFace("primary.bold");
+    font-size: convert-unit(14px, "rem");
+    line-height: convert-unit(16px, "rem");
+}
+.employee-count-row {
+    display: flex;
+    clear: both;
+    margin-top: map-get($spacers, 20);
+    margin-left: 0px;
+    .min-eligible-employee-input-label {
+        @include fontFace("primary.bold");
+        font-size: convert-unit(14px, "rem");
+        line-height: convert-unit(16px, "rem");
+    }
+    .edit-button {
+        margin-left: map-get($spacers, 10);
+        @include fontFace("primary.regular");
+    }
+    .secondQuery-subHeading {
+        @include fontFace("primary.bold");
+    }
+    .employee-count {
+        margin-right: map-get($spacers, 10);
+    }
+}
+.disabled-apply {
+    pointer-events: none;
+    opacity: 0.5;
+}
+.refresh-alert {
+    margin: map-get($spacers, 20);
+}
+
+.info-modal {
+    width: convert-unit(600px, "rem");
+    max-width: 100%;
+}
+
+.states-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+ul {
+    padding-left: 0;
+
+    li {
+        list-style-type: none;
+    }
+}
+fieldset {
+    border-width: 0rem;
+    border-style: none;
+    width: 100%;
+}
+
+@media screen and (max-width: 400px) {
+    .settings-page-wrapper {
+        .state-input {
+            width: convert-unit(250px, "rem");
+        }
+        .eligible-input {
+            ::ng-deep .mat-form-field-wrapper {
+                width: convert-unit(280px, "rem");
+            }
+        }
+    }
+}

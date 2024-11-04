@@ -1,0 +1,274 @@
+// TODO - Implemented basic styles for logic
+.mat-stepper-vertical {
+    margin-top: convert-unit(20px, "rem");
+
+    .sub-step {
+        padding: 0;
+        list-style: none;
+        margin-left: convert-unit(25px, "rem");
+        line-height: convert-unit(24px, "rem");
+        margin-top: 0;
+        font-size: convert-unit(12px, "rem");
+
+        li {
+            a,
+            .sub-step-title {
+                text-decoration: none;
+                color: get("color.black");
+            }
+
+            .sub-step-title {
+                padding: map-get($spacers, 0);
+                font-size: convert-unit(12px, "rem");
+                min-width: auto;
+                text-align: left;
+                line-height: convert-unit(24px, "rem");
+            }
+
+            &.active {
+                a,
+                .sub-step-title {
+                    @include fontFace("primary.bold");
+                }
+
+                .highlight {
+                    @include fontFace("primary.bold");
+                }
+            }
+
+            &.future-step {
+                a,
+                .sub-step-title {
+                    color: get("color.gray.700");
+                }
+            }
+        }
+    }
+
+    .mat-select-value {
+        display: none;
+    }
+
+    .mat-step-icon-state-edit {
+        .mat-step-icon-content {
+            opacity: 0;
+        }
+    }
+
+    .mat-stepper-vertical-line:before {
+        border-left-width: convert-unit(2px, "rem");
+        border-left-style: dotted;
+    }
+
+    .mat-vertical-stepper-header {
+        padding: convert-unit(5px, "rem") convert-unit(25px, "rem");
+    }
+
+    .mat-vertical-content {
+        padding: 0;
+    }
+
+    .mat-vertical-content-container {
+        margin-left: convert-unit(29px, "rem");
+        margin-top: convert-unit(6px, "rem");
+    }
+
+    &.employee-stepper {
+        [aria-selected="false"]:hover {
+            background-color: get("color.gray.200");
+        }
+    }
+}
+
+.mat-step-header {
+    .mat-step-icon {
+        background-color: transparent;
+        margin-right: convert-unit(10px, "rem");
+
+        &-selected {
+            background-color: get("color.primary.500");
+
+            .mat-step-icon-content {
+                > span {
+                    display: none;
+                }
+            }
+        }
+
+        &-state-done {
+            background-color: get("color.info.success");
+        }
+    }
+
+    .mat-step-label {
+        font-size: convert-unit(16px, "rem");
+
+        &-selected {
+            @include fontFace("primary.bold");
+        }
+
+        &-active {
+            color: get("color.black");
+        }
+    }
+
+    &[aria-selected="false"]:hover {
+        background-color: transparent;
+    }
+}
+
+.enrollment-stepper {
+    .mat-horizontal-stepper-header-container {
+        display: none;
+    }
+
+    .mat-horizontal-content-container {
+        padding: 0;
+    }
+}
+
+.review-enrollments {
+    .mat-horizontal-stepper-header-container {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+
+        .mat-horizontal-stepper-header {
+            &[aria-selected="true"] {
+                border-bottom: convert-unit(2px, "rem") solid get("color.gray.600");
+            }
+        }
+
+        .mat-stepper-horizontal-line {
+            display: none;
+        }
+
+        .material-icons {
+            display: none;
+        }
+
+        .mat-step-header {
+            .mat-step-icon {
+                margin-right: 0;
+            }
+        }
+    }
+}
+
+.mat-step-icon {
+    height: convert-unit(16px, "rem");
+    width: convert-unit(16px, "rem");
+
+    .mat-icon,
+    .mat-step-icon-content {
+        display: inline-flex;
+    }
+
+    svg {
+        .cls-1 {
+            fill: get("color.white");
+        }
+    }
+}
+
+.mat-step-icon-content {
+    vertical-align: middle;
+}
+
+.mat-stepper-vertical {
+    .mat-vertical-content-container {
+        margin-left: convert-unit(32px, "rem");
+        margin-bottom: convert-unit(6px, "rem");
+    }
+}
+
+.dialog-horizontal-stepper {
+    .mat-horizontal-stepper-header-container {
+        display: none;
+    }
+
+    .mat-horizontal-content-container {
+        padding: convert-unit(20px, "rem") 0 0;
+    }
+
+    .mat-horizontal-stepper-close-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .mat-dialog-content {
+        padding: convert-unit(0px, "rem") convert-unit(50px, "rem") convert-unit(50px, "rem");
+
+        .content-wrapper {
+            mat-label span,
+            .mat-label span {
+                @include fontFace("primary.regular");
+                font-size: convert-unit(12px, "rem");
+            }
+        }
+    }
+
+    .mon-dialog-footer {
+        .mon-btn-link {
+            min-width: auto;
+        }
+
+        .mon-btn-disabled {
+            border: convert-unit(1px, "rem") solid $disabled-btn-border;
+            background-color: $disabled-btn-background;
+            color: $dark-gray;
+            cursor: not-allowed;
+
+            .mon-icon {
+                color: $disabled-arrow;
+            }
+        }
+
+        .mon-btn-primary {
+            .mon-icon {
+                * {
+                    fill: $white;
+                }
+            }
+        }
+    }
+}
+
+.mat-stepper-vertical-line::before {
+    top: -9px !important;
+    bottom: -9px !important;
+}
+
+.stepper-overlay-trigger {
+    display: none !important;
+}
+
+.stepper-overlay {
+    position: absolute;
+    width: 100% !important;
+    background-color: get("color.white");
+    box-shadow: 0 convert-unit(2px, "rem") convert-unit(5px, "rem") rgba(0, 0, 0, 0.7);
+    max-height: convert-unit(400px, "rem");
+    overflow: auto;
+    z-index: 100;
+    display: none;
+
+    &.shown {
+        display: block;
+    }
+}
+
+.stepperTrigger {
+    display: block;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding: convert-unit(10px, "rem") convert-unit(30px, "rem");
+
+    &.mon-btn-link {
+        display: block;
+        text-decoration: none;
+    }
+}
+
+@include media-min("l") {
+    .stepperTrigger {
+        display: none;
+    }
+}

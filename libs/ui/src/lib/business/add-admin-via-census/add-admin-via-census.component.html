@@ -1,0 +1,227 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"> </mon-icon>
+        </button>
+    </div>
+    <!-- TODO: Language tO be implemented -->
+    <mat-horizontal-stepper class="dialog-horizontal-stepper mon-pt-30">
+        <mat-step [stepControl]="stepOneForm">
+            <form [formGroup]="stepOneForm">
+                <div mat-dialog-content>
+                    <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portal.administrators.addAdministrator']}}</h2>
+                    <div class="w-200 d-flex">
+                        <div>
+                            <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.searchByLastName']}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    formControlName="lastName"
+                                    #lastName
+                                    matInput
+                                    autocomplete="off"
+                                    type="text"
+                                    attr.aria-required="true"
+                                    [attr.aria-label]="languageStrings['primary.portal.administrators.searchByLastName']"
+                                />
+                                <mat-error>
+                                    <span *ngIf="stepOneForm.controls['lastName'].hasError('required')"
+                                        >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                    >
+                                    <span
+                                        *ngIf="!stepOneForm.controls['lastName'].hasError('required') && stepOneForm.controls['lastName'].hasError('pattern')"
+                                    >
+                                        {{languageStrings['primary.portal.administrators.enterValidName']}}</span
+                                    >
+                                    <span
+                                        *ngIf="!stepOneForm.controls['lastName'].hasError('required') &&
+                                        !stepOneForm.controls['lastName'].hasError('pattern') &&
+                                        stepOneForm.controls['lastName'].errors?.incorrect"
+                                        [language]="getMemberNotFoundError()"
+                                    ></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div>
+                            <button
+                                (click)="onSearch(lastName)"
+                                mat-flat-button
+                                class="mon-btn-search mon-btn-primary"
+                                [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                            >
+                                <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="census-container">
+                        <div class="table-mask-wrapper" *ngIf="memberFoundFlag && matchedMembersData.length>0">
+                            <div class="mon-table-wraper">
+                                <table mat-table [dataSource]="matchedMembersData" class="mon-pt-0">
+                                    <!-- Name Column -->
+                                    <ng-container matColumnDef="name">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let element">{{element.firstName}} {{element.lastName}}</td>
+                                    </ng-container>
+
+                                    <!-- Email Column -->
+                                    <ng-container matColumnDef="email">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let element">{{element.email}}</td>
+                                    </ng-container>
+
+                                    <!-- Weight Column -->
+                                    <ng-container matColumnDef="select">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <div
+                                                *ngIf="!element.email"
+                                                [richTooltip]="languageStrings['primary.portal.administrators.noEmployeeEmail']"
+                                                matTooltipPosition="above"
+                                            >
+                                                <button
+                                                    type="text"
+                                                    class="mon-btn-primary"
+                                                    mat-flat-button
+                                                    (click)="goToStep(1,element)"
+                                                    matStepperNext
+                                                    [disabled]="!element.email"
+                                                >
+                                                    <span> {{languageStrings['primary.portal.common.select']}}</span>
+                                                    <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                                                </button>
+                                            </div>
+                                            <div *ngIf="element.email">
+                                                <button
+                                                    type="text"
+                                                    class="mon-btn-primary"
+                                                    mat-flat-button
+                                                    (click)="goToStep(1,element)"
+                                                    matStepperNext
+                                                >
+                                                    <span> {{languageStrings['primary.portal.common.select']}}</span>
+                                                    <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr
+                                        mat-row
+                                        *matRowDef="let row; columns: displayedColumns;let element"
+                                        [ngClass]="{'inactive': !element.email}"
+                                    ></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <mat-dialog-actions class="dialog-footer">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="closeForm()"
+                    >{{languageStrings['primary.portal.common.cancel']}}</a
+                >
+                <div>
+                    <button
+                        *ngIf="isOffering"
+                        type="button"
+                        class="mon-btn-secondary mon-mr-15"
+                        mat-flat-button
+                        (click)="onBack()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                    >
+                        <mon-icon class="icon-left" iconName="left" iconSize="10"></mon-icon>
+                        <span>{{languageStrings['primary.portal.common.back']}}</span>
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </mat-step>
+
+        <mat-step [stepControl]="stepTwoForm">
+            <form [formGroup]="stepTwoForm">
+                <div mat-dialog-content>
+                    <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portal.administrators.addAdministrator']}}</h2>
+                    <div class="last-name-search-wrapper">
+                        <div>
+                            {{memberName}}
+                            <span>{{memberEmail}}</span>
+                        </div>
+                    </div>
+                    <div class="mon-mt-30 w-200">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.commission.producer.single.addSplit.selectRole']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <mat-select
+                                class="mon-select-arrow"
+                                formControlName="roleId"
+                                disableOptionCentering="true"
+                                attr.aria-required="true"
+                            >
+                                <mat-option value="" selected>select</mat-option>
+                                <mat-option *ngFor="let role of adminRoles" [value]="role.id"> {{role.name}} </mat-option>
+                            </mat-select>
+                            <mat-error>
+                                <span *ngIf="stepTwoForm.controls['roleId'].hasError('required')"
+                                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <mon-alert *ngIf="errorFlag" alertType="danger">
+                        <span>{{errorMessage}}</span>
+                    </mon-alert>
+
+                    <!-- Reports to -->
+                    <ng-container *configEnabled="'general.feature.enable.admin.reportsTo'">
+                        <div class="mon-mt-30 w-200" *ngIf="data.allAdmins.length > 0">
+                            <mat-label class="mat-label" language="primary.portal.administrators.selectLabel.reportsTo"></mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    class="mon-select-arrow"
+                                    formControlName="reportsTo"
+                                    disableOptionCentering="true"
+                                    attr.aria-required="false"
+                                    placeholder="No one"
+                                >
+                                    <mat-option
+                                        value=""
+                                        selected
+                                        language="primary.portal.administrators.selectDefault.reportsTo"
+                                    ></mat-option>
+                                    <mat-option *ngFor="let admin of data.allAdmins" [value]="admin.id">
+                                        <span *ngIf="admin.name as name"> {{ name.firstName + " " + name.lastName | titlecase }} </span>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <div>
+                        <a href="javascript:void(0)" class="mon-btn-link" (click)="closeForm()"
+                            >{{languageStrings['primary.portal.common.cancel']}}</a
+                        >
+                    </div>
+
+                    <div>
+                        <button
+                            type="button"
+                            class="mon-btn-secondary mon-mr-15"
+                            mat-flat-button
+                            matStepperPrevious
+                            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                        >
+                            <mon-icon class="icon-left" iconName="left" iconSize="10"></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-primary" mat-flat-button (click)="promoteMember()" type="submit">
+                            <span>{{languageStrings['primary.portal.common.next']}}</span>
+                            <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

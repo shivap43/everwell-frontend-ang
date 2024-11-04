@@ -1,0 +1,42 @@
+<div class="mon-card-wrapper mon-my-50 w-600 form-mobile">
+    <mat-card role="Account Message">
+        <mat-card-content class="mon-m-50 mon-pb-50">
+            <div *ngIf="accountMessage == 'exists'">
+                <mat-card-title language="primary.portal.register.accountMessage.accountRegistered"></mat-card-title>
+                <p
+                    class="mon-mt-0 mon-mb-50 mon-pb-50"
+                    language="primary.portal.register.accountMessage.accountRegisteredSubTitle"
+                ></p>
+            </div>
+            <div *ngIf="accountMessage == 'invalid'">
+                <mat-card-title language="primary.portal.register.accountMessage.accountNotFound"></mat-card-title>
+                <p
+                    class="mon-mt-0 mon-mb-50 mon-pb-50"
+                    language="primary.portal.register.accountMessage.noMatchingAccountFound"
+                ></p>
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a class="mon-btn-link mon-pt-10" routerLink="../../../register"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button
+                *ngIf="accountMessage == 'exists'"
+                class="mon-btn-primary"
+                mat-flat-button
+                routerLink="../../../login"
+            >
+                {{languageStrings['primary.portal.common.returnToLogin']}}
+            </button>
+            <button
+                *ngIf="accountMessage == 'invalid'"
+                class="mon-btn-primary"
+                mat-flat-button
+                routerLink="../../../login"
+            >
+                {{languageStrings['primary.portal.common.tryAgain']}}
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</div>

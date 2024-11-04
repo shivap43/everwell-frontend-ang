@@ -1,0 +1,255 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+
+<empowered-modal type="POPUP" size="MD">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="false"></empowered-mon-spinner>
+    <empowered-modal-header> </empowered-modal-header>
+    <mat-horizontal-stepper class="dialog-horizontal-stepper" animationDuration="0ms">
+        <mat-step [stepControl]="stepOneForm">
+            <form [formGroup]="stepOneForm" *ngIf="!hidePersonalForm">
+                <div class="step-header">
+                    <mat-label class="step-txt mat-label">
+                        {{languageStrings['primary.portal.enrollmentMethod.step1']}}
+                    </mat-label>
+
+                    <h2>
+                        {{languageStrings['primary.portal.agent.selfEnrollment.personalInfo']}}
+                    </h2>
+                </div>
+                <div class="zip-alert">
+                    <mon-alert *ngIf="zipFlag" alertType="danger">
+                        <span language="primary.portal.census.manualEntry.zipErrorMsg"></span>
+                    </mon-alert>
+                </div>
+                <div class="self-enroll-info">
+                    <div class="address">
+                        <div class="street">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.tpiEnrollment.streetAddressOne']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="addressLineOne"
+                                    [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressOne']"
+                                />
+                                <mat-error *ngIf="isFormSubmit && stepOneForm.controls.addressLineOne.errors?.required"
+                                    >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                                >
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.addressLineOne.errors?.maxlength"
+                                    language="primary.portal.members.personalValidationMsg.maxlength100"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.addressLineOne.errors?.pattern"
+                                    language="primary.portal.members.personalValidationMsg.streetAddress1"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="street">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']}}<span
+                                    class="optional-text"
+                                    >{{languageStrings['primary.portal.common.optional']}}</span
+                                ></mat-label
+                            >
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="addressLineTwo"
+                                    [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']"
+                                />
+                                <mat-hint>{{languageStrings['primary.portal.callCenter.aptUnit']}}</mat-hint>
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.addressLineTwo.errors?.maxlength"
+                                    language="primary.portal.members.personalValidationMsg.maxlength100"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.addressLineTwo.errors?.pattern"
+                                    language="secondary.portal.members.personalValidationMsg.streetAddress2"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-md-flex">
+                        <div class="field-wrapper-dropdown flex-item">
+                            <div class="w-200 mon-mr-20">
+                                <mat-label class="mat-label"
+                                    ><span>{{languageStrings['primary.portal.census.manualEntry.city']}}</span>
+                                    <span class="optional-text" language="primary.portal.common.optional"></span
+                                ></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="city"
+                                        [attr.aria-label]="languageStrings['primary.portal.census.manualEntry.city']"
+                                    />
+                                    <mat-error [language]="getErrorMessages('city')"></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="field-wrapper-dropdown flex-item">
+                            <div class="w-120 mon-mr-20">
+                                <mat-label
+                                    class="mat-label"
+                                    id="enroll-state"
+                                    language="primary.portal.census.manualEntry.state"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                        formControlName="state"
+                                        panelClass="enrollment-info-select"
+                                        aria-labelledby="enroll-state"
+                                        (selectionChange)="validateStateZipCode()"
+                                    >
+                                        <mat-option language="primary.portal.common.select" disabled></mat-option>
+                                        <mat-option *ngFor="let state of employeeStates" [value]="state.abbreviation">
+                                            {{ state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="isFormSubmit"
+                                        [language]="getEmployeeFormErrorMessage('state')"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="field-wrapper-dropdown flex-item">
+                            <div class="w-100 mon-mr-20">
+                                <mat-label
+                                    class="mat-label"
+                                    language="primary.portal.census.manualEntry.zip"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        [maxlength]="zipCodeLength"
+                                        [minlength]="zipCodeLength"
+                                        formControlName="zip"
+                                        #zip
+                                        (keyup)="checkZipCode($event.target.value)"
+                                        [attr.aria-label]="languageStrings['primary.portal.census.manualEntry.zip']"
+                                    />
+                                    <mat-error
+                                        *ngIf="isFormSubmit && !stepOneForm.controls.zip.value"
+                                        [language]="getEmployeeFormErrorMessage('zip')"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="stepOneForm.controls['zip'].errors?.pattern"
+                                        language="secondary.portal.census.manualEntry.validZip"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-md-flex">
+                        <div class="field-wrapper flex-item">
+                            <div class="w-150 mon-mr-20">
+                                <mat-label
+                                    class="mat-label"
+                                    language="primary.portal.census.manualEntry.birthdate"
+                                ></mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="picker"
+                                        matInput
+                                        #datePickerInput
+                                        formControlName="birthDate"
+                                        [max]="this.today"
+                                        empoweredDateTransform
+                                        maxlength="{{maxLength}}"
+                                        [attr.aria-label]="languageStrings['primary.portal.census.manualEntry.birthdate']"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                        <mon-icon
+                                            iconName="calendar-date"
+                                            iconSize="20"
+                                            matDatepickerToggleIcon
+                                        ></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error>{{validateDate(datePickerInput.value)}}</mat-error>
+                                    <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="field-wrapper flex-item">
+                            <div class="w-150 mon-mr-20">
+                                <mat-label
+                                    class="mat-label"
+                                    id="enroll-gender"
+                                    language="primary.portal.census.manualEntry.gender"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                        formControlName="genderName"
+                                        panelClass="enrollment-info-select"
+                                        aria-labelledby="enroll-gender"
+                                    >
+                                        <mat-option language="primary.portal.common.select" disabled></mat-option>
+                                        <mat-option *ngFor="let item of gender" [value]="item">{{item}}</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="isFormSubmit"
+                                        [language]="getEmployeeFormErrorMessage('genderName')"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </mat-step>
+
+        <mat-step [stepControl]="stepTwoForm">
+            <div class="error-alert">
+                <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+            </div>
+            <empowered-self-enrollment-sit-code
+                [stepControl]="stepTwoForm"
+                [languageStrings]="languageStrings"
+                [companyCode]="companyCode"
+            ></empowered-self-enrollment-sit-code>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+    <empowered-modal-footer>
+        <!--Step 1-->
+
+        <div *ngIf="matStepper.selectedIndex === 0">
+            <button class="mon-btn-secondary mon-mr-20" type="button" mat-flat-button (click)="backToEnrollment()">
+                <mon-icon class="mon-icon icon-left" iconSize="12" iconName="left"></mon-icon>
+                <span>{{languageStrings['primary.portal.common.back']}}</span>
+            </button>
+            <button class="mon-btn-primary" type="button" mat-flat-button (click)="onNext(1)">
+                <span>{{languageStrings['primary.portal.common.next']}}</span>
+                <mon-icon
+                    class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                    iconSize="12"
+                    iconName="right"
+                ></mon-icon>
+            </button>
+        </div>
+        <!--STEP 2-->
+        <div *ngIf="matStepper.selectedIndex === 1">
+            <button class="mon-btn-secondary mon-mr-20" type="button" mat-flat-button (click)="backToPersonalInfo(0)">
+                <mon-icon class="mon-icon icon-left" iconSize="12" iconName="left"></mon-icon>
+                <span>{{languageStrings['primary.portal.common.back']}}</span>
+            </button>
+            <button class="mon-btn-primary" type="button" mat-flat-button (click)="switchToMemberPortal()">
+                <span>{{languageStrings['primary.portal.agent.selfEnrollment.continue']}}</span>
+                <mon-icon
+                    class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                    iconSize="12"
+                    iconName="right"
+                ></mon-icon>
+            </button>
+        </div>
+    </empowered-modal-footer>
+</empowered-modal>

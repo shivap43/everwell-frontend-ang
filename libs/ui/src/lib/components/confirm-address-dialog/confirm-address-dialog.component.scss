@@ -1,0 +1,78 @@
+@import "shared";
+.address-fields {
+    display: flex;
+    flex-direction: row;
+    .address {
+        flex: 0 0 40%;
+        max-width: 40%;
+        margin-right: convert-unit(20px, "rem");
+    }
+}
+.city-details {
+    display: flex;
+    flex-direction: row;
+    .city {
+        flex: 0 0 30%;
+        max-width: 30%;
+        margin-right: convert-unit(20px, "rem");
+    }
+    .state,
+    .zip-code {
+        flex: 0 0 20%;
+        max-width: 20%;
+        margin-right: convert-unit(20px, "rem");
+    }
+}
+.acknowledge-txt {
+    ::ng-deep {
+        .mat-checkbox-layout {
+            white-space: normal;
+            .mat-checkbox-inner-container {
+                margin-top: map-get($spacers, 5);
+            }
+        }
+    }
+}
+
+.email-optional {
+    display: flex;
+    align-items: center;
+    margin-bottom: map-get($spacers, 20);
+    .email-block {
+        margin-right: map-get($spacers, 10);
+        width: convert-unit(345px, "rem");
+        height: convert-unit(80px, "rem");
+
+        .mat-form-field {
+            margin: map-get($spacers, 0);
+        }
+    }
+}
+
+.email-consent {
+    display: flex;
+    margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 0);
+}
+.confirm-message {
+    margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 0);
+}
+.sent-btn {
+    display: flex;
+    align-items: center;
+    height: map-get($spacers, 40);
+    ::ng-deep {
+        .mat-button-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .tick-icon {
+            ::ng-deep .mat-icon.mat-primary {
+                color: get("color.white");
+                .cls-1 {
+                    fill: get("color.white");
+                }
+            }
+        }
+    }
+}

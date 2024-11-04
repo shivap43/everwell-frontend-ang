@@ -1,0 +1,21 @@
+<empowered-tpi-secondary-header>
+    <div class="header">
+        <div tabindex="0" role="header">{{languageStrings['primary.portal.applicationFlow.reinstate.aflacAlways']}}</div>
+        <div>
+            <a
+                *ngIf="isFlowFromTpiShopPage; else coverageSummaryLink"
+                mat-flat-button
+                class="mon-btn-link"
+                (click)="backToCoverageSummary()"
+            >
+                {{languageStrings["primary.portal.aflacAlways.viewCoverageSummary" ]}}
+            </a>
+            <ng-template #coverageSummaryLink>
+                <a mat-flat-button class="mon-btn-link" (click)="backToCoverageSummary()">
+                    {{languageStrings["primary.portal.aflacAlways.backToCoverageSummary" ]}}
+                </a>
+            </ng-template>
+        </div>
+    </div>
+</empowered-tpi-secondary-header>
+<empowered-enroll-aflac-always-modal [isTpi]="isTpi" [isSelfAssisted]="isSelfAssisted"></empowered-enroll-aflac-always-modal>

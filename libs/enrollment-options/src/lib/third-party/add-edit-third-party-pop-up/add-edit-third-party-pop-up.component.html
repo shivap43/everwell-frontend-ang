@@ -1,0 +1,33 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="showCancel" [closeIcon]="closeIcon">
+    <empowered-modal-header>
+        {{languageStrings["primary.portal.thirdParty.adjacentDates"]}}
+        <mon-icon
+            class="mon-icon-close"
+            iconSize="25"
+            (click)="secondaryButtonClick()"
+            iconName="close"
+            aria-hidden="true"
+        ></mon-icon>
+    </empowered-modal-header>
+    <p *ngIf="data">{{data}}</p>
+    <empowered-modal-footer class="empowered-footer">
+        <button
+            mat-dialog-close
+            class="mon-btn-link"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            mat-button
+            (click)="secondaryButtonClick()"
+        >
+            {{languageStrings["primary.portal.common.cancel"]}}
+        </button>
+        <button
+            mat-dialog-close
+            class="mon-btn-danger"
+            [attr.aria-label]="languageStrings['primary.portal.thirdParty.overlapEditExisting']"
+            mat-button
+            (click)="primaryButtonClick()"
+        >
+            {{languageStrings["primary.portal.thirdParty.overlapEditExisting"]}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

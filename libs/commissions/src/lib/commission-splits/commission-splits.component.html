@@ -1,0 +1,257 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="commission-wrapper">
+    <mon-alert alertType="danger" *ngIf="errorMessage" class="message-block">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <h2 *ngIf="!selfEnrollmentFlag">{{languageStrings['primary.portal.commissionSplit.commission.title']}}</h2>
+    <ng-container *ngIf="isDirect || currentAccount?.importType!==accountImportType.AFLAC_GROUP">
+        <p class="mon-mb-20" *ngIf="!isDirect && !selfEnrollmentFlag">
+            {{languageStrings['primary.portal.commissionSplit.commission.description']}}
+        </p>
+        <p class="mon-mb-20" *ngIf="isDirect && !selfEnrollmentFlag">
+            {{languageStrings['primary.portal.direct.commissionSplit.commission.description']}}
+        </p>
+    </ng-container>
+    <div class="alert-wrapper" *ngIf="isRepairRequiredCommissionSplit && !isEnrollerRole">
+        <mon-alert alertType="danger">
+            <span>{{languageStrings['primary.portal.commissionSplit.repairRequires.error']}}</span>
+        </mon-alert>
+    </div>
+    <div class="alert-wrapper" *ngIf="isRepairRequiredCommissionSplit && isEnrollerRole">
+        <mon-alert alertType="danger">
+            <span>{{repairRequiredEnrollerError}}</span>
+        </mon-alert>
+    </div>
+    <div class="alert-wrapper" *ngIf="!isDirect && currentAccount?.importType===accountImportType.AFLAC_GROUP">
+        <mon-alert alertType="info">
+            <span> {{languageStrings['primary.portal.accountEnrollments.commissionSplitNotApplicable']}} </span>
+        </mon-alert>
+    </div>
+
+    <ng-container *configEnabled="DUPLICATE_CHECK_ENABLE_CONFIG">
+        <div
+            class="mon-my-30"
+            *ngIf="((isPayrollGroup && currentAccount?.importType!==accountImportType.AFLAC_GROUP)  || isDirect) && isProducer "
+        >
+            <mon-alert alertType="info" *ngIf="activeSitCodes.length>0" class="message-block">
+                <span *ngIf="activeSitCodes.length === 1"
+                    >{{ secondaryLanguageString['secondary.portal.commissionSplit.activeSitCodes.singleRecord'] | replaceTag: {
+                    "##writingnumber##" : activeSitCodes[0].writingNumber, "##sitcode##" : activeSitCodes[0].sitCode, "##expirationdate##" :
+                    activeSitCodes[0].expirationDate } }}
+                </span>
+                <div *ngIf="activeSitCodes.length > 1">
+                    <span>{{secondaryLanguageString['secondary.portal.commissionSplit.activeSitCodes.multipleRecordsHeader']}}</span>
+                    <ul>
+                        <li *ngFor="let activeSitCode of activeSitCodes">
+                            <span
+                                >{{ secondaryLanguageString['secondary.portal.commissionSplit.activeSitCodes.multipleRecords'] | replaceTag:
+                                { "##writingnumber##" : activeSitCode.writingNumber, "##sitcode##" : activeSitCode.sitCode,
+                                "##expirationdate##" : activeSitCode.expirationDate } }}</span
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </mon-alert>
+            <mon-alert alertType="warning" *ngIf="expiredSitCodes.length>0" class="message-block">
+                <span *ngIf="expiredSitCodes.length === 1"
+                    >{{ secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.singleRecord'] | replaceTag: {
+                    "##writingnumber##" : expiredSitCodes[0].writingNumber, "##sitcode##" : expiredSitCodes[0].sitCode } }}</span
+                >
+                <div *ngIf="expiredSitCodes.length > 1">
+                    <span>{{secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.multipleRecordsHeader']}}</span>
+                    <ul>
+                        <li *ngFor="let expiredSitCode of expiredSitCodes">
+                            {{ secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.multipleRecords'] | replaceTag : {
+                            "##writingnumber##" : expiredSitCode.writingNumber, "##sitcode##" : expiredSitCode.sitCode } }}
+                        </li>
+                    </ul>
+                </div>
+            </mon-alert>
+        </div></ng-container
+    >
+
+    <mat-expansion-panel
+        *ngIf="!isEnrollerRole"
+        hideToggle
+        [disabled]="true"
+        [expanded]="expandedView"
+        class="commission-splits-expansion"
+        [ngClass]="{'panel-white-out' : editView}"
+    >
+        <mat-expansion-panel-header *ngIf="!selfEnrollmentFlag && !isPrivacyOnForEnroller">
+            <mat-panel-title (click)="addCustmizedSplit()">
+                <a *ngIf="!expandedView" [ngClass]="{'disabled' : !isDirect && currentAccount?.importType===accountImportType.AFLAC_GROUP}"
+                    >{{languageStrings['primary.portal.commissionSplit.commission.addCustomized']}}</a
+                >
+                <a class="split-header" *ngIf="expandedView">{{languageStrings["primary.portal.commissionSplit.addUpdate.add.header"]}}</a>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+            <empowered-add-update-custmized-split
+                *ngIf="expandedView"
+                [commissionSplit]="addCommissionSplit"
+                [totalProducerList]="producerList"
+                [stateList]="stateList"
+                [companyCode]="companyCode"
+                [userCompanycode]="userCompanycode"
+                [operation]="operation.ADD"
+                [sitCodes]="sitCodes"
+                [nonEligibleCarriersForSplit]="nonEligibleCarriersForSplit"
+                (cancelEditCustmizedSplit)="cancelEditCustmizedSplit($event)"
+            >
+            </empowered-add-update-custmized-split>
+        </ng-template>
+    </mat-expansion-panel>
+    <div
+        class="commission-split"
+        *ngFor="let commission of commissionSplits;let i = index;"
+        [ngClass]="{'panel-white-out' : editView && !commission.expandedView}"
+    >
+        <mat-expansion-panel
+            hideToggle
+            [disabled]="true"
+            [expanded]="commission.expandedView"
+            class="commission-splits-expansion"
+            *ngIf="commission?.defaultSplit?.view && commission?.customSplit?.view"
+        >
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <mon-icon iconSize="16" iconName="Filled-error" class="icon-danger" *ngIf="commission.repairRequired"></mon-icon>
+                    <p
+                        class="split-header"
+                        *ngIf="!editView || commission.isDefault || commission.isPartnerCarrierSplit || commission.conversion"
+                    >
+                        {{commission.name}}
+                    </p>
+                    <a
+                        class="split-header"
+                        *ngIf="editView && !commission.isDefault && !commission.isPartnerCarrierSplit && !commission.conversion"
+                        >{{languageStrings["primary.portal.commissionSplit.addUpdate.edit.header"]}}</a
+                    >
+                </mat-panel-title>
+                <div *ngIf="isDirect || currentAccount?.importType!==accountImportType.AFLAC_GROUP">
+                    <button
+                        mat-flat-button
+                        class="mon-btn-link remove-split"
+                        *ngIf="commission.showRemoveButton && !isPrivacyOnForEnroller"
+                        (click)="removeCommissionSplit(commission)"
+                    >
+                        {{languageStrings['primary.portal.common.remove']}}
+                    </button>
+                    <button
+                        mat-flat-button
+                        class="mon-btn-link"
+                        *ngIf="commission.showEditButton && !commission.disablePartnerCarrierSplit && !commission.expandedView && !isPrivacyOnForEnroller"
+                        (click)="editCommissionSplit(i);"
+                    >
+                        {{languageStrings['primary.portal.common.edit']}}
+                    </button>
+                    <div
+                        *ngIf="commission.showEditButton && commission.disablePartnerCarrierSplit"
+                        [richTooltip]="commission.editButtonTooltipText"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                    >
+                        <button mat-flat-button class="mon-btn-link" disabled="true">
+                            {{languageStrings['primary.portal.common.edit']}}
+                        </button>
+                    </div>
+                </div>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
+                <empowered-add-update-custmized-split
+                    [commissionSplit]="commission"
+                    [totalProducerList]="producerList"
+                    [stateList]="stateList"
+                    [companyCode]="companyCode"
+                    [userCompanycode]="userCompanycode"
+                    [operation]="operation.EDIT"
+                    [sitCodes]="sitCodes"
+                    [nonEligibleCarriersForSplit]="nonEligibleCarriersForSplit"
+                    (cancelEditCustmizedSplit)="cancelEditCustmizedSplit($event)"
+                    [nonEligibleCarriersForSplit]="nonEligibleCarriersForSplit"
+                    [index]="i"
+                >
+                </empowered-add-update-custmized-split>
+            </ng-template>
+        </mat-expansion-panel>
+        <div *ngIf="!commission.expandedView && commission?.defaultSplit?.view && commission?.customSplit?.view">
+            <div class="split-applied-panel">
+                <div class="split-panel">
+                    <p class="split-panel-title">{{languageStrings['primary.portal.commissionSplit.commission.splitSection']}}</p>
+                    <div class="split-details" *ngFor="let element of commission.assignments">
+                        <ng-container>
+                            <p>{{element.percent}}%</p>
+                        </ng-container>
+                        <ng-container>
+                            <p>{{element.producer.name}}</p>
+                        </ng-container>
+                        <ng-container>
+                            <p>{{getSitCodeBySitCodeIdProducerId(element.producer.producerId,element.sitCodeId)}}</p>
+                        </ng-container>
+                        <ng-container>
+                            <p>{{getWritingNumberBySitCode(element.producer.producerId,element.sitCodeId)}}</p>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="applied-panel">
+                    <p *ngIf="commission.rules.length" class="applied-panel-title">
+                        {{languageStrings['primary.portal.commissionSplit.commission.AppliedWhen']}}
+                    </p>
+                    <!-- For Custamized Split -->
+                    <div
+                        *ngIf="commission.rules && !commission.isDefault && !commission.isPartnerCarrierSplit"
+                        class="applied-panel-description"
+                    >
+                        <div [innerHTML]="getRuleDisplayList(commission)"></div>
+                    </div>
+                    <!-- For Default Split -->
+                    <div
+                        *ngIf="commission.rules && commission.isDefault && !commission.isPartnerCarrierSplit"
+                        class="applied-panel-description"
+                    >
+                        <div *ngIf="getRuleDisplayValue(commission.rules, 'WRITING_PRODUCER')">
+                            <p>
+                                {{getRuleDisplayText('WRITING_PRODUCER')}} =
+                                <strong>{{getRuleDisplayValue(commission.rules, 'WRITING_PRODUCER')}}</strong>
+                            </p>
+                            <p *ngIf="isDirect">
+                                <strong>{{languageStrings['primary.portal.common.and']}}</strong>
+                                {{getRuleDisplayText('STATES')}} =
+                                <strong *ngIf="commission.splitCompanyCode === companyCodes.US && !eFinancePermission"
+                                    >{{languageStrings['primary.portal.commissionSplit.commission.anyExcept']}}
+                                    {{getDisplayTextOfStates(companyCodes.NY)}}</strong
+                                >
+                                <strong *ngIf="commission.splitCompanyCode === companyCodes.US && eFinancePermission"
+                                    >{{languageStrings['primary.portal.commissionSplit.commission.anyExcept']}} {{stateDisplayTextNY}}
+                                    {{languageStrings['primary.portal.common.and']}} {{stateDisplayTextMI}}
+                                </strong>
+                                <strong *ngIf="commission.splitCompanyCode === companyCodes.NY"
+                                    >{{getDisplayTextOfStates(companyCodes.NY)}}</strong
+                                >
+                                <strong *ngIf="commission.splitCompanyCode === companyCodes.MI && eFinancePermission"
+                                    >{{getDisplayTextOfStates(companyCodes.MI)}}</strong
+                                >
+                            </p>
+                        </div>
+                        <p *ngIf="!selfEnrollmentFlag">
+                            {{languageStrings['primary.portal.commissionSplit.commission.overriddenMessage']}}
+                        </p>
+                    </div>
+                    <!-- For Partner Carrier Split-->
+                    <div
+                        *ngIf="commission.rules && !commission.isDefault && commission.isPartnerCarrierSplit"
+                        class="applied-panel-description"
+                    >
+                        <div *ngIf="getRuleDisplayValue(commission.rules, 'CARRIER')">
+                            <p>
+                                {{getRuleDisplayText('CARRIER')}} =
+                                <strong>{{getRuleDisplayValue(commission.rules, 'CARRIER')}}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

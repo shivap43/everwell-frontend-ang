@@ -1,0 +1,205 @@
+@import "shared";
+::ng-deep {
+    .commission_split_dropdown {
+        width: convert-unit(179px, "rem") !important;
+        margin-left: convert-unit(3px, "rem") !important;
+
+        .mat-select-trigger {
+            .mat-select-arrow-wrapper {
+                position: relative;
+                left: convert-unit(12px, "rem") !important;
+            }
+        }
+    }
+
+    .send_date_dropdown {
+        width: convert-unit(95px, "rem") !important;
+        margin-left: convert-unit(3px, "rem") !important;
+
+        .mat-select-trigger {
+            .mat-select-arrow-wrapper {
+                position: relative !important;
+                left: convert-unit(15px, "rem") !important;
+            }
+        }
+
+        .mat-option {
+            margin-bottom: convert-unit(10px, "rem");
+        }
+    }
+}
+
+.enrollments-header {
+    margin: convert-unit(20px, "rem") 0 convert-unit(15px, "rem");
+    color: get("color.gray.700");
+    font-size: 28px;
+    font-weight: normal;
+}
+
+.commission-split-warning {
+    color: get("color.gray.600");
+    font-size: 12px;
+}
+
+table {
+    width: 100%;
+}
+
+::ng-deep .mat-select-panel .mat-optgroup-label,
+.mat-select-panel .mat-option {
+    height: 4em !important;
+}
+
+::ng-deep .mat-select-panel-wrap .list-grid-filter.mat-select-panel .mat-option .mat-option-text.mat-option-text {
+    white-space: nowrap;
+}
+
+.header-def {
+    margin-bottom: convert-unit(15px, "rem");
+    .shared-account {
+        margin-top: map-get($spacers, 20);
+    }
+}
+
+.message-block {
+    margin-top: convert-unit(20px, "rem");
+    display: block;
+}
+
+.search-filter-wraper {
+    align-items: normal;
+    display: flex;
+    justify-content: space-between;
+
+    .search-wrapper {
+        background: none;
+
+        div {
+            margin-bottom: convert-unit(5px, "rem");
+        }
+
+        .search-label {
+            @include fontFace("primary.bold");
+            width: convert-unit(140px, "rem");
+            margin-right: convert-unit(10px, "rem");
+            display: inline-block;
+        }
+    }
+
+    .filter-wrapper {
+        flex-grow: 0;
+        width: convert-unit(500px, "rem");
+    }
+}
+
+.unsent-container {
+    margin: map-get($spacers, 0) map-get($spacers, 30);
+    padding-bottom: convert-unit(100px, "rem");
+    ::ng-deep {
+        .mat-table {
+            margin-bottom: convert-unit(100px, "rem");
+
+            .mat-row {
+                .mat-cell {
+                    vertical-align: top;
+
+                    &.mat-column-enrollment > div {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .mat-form-field {
+                        margin-bottom: 0;
+                    }
+                }
+
+                &:last-child {
+                    .mat-cell {
+                        width: auto;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.mat-column-note {
+    width: convert-unit(55px, "rem");
+
+    a {
+        display: inline-block;
+        margin-top: convert-unit(-3px, "rem");
+        padding-top: convert-unit(2px, "rem");
+    }
+}
+
+.mat-column-commissionSplit {
+    width: convert-unit(235px, "rem");
+
+    & > div {
+        width: convert-unit(215px, "rem");
+    }
+}
+
+.mat-column-sendDate {
+    width: convert-unit(150px, "rem");
+
+    & > div {
+        width: convert-unit(130px, "rem");
+    }
+}
+
+.note-icon {
+    margin: 0;
+}
+
+.enrolled_row {
+    background-color: #e4f0fe !important;
+    outline: convert-unit(1px, "rem") solid #0c6cd7;
+    outline-offset: convert-unit(-1px, "rem");
+}
+
+.enrolled-note {
+    width: convert-unit(140px, "rem");
+    text-align: right;
+}
+
+.fixed-position {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+a.disabled {
+    color: get("color.gray.600");
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+::ng-deep {
+    .is-footer-fixed .fixed-position {
+        position: absolute;
+    }
+
+    .mat-option-text span {
+        color: #6e6e6e;
+        line-height: convert-unit(16px, "rem");
+        padding: convert-unit(2px, "rem") 0;
+
+        &:first-child {
+            line-height: inherit;
+            padding: 0;
+        }
+    }
+
+    .alert-content {
+        justify-content: space-between;
+        display: flex;
+    }
+}
+.alert-msg,
+.unsent-filters {
+    margin: map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 20) map-get($spacers, 30);
+}

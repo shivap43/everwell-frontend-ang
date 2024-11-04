@@ -1,0 +1,166 @@
+<form [formGroup]="form" (submit)="onSubmit()">
+    <empowered-sheet>
+        <empowered-sheet-header>
+            <span language="primary.portal.messageCenter.compose.header"></span>
+        </empowered-sheet-header>
+
+        <empowered-sheet-footer>
+            <button
+                mat-button
+                mat-raised-button
+                class="mon-btn-primary"
+                color="primary"
+                language="primary.portal.messageCenter.compose.button.send"
+            ></button>
+        </empowered-sheet-footer>
+
+        <div class="container" *ngIf="portal$ | async as portal">
+            <!--Recipient-->
+            <div *ngIf="portal === PORTAL_ADMIN" class="row">
+                <div class="col-2">
+                    <mat-label language="primary.portal.messageCenter.compose.recipientType.label"></mat-label>
+                    <mat-form-field>
+                        <mat-select [formControl]="recipientType" [disableOptionCentering]="true">
+                            <mat-option value="single" language="primary.portal.messageCenter.compose.recipientType.single"> </mat-option>
+                            <mat-option value="audience" language="primary.portal.messageCenter.compose.recipientType.multiple">
+                            </mat-option>
+                            <mat-option value="producer" language="primary.portal.messageCenter.compose.recipientType.producer">
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <ng-container *ngIf="recipientTypeValueChange$ | async as recipientTypeValue">
+                <div class="row">
+                    <div [ngClass]="{'col-10': portal === PORTAL_ADMIN, 'col-12': portal !== PORTAL_ADMIN}">
+                        <mat-label language="primary.portal.messageCenter.metaLabel.to"></mat-label>
+                        <empowered-single-recipient-input
+                            *ngIf="(recipientTypeValue === RECIPIENT_TYPE_SINGLE || recipientTypeValue === RECIPIENT_TYPE_PRODUCER) && portal"
+                            formControlName="singleRecipient"
+                            [portalType]="portal"
+                            [toProducer]="recipientTypeValue === 'producer'"
+                            (latestValue)="updateSingleRecipient($event)"
+                        >
+                        </empowered-single-recipient-input>
+
+                        <empowered-audience-builder-container
+                            *ngIf="recipientTypeValue === 'audience'"
+                            [displayAudienceGroupTypes]="['SSN', 'EMPLOYEE_ID', 'EMPLOYMENT_STATUS', 'CLAZZ', 'REGION', 'ENROLLMENT_PLAN']"
+                            [initialAudienceGrouping]="multiRecipientInit"
+                            (audienceGrouping)="updateMultiRecipient($event)"
+                        >
+                        </empowered-audience-builder-container>
+                    </div>
+                </div>
+
+                <!--Subject-->
+                <div class="row">
+                    <div class="col-10" [ngClass]="{ 'col-10': portal === PORTAL_ADMIN, 'col-12': portal !== PORTAL_ADMIN }">
+                        <mat-label language="primary.portal.messageCenter.compose.subject.label"></mat-label>
+                        <mat-form-field>
+                            <input matInput [formControlName]="FORM_INPUT_SUBJECT" />
+                            <mat-hint language="primary.portal.messageCenter.compose.subject.hint"></mat-hint>
+                            <mat-error *ngIf="form?.controls['subject']?.errors?.required">
+                                <span language="primary.portal.messageCenter.compose.subject.error.required"></span>
+                            </mat-error>
+                            <mat-error *ngIf="form?.controls['subject']?.errors?.subjectTooLong">
+                                <span language="primary.portal.messageCenter.compose.subject.error.length"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="col-2" *ngIf="portal === PORTAL_ADMIN && recipientTypeValue !== RECIPIENT_TYPE_PRODUCER">
+                        <mat-label language="primary.portal.messageCenter.compose.category.label"></mat-label>
+                        <mat-form-field>
+                            <mat-select [formControlName]="FORM_INPUT_CATEGORY_ID" [disableOptionCentering]="true">
+                                <mat-option [value]="undefined"></mat-option>
+                                <mat-option *ngFor="let category of categories$ | async" [value]="category.id">
+                                    {{ category.name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!--Message-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-label language="primary.portal.messageCenter.compose.message.label"></mat-label>
+                    <mat-form-field>
+                        <textarea matInput [formControlName]="FORM_INPUT_MESSAGE" matTextareaAutosize [matAutosizeMinRows]="5"></textarea>
+                        <mat-error
+                            *ngIf="form?.controls['subject']?.errors?.required"
+                            language="primary.portal.messageCenter.compose.message.error.required"
+                        >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!--Attachments-->
+            <ng-container *ngIf="doDisplayAttachmentType$ | async; else justFileUploader">
+                <div class="row">
+                    <div class="col-2">
+                        <mat-label language="primary.portal.messageCenter.compose.attachmentType.label"></mat-label>
+                        <mat-form-field>
+                            <mat-select [formControl]="attachmentType" [disableOptionCentering]="true">
+                                <mat-option value="file" language="primary.portal.messageCenter.compose.attachmentType.option.file">
+                                </mat-option>
+                                <mat-option value="resource" language="primary.portal.messageCenter.compose.attachmentType.option.resource">
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <ng-container *ngIf="showFileUpload$ | async; else resourceInput">
+                    <div class="row">
+                        <div class="col-12">
+                            <empowered-file-uploader
+                                [label]="uploadFileLabel"
+                                [hint]="uploadFileHint"
+                                [uploadFunction]="uploadFunction"
+                                [deleteFunction]="deleteFunction"
+                                (uploads)="documentUpload($event)"
+                                [acceptableFileSize]="MAX_FILE_SIZE"
+                            >
+                            </empowered-file-uploader>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #resourceInput>
+                    <div class="row">
+                        <div class="col-2">
+                            <mat-label language="primary.portal.messageCenter.compose.resource.label"></mat-label>
+                            <mat-form-field>
+                                <mat-select [formControlName]="FORM_INPUT_RESOURCE_ID" [disableOptionCentering]="true">
+                                    <ng-container *ngIf="resources$ | async as resources">
+                                        <mat-option *ngFor="let resource of resources" [value]="resource.id">
+                                            {{ resource.name }}
+                                        </mat-option>
+                                    </ng-container>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-container>
+            <ng-template #justFileUploader>
+                <div class="row">
+                    <div class="col-12">
+                        <empowered-file-uploader
+                            [label]="uploadFileLabel"
+                            [hint]="uploadFileHint"
+                            [uploadFunction]="uploadFunction"
+                            [deleteFunction]="deleteFunction"
+                            (uploads)="documentUpload($event)"
+                            [acceptableFileSize]="MAX_FILE_SIZE"
+                        >
+                        </empowered-file-uploader>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </empowered-sheet>
+</form>

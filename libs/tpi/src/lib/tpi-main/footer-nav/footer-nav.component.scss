@@ -1,0 +1,104 @@
+@import "shared";
+
+.mat-sidenav-container {
+    /// - Set `flex-shrink` to `0` to prevent some browsers from letting these items shrink to smaller
+    ///   than their content's default minimum size. See http://bit.ly/1Mn35US for details.
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    background-color: get("color.white");
+    color: get("color.black");
+
+    .mat-sidenav-content {
+        display: flex;
+        flex-direction: column;
+
+        @include media-max("l") {
+            padding: map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 25) !important;
+        }
+    }
+}
+
+.sideNav {
+    min-width: 17%;
+    background-color: get("color.white");
+    border-right: none !important;
+    min-height: 100%;
+    color: black;
+    font-size: convert-unit(16px, "rem");
+    @include fontFace("primary.regular");
+    font-weight: normal;
+    letter-spacing: convert-unit(0px, "rem");
+    line-height: convert-unit(39px, "rem");
+    margin-top: map-get($spacers, 30);
+
+    @include media-max("l") {
+        margin-top: map-get($spacers, 0) !important;
+        width: convert-unit(240px, "rem");
+    }
+
+    .side-nav-link {
+        padding: map-get($spacers, 0) map-get($spacers, 30);
+    }
+
+    .icon-primary {
+        @include media-max("l") {
+            height: convert-unit(0px, "rem");
+        }
+    }
+
+    .secondaryFooter-link {
+        color: get("color.gray.500");
+        text-decoration: none;
+
+        &--active {
+            font-weight: Bold;
+            color: black;
+        }
+    }
+
+    p {
+        line-height: convert-unit(35px, "rem");
+    }
+}
+
+.content-common-header {
+    margin: map-get($spacers, 0);
+    padding-right: map-get($spacers, 30);
+    padding-left: map-get($spacers, 15);
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    background-color: get("color.gray.100");
+
+    .footer-text {
+        margin: map-get($spacers, 0);
+        padding: map-get($spacers, 15) map-get($spacers, 15) map-get($spacers, 17);
+        font-weight: normal;
+        font-size: convert-unit(28px, "rem");
+        @include fontFace("primary.regular");
+        color: get("color.gray.1000");
+    }
+}
+
+.footer-content {
+    .header {
+        border-bottom: convert-unit(1px, "rem") solid grey;
+        margin-left: map-get($spacers, 0);
+
+        @include media-max("l") {
+            margin: map-get($spacers, 0) !important;
+        }
+
+        h3 {
+            font-size: convert-unit(22px, "rem");
+            color: get("color.black");
+            font-weight: normal;
+            letter-spacing: convert-unit(0px, "rem");
+            margin: map-get($spacers, 40) map-get($spacers, 0) map-get($spacers, 24);
+
+            @include media-max("l") {
+                margin-top: map-get($spacers, 30);
+            }
+        }
+    }
+}

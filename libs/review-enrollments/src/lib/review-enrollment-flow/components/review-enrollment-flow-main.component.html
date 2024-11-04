@@ -1,0 +1,36 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<div *ngIf="linkExpired">
+    <div class="expired-link expired-link-header">{{languageStrings['primary.portal.review.expired']}}</div>
+    <p class="expired-link expired-link-sub-heading">
+        <label class="access-sub-header">{{languageStrings['primary.portal.review.expired.access']}}</label>
+        <a
+            tabindex="0"
+            href="javascript:void(0)"
+            [attr.aria-label]="languageStrings['primary.portal.review.expired.login']"
+            class="link-sub-header"
+            (click)="switchToMyAflac()"
+            >{{languageStrings['primary.portal.review.expired.login']}}</a
+        >
+    </p>
+</div>
+
+<div>
+    <div class="review-enrollments" *ngIf="!linkExpired && currentStep">
+        <mat-horizontal-stepper #stepper [linear]="true">
+            <mat-step [editable]="false" [completed]="completedStep>=1">
+                <ng-template matStepLabel>{{languageStrings['primary.portal.enrollment.summary.elected.verify.identify']}}</ng-template>
+                <div *ngIf="currentStep === verifyUserStep"><empowered-verify-identity></empowered-verify-identity></div>
+            </mat-step>
+            <mat-step [editable]="false" [completed]="completedStep>=2">
+                <ng-template matStepLabel>{{languageStrings['primary.portal.enrollment.summary.elected.enrollment.summary']}}</ng-template>
+                <div *ngIf="currentStep === enrollmentSummaryStep"><empowered-enrollment-summary></empowered-enrollment-summary></div>
+            </mat-step>
+            <ng-template matStepperIcon="done">
+                <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+            </ng-template>
+        </mat-horizontal-stepper>
+    </div>
+</div>

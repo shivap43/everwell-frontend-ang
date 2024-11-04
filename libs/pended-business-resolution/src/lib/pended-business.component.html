@@ -1,0 +1,22 @@
+<div class="pended-business-wrapper">
+    <mat-tab-group animationDuration="0ms">
+        <mat-tab *ngFor="let tab of tabs" [label]="tab.name">
+            <ng-template matTabContent>
+                <empowered-pended-business-header></empowered-pended-business-header>
+                <ng-container *ngComponentOutlet="tab.component"></ng-container>
+            </ng-template>
+        </mat-tab>
+        <mat-tab disabled>
+            <ng-template mat-tab-label>
+                <button
+                    mat-flat-button
+                    class="mon-btn-primary mon-ml-20"
+                    *hasPermission="'aflac.producer.read.pendedBusiness.any'"
+                    (click)="findOtherProducersPendedBusiness()"
+                >
+                    <span language="primary.portal.pendedBusiness.findOtherProducersBusiness"></span>
+                </button>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</div>

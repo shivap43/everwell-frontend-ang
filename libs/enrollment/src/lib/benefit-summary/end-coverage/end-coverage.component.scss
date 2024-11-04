@@ -1,0 +1,70 @@
+@import "shared";
+.step-txt {
+    display: block;
+    font-size: convert-unit(14px, "rem");
+    color: get("color.black");
+    @include fontFace("primary.bold");
+    line-height: convert-unit(17px, "rem");
+}
+.end-coverage-wrapper {
+    max-height: calc(100vh - 400px);
+    margin-right: convert-unit(-50px, "rem");
+    .dialog-horizontal-stepper {
+        padding-right: map-get($spacers, 50);
+        ::ng-deep {
+            .mat-horizontal-content-container {
+                padding-top: map-get($spacers, 0);
+            }
+        }
+    }
+    p {
+        margin-bottom: map-get($spacers, 20);
+        span {
+            display: block;
+        }
+    }
+    .coverage-end-date {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    textarea {
+        resize: none;
+        height: convert-unit(76px, "rem");
+    }
+    .confirm-end-coverage {
+        .coverage-view {
+            display: flex;
+            &:first-child {
+                margin-bottom: map-get($spacers, 10);
+            }
+            .label {
+                @include fontFace("primary.bold");
+                min-width: convert-unit(170px, "rem");
+            }
+        }
+        .data {
+            word-break: break-all;
+        }
+    }
+    .error-msg {
+        margin-top: map-get($spacers, 20);
+    }
+    .pretax {
+        padding-top: map-get($spacers, 30);
+        border-top: convert-unit(1px, "rem") solid get("color.black");
+        margin-top: map-get($spacers, 30);
+        ::ng-deep {
+            .pretax-content {
+                p {
+                    padding-bottom: map-get($spacers, 20);
+                }
+            }
+        }
+    }
+}
+.mon-btn-secondary {
+    margin-right: map-get($spacers, 20);
+}
+:host ::ng-deep .mat-dialog-content {
+    padding-top: 0;
+}

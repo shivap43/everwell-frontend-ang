@@ -1,0 +1,119 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="caseBuilderAdminForm" class="info-modal case-builder-admin" (ngSubmit)="createUpdateCaseBuilderAdmin()">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            type="button"
+            (click)="closePopup(false)"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <ng-template [ngIf]="showSpinner">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+    <div mat-dialog-content>
+        <h2 *ngIf="data.type === 'add'" mat-dialog-title>{{languageStrings["primary.portal.caseBuilderAdmin.header.add"]}}</h2>
+        <h2 *ngIf="data.type === 'edit'" mat-dialog-title>{{languageStrings['primary.portal.caseBuilderAdmin.header.edit']}}</h2>
+        <div class="padding-bottom" *ngIf="apiError">
+            <mon-alert alertType="danger">
+                <span>{{ apiError }}</span>
+            </mon-alert>
+        </div>
+        <mat-label class="mat-label" language="primary.portal.caseBuilderAdmin.admin"></mat-label>
+        <mat-form-field class="add-edit-form">
+            <mat-select
+                formControlName="caseBuilderAdminSelect"
+                [placeholder]="languageStrings['primary.portal.caseBuilderAdmin.admin.select']"
+            >
+                <mat-option *ngFor="let caseBuilder of data.allCaseBuilderAdmin" [value]="caseBuilder.id">
+                    {{caseBuilder.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="caseBuilderAdminForm.controls.caseBuilderAdminSelect.errors?.required">
+                {{languageStrings['primary.portal.common.requiredField']}}
+            </mat-error>
+        </mat-form-field>
+
+        <p class="padding-bottom">{{languageStrings['primary.portal.caseBuilderAdmin.addEdit.text']}}</p>
+
+        <div class="d-flex">
+            <div>
+                <mat-label class="mat-label" language="primary.portal.caseBuilderAdmin.startDate"></mat-label>
+                <mat-form-field class="mon-mr-10 mon-date-field">
+                    <input
+                        matInput
+                        [matDatepicker]="startDatepicker"
+                        [min]="date"
+                        formControlName="{{START_DATE}}"
+                        name="startDatePicker"
+                        (dateChange)="validateInput(START_DATE)"
+                        [attr.aria-label]="languageStrings['primary.portal.caseBuilderAdmin.startDate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker #startDatepicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="startDatepicker">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-hint language="primary.portal.caseBuilderAdmin.dateformat"></mat-hint>
+                    <mat-error class="err-max-width" *ngIf="!caseBuilderAdminForm.controls?.startDate?.errors?.required">
+                        {{error.messageStartDate}}
+                    </mat-error>
+                    <mat-error *ngIf="caseBuilderAdminForm.controls?.startDate?.errors?.required">
+                        {{languageStrings['primary.portal.common.requiredField']}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="mon-ml-15">
+                <mat-label class="mat-label"
+                    ><span>{{languageStrings['primary.portal.caseBuilderAdmin.endDate']}}</span>
+                    <span class="optional-text" language="primary.portal.common.optional"></span>
+                </mat-label>
+                <mat-form-field class="mon-mr-20 mon-date-field">
+                    <input
+                        matInput
+                        [matDatepicker]="endDatepicker"
+                        [min]="date"
+                        formControlName="{{END_DATE}}"
+                        name="endDatePicker"
+                        (dateChange)="validateInput(END_DATE)"
+                        [attr.aria-label]="languageStrings['primary.portal.caseBuilderAdmin.endDate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker #endDatepicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="endDatepicker">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-hint language="primary.portal.caseBuilderAdmin.dateformat"></mat-hint>
+                    <mat-error class="err-max-width"> {{error.messageEndDate}} </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+        <a href="javascript:void(0)" type="button" class="mon-btn-link mon-px-0" mat-button mat-dialog-close (click)="closePopup(false)"
+            >{{languageStrings["primary.portal.common.cancel"]}}</a
+        >
+        <button
+            mat-flat-button
+            color="primary"
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            *ngIf="data.type === 'add'"
+            type="submit"
+            [disabled]="isDisableAddButton"
+        >
+            {{languageStrings['primary.portal.caseBuilderAdmin.button.add']}}
+        </button>
+        <button
+            mat-flat-button
+            color="primary"
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            *ngIf="data.type === 'edit' "
+            type="submit"
+            [disabled]="isDisableEditButton"
+        >
+            {{languageStrings['primary.portal.caseBuilderAdmin.button.save']}}
+        </button>
+    </mat-dialog-actions>
+</form>

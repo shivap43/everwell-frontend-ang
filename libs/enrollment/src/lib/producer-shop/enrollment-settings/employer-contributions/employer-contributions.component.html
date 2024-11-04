@@ -1,0 +1,51 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeDialog()">
+            <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            <h1 language="primary.portal.shoppingCart.quoteLevelSettings.footer.benefitBank"></h1>
+        </h2>
+        <p>
+            {{ "primary.portal.memberBenefitDollars.memberBenefitDollars.memberNameNonZeroState" | replaceTag: { "#companyname" :
+            dialogData.accountName, "#membername" : dialogData.employeeName } }}
+        </p>
+
+        <div class="employer-contributions-list">
+            <div
+                class="item"
+                *ngFor="let selectedMemberFlexDollar of dialogData.selectedMemberFlexDollars; trackBy: trackByMemberFlexDollarId"
+            >
+                <span class="price" *ngIf="selectedMemberFlexDollar.contributionType === contributionType.FLAT_AMOUNT">
+                    {{(selectedMemberFlexDollar.currentAmount ? selectedMemberFlexDollar.currentAmount : selectedMemberFlexDollar.amount) |
+                    currency }}
+                </span>
+                <span class="price" *ngIf="selectedMemberFlexDollar.contributionType === contributionType.PERCENTAGE">
+                    {{ (selectedMemberFlexDollar.currentAmount ? selectedMemberFlexDollar.currentAmount: selectedMemberFlexDollar.amount) +
+                    benefitDollars.PERCENTAGE}}
+                </span>
+                <span class="text">
+                    <span class="title">
+                        <p *ngIf="selectedMemberFlexDollar.contributionType === contributionType.FLAT_AMOUNT else contributionInPercentage">
+                            <span
+                                [ngClass]="{'flex-dollar': selectedMemberFlexDollar.payFrequency?.name?.length > PAY_FREQUENCY_SHORT_LENGTH}"
+                            >
+                                {{ selectedMemberFlexDollar.name }} |
+                            </span>
+                            <span>{{ selectedMemberFlexDollar.payFrequency?.name}}</span>
+                        </p>
+                        <ng-template #contributionInPercentage>
+                            <p>{{ selectedMemberFlexDollar.name }}</p>
+                        </ng-template>
+                    </span>
+                    <p class="subtitle">{{selectedMemberFlexDollar.description}}</p>
+                </span>
+            </div>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button class="mon-btn-primary" mat-flat-button (click)="closeDialog()">Got it</button>
+    </mat-dialog-actions>
+</div>

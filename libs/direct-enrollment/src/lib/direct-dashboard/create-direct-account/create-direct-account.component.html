@@ -1,0 +1,122 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="info-modal size-small">
+    <form [formGroup]="createDirectAccountFormGroup" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+            <button type="button" mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" (click)="close(CreateFormResponse.CANCEL)" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+
+        <div mat-dialog-content class="flex-form-wrapper">
+            <h2 mat-dialog-title>{{languageStrings['primary.portal.direct.directSales.welcome']}}</h2>
+            <p *ngIf="data.nySitCodes && data.nySitCodes.length > 0 && data.usSitCodes && data.usSitCodes.length > 0">
+                {{languageStrings['primary.portal.direct.directSales.welcomeDescription']}}
+            </p>
+            <p *ngIf="data.nySitCodes && data.nySitCodes.length > 0 && !data.usSitCodes">
+                {{languageStrings['primary.portal.direct.directSales.welcomeDescriptionNySitCodes']}}
+            </p>
+            <p *ngIf="data.usSitCodes && data.usSitCodes.length > 0 && !data.nySitCodes">
+                {{languageStrings['primary.portal.direct.directSales.welcomeDescriptionUsSitCodes']}}
+            </p>
+
+            <!-- for US -->
+            <div *ngIf="data.usSitCodes && data.usSitCodes.length > 0" [formGroupName]="ProducerState.US" class="d-md-flex">
+                <div class="flex-item">
+                    <!-- TODO : the select dropdowns for Writing Number of US -->
+                    <div class="field-wrapper-dropdown w-150">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.direct.directSales.usWritingNo']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                (selectionChange)="enableUsSitCodes()"
+                                formControlName="writingNumber"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                                panelClass="direct-account-select"
+                            >
+                                <mat-option *ngFor=" let usSitCode of data.usSitCodes" [value]="usSitCode">{{usSitCode.number}}</mat-option>
+                            </mat-select>
+                            <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="flex-item">
+                    <!-- TODO : the select dropdowns for SIT code of US -->
+                    <div class="field-wrapper-dropdown w-100">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.direct.directSales.usSitcode']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="usSitCodeId"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                                panelClass="direct-account-select"
+                            >
+                                <mat-option *ngFor="let usSitCode of usSitCodes" [value]="usSitCode.id">{{usSitCode.code}}</mat-option>
+                            </mat-select>
+                            <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+            <!-- for NY -->
+            <div *ngIf="data.nySitCodes && data.nySitCodes.length > 0" [formGroupName]="ProducerState.NY" class="d-md-flex">
+                <div class="flex-item">
+                    <!-- TODO : the select dropdowns for Writing Number of NY -->
+                    <div class="field-wrapper-dropdown w-150">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.direct.directSales.nyWritingNo']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                (selectionChange)="enableNySitCodes()"
+                                formControlName="writingNumber"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                                panelClass="direct-account-select"
+                            >
+                                <mat-option *ngFor=" let nySitCode of data.nySitCodes" [value]="nySitCode">{{nySitCode.number}}</mat-option>
+                            </mat-select>
+                            <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="flex-item">
+                    <!-- TODO : the select dropdowns for SIT code of NY -->
+                    <div class="field-wrapper-dropdown w-100">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.direct.directSales.nySitcode']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="nySitCodeId"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                                panelClass="direct-account-select"
+                            >
+                                <mat-option *ngFor="let nySitCode of nySitCodes" [value]="nySitCode.id">{{nySitCode.code}}</mat-option>
+                            </mat-select>
+                            <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <mat-dialog-actions class="dialog-footer">
+            <button type="button" (click)="close(CreateFormResponse.CANCEL)" class="mon-btn-link">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <div class="d-flex">
+                <button
+                    *hasPermission="'core.account.read.account.direct.any'"
+                    type="button"
+                    mat-flat-button
+                    (click)="backToSearchProducer()"
+                    class="mon-btn-secondary mon-mr-20"
+                >
+                    <mon-icon class="mon-icon mon-directions-btn-icon icon-left" iconSize="12" iconName="left"> </mon-icon
+                    >{{languageStrings['primary.portal.common.back']}}
+                </button>
+                <button class="mon-btn-primary mat-flat-button" [disabled]="isLoading" type="submit">
+                    {{languageStrings['primary.portal.common.save']}}
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</div>

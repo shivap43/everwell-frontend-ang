@@ -1,0 +1,37 @@
+<ng-template [ngIf]="isSpinnerLoading" [ngIfElse]="cartTemplete">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="true"> </empowered-mon-spinner>
+</ng-template>
+<ng-template #cartTemplete>
+    <a
+        class="shopping-container"
+        (click)="checkLock()"
+        [ngClass]="{'shop-conatiner-bl': isCartOpen}"
+        href="javascript:void(0)"
+    >
+        <div class="cart-icon-cntr">
+            <mon-icon iconName="cart" [iconSize]="40" class="d-flex shopping-cart-icon icon-primary"> </mon-icon>
+            <!--TODO red exclamatory mark -->
+            <div class="danger-card-count" *ngIf="isMember && !cartOpened && priceChanged">
+                <span class="cart-bubble">!</span>
+            </div>
+            <!--TODO orange exclamatory mark -->
+            <div class="waring-card-count" *ngIf="isMember && !cartOpened && modified">
+                <span class="cart-bubble">!</span>
+            </div>
+            <div *ngIf="!modified || !priceChanged">
+                <span class="cart-bubble">{{cartCount}}</span>
+            </div>
+            <div *ngIf="(modified || priceChanged) && cartOpened && isMember">
+                <span class="cart-bubble">{{cartCount}}</span>
+            </div>
+        </div>
+        <div class="cart-amount-cntr">
+            <span class="cart-amount" *ngIf="payFrequencyLoaded"
+                >{{(totalCost > -flexCost ? totalCost + flexCost : 0) | currency}}
+            </span>
+            <p class="short-term"></p>
+            <span class="cart-term" *ngIf="payFrequencies">{{payFrequencies.name}}</span>
+            <span class="cart-term" *ngIf="payFrequencyStore ">{{payFrequencyStore.name}}</span>
+        </div>
+    </a>
+</ng-template>

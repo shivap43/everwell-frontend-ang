@@ -1,0 +1,72 @@
+@import "shared";
+
+.products-tab {
+    .product-filter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: convert-unit(10px, "rem");
+
+        .filter-wrapper {
+            padding-left: 0;
+        }
+    }
+
+    .zero-state {
+        background-color: get("color.gray.100");
+        padding: convert-unit(30px, "rem");
+        text-align: center;
+    }
+
+    .mat-expansion-panel-header-title {
+        justify-content: space-between;
+        color: get("color.black");
+
+        .plans-count {
+            width: convert-unit(150px, "rem");
+            text-align: right;
+        }
+    }
+
+    .mon-icon.accordion-indicator {
+        top: convert-unit(18px, "rem");
+    }
+
+    .ag-refresh {
+        margin-right: map-get($spacers, 20);
+    }
+}
+
+::ng-deep .states-tooltip {
+    max-height: convert-unit(400px, "rem");
+    max-width: convert-unit(600px, "rem") !important;
+    .message-container {
+        display: flex;
+        flex-flow: row wrap;
+        div {
+            width: convert-unit(140px, "rem");
+        }
+    }
+}
+
+.admin-filter-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.mat-row {
+    &.disabled-plan {
+        .mat-cell {
+            color: get("color.gray.500");
+
+            .check-confirmed {
+                ::ng-deep .cls-1 {
+                    fill: get("color.gray.500");
+                }
+            }
+        }
+    }
+}
+.refresh-ag {
+    margin-left: map-get($spacers, 20);
+}

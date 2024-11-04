@@ -1,0 +1,185 @@
+@import "shared";
+
+.split-name-wrapper {
+    display: flex;
+
+    .radio-wrapper {
+        margin-top: convert-unit(6px, "rem");
+
+        .mat-radio-button {
+            margin-left: convert-unit(20px, "rem");
+            display: inline-block !important;
+        }
+    }
+}
+
+.split-name-input.mat-form-field {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(381px, "rem");
+        background-color: get("color.white");
+    }
+}
+
+.producer-select {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(180px, "rem");
+        background-color: get("color.white");
+    }
+}
+
+.percentage-select {
+    width: convert-unit(120px, "rem");
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(95px, "rem");
+        background-color: get("color.white");
+        margin-left: convert-unit(20px, "rem");
+    }
+}
+
+.writing-select {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(95px, "rem");
+        background-color: get("color.white");
+        margin-left: convert-unit(20px, "rem");
+    }
+}
+
+.sit-code-select {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(90px, "rem");
+        background-color: get("color.white");
+        margin-left: convert-unit(20px, "rem");
+    }
+}
+
+.split-name {
+    margin-bottom: 20px;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.400");
+}
+
+.split-header {
+    color: get("color.black");
+    margin-bottom: convert-unit(10px, "rem");
+}
+
+.split-content {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.remove-link,
+.duplicate-error,
+.max-producer-error {
+    color: get("color.info.danger.500") !important;
+    display: flex;
+    align-items: center;
+
+    a {
+        color: get("color.info.danger.500") !important;
+    }
+}
+
+.sit-tooltip {
+    display: flex;
+    align-items: center;
+    margin-left: convert-unit(20px, "rem");
+}
+
+.add-new-split-link {
+    padding-bottom: convert-unit(20px, "rem");
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.400");
+}
+
+.applied-when-description {
+    margin-bottom: convert-unit(20px, "rem");
+    color: get("color.gray.600");
+}
+
+.applied-when-for-defaults {
+    div {
+        margin-bottom: map-get($spacers, 10);
+    }
+}
+
+.split-enrollment-select,
+.split-enrollment-optinal-select {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(240px, "rem");
+        background-color: get("color.white");
+    }
+}
+
+.split-enrollment-optinal-select {
+    ::ng-deep .mat-form-field-flex {
+        width: convert-unit(202px, "rem");
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: convert-unit(30px, "rem") 0;
+}
+
+.sit-hierarchy-label {
+    @include fontFace("primary.bold");
+}
+
+.sit-code-hierarchy {
+    display: flex;
+    justify-content: flex-start;
+
+    p {
+        @include fontFace("primary.bold");
+        padding-right: convert-unit(10px, "rem");
+    }
+}
+
+.sit-code-hierarchy-list {
+    display: flex;
+    justify-content: flex-start;
+
+    p {
+        padding-right: convert-unit(10px, "rem");
+    }
+}
+
+.applied-when-optional {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.producer-selected-data {
+    ::ng-deep .mat-form-field-flex {
+        @include media-max("xl") {
+            width: convert-unit(300px, "rem");
+        }
+
+        width: convert-unit(477px, "rem");
+        background-color: get("color.white");
+
+        min-height: convert-unit(38px, "rem");
+
+        .mat-form-field-infix {
+            min-height: convert-unit(38px, "rem");
+
+            .mat-chip-list-wrapper {
+                margin: convert-unit(-10px, "rem");
+
+                .mat-chip.mat-standard-chip .mat-chip-remove {
+                    opacity: 1;
+                    margin-top: convert-unit(10px, "rem");
+                }
+            }
+        }
+    }
+}
+
+.split-articles {
+    padding: convert-unit(10px, "rem") convert-unit(15px, "rem") 0;
+}
+
+mon-alert {
+    margin-bottom: map-get($spacers, 25);
+    display: block;
+}

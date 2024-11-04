@@ -1,0 +1,152 @@
+@import "shared";
+
+:host {
+    h2 {
+        margin: 25px 0 5px 0;
+    }
+    .sub-header {
+        margin: 0 0 convert-unit(25px, "rem") 0;
+        margin: 0 0 25px 0;
+        color: get("color.black");
+    }
+
+    .region-whole-wrapper {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+        margin-bottom: convert-unit(30px, "rem");
+        ::ng-deep {
+            .mat-expansion-panel {
+                border: none;
+
+                &.panel-white-out {
+                    position: relative;
+
+                    &:before {
+                        content: " ";
+                        position: absolute;
+                        height: 100%;
+                        width: 100%;
+                        background-color: rgba($color: get("color.white"), $alpha: 0.8);
+                        z-index: 1;
+                    }
+                }
+
+                &.panel-active {
+                    &:before {
+                        width: 0;
+                        height: 0;
+                    }
+                }
+
+                .mat-expansion-panel-header {
+                    padding-left: convert-unit(15px, "rem");
+                    padding-right: 0;
+
+                    &:hover {
+                        background-color: get("color.gray.200");
+                    }
+
+                    &.cdk-focused.cdk-keyboard-focused {
+                        background-color: transparent !important;
+                    }
+
+                    &.add-region-title {
+                        background-color: get("color.white");
+                        padding: convert-unit(3px, "rem") 0;
+                    }
+
+                    &.region-title {
+                        padding-left: convert-unit(30px, "rem");
+                        height: auto !important;
+                        min-height: convert-unit(50px, "rem");
+                    }
+                    .region-panel-title {
+                        @include fontFace("primary.regular");
+                        font-size: convert-unit(18px, "rem");
+                        color: get("color.black");
+                        margin: 0 convert-unit(10px, "rem") 0 0;
+                    }
+                }
+
+                .mat-expansion-panel-header-title {
+                    h4 {
+                        margin: 0;
+                        margin-right: convert-unit(15px, "rem");
+                    }
+
+                    span {
+                        margin: 0;
+                    }
+                }
+
+                .mat-expansion-panel-body {
+                    padding-left: convert-unit(15px, "rem");
+                    padding-right: convert-unit(15px, "rem");
+                }
+                .mat-content {
+                    align-items: center;
+                }
+            }
+
+            .mat-expanded {
+                padding-left: 15px;
+
+                &.mat-expansion-panel {
+                    .mat-expansion-panel-header {
+                        &.add-region-title {
+                            background-color: get("color.gray.200");
+                            padding: 0 convert-unit(30px, "rem");
+                        }
+                    }
+                }
+            }
+
+            .action-buttons {
+                .link-danger {
+                    color: get("color.info.danger.500");
+                    opacity: 0;
+                    transition: opacity 0.5s;
+
+                    &:disabled {
+                        color: get("color.gray.600");
+                    }
+                }
+            }
+            .region-each-wrapper {
+                &:hover {
+                    .regiontype-removeedit-wrapper {
+                        .link-danger {
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+            .form-footer {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .mat-progress-bar {
+                width: convert-unit(45px, "rem");
+                height: convert-unit(10px, "rem");
+                border: convert-unit(1px, "rem") solid get("color.greenishBlue");
+                border-radius: convert-unit(2px, "rem");
+                margin-right: convert-unit(10px, "rem");
+
+                .mat-expansion-panel-body {
+                    padding: 0;
+                    padding-bottom: convert-unit(15px, "rem");
+                }
+
+                &-fill {
+                    &:after {
+                        background-color: get("color.greenishBlue");
+                    }
+                }
+
+                &-buffer {
+                    background-color: get("color.white");
+                }
+            }
+        }
+    }
+}

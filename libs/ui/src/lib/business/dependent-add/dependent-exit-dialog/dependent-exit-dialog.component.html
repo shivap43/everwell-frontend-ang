@@ -1,0 +1,33 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closePopup()" [attr.aria-label]="languageStrings.ariaCancel">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title>{{data.content}}</h1>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            *ngIf="this.data.secondaryButton && this.data.secondaryButton.buttonTitle"
+            (click)="secondaryButtonClick()"
+            class="mon-btn-secondary mon-px-30 mon-mr-20"
+            aria-label="{{data.secondaryButton.buttonTitle}}"
+        >
+            {{data.secondaryButton.buttonTitle}}
+        </button>
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            *ngIf="this.data.primaryButton && this.data.primaryButton.buttonTitle"
+            (click)="primaryButtonClick()"
+            class="mon-btn-primary mon-px-30"
+            aria-label="{{data.primaryButton.buttonTitle}}"
+        >
+            {{data.primaryButton.buttonTitle}}
+        </button>
+    </mat-dialog-actions>
+</div>

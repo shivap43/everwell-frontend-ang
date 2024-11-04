@@ -1,0 +1,522 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="mon-mt-20" *ngIf="hasApiError">
+    <mon-alert alertType="danger" class="mon-alert">
+        <span [language]="errorMessage"></span>
+    </mon-alert>
+</div>
+<div class="products-tab">
+    <h2 class="title">{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.title']}}</h2>
+    <div class="product-filter">
+        <div class="filter-wrapper">
+            <form [formGroup]="filters">
+                <mat-label class="mat-label"> {{languageStrings['primary.portal.accounts.accountList.filter']}} </mat-label>
+                <div class="filter-sub-wrapper">
+                    <mat-form-field [ngClass]="{ 'filter-applied': availabilityLabel, 'filter-selected': availabilityLabel}">
+                        <label class="filter-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.filterAvailability']}}</label
+                        >
+                        <mat-select
+                            #availabilityFilterRef
+                            disableOptionCentering
+                            panelClass="list-grid-filter product-availability"
+                            disableOptionCentering="true"
+                            (openedChange)="filtersTapped()"
+                        >
+                            <mat-select-trigger></mat-select-trigger>
+                            <div class="filter-options">
+                                <mat-radio-group aria-label="Select an option" formControlName="availability">
+                                    <mat-radio-button value="Continuous"
+                                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.continuous']}}</mat-radio-button
+                                    >
+                                    <ng-container *ngFor="let py of planYearResponse">
+                                        <mat-radio-button [value]="py">{{py.name}}</mat-radio-button>
+                                    </ng-container>
+                                    <mat-radio-button value="date"
+                                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.date']}}</mat-radio-button
+                                    >
+                                </mat-radio-group>
+                                <mat-form-field class="mon-date-field" *ngIf="filters.value.availability === 'date'">
+                                    <input
+                                        [matDatepicker]="picker"
+                                        matInput
+                                        formControlName="date"
+                                        empoweredDateTransform
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.products.date']"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                        <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                </mat-form-field>
+                                <mat-option class="no-mat-pseudo-checkbox"> </mat-option>
+                            </div>
+                            <div class="mon-clear">
+                                <div>
+                                    <a *ngIf="availabilityFilter" href="javascript:void(0)" (click)="clearAvailabilityFilter()"
+                                        >{{languageStrings['primary.portal.common.clear']}}</a
+                                    >
+                                </div>
+                                <div>
+                                    <a href="javascript:void(0)" class="mon-apply" (click)="applyFilters()"
+                                        >{{languageStrings['primary.portal.common.apply']}}</a
+                                    >
+                                </div>
+                            </div>
+                        </mat-select>
+                        <label class="filter-label" *ngIf="availabilityFilter">: {{availabilityFilter}}</label>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="!isAdmin" [ngClass]="{ 'filter-applied': statusFilter, 'filter-selected': statusFilter}">
+                        <label class="filter-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.filterStatus']}}</label
+                        >
+                        <mat-select
+                            #statusFilterRef
+                            disableOptionCentering
+                            panelClass="list-grid-filter product-status"
+                            disableOptionCentering="true"
+                            (openedChange)="filtersTapped()"
+                        >
+                            <mat-select-trigger></mat-select-trigger>
+                            <div class="filter-options">
+                                <mat-radio-group aria-label="Select an option" formControlName="status">
+                                    <mat-radio-button value="Approved"
+                                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.approved']}}</mat-radio-button
+                                    >
+                                    <mat-radio-button value="Pending"
+                                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.pending']}}</mat-radio-button
+                                    >
+                                </mat-radio-group>
+                                <mat-option class="no-mat-pseudo-checkbox"></mat-option>
+                            </div>
+                            <div class="mon-clear">
+                                <div>
+                                    <a href="javascript:void(0)" *ngIf="statusFilter" (click)="clearStatusFilter()"
+                                        >{{languageStrings['primary.portal.common.clear']}}</a
+                                    >
+                                </div>
+                                <div>
+                                    <a href="javascript:void(0)" class="mon-apply" (click)="applyFilters()"
+                                        >{{languageStrings['primary.portal.common.apply']}}</a
+                                    >
+                                </div>
+                            </div>
+                        </mat-select>
+                        <label class="filter-label" *ngIf="statusFilter">: {{statusFilter}}</label>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+        <button
+            *ngIf="isAGOnly || isShared "
+            class="mon-btn-secondary btn-sm"
+            mat-flat-button
+            [disabled]="isRefreshDisabled"
+            (click)="refreshOffering()"
+        >
+            <span *ngIf="checkAgRenewal"> {{languageStrings['primary.portal.common.renewAgPlanYear']}} </span>
+            <span *ngIf="!checkAgRenewal"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.refreshAgOffering']}} </span>
+        </button>
+        <ng-container *hasPermission="permissionEnum.BO_PRODUCT_UPDATE">
+            <a
+                *ngIf="disableAddButton  && !isAdmin && !isAGOnly"
+                richTooltip="{{languageStrings[
+            'primary.portal.maintenanceBenefitsOffering.products.noPlanToSelect'
+        ]}}"
+            >
+                <button
+                    class="mon-btn-secondary btn-sm"
+                    mat-flat-button
+                    [disabled]="disableAddButton || (checkedOut && !maintainanceLock && !unpluggedAccessAllowed) || !validZip"
+                    [ngClass]="{'refresh-ag':currentAccount?.importType!==accountImportType?.AFLAC_INDIVIDUAL}"
+                >
+                    <span *ngIf="!isShared"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.addProducts']}} </span>
+                    <span *ngIf="isShared"> {{languageStrings['primary.portal.common.addNonAgPlans']}} </span>
+                </button>
+            </a>
+        </ng-container>
+        <button
+            *ngIf="!disableAddButton && !isAdmin && !isAGOnly && !isPrivacyOnForEnroller"
+            class="mon-btn-secondary btn-sm"
+            mat-flat-button
+            [disabled]="isRequestPending || (checkedOut && !maintainanceLock && !unpluggedAccessAllowed)  || !validZip"
+            (click)="addProducts()"
+            [ngClass]="{'refresh-ag':currentAccount?.importType!==accountImportType?.AFLAC_INDIVIDUAL}"
+        >
+            <span *ngIf="!isShared"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.addProducts']}} </span>
+            <span *ngIf="isShared"> {{languageStrings['primary.portal.common.addNonAgPlans']}} </span>
+        </button>
+    </div>
+    <div class="zero-state" *ngIf="!allProducts.length && !availabilityFilter && !statusFilter">
+        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.zeroState']}}
+    </div>
+    <div class="zero-state" *ngIf="!allProducts.length && availabilityFilter && !statusFilter">
+        <p *ngIf="filters.value.availability === 'date' && pastDate">
+            <span>{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.noProductsWereAvailable']}} </span
+            ><span>{{availabilityFilter}}</span>
+        </p>
+        <p *ngIf="filters.value.availability === 'date' && !pastDate">
+            <span>{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.noProductsAreAvailable']}} </span>
+            <span>{{availabilityFilter}}</span>
+        </p>
+        <span *ngIf="filters.value.availability !== 'date'">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.zeroState']}}
+        </span>
+    </div>
+    <div class="zero-state" *ngIf="!allProducts.length && !availabilityFilter && statusFilter">
+        <p *ngIf="statusFilter === 'Pending'">{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.noPlansPending']}}</p>
+        <p *ngIf="statusFilter === 'Approved'">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.noPlansApproved']}}
+        </p>
+    </div>
+    <div class="zero-state" *ngIf="!allProducts.length && availabilityFilter && statusFilter">
+        <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.noPlansMatchFilter']}}</p>
+    </div>
+    <mat-accordion class="accordion-default">
+        <div *ngFor="let productDetail of allProducts">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                    <mon-icon iconSize="10" iconName="Caret-down" class="accordion-indicator icon-black"></mon-icon>
+                    <mat-panel-title>
+                        <div class="">
+                            <p>
+                                <mon-icon
+                                    iconSize="16"
+                                    iconName="Filled-error"
+                                    class="icon-danger"
+                                    *ngIf="productDetail.productHighAlert"
+                                ></mon-icon>
+                                <mon-icon
+                                    iconSize="16"
+                                    iconName="Filled-warning"
+                                    class="icon-warning"
+                                    *ngIf="(productDetail.planLowAlert || productDetail.planLowAlertTooltip  || productDetail.notEligible) && !productDetail.productHighAlert"
+                                ></mon-icon>
+                                {{productDetail.productName}} | {{productDetail.policyOwnershipType | titlecase }} |
+                                {{productDetail.carrierName}}
+                            </p>
+                        </div>
+                        <div class="d-flex">
+                            <p *ngIf="productDetail.planYear==='false'">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.continuous']}}
+                            </p>
+                            <p *ngIf="productDetail.planYear==='true' && productDetail.planYears>1">{{productDetail.planYearCount}}</p>
+                            <a
+                                *ngIf="productDetail.planYear==='true' && productDetail.planYears>1"
+                                [richTooltip]="productDetail.planYearToolTip"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                            >
+                                <mon-icon iconName="Filled-info" iconSize="16" class="infoicon icon-primary"> </mon-icon>
+                            </a>
+                            <p *ngIf="productDetail.planYears===1">{{productDetail.planYearToolTip}}</p>
+                            <p class="plans-count">
+                                {{
+                                languageStrings["primary.portal.maintenanceBenefitsOffering.products.planCount"].replace("#plancount",this.productDetail.plansCount)
+                                }}
+                            </p>
+                        </div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <table mat-table [dataSource]="productDetail.plans">
+                    <!-- Plan name Column -->
+                    <ng-container matColumnDef="plan">
+                        <th mat-header-cell *matHeaderCellDef class="w-200">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.planName']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" [innerHTML]="element.plan.plan.name"></td>
+                    </ng-container>
+
+                    <!-- States Column -->
+                    <ng-container matColumnDef="states">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.states']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <ng-container *ngIf="element?.plan?.plan?.carrierId === carrierIds?.AFLAC_GROUP">
+                                {{currentAccount?.situs?.state?.abbreviation}}
+                            </ng-container>
+                            <ng-container *ngIf="element?.plan?.plan?.carrierId !== carrierIds?.AFLAC_GROUP">
+                                {{element.state}}
+                            </ng-container>
+                            <a
+                                *ngIf="element.statesTooltip!=='empty'"
+                                [richTooltip]="element.statesTooltip"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above states-tooltip"
+                            >
+                                <mon-icon iconName="Filled-info" iconSize="16" class="infoicon icon-primary"> </mon-icon>
+                            </a>
+                        </td>
+                    </ng-container>
+
+                    <!-- tax status Column -->
+                    <ng-container matColumnDef="preTax">
+                        <th mat-header-cell *matHeaderCellDef class="text-center" language="primary.portal.quoteShop.taxStatus"></th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <span [ngSwitch]="element.plan.taxStatus">
+                                <span *ngSwitchCase="TaxStatus.PRETAX" language="primary.portal.benefitsOffering.preTax"></span>
+                                <span *ngSwitchCase="TaxStatus.POSTTAX" language="primary.portal.coverage.posttax"></span>
+                                <span *ngSwitchDefault language="primary.portal.benefitsOffering.prePostTax"></span>
+                            </span>
+                            <a [richTooltip]="element.taxStatusTooltip" matTooltipPosition="above" matTooltipClass="pos-above">
+                                <mon-icon iconName="Filled-info" iconSize="16" class="infoicon icon-primary"></mon-icon>
+                            </a>
+                        </td>
+                    </ng-container>
+
+                    <!-- Agent assistance required Column -->
+                    <ng-container matColumnDef="agentAssistance">
+                        <th mat-header-cell *matHeaderCellDef class="text-center">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.agentAssistance']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <mon-icon
+                                *ngIf="element.plan.agentAssisted===true"
+                                iconName="check"
+                                class="check-confirmed"
+                                iconSize="16"
+                            ></mon-icon>
+                        </td>
+                    </ng-container>
+
+                    <!-- Coverage Details Column -->
+                    <ng-container matColumnDef="EnrollmentDetails">
+                        <span *ngIf="productDetail.planYear==='true'">
+                            <th mat-header-cell *matHeaderCellDef>
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.planYear']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.planYear.name}}
+                                <a
+                                    *ngIf="element.isDeactivated"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [richTooltip]="element.tooltipValue"
+                                >
+                                    <mon-icon iconName="Filled-info" iconSize="16" class="infoicon icon-primary"></mon-icon>
+                                </a>
+                            </td>
+                        </span>
+                        <span *ngIf="productDetail.planYear==='false'">
+                            <th mat-header-cell *matHeaderCellDef>
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.enrollment']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.plan.enrollmentPeriod.effectiveStarting | date:'MM/dd/yyyy' }}
+                                <span *ngIf="element.plan.enrollmentPeriod.expiresAfter"
+                                    >- {{element.plan.enrollmentPeriod.expiresAfter | date:'MM/dd/yyyy' }}</span
+                                >
+                            </td>
+                        </span>
+                    </ng-container>
+                    <!-- Pricing Column -->
+                    <ng-container matColumnDef="pricing">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.pricesEligibility']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <mon-icon
+                                *ngIf="element.plan.plan.pricingEditable && !element.planChoice.priceSet && element.plan.plan.pricingModel==='GROUP_RATED'"
+                                iconSize="16"
+                                iconName="Filled-error"
+                                class="icon-danger"
+                            ></mon-icon>
+                            <span
+                                *ngIf="element.plan.plan.pricingEditable && !element.planChoice.priceSet && element.plan.plan.pricingModel==='GROUP_RATED'"
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.notSet']}}</span
+                            >
+                            <mon-icon
+                                *ngIf="(!element.plan.plan.pricingEditable) || (element.plan.plan.pricingEditable && element.planChoice.priceSet)
+                                 || (element.plan.plan.pricingEditable && element.plan.plan.pricingModel!=='GROUP_RATED')"
+                                iconName="check"
+                                class="check-confirmed"
+                                iconSize="16"
+                                class="check-confirmed"
+                            ></mon-icon>
+                        </td>
+                    </ng-container>
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef class="text-center">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.status']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <a
+                                *ngIf="(element.planLowAlertTooltip && element.planTooltipValue) || element.tppAlert"
+                                [richTooltip]="element.planTooltipValue ? element.planTooltipValue : element.tppAlert"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                            >
+                                <mon-icon iconSize="16" iconName="Filled-warning" class="icon-warning"></mon-icon>
+                            </a>
+                        </td>
+                    </ng-container>
+                    <!-- Manage Column -->
+                    <ng-container matColumnDef="manage">
+                        <th mat-header-cell *matHeaderCellDef class="text-center">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.manage']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <ng-container *hasPermission="permissionEnum.UPDATE_PLAN">
+                                <button
+                                    *ngIf="(!isRequestPending || element.isDeactivated) && productDetail?.carrierId!==carrierIds?.AFLAC_GROUP && !element.isRemovePlan && element.canUpdatePlan && maintainanceLock && unpluggedAccessAllowed && !isPrivacyOnForEnroller"
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="beforeMenu"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                                    [disabled]="element.isDeactivated"
+                                >
+                                    <mon-icon
+                                        iconName="ellipsis"
+                                        iconSize="20"
+                                        class="more-option icon-primary"
+                                        *ngIf="!element.isDeactivated"
+                                    >
+                                    </mon-icon>
+                                </button>
+                            </ng-container>
+                            <button
+                                *ngIf="element?.plan?.plan?.carrierId === carrierIds?.AFLAC_GROUP"
+                                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.products.viewPrices']"
+                                mat-icon-button
+                                class="mon-btn-link visible-on-row-hover"
+                                (click)="viewAGPrices(element.plan, element.planYear)"
+                            >
+                                {{languageStrings["primary.portal.maintenanceBenefitsOffering.products.viewPrices"]}}
+                            </button>
+
+                            <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                <ng-container *hasPermission="permissionEnum.UPDATE_PLAN">
+                                    <button
+                                        *ngIf="productDetail.planYear==='false' && !isRequestPending"
+                                        mat-menu-item
+                                        (click)="updateAvailability(element,'plan')"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.updateAvailability']}}
+                                    </button>
+                                </ng-container>
+                                <ng-container *hasPermission="permissionEnum.BO_PRODUCT_OFFERING_DEACTIVATE">
+                                    <button mat-menu-item class="text-danger" (click)="removePlan(element,productDetail)">
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.removePlan']}}
+                                    </button>
+                                </ng-container>
+                            </mat-menu>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="productDisplayedColumns"></tr>
+                    <tr
+                        mat-row
+                        *matRowDef="let row; columns: productDisplayedColumns;"
+                        [ngClass]="{'disabled-plan': row.isDeactivated}"
+                    ></tr>
+                </table>
+
+                <ng-container
+                    *hasAnyPermission="[permissionEnum.BO_APPROVAL_REQUEST_CREATE, permissionEnum.BO_PLAN_YEAR_CREATE, permissionEnum.UPDATE_PLAN, permissionEnum.BO_PRODUCT_OFFERING_DEACTIVATE]"
+                >
+                    <div class="d-flex justify-content-end" *isRestricted="permissionEnum.ACCOUNT_BO_RESTRICT_MANAGE_PLANS">
+                        <button
+                            *ngIf="!isAdmin && productDetail?.carrierId!==carrierIds?.AFLAC_GROUP && !isPrivacyOnForEnroller"
+                            mat-flat-button
+                            class="mon-btn-secondary btn-sm pull-down-sm mon-mt-30"
+                            [disabled]="isRequestPending || (checkedOut && !maintainanceLock && !unpluggedAccessAllowed) || !validZip"
+                            [matMenuTriggerFor]="managePlans"
+                        >
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.managePlans']}}
+                            <mon-icon iconSize="8" iconName="down" class="icon-right"></mon-icon>
+                        </button>
+                        <mat-menu #managePlans="matMenu" xPosition="before">
+                            <span *ngIf="productDetail.planYear==='true'">
+                                <ng-container *ngIf="productDetail?.canUpdateProduct">
+                                    <button
+                                        *hasPermission="permissionEnum.BO_APPROVAL_REQUEST_CREATE"
+                                        mat-menu-item
+                                        (click)="managePlansSelection(productDetail, productDetail.planYear)"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.updatePlan']}}
+                                    </button>
+                                </ng-container>
+                                <button
+                                    mat-menu-item
+                                    (click)="copyPlansToNewPlanYear(productDetail)"
+                                    *hasPermission="permissionEnum.BO_PLAN_YEAR_CREATE"
+                                >
+                                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.copyPlan']}}
+                                </button>
+                                <ng-container *ngIf="productDetail?.canUpdateProduct && !productDetail?.isRemoveAllPlans">
+                                    <button
+                                        mat-menu-item
+                                        class="text-danger"
+                                        (click)="RemoveAllPlan(productDetail)"
+                                        *hasPermission="permissionEnum.BO_PRODUCT_OFFERING_DEACTIVATE"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.removeAllPlans']}}
+                                    </button>
+                                </ng-container> </span
+                            ><span *ngIf="productDetail.planYear==='false'">
+                                <ng-container *ngIf="productDetail?.canUpdateProduct">
+                                    <button
+                                        *hasPermission="permissionEnum.BO_APPROVAL_REQUEST_CREATE"
+                                        mat-menu-item
+                                        (click)="managePlansSelection(productDetail, productDetail.planYear)"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.updatePlan']}}
+                                    </button>
+                                </ng-container>
+                                <ng-container *ngIf="productDetail?.isAllPlansDeactivated !== productDetail?.plansCount">
+                                    <button
+                                        mat-menu-item
+                                        (click)="updateAvailability(productDetail, productString)"
+                                        *hasPermission="permissionEnum.UPDATE_PLAN"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.updateAvailability']}}
+                                    </button>
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="productDetail?.canUpdateProduct && productDetail?.isAllPlansDeactivated !== productDetail?.plansCount"
+                                >
+                                    <button
+                                        mat-menu-item
+                                        class="text-danger"
+                                        (click)="RemoveAllPlan(productDetail)"
+                                        *hasPermission="permissionEnum.BO_PRODUCT_OFFERING_DEACTIVATE"
+                                    >
+                                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.products.removeAllPlans']}}
+                                    </button>
+                                </ng-container>
+                            </span>
+                        </mat-menu>
+                    </div>
+                </ng-container>
+                <ng-container *hasPermission="permissionEnum.ACCOUNT_BO_READ_AVAILABILITY">
+                    <div class="d-flex justify-content-end">
+                        <button
+                            *ngIf="!isAdmin && productDetail?.carrierId !== carrierIds?.AFLAC_GROUP && productDetail.planYear === 'false'"
+                            mat-flat-button
+                            class="mon-btn-secondary btn-sm pull-down-sm mon-mt-30"
+                            [disabled]="isRequestPending || !validZip"
+                            [matMenuTriggerFor]="managePlans"
+                        >
+                            {{ languageStrings['primary.portal.maintenanceBenefitsOffering.products.managePlans'] }}
+                            <mon-icon iconSize="8" iconName="down" class="icon-right"></mon-icon>
+                        </button>
+                        <mat-menu #managePlans="matMenu" xPosition="before">
+                            <span>
+                                <ng-container *ngIf="productDetail?.isAllPlansDeactivated !== productDetail?.plansCount">
+                                    <button
+                                        mat-menu-item
+                                        (click)="updateAvailability(productDetail, productString)"
+                                        *hasPermission="permissionEnum.ACCOUNT_BO_READ_AVAILABILITY"
+                                    >
+                                        {{ languageStrings['primary.portal.maintenanceBenefitsOffering.products.updateAvailability'] }}
+                                    </button>
+                                </ng-container>
+                            </span>
+                        </mat-menu>
+                    </div>
+                </ng-container>
+            </mat-expansion-panel>
+        </div>
+    </mat-accordion>
+</div>

@@ -1,0 +1,59 @@
+<div class="info-modal change-prod-role-wrapper">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closePopup()"
+            [attr.aria-label]="languageString['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h2 mat-dialog-title>{{changeRoleString}}</h2>
+
+        <mat-label class="mat-label"
+            ><span language="primary.portal.commission.producer.select.role"></span>
+            <button
+                mat-icon-button
+                [richTooltip]="ROLE_DETAILS"
+                matTooltipPosition="above"
+                [attr.aria-label]="languageString['primary.portal.common.info']"
+            >
+                <mon-icon iconName="Filled-info" [iconSize]="16" class="icon-primary"></mon-icon>
+            </button>
+        </mat-label>
+
+        <mat-form-field class="w-200 mon-mb-5">
+            <mat-select
+                class="mon-input"
+                placeholder="Select"
+                [(ngModel)]="selectedRole"
+                disableOptionCentering="true"
+                panelClass="comm-spilts-select"
+            >
+                <mat-option *ngFor="let item of roleList" [value]="item.id">{{item.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <p class="replace-string" *ngIf="selectedRole==='PRIMARY_PRODUCER'">{{replaceString}}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            *ngIf="this.data.secondaryButton && this.data.secondaryButton.buttonTitle"
+            (click)="secondaryButtonClick()"
+            [ngClass]="this.data.secondaryButton.buttonClass ? this.data.secondaryButton.buttonClass : 'mon-btn-link'"
+        >
+            {{data.secondaryButton.buttonTitle}}
+        </button>
+        <button
+            [mat-dialog-close]="true"
+            mat-flat-button
+            *ngIf="this.data.primaryButton && this.data.primaryButton.buttonTitle"
+            (click)="primaryButtonClick()"
+            class="mon-btn-primary mon-px-30"
+        >
+            {{data.primaryButton.buttonTitle}}
+        </button>
+    </mat-dialog-actions>
+</div>

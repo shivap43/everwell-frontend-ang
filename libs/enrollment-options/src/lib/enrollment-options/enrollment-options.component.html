@@ -1,0 +1,21 @@
+<div class="enrollment-wrapper">
+    <h1>{{languageStrings['primary.portal.profile.enrollmentOptions.title']}}</h1>
+
+    <div class="error-alerts">
+        <mon-alert alertType="danger" *ngFor="let error of errors">
+            <span>{{ error }}</span>
+        </mon-alert>
+    </div>
+
+    <div class="thirparty-wrapper">
+        <empowered-third-party [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"></empowered-third-party>
+    </div>
+
+    <div class="callcenter-wrapper">
+        <empowered-call-center (onError)="showErrorAlertMessage($event)"></empowered-call-center>
+    </div>
+
+    <div *configEnabled="'broker.create.pin_signature_exception'" class="exception-wrapper">
+        <empowered-enrollment-exceptions></empowered-enrollment-exceptions>
+    </div>
+</div>

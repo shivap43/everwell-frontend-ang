@@ -1,0 +1,469 @@
+<div *ngIf="this.data.openMode === 'edit'">
+    <form [formGroup]="editPlanYearForm">
+        <div class="info-modal">
+            <div class="modal-header">
+                <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                    <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                </button>
+            </div>
+            <mat-dialog-content
+                ><mon-alert *ngIf="error" alertType="danger">
+                    <span> {{ this.fieldErrorMessage }} </span>
+                </mon-alert>
+                <h1 mat-dialog-title>{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.title']}}</h1>
+                <p class="mon-mb-30" *ngIf="!data.planYear.enrollmentEditable">
+                    {{languageStrings["primary.portal.maintenanceBenefitsOffering.editPlanYear.subTitle"] .replace("#planYearDetails",
+                    this.data.planYear.planYearDetails.name) }}
+                </p>
+                <p class="mon-mt-0 mon-mb-20" *ngIf="isCarrier && (isAflacGroup$ |async)">
+                    {{languageStrings['primary.portal.benefitsOffering.aflacDates']}} {{cafeteriaStartDate}}-{{cafeteriaEndDate}}
+                    <span
+                        [richTooltip]="languageStrings['primary.portal.benefitsOffering.cafeteriaDatesInfo']"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.cafeteriaDatesInfo']"
+                    >
+                        <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info"> </mon-icon>
+                    </span>
+                </p>
+                <div class="edit-plan-year">
+                    <div class="read-only-control">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.planYearName']}}</mat-label
+                        >
+                        <div class="d-md-flex">
+                            <div class="flex-item">
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="name"
+                                        type="text"
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.planYearName']"
+                                    />
+                                    <mat-error language="secondary.portal.benefitsOffering.setting.employeesRequired"> </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="read-only-control">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.enrollmentDates']}}</mat-label
+                        >
+                        <div class="d-md-flex">
+                            <div class="flex-item">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="enrollmentStartDate"
+                                        formControlName="enrollmentStartDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('enrollmentStartDate'));"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="CALENDAR_MAX_LENGTH"
+                                        [min]="currentDate"
+                                        [disabled]="isDatePickerDisabled"
+                                        (dateChange)="onStartDateUpdated()"
+                                    />
+                                    <mat-datepicker #enrollmentStartDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentStartDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentStartDate.hasError('required') && !editPlanYearForm.controls.enrollmentStartDate.hasError('requirements') && !editPlanYearForm.controls.enrollmentStartDate.hasError('invalid')"
+                                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentStartDate?.errors?.requirements"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span *ngIf="editPlanYearForm.controls.enrollmentStartDate.hasError('invalid')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span *ngIf="editPlanYearForm.controls.enrollmentStartDate.hasError('pastDate')"
+                                            >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentStartDate.hasError('invalidStartDate') && !editPlanYearForm.controls.enrollmentStartDate.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidStartDate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="enrollmentEndDate"
+                                        formControlName="enrollmentEndDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('enrollmentEndDate'));"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="CALENDAR_MAX_LENGTH"
+                                        [min]="currentDate"
+                                        [disabled]="isDatePickerDisabled"
+                                        (dateChange)="onDatesUpdated()"
+                                    />
+                                    <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentEndDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentEndDate.hasError('required') &&
+                                     !editPlanYearForm.controls.enrollmentEndDate.hasError('requirements') &&
+                                      !editPlanYearForm.controls.enrollmentEndDate.hasError('invalid')"
+                                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentEndDate.hasError('requirements') && !editPlanYearForm.controls.enrollmentEndDate.hasError('invalid')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentEndDate.hasError('invalid') && !editPlanYearForm.controls.enrollmentEndDate.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentEndDate.hasError('pastDate') && !editPlanYearForm.controls.enrollmentEndDate.hasError('required')  && !editPlanYearForm.controls.enrollmentEndDate.hasError('invalidEndDate')"
+                                            >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.enrollmentEndDate.hasError('invalidEndDate') && !editPlanYearForm.controls.enrollmentEndDate.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="read-only-control" *ngIf="isQ60 && isGIEnrollmentDatesOn">
+                        <mat-label class="mat-label" language="primary.portal.maintenanceBenefitsOffering.editPlanYear.giEnrollmentDates"
+                            ><span
+                                [richTooltip]="languageStrings['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info icon-primary">
+                                </mon-icon>
+                            </span>
+                        </mat-label>
+                        <div class="d-md-flex">
+                            <div class="flex-item">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="giEnrollmentStartDate"
+                                        formControlName="giEnrollmentStartDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('giEnrollmentStartDate'));"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="CALENDAR_MAX_LENGTH"
+                                        [min]="currentDate"
+                                        [disabled]="isDatePickerDisabled"
+                                    />
+                                    <mat-datepicker #giEnrollmentStartDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="giEnrollmentStartDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>
+                                        <div language="primary.portal.common.dateHint"></div>
+                                        <div
+                                            *ngIf="data.enableGIEligibleDateMessage$ | async"
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.classDInfo"
+                                        ></div>
+                                    </mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentStartDate.hasError('required') && !editPlanYearForm.controls.giEnrollmentStartDate.hasError('requirements') && !editPlanYearForm.controls.enrollmentStartDate.hasError('invalid')"
+                                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentStartDate?.errors?.requirements"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span *ngIf="editPlanYearForm.controls.giEnrollmentStartDate.hasError('invalid')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span *ngIf="editPlanYearForm.controls.giEnrollmentStartDate.hasError('pastDate')"
+                                            >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentStartDate.hasError('invalidStartDate') && !editPlanYearForm.controls.giEnrollmentStartDate.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidStartDate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="giEnrollmentEndDate"
+                                        formControlName="giEnrollmentEndDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('giEnrollmentEndDate'));"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="CALENDAR_MAX_LENGTH"
+                                        [min]="currentDate && giMinDiffStartDate"
+                                        [max]="giEnrollEndDateDisable? editPlanYearForm.controls.enrollmentEndDate.value: giMaxDiffStartDate"
+                                    />
+                                    <mat-datepicker #giEnrollmentEndDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="giEnrollmentEndDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>
+                                        <div language="primary.portal.common.dateHint"></div>
+                                        <div
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDateAndWithIn45Days"
+                                        ></div>
+                                    </mat-hint>
+                                    <mat-error>
+                                        <span
+                                            language="primary.portal.common.requiredField"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.required &&
+                                            !editPlanYearForm.controls.giEnrollmentEndDate.errors?.requirements &&
+                                            !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalid"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.requirements && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalid"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalid && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required"
+                                        ></span>
+                                        <span
+                                            language="primary.portal.coverage.cannotBePast"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.pastDate && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required  && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.mustBeAfterStartDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.beforeStartDate && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.mustBeAtLeast5DaysAfterStartDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.lessFiveDays && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.greaterOEEndDate && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.withIn45DaysAfterStartDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.greaterThanStartDateAfter45 && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDateAndWithIn45Days"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.greaterThanOEendDateAnd45DaysStartDate && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.selectOrEnterOEDate"
+                                            *ngIf="editPlanYearForm.controls.giEnrollmentEndDate.errors?.enterEnrollmentDate && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.required && !editPlanYearForm.controls.giEnrollmentEndDate.errors?.invalidEndDate"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="read-only-control">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.coverageDates']}}</mat-label
+                        >
+                        <div class="d-md-flex">
+                            <div class="flex-item" *ngIf="noOfNonAflacPlans===0 || noOfNonAflacPlans===noOfVasPlans">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="coverageStartDatePicker"
+                                        [matDatepickerFilter]="dateClass"
+                                        formControlName="coverageStartDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('coverageStartDate'))"
+                                        matInput
+                                        [min]="coverageMinDate"
+                                        (dateChange)="populateEndDate(editPlanYearForm.get('coverageStartDate').value,true)"
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.coverageStartDate']"
+                                        empoweredDateTransform
+                                    />
+                                    <mat-datepicker #coverageStartDatePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="coverageStartDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span *ngIf="editPlanYearForm.controls.coverageStartDate.hasError('minimumDays')"
+                                            >{{minimumDayErrorMessage}}
+                                        </span>
+                                        <span *ngIf="editPlanYearForm.controls.coverageStartDate.errors?.notAllowedDate"
+                                            >{{languageStrings['primary.portal.coverage.notAllowedDate'] | replaceTag : {'##entereddate##':
+                                            this.enteredDate} }}
+                                        </span>
+                                        <span *ngIf="editPlanYearForm.controls.coverageStartDate.errors?.pastDate"
+                                            >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.coverageStartDate?.errors?.required && !editPlanYearForm.controls.coverageStartDate?.errors?.requirements && !editPlanYearForm.controls.coverageStartDate?.errors?.invalid"
+                                            language="primary.portal.common.requiredField"
+                                        ></span>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.coverageStartDate?.errors?.requirements"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item" *ngIf="noOfNonAflacPlans!==0 && noOfNonAflacPlans!==noOfVasPlans">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <mat-select
+                                        formControlName="coverageStartDate"
+                                        (selectionChange)="populateEndDate($event.value,true,$event)"
+                                    >
+                                        <mat-option *ngFor="let date of dateArray" [value]="date"> {{date}} </mat-option>
+                                    </mat-select>
+                                    <mat-error>
+                                        <span *ngIf="editPlanYearForm.controls.coverageStartDate.hasError('minimumDays')"
+                                            >{{minimumDayErrorMessage}}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mat-form-field class="mon-date-field mon-coverage-field">
+                                    <input
+                                        [matDatepicker]="coverageDatesPicker"
+                                        formControlName="coverageEndDate"
+                                        (input)="checkDateInput($event,editPlanYearForm.get('coverageEndDate'))"
+                                        matInput
+                                        [min]="minDate"
+                                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.coverageEndDate']"
+                                        empoweredDateTransform
+                                    />
+                                    <mat-datepicker #coverageDatesPicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="coverageDatesPicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.coverageEndDate.hasError('required') && !editPlanYearForm.controls.coverageEndDate.hasError('requirements')"
+                                            language="secondary.portal.benefitsOffering.setting.employeesRequired"
+                                        ></span>
+                                        <span
+                                            *ngIf="editPlanYearForm.controls.coverageEndDate.hasError('requirements')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span *ngIf="editPlanYearForm.controls.coverageEndDate.hasError('matDatepickerMax')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.maxEndDate']}}</span
+                                        >
+                                        <span *ngIf="editPlanYearForm.controls.coverageEndDate.hasError('invalidEndDate')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                        >
+                                        <span *ngIf="editPlanYearForm.controls.coverageEndDate.errors?.pastDate"
+                                            >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span *ngIf="editPlanYearForm.controls.coverageEndDate.hasError('beforeCoverageStartDate')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coverageDate.cannotBeBeforeStartDate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mon-alert *ngIf="isInvalidPCPlanYear" alertType="danger">
+                    <span> {{ fifteenDaysErrorMessage }} </span>
+                </mon-alert>
+            </mat-dialog-content>
+            <mat-dialog-actions class="dialog-footer">
+                <a
+                    href="javascript:void(0)"
+                    class="mon-btn-link"
+                    mat-dialog-close
+                    (click)="closeForm()"
+                    [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <button
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    (click)="saveForm()"
+                    [attr.aria-label]="languageStrings['primary.portal.common.save']"
+                >
+                    {{languageStrings['primary.portal.common.save']}}
+                </button>
+            </mat-dialog-actions>
+        </div>
+    </form>
+</div>
+<div *ngIf="this.data.openMode === 'view'">
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <mat-dialog-content>
+            <h1 mat-dialog-title>{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.title']}}</h1>
+            <div class="read-only-control">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.planYearName']}}</mat-label
+                >
+                <p class="content">{{this.data.planYear.planYearDetails.name}}</p>
+            </div>
+            <div class="read-only-control">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.enrollmentDates']}}</mat-label
+                >
+                <p class="content">
+                    {{this.data.planYear.planYearDetails.enrollmentPeriod.effectiveStarting}} &nbsp;&nbsp;
+                    {{this.data.planYear.planYearDetails.enrollmentPeriod.expiresAfter}}
+                </p>
+            </div>
+            <div class="read-only-control" *ngIf="isQ60 && isGIEnrollmentDatesOn">
+                <mat-label class="mat-label" language="primary.portal.maintenanceBenefitsOffering.editPlanYear.giEnrollmentDates"
+                    ><span
+                        [richTooltip]="languageStrings['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                    >
+                        <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info icon-primary"> </mon-icon>
+                    </span>
+                    <mat-hint
+                        class="mat-hint"
+                        *ngIf="data.enableGIEligibleDateMessage$ | async"
+                        language="secondary.portal.benefitsOffering.giEnrollmentDates.classDInfo"
+                    >
+                    </mat-hint>
+                </mat-label>
+                <p class="content">
+                    {{this.data.planYear.planYearDetails.enrollmentPeriod.guaranteedIssueEffectiveStarting}} &nbsp;&nbsp;
+                    {{this.data.planYear.planYearDetails.enrollmentPeriod.guaranteedIssueExpiresAfter}}
+                </p>
+            </div>
+            <div class="read-only-control">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.coverageDates']}}</mat-label
+                >
+                <p class="content">
+                    {{this.data.planYear.planYearDetails.coveragePeriod.effectiveStarting}} &nbsp;&nbsp;
+                    {{this.data.planYear.planYearDetails.coveragePeriod.expiresAfter}}
+                </p>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-end">
+            <button
+                type="submit"
+                mat-flat-button
+                class="mon-btn-primary"
+                (click)="closeForm()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                {{languageStrings['primary.portal.common.close']}}
+            </button>
+        </mat-dialog-actions>
+    </div>
+</div>

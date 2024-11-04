@@ -1,0 +1,93 @@
+@import "shared";
+
+.verify-section {
+    .header {
+        h1 {
+            @include fontFace("secondary.light");
+            margin: convert-unit(30px, "rem") 0 convert-unit(15px, "rem") 0;
+        }
+        p {
+            font-size: convert-unit(16px, "rem");
+            color: get("color.gray.700");
+        }
+        margin-bottom: convert-unit(40px, "rem");
+    }
+
+    .verify-name {
+        display: flex;
+        .flex-item {
+            margin: 0 convert-unit(20px, "rem") 0 0;
+        }
+    }
+    .verify-date {
+        display: flex;
+        div {
+            width: convert-unit(200px, "rem");
+        }
+    }
+    .verify-email {
+        display: flex;
+        div {
+            width: convert-unit(300px, "rem");
+        }
+    }
+
+    .action-btn {
+        margin: convert-unit(30px, "rem") 0;
+    }
+}
+
+.header {
+    h1 {
+        @include fontFace("secondary.light");
+        color: get("color.black");
+    }
+    p {
+        font-size: convert-unit(16px, "rem");
+        color: get("color.gray.700");
+    }
+    margin-bottom: convert-unit(40px, "rem");
+}
+
+.dialog-footer {
+    .mon-btn-primary {
+        margin-left: convert-unit(20px, "rem");
+    }
+}
+
+.mat-dialog-content {
+    .detail-text {
+        margin: convert-unit(20px, "rem") 0;
+    }
+}
+
+.consent {
+    display: flex;
+    flex-direction: column;
+    .statement {
+        display: flex;
+        align-items: center;
+    }
+    a {
+        margin-left: convert-unit(10px, "rem");
+    }
+
+    @include media-max("s") {
+        a {
+            white-space: normal;
+            margin-left: map-get($spacers, 0);
+        }
+    }
+}
+
+@include media-max("s") {
+    .verify-section {
+        .verify-name {
+            flex-direction: column;
+        }
+    }
+    .flex-item {
+        margin: map-get($spacers, 0);
+        width: 100% !important;
+    }
+}

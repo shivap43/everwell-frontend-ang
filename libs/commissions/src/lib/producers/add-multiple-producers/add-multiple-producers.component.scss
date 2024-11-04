@@ -1,0 +1,181 @@
+@import "shared";
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: none;
+    padding: convert-unit(25px, "rem") convert-unit(25px, "rem") 0px;
+}
+
+.quasi-modal {
+    div {
+        .mat-dialog-content {
+            padding: 0 convert-unit(40px, "rem") convert-unit(25px, "rem");
+            min-height: convert-unit(420px, "rem");
+
+            .description {
+                padding: 0 convert-unit(10px, "rem") convert-unit(20px, "rem");
+            }
+
+            .multiple-desc-sub-wrapper {
+                padding: convert-unit(20px, "rem") 0;
+            }
+
+            .mat-tab-group {
+                ::ng-deep .mat-tab-header {
+                    margin: 0 convert-unit(10px, "rem");
+
+                    .mat-tab-label-container {
+                        .mat-tab-list {
+                            .mat-tab-labels {
+                                display: block;
+
+                                .mat-tab-label {
+                                    text-transform: none;
+
+                                    .mat-tab-label-content {
+                                        line-height: convert-unit(18px, "rem");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ::ng-deep .mat-tab-body {
+                    .mat-tab-body-content {
+                        padding: 0 convert-unit(10px, "rem");
+                    }
+                }
+            }
+
+            .mon-alert {
+                ::ng-deep .alert-danger {
+                    margin-top: convert-unit(20px, "rem");
+                }
+            }
+        }
+    }
+}
+
+.multiple-prod-wrapper {
+    .my-hierarchy-wrapper {
+        form {
+            display: flex;
+        }
+    }
+
+    .mon-tab-sub-wrapper {
+        padding: 0;
+
+        .all-producer-tab-wrapper {
+            padding: convert-unit(30px, "rem") convert-unit(0px, "rem") convert-unit(0px, "rem");
+            flex-direction: row;
+
+            .search-button {
+                margin-top: convert-unit(22px, "rem");
+
+                .mon-btn-search {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+
+    .table-mask-wrapper {
+        padding: 0 convert-unit(10px, "rem");
+
+        ::ng-deep .mat-checkbox-frame {
+            border-width: convert-unit(1px, "rem");
+        }
+
+        .infoicon {
+            margin-left: convert-unit(5px, "rem") !important;
+        }
+
+        .mon-table-wraper {
+            .mon-icon {
+                line-height: convert-unit(10px, "rem");
+                margin: convert-unit(0px, "rem");
+            }
+
+            .icon-warning {
+                vertical-align: sub;
+                padding-right: convert-unit(5px, "rem");
+            }
+
+            ::ng-deep tbody {
+                .mat-column-name {
+                    @include fontFace("primary.bold");
+                }
+            }
+        }
+    }
+}
+
+td.mat-column-select,
+th.mat-column-select {
+    width: 5% !important;
+}
+
+td.mat-column-name,
+th.mat-column-name {
+    width: 35% !important;
+}
+
+td.mat-column-states,
+th.mat-column-states {
+    width: 30% !important;
+}
+
+::ng-deep .mat-select-panel-wrap {
+    .mat-select-panel {
+        .mat-option {
+            font-size: convert-unit(16px, "rem");
+        }
+    }
+
+    .list-grid-filter {
+        width: calc(100% + 22px) !important;
+        margin-top: convert-unit(27px, "rem") !important;
+        margin-left: convert-unit(13px, "rem") !important;
+        max-height: convert-unit(310px, "rem");
+
+        @media all and (-ms-high-contrast: none) {
+            /* IE10+ CSS styles go here */
+            margin-left: convert-unit(30px, "rem");
+        }
+
+        @supports (-ms-ime-align: auto) {
+            margin-left: convert-unit(30px, "rem");
+        }
+    }
+
+    .myhierarchy-carrier {
+        margin-top: convert-unit(22px, "rem") !important;
+        margin-left: convert-unit(-40px, "rem") !important;
+
+        @media all and (-ms-high-contrast: none) {
+            /* IE10+ CSS styles go here */
+            margin-left: convert-unit(-22px, "rem");
+        }
+
+        @supports (-ms-ime-align: auto) {
+            margin-left: convert-unit(-22px, "rem");
+        }
+    }
+
+    .myhierarchy-state {
+        margin-top: convert-unit(22px, "rem") !important;
+        margin-left: convert-unit(-30px, "rem") !important;
+
+        @media all and (-ms-high-contrast: none) {
+            /* IE10+ CSS styles go here */
+            margin-left: convert-unit(-12px, "rem");
+        }
+
+        @supports (-ms-ime-align: auto) {
+            margin-left: convert-unit(-12px, "rem");
+        }
+    }
+}

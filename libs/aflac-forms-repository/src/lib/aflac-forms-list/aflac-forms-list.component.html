@@ -1,0 +1,52 @@
+<div [hidden]="!(dataSource && dataSource.data.length > 0)" class="form-list">
+    <table mat-table [dataSource]="dataSource" matSort matSortDisableClear>
+        <!-- Form name Column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{languageStrings['primary.portal.formRepository.formName']}}
+            </th>
+            <td mat-cell *matCellDef="let element">{{element.name}}</td>
+        </ng-container>
+        <ng-container matColumnDef="channelName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{languageStrings['primary.portal.formRepository.channel']}}
+            </th>
+            <td mat-cell *matCellDef="let element" class="channel-name">{{element.channelName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="formNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{languageStrings['primary.portal.formRepository.formNumber']}}
+            </th>
+            <td mat-cell *matCellDef="let element" class="form-number">{{element.formNumber}}</td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>
+                {{languageStrings['primary.portal.formRepository.action']}}
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <div class="access-form">
+                    <button (click)="goToLink(element.url)" mat-icon-button class="mon-btn-link visible-on-row-hover">
+                        <span>{{languageStrings['primary.portal.formRepository.accessForm']}}</span>
+                    </button>
+                </div>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div
+        class="min-range-label"
+        [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1"
+    >
+        <span>
+            {{ "primary.portal.commission.producer.showingItems" | replaceTag: { "##length##": dataSource?.data?.length
+            } }}
+        </span>
+    </div>
+    <div [hidden]="dataSource.filteredData?.length === 0 || dataSource.paginator?.getNumberOfPages() === 1">
+        <empowered-paginator [data]="dataSource?.data"></empowered-paginator>
+    </div>
+</div>

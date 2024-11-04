@@ -1,0 +1,75 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+<empowered-tpi-secondary-header>
+    <ng-container *ngIf="currentStep === addressMatchingSteps.AGENT_OR_ACCOUNT || currentStep === addressMatchingSteps.RELATIVE_TO_AGENT">
+        <span language="primary.portal.confirm.applicant.addressInformation"></span>
+    </ng-container>
+    <ng-container *ngIf="currentStep === addressMatchingSteps.UPDATE_ADDRESS">
+        <span language="primary.portal.applicant.tpi.addressUpdate"></span>
+    </ng-container>
+    <ng-container *ngIf="currentStep === addressMatchingSteps.MATCHED_ADDRESS_ALLOWED">
+        <span language="primary.portal.applicant.addressMatch.allowed"></span> </ng-container
+></empowered-tpi-secondary-header>
+<div class="tpi-content-wrapper">
+    <div class="tpi-content">
+        <ng-container *ngIf="currentStep === addressMatchingSteps.AGENT_OR_ACCOUNT">
+            <div>
+                <p class="mon-mt-0" language="primary.portal.applicant.mmp.addressMatch.message" class="confirmation-header-title"></p>
+            </div>
+            <div>
+                <p class="mon-mt-0 mon-mb-10" language="primary.portal.addressMatch.checkBox.message"></p>
+            </div>
+            <mat-checkbox (change)="onChangeAgent($event)" [checked]="isAgent">
+                <span class="mon-mt-0" language="primary.portal.applicant.mmp.agentOrOwnerAddressMatch.confirmation"></span>
+            </mat-checkbox>
+        </ng-container>
+        <ng-container *ngIf="currentStep === addressMatchingSteps.RELATIVE_TO_AGENT">
+            <div>
+                <p class="mon-mt-0" language="primary.portal.applicant.mmp.notAgentOrOwner.message" class="confirmation-header-title"></p>
+            </div>
+            <div>
+                <p class="mon-mt-0" language="primary.portal.addressMatch.checkBox.message"></p>
+            </div>
+            <mat-checkbox (change)="onChangeRelated($event)" class="address-confirmation-select" [checked]="isRelatedToAgent">
+                <span class="mon-mt-0" language="primary.portal.applicant.mmp.agentOrOwnerRelation.addressMatch.confirmation"></span>
+            </mat-checkbox>
+        </ng-container>
+        <ng-container *ngIf="currentStep === addressMatchingSteps.UPDATE_ADDRESS">
+            <mon-alert alertType="warning" class="message">
+                <p class="mon-mt-0" language="primary.portal.applicant.tpi.addressUpdate.warningMessage"></p>
+            </mon-alert>
+            <div *ngIf="!isAgentAssisted">
+                <p class="message" language="primary.portal.applicant.tpi.addressUpdate.messageOne"></p>
+                <p class="message" language="primary.portal.applicant.tpi.addressUpdate.messageTwo"></p>
+            </div>
+            <div *ngIf="isAgentAssisted">
+                <p class="message" language="primary.portal.applicant.tpiEnrollmentsPend.message"></p>
+            </div>
+            <div language="primary.portal.applicant.enrollmentsPend.note"></div>
+        </ng-container>
+        <ng-container *ngIf="currentStep === addressMatchingSteps.MATCHED_ADDRESS_ALLOWED">
+            <span language="primary.portal.applicant.mmp.agentOrOwner.addressMatched.message"></span>
+        </ng-container>
+    </div>
+    <empowered-tpi-footer class="tpi-footer">
+        <div>
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-flat-button
+                (click)="onExit()"
+                language="primary.portal.tpiEnrollment.exit"
+            >
+            </a>
+        </div>
+        <div>
+            <button mat-button type="button" class="mon-btn-secondary mon-ml-20" (click)="back()">
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                <span language="primary.portal.common.back"></span>
+            </button>
+
+            <button mat-button (click)="next()" class="mon-btn-primary mon-ml-20">
+                <span language="primary.portal.common.continue"></span>
+            </button>
+        </div>
+    </empowered-tpi-footer>
+</div>

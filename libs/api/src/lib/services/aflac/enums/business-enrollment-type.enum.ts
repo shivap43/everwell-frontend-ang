@@ -1,0 +1,4 @@
+export enum BUSINESS_ENROLLMENT_TYPE {
+    UNSENT = "UNSENT",
+    SENT = "SENT",
+}

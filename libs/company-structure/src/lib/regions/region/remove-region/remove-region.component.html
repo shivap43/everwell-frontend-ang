@@ -1,0 +1,34 @@
+<div class="info-modal">
+    <div class="flex-item region-desc">
+        <div *ngIf="data">
+            <mat-dialog-content>
+                <h1 mat-dialog-title>
+                    {{ "primary.portal.regions.removeRegionName" | replaceTag: { "#regiontitlename":
+                    data?.regionName.name } }}
+                </h1>
+                <!--Replacepipe need work-->
+                <!-- Remove {{data?.regionName.name}}? -->
+                <p *ngIf="data.regionName.numberOfMembers > 0" language="primary.portal.regions.unassignedRegion"></p>
+            </mat-dialog-content>
+            <mat-dialog-actions class="dialog-footer justify-content-between">
+                <button
+                    mat-stroked-button
+                    color="primary"
+                    mat-dialog-close
+                    [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                    class="mon-btn-link"
+                    language="primary.portal.common.cancel"
+                    class="mon-btn-link mon-mr-30"
+                ></button>
+                <button
+                    mat-button
+                    color="primary"
+                    [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+                    (click)="removeRegion()"
+                    class="mon-btn-danger link-danger"
+                    language="primary.portal.common.remove"
+                ></button>
+            </mat-dialog-actions>
+        </div>
+    </div>
+</div>

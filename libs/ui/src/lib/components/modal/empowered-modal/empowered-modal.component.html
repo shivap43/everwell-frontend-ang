@@ -1,0 +1,49 @@
+<div
+    cdkTrapFocus
+    class="info-modal"
+    role="dialog"
+    [ngClass]="{'size-extra-small': size === 'XS', 'size-small': size === 'SM', 'size-medium': size === 'MD', 'size-large': size === 'LG', 'size-extra-large': size === 'XL', 'size-double-extra-large': size === 'XXL'}"
+>
+    <div class="header" *ngIf="(type && type === 'INFORMATIONAL') || closeIcon">
+        <!--Header content-->
+        <ng-content select="empowered-modal-header"></ng-content>
+
+        <ng-container *ngIf="type=='POPUP';else initialFocusBtn">
+            <button mat-icon-button type="button" (click)="close()" #closeBtn>
+                <mon-icon iconSize="25" iconName="close" aria-hidden="true"></mon-icon>
+                <span class="cdk-visually-hidden" language="primary.portal.common.closeNavigation"></span>
+            </button>
+        </ng-container>
+        <ng-template #initialFocusBtn>
+            <button mat-icon-button (click)="close()" #closeBtn>
+                <mon-icon iconSize="25" iconName="close" aria-hidden="true"></mon-icon>
+                <span class="cdk-visually-hidden" language="primary.portal.common.closeNavigation"></span>
+            </button>
+        </ng-template>
+    </div>
+
+    <mat-dialog-content>
+        <div>
+            <!--Unspecified content is treated like body-->
+            <ng-content></ng-content>
+        </div>
+    </mat-dialog-content>
+
+    <div mat-dialog-actions class="dialog-footer" [ngClass]="{ 'hide-cancel' : !showCancel }" *ngIf="type && type === 'POPUP'">
+        <a
+            *ngIf="showCancel"
+            aria-label="cancel"
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-button
+            mat-dialog-close
+            (click)="close()"
+            #cancelBtn
+            language="primary.portal.common.cancel"
+        >
+        </a>
+
+        <!--Footer content-->
+        <ng-content select="empowered-modal-footer"></ng-content>
+    </div>
+</div>

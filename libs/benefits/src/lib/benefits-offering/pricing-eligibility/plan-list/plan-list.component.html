@@ -1,0 +1,214 @@
+<div class="set-pricelist-wrapper">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <section>
+        <div class="w-500 productelig-heading">
+            <h2>{{languageStrings['primary.portal.planList.title']}}</h2>
+            <p>
+                {{languageStrings['primary.portal.planList.description']}}
+                <a
+                    [routerLink]="['../../../', 'profile', 'structure']"
+                    routerLinkActive="router-link-active"
+                    [attr.aria-label]="languageStrings['primary.portal.planList.descriptionanchor']"
+                >
+                    {{languageStrings['primary.portal.planList.descriptionanchor']}}</a
+                >
+                {{languageStrings['primary.portal.planList.descriptionupto']}}
+            </p>
+        </div>
+        <mat-label class="mat-label">
+            {{languageStrings['primary.portal.planList.filterheading']}}
+        </mat-label>
+        <div class="filter-wrapper">
+            <div class="filter-sub-wrapper">
+                <mat-form-field class="custom-select-withoutBorder">
+                    <label class="filter-label"
+                        >{{languageStrings['primary.portal.planList.filterProductLabel']}}<span *ngIf="productNameLabel"
+                            >: {{productNameLabel}}</span
+                        ></label
+                    >
+                    <mat-select
+                        #productSelect
+                        class="filter-select"
+                        panelClass="list-grid-filter filter-product"
+                        (openedChange)="matSelectOpenHandler($event)"
+                    >
+                        <mat-option style="display:none"></mat-option>
+                        <div class="CustomRadio-OptionsCntr benefit-select-block radio-group-filter">
+                            <mat-radio-group [(ngModel)]="productName">
+                                <div class="radioElement" *ngFor="let productInfo of productList">
+                                    <mat-radio-button
+                                        class="CustomRadioOption jobClass"
+                                        value="{{ productInfo.productDetails.name }}"
+                                        (change)="filter.query.product_id = productInfo.productDetails.id"
+                                    >
+                                        {{productInfo.productDetails.name}}
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="mon-clear">
+                            <div>
+                                <a
+                                    class="reset-link"
+                                    (click)="resetFilters(productSelect); productNameLabel = null;"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.reset']"
+                                    *ngIf="productName"
+                                    >{{languageStrings['primary.portal.common.reset']}}</a
+                                >
+                            </div>
+                            <div>
+                                <a
+                                    [ngClass]="{'disabled-apply': !productName}"
+                                    class="mon-apply"
+                                    (click)="applyFilters(productSelect); productNameLabel = productName;"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                >
+                            </div>
+                        </div>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- product -->
+                <!-- Activity -->
+                <mat-form-field class="custom-select-withoutBorder">
+                    <label class="filter-label"
+                        >{{languageStrings['primary.portal.planList.filterActivityLabel']}}<span
+                            *ngIf="activityStatusLabel"
+                            >: {{activityStatusLabel}}</span
+                        ></label
+                    >
+                    <mat-select
+                        #activitySelect
+                        class="filter-select"
+                        panelClass="list-grid-filter filter-activity"
+                        (openedChange)="matSelectOpenHandler($event)"
+                    >
+                        <mat-option style="display:none"></mat-option>
+                        <div class="CustomRadio-OptionsCntr benefit-select-block radio-group-filter">
+                            <mat-radio-group [(ngModel)]="activityStatus">
+                                <div class="radioElement" *ngFor="let activity of activityFilterList">
+                                    <mat-radio-button
+                                        class="CustomRadioOption jobClass"
+                                        value="{{ activity }}"
+                                        (change)="filter.query.combinationStatus = activity"
+                                    >
+                                        {{activity}}
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="mon-clear">
+                            <div>
+                                <a
+                                    class="reset-link"
+                                    (click)="resetFilters(activitySelect); activityStatusLabel = null;"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.reset']"
+                                    *ngIf="activityStatus"
+                                    >{{languageStrings['primary.portal.common.reset']}}</a
+                                >
+                            </div>
+                            <div>
+                                <a
+                                    [ngClass]="{'disabled-apply': !activityStatus}"
+                                    class="mon-apply"
+                                    (click)="applyFilters(activitySelect); activityStatusLabel = activityStatus;"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                >
+                            </div>
+                        </div>
+                    </mat-select>
+                </mat-form-field>
+                <!-- Activity -->
+            </div>
+        </div>
+        <mat-list>
+            <div
+                *ngFor="let productCombination of priceEligibilityCombinations"
+                [ngClass]="{'panel-white-out': filterOpen}"
+            >
+                <div class="planinfo">
+                    <div class="plandetails">
+                        <div class="planname">{{productCombination.choicePlan.plan.name}}</div>
+                        <div>
+                            {{productCombination.product.productDetails.name}}:
+                            {{productCombination.choicePlan.planChoice.plan.policyOwnershipType}} /
+                            {{productCombination.choicePlan.planChoice.plan.pricingModel}}
+                        </div>
+                    </div>
+                    <div>
+                        <button
+                            *ngIf="productCombination.combinationStatus == 'Not started'"
+                            (click)="navigateToPricingEligibility(productCombination.choiceId)"
+                            class="mon-btn-primary mat-flat-button pricebtn"
+                            [attr.aria-label]="languageStrings['primary.portal.planList.setPriceBtn']"
+                        >
+                            <span class="sr-only">
+                                {{languageStrings['primary.portal.planList.setPriceBtn']}}
+                                {{languageStrings['primary.portal.common.for']}}
+                                {{productCombination.choicePlan.plan.name}}
+                            </span>
+                            {{languageStrings['primary.portal.planList.setPriceBtn']}}
+                        </button>
+                        <span class="d-flex">
+                            <div
+                                class="price-status prices-incomplete"
+                                *ngIf="productCombination.combinationStatus == 'Incomplete'"
+                            >
+                                <mon-icon class="icon-warning" iconName="Filled-warning" [iconSize]="20"> </mon-icon>
+                                {{languageStrings['primary.portal.planList.inComplete']}}
+                            </div>
+                            <button
+                                *ngIf="productCombination.combinationStatus == 'Incomplete'"
+                                (click)="navigateToPricingEligibility(productCombination.choiceId)"
+                                class="mon-btn-secondary mat-flat-button pricebtn"
+                                [attr.aria-label]="languageStrings['primary.portal.planList.resumeBtn']"
+                            >
+                                <span class="sr-only">
+                                    {{languageStrings['primary.portal.planList.resumeBtn']}}
+                                    {{languageStrings['primary.portal.planList.setPriceBtn']}}
+                                </span>
+                                {{languageStrings['primary.portal.planList.resumeBtn']}}
+                            </button>
+                        </span>
+
+                        <span class="d-flex">
+                            <div class="price-status-set" *ngIf="productCombination.combinationStatus == 'Completed'">
+                                <mon-icon class="icon-success" iconName="Filled-check" [iconSize]="20"> </mon-icon>
+                                {{languageStrings['primary.portal.planList.priceSetText']}}
+                            </div>
+                            <button
+                                class="mon-btn-link view-Edit"
+                                mat-flat-button
+                                *ngIf="productCombination.combinationStatus == 'Completed'"
+                                (click)="navigateToPricingEligibility(productCombination.choiceId)"
+                                [attr.aria-label]="languageStrings['primary.portal.planList.viewOrEdit']"
+                            >
+                                <span class="sr-only">
+                                    {{languageStrings['primary.portal.common.view']}}
+                                    {{languageStrings['primary.portal.common.or']}}
+                                    {{languageStrings['primary.portal.common.edit']}}
+                                    {{productCombination.choicePlan.plan.name}}
+                                </span>
+                                {{languageStrings['primary.portal.planList.viewOrEdit']}}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </mat-list>
+    </section>
+    <section class="price-list-btn">
+        <div>
+            <button class="mon-btn-secondary" type="button" mat-flat-button (click)="onBack()">
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                <span>{{languageStrings['primary.portal.common.back']}}</span>
+            </button>
+            <button type="submit" class="mon-btn-primary mon-ml-20" mat-flat-button (click)="onNext()">
+                <span>{{languageStrings['primary.portal.common.next']}}</span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </section>
+</div>

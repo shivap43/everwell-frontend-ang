@@ -1,0 +1,115 @@
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<div class="knockout-modal" *ngIf="showData">
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <form [formGroup]="form" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onNext()">
+            <div mat-dialog-content>
+                <ng-container *ngIf="isEdit">
+                    <!-- TODO: Title and Directions should come from language -->
+                    <div class="headercontent">
+                        <h2 language="primary.portal.knockout.updatesTitle"></h2>
+                        <p language="primary.portal.knockout.eligibilityImpact"></p>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="!isEdit && isProducer">
+                    <!-- TODO: Title and Directions should come from language -->
+                    <div class="headercontent">
+                        <h2>{{languageStrings['primary.portal.knockout.editnProducer.question']}}</h2>
+                        <p>{{languageStrings['primary.portal.knockout.editnProducer.description']}}</p>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="!isEdit && !isProducer">
+                    <!-- TODO: Title and Directions should come from language -->
+                    <div class="headercontent">
+                        <h2 language="primary.portal.knockout.noteditnProducer.question"></h2>
+                        <p language="primary.portal.knockout.noteditnProducer.description"></p>
+                    </div>
+                </ng-container>
+                <div class="question-container">
+                    <ng-container *ngFor="let stepData of stepsData; let i=index;" [formGroupName]="stepData.step.question.id">
+                        <div *ngIf="stepData.step.type==='QUESTION' && stepData.showStep">
+                            <div class="question-section">
+                                <div class="question-block">
+                                    <span> {{i+1}}. <span [innerHTML]="stepData.step.question.text"></span></span>
+                                </div>
+                                <div class="response-block">
+                                    <div *ngIf="stepData.step.question.inputType === inputType.RADIO" class="response-type radio">
+                                        <mat-radio-group
+                                            ariaLabel="stepData.step.question.text"
+                                            formControlName="element"
+                                            (change)="hideAndShowQuestions()"
+                                        >
+                                            <ng-container *ngFor="let option of stepData.step.question.options">
+                                                <mat-radio-button [value]="option.value" *ngIf="option.showOption && option.value">
+                                                    <div [innerHTML]="option.label"></div>
+                                                </mat-radio-button>
+                                            </ng-container>
+                                        </mat-radio-group>
+                                        <mat-error
+                                            *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required') && showError"
+                                        >
+                                            {{languageStrings['primary.portal.knockout.errorMsg']}}
+                                        </mat-error>
+                                    </div>
+
+                                    <div class="response-type checkbox">
+                                        <div *ngIf="stepData.step.question.inputType === inputType.CHECKBOX" formArrayName="element">
+                                            <div *ngFor="let option of getShowedOptions(stepData.step.question.options); let i=index">
+                                                <mat-checkbox
+                                                    [value]="option.value"
+                                                    [formControlName]="i"
+                                                    (change)="hideAndShowQuestions()"
+                                                    *ngIf="option.showOption && option.value"
+                                                >
+                                                    <div [innerHTML]="option.label"></div>
+                                                </mat-checkbox>
+                                            </div>
+                                            <mat-error
+                                                *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required') && showError"
+                                            >
+                                                {{languageStrings['primary.portal.knockout.errorMsg']}}
+                                            </mat-error>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <a
+                    href="javascript:void(0)"
+                    class="mon-btn-link"
+                    (click)="onCancel()"
+                    aria-label="Cancel"
+                    language="primary.portal.common.cancel"
+                ></a>
+                <button
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    type="submit"
+                    aria-label="Submit"
+                    language="primary.portal.common.submit"
+                    *ngIf="!isEdit"
+                ></button>
+                <button
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    aria-label="Submit"
+                    language="primary.portal.common.submitChanges"
+                    *ngIf="isEdit"
+                ></button>
+            </mat-dialog-actions>
+        </form>
+    </div>
+</div>

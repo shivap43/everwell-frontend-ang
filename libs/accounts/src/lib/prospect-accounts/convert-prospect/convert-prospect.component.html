@@ -1,0 +1,229 @@
+<!-- convert to account start here-->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-horizontal-stepper #stepper class="dialog-horizontal-stepper">
+        <!-- step for online aaod process -->
+        <mat-step *ngIf="accountNumber">
+            <div mat-dialog-content>
+                <div class="convertp-name">
+                    <span>{{languageStrings['primary.portal.prospects.convert']}} </span>{{prospectName}}
+                    <span> {{languageStrings['primary.portal.prospects.convertProspectName']}}</span>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link">{{languageStrings['primary.portal.common.cancel']}}</a>
+                <button class="mon-btn-primary" mat-flat-button (click)="convertAccount()">
+                    <span>{{languageStrings['primary.portal.prospects.convert']}}</span>
+                </button>
+            </mat-dialog-actions>
+        </mat-step>
+        <!-- Step1 convert to account-->
+        <mat-step>
+            <div mat-dialog-content>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.stepOne']}}</mat-label>
+                <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portal.prospects.converttoAccount']}}</h2>
+                <div class="account-number">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.searchbyAccountnumber']}}</mat-label>
+                    <form [formGroup]="SearchAccountForm" (ngSubmit)="searchAflacAccount()">
+                        <div class="d-flex">
+                            <mat-form-field>
+                                <input
+                                    formControlName="accountNumber"
+                                    matInput
+                                    autocomplete="off"
+                                    maxlength="45"
+                                    [attr.aria-label]="languageStrings['primary.portal.prospects.searchbyAccountnumber']"
+                                />
+                                <mat-error *ngIf="SearchAccountForm.controls.accountNumber.errors?.invalid">{{fieldError}}</mat-error>
+                            </mat-form-field>
+                            <button
+                                #submit
+                                mat-flat-button
+                                class="mon-btn-search mon-btn-primary"
+                                color="primary"
+                                type="submit"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.searchbyAccountnumber']"
+                            >
+                                <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                            </button>
+                        </div>
+
+                        <div class="convert-details-wrapper" *ngIf="account">
+                            {{account.name}}<span
+                                >/ {{ account.primaryContact.address.city}}, {{account.primaryContact.address.state}}<span
+                                    >/ {{languageStrings['primary.portal.prospects.account']}} {{account.groupNumber}}</span
+                                ></span
+                            >
+                        </div>
+                        <div class="danger-msg" *ngIf="errorMessage">
+                            <mon-alert class="message-block" alertType="danger">
+                                <span>{{errorMessage}}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="warning-msg" *ngIf="warningMessage">
+                            <mon-alert class="message-block" alertType="warning">
+                                <span>
+                                    {{"primary.portal.prospects.warningMessage"| replaceTag: { "##producername##": this.producerName } }}
+                                </span>
+                            </mon-alert>
+                        </div>
+                    </form>
+                    <div *ngIf="account==null">
+                        <a href="javascript:void(0)" (click)="moveToAbout(stepper)"
+                            >{{languageStrings['primary.portal.prospects.aboutLink']}}</a
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <mat-dialog-actions class="dialog-footer">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="close()">{{languageStrings['primary.portal.common.cancel']}}</a>
+                <div class="d-flex">
+                    <button class="mon-btn-primary" type="button" mat-flat-button (click)="goForward(stepper)">
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon class="mon-icon mon-directions-btn-icon icon-right" iconSize="12" iconName="right"> </mon-icon>
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </mat-step>
+
+        <!-- Step2 Writing number and SIT code-->
+        <mat-step>
+            <form [formGroup]="convertForm" (ngSubmit)="convertAccount()">
+                <div class="addcontact-info">
+                    <div mat-dialog-content>
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.stepTwo']}}</mat-label>
+                        <h2 role="heading" class="producer-name" mat-dialog-title>
+                            {{"primary.portal.prospects.selectProducername"| replaceTag: { "##producername##": this.producerName } }}
+                        </h2>
+                        <div class="convert-details-wrapper" *ngIf="account">
+                            {{account.name}}<span
+                                >/ {{ account.primaryContact.address.city}}, {{account.primaryContact.address.state}}<span
+                                    >/ {{languageStrings['primary.portal.prospects.account']}}{{account.groupNumber}}</span
+                                ></span
+                            >
+                        </div>
+                        <div class="writing-sitcode">
+                            <div class="writing-number">
+                                <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.writingNumber']}}</mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        [disableOptionCentering]="true"
+                                        (selectionChange)="onchange()"
+                                        formControlName="writingNumber"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                    >
+                                        <mat-option *ngFor="let element of writtingNumber" [value]="element.number">
+                                            {{element.number}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="sit-code">
+                                <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.sitCode']}}</mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        [disableOptionCentering]="true"
+                                        formControlName="sitCode"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                    >
+                                        <mat-option *ngFor="let element of sitCode" [value]="element.id"> {{element.code}} </mat-option>
+                                    </mat-select>
+                                    <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <mon-alert class="message-block" alertType="danger" *ngIf="errorMessageDisplay">
+                            <span>{{errorMessageDisplay}}</span>
+                        </mon-alert>
+                    </div>
+
+                    <mat-dialog-actions class="dialog-footer">
+                        <a class="mon-btn-link" href="javascript:void(0)" (click)="close()"
+                            >{{languageStrings['primary.portal.common.cancel']}}</a
+                        >
+                        <div class="d-flex">
+                            <button type="button" class="mon-btn-secondary" color="primary" mat-flat-button (click)="goBack(stepper)">
+                                <mon-icon class="mon-icon mon-directions-btn-icon icon-left" iconSize="12" iconName="left"> </mon-icon
+                                >{{languageStrings['primary.portal.common.back']}}
+                            </button>
+                            <button class="mon-btn-primary" mat-flat-button type="submit">
+                                <span>{{languageStrings['primary.portal.prospects.convert']}}</span>
+                            </button>
+                        </div>
+                    </mat-dialog-actions>
+                </div>
+            </form>
+        </mat-step>
+        <!-- about aaod stepper -->
+        <mat-step>
+            <div mat-dialog-content>
+                <div class="content-wrapper">
+                    <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.about.title']}}</h2>
+                    <!-- Don't remove this line since it has been commented out for pilot. This will be reverted sometime in future. Refer to MON-33954. -->
+                    <!-- <p class="info-txt">
+                        {{languageStrings['primary.portals.accounts.importAccount.about.infoPart1']}}
+                    </p> -->
+                    <p>{{languageStrings['primary.portals.accounts.importAccount.about.NASSA.infoPart1']}}</p>
+                    <p class="mon-mt-10">
+                        {{languageStrings['primary.portals.accounts.importAccount.about.NASSA.infoPart2']}}
+                        <a
+                            class="email-info"
+                            href="mailto:{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}?subject={{languageStrings['primary.portals.accounts.importAccount.NASSA.email.subject']}}"
+                            >{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}</a
+                        >.
+                    </p>
+                    <!-- Don't remove this line since it has been commented out for pilot. This will be reverted sometime in future. Refer to MON-33954. -->
+                    <!-- <p class="info-link">
+                        <a
+                            target="_blank"
+                            [href]="languageStrings['primary.portals.accounts.importAccount.about.precallWorksheet.link']"
+                            >{{languageStrings['primary.portals.accounts.importAccount.about.precallWorksheetView']}}</a
+                        >
+                    </p> -->
+                    <p class="mon-mt-10">
+                        <a
+                            class="info-link"
+                            target="_blank"
+                            [href]="languageStrings['primary.portals.accounts.importAccount.about.NASSA.link']"
+                            >{{languageStrings['primary.portals.accounts.importAccount.about.learnMoreNASSA']}}</a
+                        >
+                        <mon-icon iconName="open-in-new" iconSize="16"></mon-icon>
+                    </p>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <div>
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="close()"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                </div>
+
+                <div>
+                    <button
+                        class="mon-btn-secondary"
+                        color="primary"
+                        mat-flat-button
+                        type="button"
+                        (click)="moveBackToConvert(stepper)"
+                        [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                    >
+                        <mon-icon class="mon-icon mon-directions-btn-icon icon-left" iconSize="12" iconName="left"> </mon-icon
+                        ><span>{{languageStrings['primary.portal.common.back']}}</span>
+                    </button>
+                    <button type="button" class="mon-btn-primary mon-m-0" (click)="close()" mat-flat-button>
+                        {{languageStrings['primary.portals.accounts.importAccount.about.startNASSA']}}
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>
+<!-- convert to account end here-->

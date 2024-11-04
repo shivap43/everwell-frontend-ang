@@ -1,0 +1,77 @@
+<mat-accordion>
+    <mat-expansion-panel
+        [ngClass]="{'panel-active': panelOpenState }"
+        hideToggle
+        (closed)="triggerPanelToggle(false)"
+        (opened)="triggerPanelToggle(true)"
+        class="group-expand"
+        [disabled]="true"
+    >
+        <mat-expansion-panel-header class="prevent-click">
+            <mat-panel-title class="regiontype-panel-title">
+                <ng-container [ngTemplateOutlet]="addRegionType?addTitle:title"></ng-container>
+            </mat-panel-title>
+            <mat-panel-description class="regiontype-panel-desc">
+                <ng-container [ngTemplateOutlet]="addRegionType?empty:description"></ng-container>
+            </mat-panel-description>
+            <ng-container [ngTemplateOutlet]="addRegionType?empty:links"></ng-container>
+        </mat-expansion-panel-header>
+        <ng-template [cdkPortalOutlet]="portalsService.selectedPortal"></ng-template>
+    </mat-expansion-panel>
+</mat-accordion>
+
+<!-- Templates -->
+<!-- -------------------------------------------------------------------------------------------------- -->
+
+<ng-template #addTitle>
+    <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_REGION_TYPE">
+        <button
+            mat-button
+            (click)="addRegionTypes()"
+            class="authorize-click"
+            [ngClass]="{'mon-btn-primary':zeroState,'mon-btn-link':!zeroState}"
+            *ngIf="!panelOpenState && !isPrivacyOnForEnroller"
+            [tabIndex]="-1"
+        >
+            {{ languageStrings['primary.portal.regions.addRegionType'] }}
+        </button>
+        <h4 *ngIf="panelOpenState" class="regiontype-newclass-title">{{ languageStrings['primary.portal.regions.newRegionType'] }}</h4>
+    </ng-container>
+</ng-template>
+<ng-template #empty></ng-template>
+<ng-template #title><p class="region-type-name">{{regionType?.name}}</p></ng-template>
+<ng-template #description><span class="space">{{regionType?.description}}</span></ng-template>
+<ng-template #links>
+    <div class="action-buttons authorize-click d-flex regiontype-removeedit-wrapper">
+        <span class="space" *ngIf="!panelOpenState && !isPrivacyOnForEnroller">
+            <span
+                [richTooltip]="languageStrings['primary.portal.regionType.removeToolTip']"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+                [matTooltipDisabled]="regionType && !regionType.determinesPlanAvailabilityOrPricing"
+            >
+                <button
+                    mat-flat-button
+                    class="mon-btn-link link-danger"
+                    [disabled]="regionType && regionType.determinesPlanAvailabilityOrPricing"
+                    (click)="$event.stopPropagation(); openRemoveRegionTypeDialog(regionType)"
+                    [tabIndex]="-1"
+                    *isRestricted="permissionEnum.ACCOUNT_RESTRICT_DELETE_REGION_TYPE"
+                >
+                    {{languageStrings['primary.portal.common.remove']}}
+                </button>
+            </span>
+        </span>
+        <span class="space" *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_REGION_TYPE">
+            <button
+                mat-flat-button
+                class="mon-btn-link"
+                (click)="editRegionType()"
+                *ngIf="!panelOpenState && !isPrivacyOnForEnroller"
+                [tabIndex]="-1"
+            >
+                {{languageStrings['primary.portal.common.edit']}}
+            </button></span
+        >
+    </div>
+</ng-template>

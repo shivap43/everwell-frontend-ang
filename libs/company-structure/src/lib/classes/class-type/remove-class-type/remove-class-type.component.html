@@ -1,0 +1,17 @@
+<div class="info-modal">
+    <mat-dialog-content>
+        <h1 mat-dialog-title>
+            <!-- FIXME - Use language. Code below doesn't work -->
+            <!-- {{ "primary.portal.classes.removeText" | replaceTag: { "#classType": data?.name } }} -->
+            Remove {{data?.name}} and all related classes?
+        </h1>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" mat-button mat-dialog-close class="mon-btn-link" (click)="closeDialog()"
+            >{{languageStrings["primary.portal.common.cancel"]}}</a
+        >
+        <button [disabled]="disableSubmit" mat-button (click)="removeClassType()" class="mon-btn-danger">
+            {{languageStrings["primary.portal.common.remove"]}}
+        </button>
+    </mat-dialog-actions>
+</div>

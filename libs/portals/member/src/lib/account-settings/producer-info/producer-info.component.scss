@@ -1,0 +1,35 @@
+@import "shared";
+.producer-info-wrapper {
+    .producer-info-content {
+        max-height: convert-unit(600px, "rem");
+        overflow: auto;
+        border: convert-unit(1px, "rem") solid get("color.gray.600");
+        border-width: convert-unit(1px, "rem") 0 convert-unit(1px, "rem") 0;
+        padding-top: map-get($spacers, 30);
+        .flex-cont {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: map-get($spacers, 15);
+            .left-label {
+                min-width: convert-unit(200px, "rem");
+                .label-txt {
+                    margin-bottom: map-get($spacers, 0);
+                    line-height: normal;
+                }
+            }
+            .left-label-initstate {
+                min-width: convert-unit(200px, "rem");
+                padding-left: map-get($spacers, 15);
+                .label-txt {
+                    margin-bottom: map-get($spacers, 0);
+                    line-height: normal;
+                }
+            }
+            .right-data {
+                .state-dropdown {
+                    width: convert-unit(200px, "rem");
+                }
+            }
+        }
+    }
+}

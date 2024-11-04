@@ -1,0 +1,88 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        <ng-container *ngIf="step1">
+            <span language="primary.portal.everwellMax.easierPolicyAccess"></span>
+        </ng-container>
+        <ng-container *ngIf="step2NoEmail">
+            <span language="primary.portal.everwellMax.getInfo"></span>
+        </ng-container>
+        <ng-container *ngIf="step2WithEmail">
+            <span language="primary.portal.everwellMax.confirmEmail"></span>
+        </ng-container>
+        <ng-container *ngIf="step3">
+            <span language="primary.portal.everwellMax.updateEmail"></span>
+        </ng-container>
+        <ng-container *ngIf="step4">
+            <span language="primary.portal.everwellMax.preferenceChanged"></span>
+        </ng-container>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-secondary" *ngIf="step1" (click)="completePreferenceChange()">
+            <span language="primary.portal.everwellMax.noThanks"></span>
+        </button>
+        <button mat-button class="mon-btn-secondary" *ngIf="!step1 && !step4" (click)="back()">
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step1" (click)="onSwitch()">
+            <span language="primary.portal.everwellMax.switchDelivery"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step4" (click)="completePreferenceChange()">
+            <span language="primary.portal.common.gotIt"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step3" (click)="updateEmailAndDeliveryChange()">
+            <span language="primary.portal.everwellMax.updateAndFinish"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step2NoEmail" (click)="updateEmailData()">
+            <span language="primary.portal.applicationFlow.finish"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step2WithEmail" (click)="updateDeliveryPreference()">
+            <span language="primary.portal.everwellMax.confirmAndFinish"></span>
+        </button>
+    </empowered-modal-footer>
+    <ng-container *ngIf="step1">
+        <span language="primary.portal.everwellMax.eDeliveryBenefits"></span>
+    </ng-container>
+    <ng-container *ngIf="step2WithEmail">
+        <div>
+            <span language="primary.portal.everwellMax.emailOnFile"></span>
+        </div>
+        <span class="text-bold"> <{{memberEmail}}> </span>
+        <button mat-button class="mon-btn-link" (click)="onEdit()">
+            <span language="primary.portal.common.edit"></span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="step3 || step2NoEmail">
+        <div *ngIf="step2NoEmail">
+            <p language="primary.portal.everwellMax.enterEmail" class="header-title"></p>
+        </div>
+        <div *ngIf="step3">
+            <p language="primary.portal.everwellMax.updateExistingEmail" class="header-title"></p>
+        </div>
+        <div *ngIf="step2NoEmail || step3">
+            <form [formGroup]="emailForm">
+                <div class="field-wrapper field-wrapper-email">
+                    <mat-label class="mat-label" language="primary.portal.common.emailAddress"></mat-label>
+                    <mat-form-field class="w-200">
+                        <input formControlName="emailInput" type="text" class="mon-pt-5" matInput />
+                        <mat-error
+                            *ngIf="emailForm.controls.emailInput.errors?.pattern"
+                            language="primary.portal.vf2f.invalidEmail"
+                        ></mat-error>
+                        <mat-error
+                            *ngIf="emailForm.controls.emailInput.errors?.required"
+                            language="primary.portal.common.requiredField"
+                        ></mat-error>
+                        <mat-error
+                            *ngIf="emailForm.controls.emailInput.errors?.duplicate"
+                            language="secondary.portal.members.emailValidationMsg.DuplicateErrorMessage"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="step4">
+        <span language="primary.portal.everwellMax.updateSuccess"> </span>
+    </ng-container>
+</empowered-modal>

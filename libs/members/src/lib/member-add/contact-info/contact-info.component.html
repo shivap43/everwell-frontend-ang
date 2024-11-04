@@ -1,0 +1,440 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="memberContactForm">
+    <fieldset>
+        <legend class="sr-only">{{languageStringsArray['primary.portal.members.contactLabel.contactInfo']}}</legend>
+        <div class="flex-form-wrapper">
+            <h2>{{languageStringsArray['primary.portal.members.contactLabel.contactInfo']}}</h2>
+            <div class="mon-my-20" *ngFor="let error of errorMessageArray">
+                <mon-alert alertType="danger">
+                    <span>{{ error }}</span>
+                </mon-alert>
+            </div>
+
+            <div class="flex-form-item mon-pb-40">
+                <ng-container *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                    <div class="d-md-flex justify-content-between">
+                        <mat-label class="mat-label" for="phone-numbers"
+                            >{{ languageStringsArray['primary.portal.members.contactLabel.phone'] }}</mat-label
+                        >
+                        <div
+                            [richTooltip]="langStrings['primary.portal.members.contactLabel.AddPhoneTooltip']"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [matTooltipDisabled]="!(phoneDataSource && phoneDataSource['_value'].length >= maxNumberOfPhoneContact)"
+                        >
+                            <button
+                                [attr.disableControl]="phoneDataSource && phoneDataSource['_value'].length >= maxNumberOfPhoneContact || isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                                class="mon-btn-link"
+                                mat-flat-button
+                                (click)="openDialog('Phone','','Add')"
+                                *ngIf="phoneData.length"
+                                [disabled]="phoneDataSource && phoneDataSource['_value'].length >= maxNumberOfPhoneContact || isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                            >
+                                {{ langStrings['primary.portal.members.contactLabel.addPhone'] }}
+                            </button>
+                        </div>
+                    </div>
+                    <button
+                        [attr.disableControl]="phoneDataSource && phoneDataSource['_value'].length >= maxNumberOfPhoneContact || isAflacReadOnly || disableFormFields || isVestedAgent"
+                        class="mon-btn-link"
+                        mat-flat-button
+                        (click)="openDialog('Phone','','Add')"
+                        *ngIf="!(phoneData.length)"
+                        [disabled]="phoneDataSource && phoneDataSource['_value'].length >= maxNumberOfPhoneContact || isAflacReadOnly || disableFormFields || isVestedAgent"
+                    >
+                        {{ langStrings['primary.portal.members.contactLabel.addPhone'] }}
+                    </button>
+                </ng-container>
+                <table mat-table [dataSource]="phoneDataSource" *ngIf="phoneData.length > 0">
+                    <ng-container matColumnDef="phoneNumber">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.number']}}</th>
+                        <td mat-cell *matCellDef="let phonelement">{{phonelement.phoneNumber | phone: country}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="extension">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.extention']}}</th>
+                        <td mat-cell *matCellDef="let phoneelement">{{phoneelement.extension}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.type']}}</th>
+                        <td mat-cell *matCellDef="let phoneelement">{{phoneelement.type}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="mobile">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.members.dependent.contactInfo.mobileColumn"></th>
+                        <td mat-cell *matCellDef="let phoneElement">
+                            <span *ngIf="phoneElement.isMobile">
+                                <mon-icon iconName="check" aria-label="check" [iconSize]="15"></mon-icon>
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="verified">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.verified']}}</th>
+                        <td mat-cell *matCellDef="let phoneelement"></td>
+                    </ng-container>
+                    <ng-container matColumnDef="primary">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.primary']}}</th>
+                        <td mat-cell *matCellDef="let phoneelement">
+                            <span *ngIf="phoneelement.primary">
+                                <mon-icon iconName="check" aria-label="check" [iconSize]="15"></mon-icon>
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="manage">
+                        <th *matHeaderCellDef mat-header-cell>{{languageStringsArray['primary.portal.members.contactLabel.manage']}}</th>
+                        <td *matCellDef="let row; let i=index;" mat-cell>
+                            <!-- We can not add ngIf in span and matmenu because the functionality will not work.Created div for expected result. -->
+                            <div>
+                                <button
+                                    *ngIf="!isAflacReadOnly && !isPartialEdit && !disableFormFields && !isVestedAgent"
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="menu"
+                                >
+                                    <mon-icon iconName="ellipsis" class="more-option icon-primary" aria-label="menu"> </mon-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item mat-row (click)="openDialog('Phone',row,'Edit',i)">
+                                        {{ManageContactOptions[0]}}
+                                    </button>
+                                    <div class="seperator" *ngIf="!row.primary"></div>
+                                    <button
+                                        *ngIf="!row.primary"
+                                        mat-menu-item
+                                        mat-row
+                                        class="text-danger"
+                                        (click)="openDialog('Phone',row,'Delete',i)"
+                                    >
+                                        {{ManageContactOptions[1]}}
+                                    </button>
+                                    <button *ngIf="row.type == 'CELL'" mat-menu-item>{{ManageContactOptions[2]}}</button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedPhoneColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedPhoneColumns;"></tr>
+                </table>
+
+                <div class="d-md-flex justify-content-between mon-mt-30" *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                    <mat-label class="mat-label" for="email"
+                        >{{ languageStringsArray['primary.portal.members.contactLabel.email'] }}</mat-label
+                    >
+                    <div
+                        richTooltip="{{langStrings['primary.portal.members.contactLabel.AddEmailTooltip']}}"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [matTooltipDisabled]="!(emailDataSource && emailDataSource['_value'].length >= maxNumberOfEmailContact)"
+                    >
+                        <button
+                            [attr.disableControl]="emailDataSource && emailDataSource['_value'].length >= maxNumberOfEmailContact || isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                            class="mon-btn-link"
+                            mat-flat-button
+                            (click)="openDialog('Email','','Add')"
+                            *ngIf="emailData.length"
+                            [disabled]="emailDataSource && emailDataSource['_value'].length >= maxNumberOfEmailContact || isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                        >
+                            {{ langStrings['primary.portal.members.contactLabel.addEmail'] }}
+                        </button>
+                    </div>
+                </div>
+                <ng-container *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                    <button
+                        [attr.disableControl]="emailDataSource && emailDataSource['_value'].length >= maxNumberOfEmailContact || isAflacReadOnly || disableFormFields || isVestedAgent"
+                        class="mon-btn-link"
+                        mat-flat-button
+                        (click)="openDialog('Email','','Add')"
+                        *ngIf="!(emailData.length)"
+                        [disabled]="emailDataSource && emailDataSource['_value'].length >= maxNumberOfEmailContact || isAflacReadOnly || disableFormFields || isVestedAgent"
+                    >
+                        {{ langStrings['primary.portal.members.contactLabel.addEmail'] }}
+                    </button>
+                </ng-container>
+                <table mat-table [dataSource]="emailDataSource" *ngIf="emailData.length > 0">
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.address']}}</th>
+                        <td mat-cell *matCellDef="let emailelement">{{emailelement.email}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.type']}}</th>
+                        <td mat-cell *matCellDef="let emailelement">{{emailelement.type}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="verified">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.verified']}}</th>
+                        <td mat-cell *matCellDef="let emailelement"></td>
+                    </ng-container>
+                    <ng-container matColumnDef="primary">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStringsArray['primary.portal.members.contactLabel.primary']}}</th>
+                        <td mat-cell *matCellDef="let emailelement">
+                            <span *ngIf="emailelement.primary">
+                                <mon-icon iconName="check" aria-label="check" [iconSize]="15"></mon-icon>
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="manage">
+                        <th *matHeaderCellDef mat-header-cell>{{languageStringsArray['primary.portal.members.contactLabel.manage']}}</th>
+                        <td *matCellDef="let row; let i=index;" mat-cell>
+                            <!-- We can not add ngIf in span and matmenu because the functionality will not work.Created div for expected result. -->
+                            <div>
+                                <button
+                                    *ngIf="!isAflacReadOnly && !isPartialEdit && !disableFormFields && !isVestedAgent"
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="menu"
+                                >
+                                    <mon-icon iconName="ellipsis" class="more-option icon-primary" aria-label="menu"> </mon-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item mat-row (click)="openDialog('Email',row,'Edit',i)">
+                                        {{ManageContactOptions[0]}}
+                                    </button>
+                                    <div class="seperator" *ngIf="!row.primary"></div>
+                                    <button
+                                        *ngIf="!row.primary"
+                                        mat-menu-item
+                                        mat-row
+                                        class="text-danger"
+                                        (click)="openDialog('Email',row,'Delete',i)"
+                                    >
+                                        {{ManageContactOptions[1]}}
+                                    </button>
+                                </mat-menu>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedEmailColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedEmailColumns;"></tr>
+                </table>
+            </div>
+            <div class="divider"></div>
+            <h2>{{langStrings['primary.portal.members.contactLabel.contactPreferences']}}</h2>
+            <div class="flex-form-item">
+                <div class="d-md-flex">
+                    <ng-container *ngIf="hideFieldElementSetting.contactPreference">
+                        <div class="flex-item w-250">
+                            <mat-label class="mat-label">
+                                <span>{{languageStringsArray['primary.portal.members.contactLabel.method']}}</span>
+                                <span *ngIf="!(requiredFields && isRequiredField('contactPreference'))" class="optional-text"
+                                    >{{languageStringsArray['primary.portal.common.optional']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="contactPreference"
+                                    class="mon-input"
+                                    [disableControl]="(readOnlyFieldElementSetting.contactPreference || disableFormFields) || !(emailData.length > 0 || phoneData.length>0)"
+                                    [placeholder]="languageStrings.select"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="updateContactMethodOrTimeOfContact()"
+                                >
+                                    <mat-option>{{languageStringsArray['primary.portal.members.contactLabel.select']}}</mat-option>
+                                    <ng-container *ngIf="emailData.length>0 && phoneData.length>0; else elseBlock">
+                                        <mat-option
+                                            *ngFor="let contactpref of CommunicationPreference"
+                                            value="{{ contactpref }}"
+                                            title="{{ contactpref }}"
+                                        >
+                                            {{ contactpref }}
+                                        </mat-option>
+                                    </ng-container>
+                                    <ng-template #elseBlock>
+                                        <mat-option
+                                            *ngIf="phoneData.length > 0"
+                                            value="{{ CommunicationPreference[0] }}"
+                                            title="{{ CommunicationPreference[0] }}"
+                                        >
+                                            {{ CommunicationPreference[0] }}
+                                        </mat-option>
+                                        <mat-option
+                                            *ngIf="emailData.length > 0"
+                                            value="{{ CommunicationPreference[1] }}"
+                                            title="{{ CommunicationPreference[1] }}"
+                                        >
+                                            {{ CommunicationPreference[1] }}
+                                        </mat-option>
+                                    </ng-template>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="memberContactForm.get('contactPreference').hasError('required')"
+                                    [language]="'secondary.portal.members.requiredField'"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.contactTimeOfDay">
+                        <div class="flex-item" *ngIf="memberContactForm.get('contactPreference').value == 'PHONE'">
+                            <mat-label class="mat-label">
+                                <span>{{languageStringsArray['primary.portal.members.contactLabel.timeOfDay']}}</span>
+                                <span *ngIf="!(requiredFields && isRequiredField('contactTimeOfDay'))" class="optional-text"
+                                    >{{languageStringsArray['primary.portal.common.optional']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="contactTimeOfDay"
+                                    [disableControl]="(readOnlyFieldElementSetting.contactTimeOfDay || disableFormFields) || !(emailData.length > 0 || phoneData.length>0)"
+                                    class="mon-input"
+                                    [placeholder]="languageStrings.select"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="updateContactMethodOrTimeOfContact()"
+                                >
+                                    <mat-option *ngFor="let contacttime of TimeOfDay" value="{{ contacttime }}" title="{{ contacttime }}"
+                                        >{{ contacttime }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="memberContactForm.get('contactTimeOfDay').hasError('required')"
+                                    [language]="'secondary.portal.members.requiredField'"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+                <ng-container *ngIf="hideFieldElementSetting.deliveryPreference">
+                    <div class="flex-item">
+                        <mat-label class="mat-label"
+                            >{{languageStringsArray['primary.portal.members.contactLabel.planInfoDeliveryPreference']}}</mat-label
+                        >
+                        <mat-radio-group
+                            aria-label="Select an option"
+                            formControlName="deliveryPreference"
+                            (change)="updateDeliveryPreference($event)"
+                            class="d-md-flex flex-column"
+                            [disableControl]="readOnlyFieldElementSetting.deliveryPreference || disableFormFields"
+                        >
+                            <mat-radio-button
+                                name="correspondenceType"
+                                *ngFor="let type of CorrespondenceType"
+                                value="{{ type }}"
+                                class="mon-mb-10"
+                                >{{ type }}</mat-radio-button
+                            >
+                        </mat-radio-group>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="hideFieldElementSetting.typeOfContact">
+                    <div *ngIf="memberContactForm.get('deliveryPreference').value == ELECTRONIC" class="mon-mb-20">
+                        <p *ngIf="memberFirstName && !isMemberPortal" class="policy-delivery-hint">
+                            {{langStrings['primary.portal.members.mappPolicyDeliveryMsgElectronic'].replace('##memberFirstName##',
+                            this.memberFirstName)}}
+                        </p>
+                        <p *ngIf="memberFirstName && isMemberPortal" class="policy-delivery-hint">
+                            {{langStrings['primary.portal.members.mmpPolicyDeliveryMsgElectronic'].replace('##memberFirstName##',
+                            this.memberFirstName)}}
+                        </p>
+                    </div>
+                    <div class="d-md-flex mon-ml-30 mon-mb-20" *ngIf="memberContactForm.get('deliveryPreference').value == PAPER">
+                        <div class="flex-item">
+                            <p *ngIf="memberFirstName && !isMemberPortal" class="policy-delivery-hint">
+                                {{langStrings['primary.portal.members.mappPolicyDeliveryMsgPaper'].replace('##memberFirstName##',
+                                this.memberFirstName)}}
+                            </p>
+                            <p *ngIf="memberFirstName && isMemberPortal" class="policy-delivery-hint">
+                                {{langStrings['primary.portal.members.mmpPolicyDeliveryMsgPaper'].replace('##memberFirstName##',
+                                this.memberFirstName)}}
+                            </p>
+                        </div>
+                    </div>
+                    <mon-alert
+                        class="message-block"
+                        alertType="warning"
+                        *ngIf="memberContactForm.get('deliveryPreference').value == PAPER && showEAAMessage"
+                    >
+                        {{langStrings["primary.portal.members.planInfoDeliveryPreference.eaaMessage"]}}
+                    </mon-alert>
+                </ng-container>
+                <ng-container *ngIf="notificationPreferenceEnabled && hideFieldElementSetting.notificationPreference">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span>{{languageStringsArray['primary.portal.members.contactLabel.notificationPreferences']}}</span>
+                            <a
+                                id="notification-preferences"
+                                href="javascript:void(0)"
+                                richTooltip="{{memberFirstName | titlecase}}{{languageStrings.notificationPreferences}}"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStringsArray['primary.portal.members.contactLabel.ariaLabel.notification.preferences']"
+                            >
+                                <mon-icon
+                                    iconName="Filled-info"
+                                    iconSize="15"
+                                    class="infoicon icon-primary"
+                                    aria-describedby="notification-preferences"
+                                >
+                                </mon-icon>
+                            </a>
+                        </mat-label>
+
+                        <mat-radio-group
+                            aria-label="Select an option"
+                            formControlName="notificationPreference"
+                            class="d-md-flex flex-column"
+                            [disableControl]="readOnlyFieldElementSetting.notificationPreference || disableFormFields"
+                            (change)="updateCommunicationPreference($event.value)"
+                        >
+                            <mat-radio-button value="EMAIL" class="mon-mb-10" [disabled]="!primaryEmail || !emailData.length">
+                                <ng-container *ngIf="primaryEmail && emailData.length; else noEmail">
+                                    <span>
+                                        {{langStrings['primary.portal.members.contactLabel.notificationPreferences.primaryEmail']
+                                        .replace("##primaryEmail", primaryEmail.email) }}
+                                    </span>
+                                </ng-container>
+
+                                <ng-template #noEmail>
+                                    <span language="primary.portal.members.contactLabel.notificationPreferences.noEmailListed"></span>
+                                </ng-template>
+                            </mat-radio-button>
+                            <mat-radio-button
+                                [value]="communicationPreference.PHONE"
+                                class="mon-mb-10"
+                                [disabled]="!primaryPhone?.isMobile"
+                            >
+                                <span *ngIf="primaryPhone?.isMobile; else noMobile">
+                                    {{langStrings['primary.portal.members.contactLabel.notificationPreferences.primaryPhone']
+                                    .replace("##primaryPhoneNumber", primaryPhone.phoneNumber | phone: country) }}
+                                </span>
+                                <ng-template #noMobile>
+                                    <span
+                                        language="primary.portal.members.contactLabel.notificationPreferences.noMobileNumberListed"
+                                    ></span>
+                                </ng-template>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <footer class="flex-form-footer fixed-position">
+            <button
+                *ngIf="isSaved && !isFormValueChange"
+                type="button"
+                mat-flat-button
+                class="mon-btn-success"
+                [attr.aria-label]="langStrings['primary.portal.common.saved']"
+            >
+                <span><mon-icon class="check-icon" iconName="check" aria-label="check" [iconSize]="19"></mon-icon></span>
+                <span>{{languageStringsArray['primary.portal.common.saved']}}</span>
+            </button>
+            <button
+                type="button"
+                class="mon-btn-secondary mon-mr-30"
+                *ngIf="((isMemberContactFormDirty$ | async) || isFormValueChange) && !saveInProgress"
+                mat-flat-button
+                (click)="revertForm()"
+                [attr.aria-label]="langStrings['primary.portal.common.undoChanges']"
+            >
+                {{langStrings['primary.portal.common.undoChanges']}}
+            </button>
+            <ng-container *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                <button
+                    *ngIf="!isSaved || isFormValueChange"
+                    class="mon-btn-primary"
+                    type="submit"
+                    [disabled]="(isMemberContactFormDirty$ | async) === false || saveInProgress"
+                    aria-label="Save contact info"
+                    mat-flat-button
+                    (click)="onSubmit(memberContactForm.valid)"
+                    [attr.aria-label]="langStrings['primary.portal.common.save']"
+                >
+                    {{ langStrings['primary.portal.common.save'] }}
+                </button>
+            </ng-container>
+        </footer>
+    </fieldset>
+</form>

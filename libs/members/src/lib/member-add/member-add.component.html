@@ -1,0 +1,49 @@
+<div>
+    <empowered-mon-spinner enableSpinner="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <!-- Email Address Alert -->
+    <mon-alert
+        class="message-block"
+        *ngIf="(stronglyRecommendEmailConfig$ | async) && (emailOnFile$ | async) === false && (emailAlertDismissed$ | async) === false"
+        closeButton="true"
+        (emitCloseEvent)="dismissEmailAlert()"
+    >
+        <span>{{ languageStrings["primary.portal.common.encourageEmailAddress"] }}</span>
+    </mon-alert>
+    <!-- Added First & Last name for Employee -->
+    <h1 class="mon-px-30" *ngIf="(member$ | async)?.name as name">
+        {{ name.firstName }} {{ name.lastName }}
+        <span *ngIf="isTestEmployee">{{ languageStrings["primary.portal.member.testText"] }}</span>
+    </h1>
+    <!-- End of First & Last name for Employee -->
+    <mat-tab-group #tabs animationDuration="0ms" class="mon-tab-wrapper" (selectedTabChange)="showTab($event)">
+        <!-- ToDo: Fetch Labels from language Directive instead of array index -->
+        <mat-tab [label]="navLinks[0].label">
+            <ng-template matTabContent>
+                <empowered-personal-info
+                    *ngIf="type === MemberAddTabs.PERSONAL"
+                    (enableAll)="enableAll($event)"
+                    (enableWork)="enableWork($event)"
+                >
+                </empowered-personal-info>
+            </ng-template>
+        </mat-tab>
+        <!-- ToDo: Fetch Labels from language Directive instead of array index -->
+        <mat-tab [label]="navLinks[1].label" [disabled]="disableWork">
+            <ng-template matTabContent>
+                <empowered-work-info
+                    *ngIf="type === MemberAddTabs.WORK"
+                    (enableContact)="enableContact($event)"
+                    [isDirect]="isDirect"
+                    [isEmployerNameFieldEnabled]="isEmployerNameFieldEnabled"
+                    [isEmployerNameFieldReadOnly]="isEmployerNameFieldReadOnly"
+                ></empowered-work-info>
+            </ng-template>
+        </mat-tab>
+        <!-- ToDo: Fetch Labels from language Directive instead of array index -->
+        <mat-tab [label]="navLinks[2].label" id="2" [disabled]="disableContact" *hasPermission="'core.census.read.contact'">
+            <ng-template matTabContent>
+                <empowered-contact-info *ngIf="type === MemberAddTabs.CONTACT"></empowered-contact-info>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</div>

@@ -1,0 +1,75 @@
+<button
+    *ngIf="showFilter$ | async"
+    [matMenuTriggerFor]="menu"
+    class="pill-filter-label"
+    [ngClass]="{'pill-filter-label-active': isActive,
+                'pill-filter-label-inactive': !isActive,
+                'pill-filter-label-pressed': isOpened}"
+    (menuOpened)="onMenuStateChange(true)"
+    (menuClosed)="onMenuStateChange(false)"
+>
+    {{ filterLabel$ | async }}
+</button>
+<mat-menu #menu="matMenu" class="pill-filter-panel" [overlapTrigger]="false">
+    <div class="pill-filter-panel-wrapper" (click)="$event.stopPropagation()" (keydown)="escapeFilterMenu($event)" #panelsContainer>
+        <span class="cdk-visually-hidden" tabindex="-1" (keydown.space)="false" #placeholder id="placeholder"
+            >{{ filterAriaLabel$ | async }}</span
+        >
+        <div class="pill-filter-panel-panels">
+            <ng-container *ngFor="let filterModel of filterModels$ | async; let i = index">
+                <mat-divider *ngIf="i > 0"></mat-divider>
+                <div class="cdk-visually-hidden" [attr.id]="title + i">{{ filterModel.title }}</div>
+                <empowered-multi-filter-panel
+                    *ngIf="filterModel.filterType === 'MULTI'"
+                    [filterModel]="filterModel"
+                    [combined]="modelCount > 1"
+                    (selectionEvent)="setSelectedValue($event)"
+                    role="group"
+                    [attr.aria-labelledby]="title + i"
+                >
+                </empowered-multi-filter-panel>
+
+                <empowered-single-filter-panel
+                    *ngIf="filterModel.filterType === 'SINGLE'"
+                    [filterModel]="filterModel"
+                    [combined]="modelCount > 1"
+                    role="group"
+                    [attr.aria-labelledby]="title + i"
+                >
+                </empowered-single-filter-panel>
+
+                <empowered-search-filter-panel
+                    *ngIf="filterModel.filterType === 'SEARCH'"
+                    [filterModel]="filterModel"
+                    [combined]="modelCount > 1"
+                    role="group"
+                    [attr.aria-labelledby]="title + i"
+                >
+                </empowered-search-filter-panel>
+                <empowered-date-filter-panel
+                    *ngIf="filterModel.filterType === 'DATE'"
+                    [filterModel]="filterModel"
+                    [combined]="modelCount > 1"
+                    (selectionEvent)="setSelectedValue($event)"
+                    role="group"
+                    [attr.aria-labelledby]="title + i"
+                >
+                </empowered-date-filter-panel>
+            </ng-container>
+        </div>
+
+        <div
+            class="pill-filter-panel-controls"
+            [ngClass]="{'can-reset': resetActive || isSelected, 'multi': (filterModels$ | async).length > 1}"
+        >
+            <button
+                class="apply-button mon-btn-link"
+                (click)="applyFilters()"
+                language="primary.portal.globalComponent.filter.apply"
+            ></button>
+            <button *ngIf="resetActive || isSelected" (click)="resetFilters()" class="filter-reset mon-btn-link">
+                {{ resetLabel$ | async }}
+            </button>
+        </div>
+    </div>
+</mat-menu>

@@ -1,0 +1,78 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header [optionalLabel]="languageStrings['primary.portal.applicationFlow.planInfo.title']">
+        <span [innerHTML]="viewPlanInfoDetail.planName"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            (click)="closeModal()"
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </empowered-modal-footer>
+    <div class="view-detail-wrapper">
+        <div class="plan-details">
+            <div class="label-column">
+                <mat-label>
+                    {{languageStrings['primary.portal.applicationFlow.planInfo.coverageLevel']}}
+                </mat-label>
+                <div class="value">{{viewPlanInfoDetail.coverageLevel}}</div>
+            </div>
+            <div class="label-column" *ngIf="viewPlanInfoDetail.isRider">
+                <mat-label>
+                    {{languageStrings['primary.portal.applicationFlow.planInfo.riders']}}
+                </mat-label>
+                <div class="value" [innerHTML]="viewPlanInfoDetail.riders.join('')"></div>
+            </div>
+
+            <div class="label-column">
+                <mat-label>
+                    {{languageStrings['primary.portal.applicationFlow.planInfo.taxStatus']}}
+                </mat-label>
+                <div class="value">{{viewPlanInfoDetail.taxStatus | titlecase}}</div>
+            </div>
+        </div>
+        <div class="cost-wrapper">
+            <div class="label-column">
+                <mat-label>
+                    {{languageStrings['primary.portal.applicationFlow.planInfo.baseCost']}}
+                </mat-label>
+                <div class="value">
+                    {{viewPlanInfoDetail.planCost ? (viewPlanInfoDetail.planCost | currency) :
+                    languageStrings['primary.portal.applicationFlow.planInfo.currency']}}
+                </div>
+            </div>
+            <div class="label-column" *ngFor="let flexDollar of viewPlanInfoDetail.flexDollars">
+                <mat-label>
+                    {{ flexDollar.flexDollarOrIncentiveName }}
+                </mat-label>
+                <div class="value">
+                    {{flexDollar.flexDollarOrIncentiveAmount | currency}}
+                </div>
+            </div>
+            <div class="label-column your-cost">
+                <mat-label>
+                    {{languageStrings['primary.portal.applicationFlow.planInfo.yourCost']}}
+                </mat-label>
+                <div class="value">
+                    <strong
+                        >{{viewPlanInfoDetail.netCost ? (viewPlanInfoDetail.netCost | currency) :
+                        languageStrings['primary.portal.applicationFlow.planInfo.currency']}}</strong
+                    >
+                    <p>{{viewPlanInfoDetail.payFrequencyName}}</p>
+                </div>
+            </div>
+        </div>
+        <a
+            href="javascript:void(0)"
+            class="text-danger"
+            (click)="discard()"
+            *ngIf="!viewPlanInfoDetail.isCompanyProvided.includes(characteristics.COMPANY_PROVIDED)"
+            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.removeThisPlan']"
+        >
+            {{languageStrings['primary.portal.tpiEnrollment.removeThisPlan']}}
+        </a>
+    </div>
+</empowered-modal>

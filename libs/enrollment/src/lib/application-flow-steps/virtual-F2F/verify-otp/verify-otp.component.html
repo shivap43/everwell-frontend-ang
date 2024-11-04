@@ -1,0 +1,39 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="application-review-block">
+    <h2>{{verifyOtpStepInfo?.title}}</h2>
+    <p class="electronic-address">
+        {{this.verifyOtpStepInfo?.steps[0]?.directions.replace(electronicAddToken, electronicAddressValue)}}
+    </p>
+    <form [formGroup]="verifyOtpForm" (ngSubmit)="verifyOtp()">
+        <mat-label class="mat-label">
+            {{languageStrings['primary.portal.vf2f.code']}}
+        </mat-label>
+        <mat-form-field class="w-200 highlight-required">
+            <input
+                matInput
+                formControlName="verificationCode"
+                autocomplete="off"
+                type="password"
+                [maxlength]="10"
+                [attr.aria-label]="languageStrings['primary.portal.vf2f.code']"
+            />
+            <mat-error
+                *ngIf="verifyOtpForm.controls.verificationCode.touched && verifyOtpForm.controls.verificationCode.invalid"
+            >
+                <span>{{languageStrings['primary.portal.vf2f.required']}}</span>
+            </mat-error>
+        </mat-form-field>
+        <mat-error *ngIf="isVerificationFailed">
+            <span>{{languageStrings['primary.portal.vf2f.invalidCode']}}</span>
+        </mat-error>
+        <p class="mon-mt-10">
+            <a href="javascript:void(0)" class="mon-btn-link" (click)="goToOtpSendStep()">
+                {{this.verifyOtpStepInfo?.steps[0]?.resendOtpText}}
+            </a>
+        </p>
+        <button class="mon-btn-primary submit-app-flow-form" type="submit" mat-flat-button>
+            <span>{{languageStrings['primary.portal.applicationFlow.nextSignature']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </form>
+</div>

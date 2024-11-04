@@ -1,0 +1,113 @@
+@import "shared";
+
+$component: ".eb-plan-prices";
+
+#{$component} {
+    padding-bottom: map-get($spacers, 15);
+    .products-accordion-table {
+        padding: map-get($spacers, 30) map-get($spacers, 30);
+        padding-bottom: 0;
+        width: 100%;
+        table-layout: fixed;
+        .mat-header-row {
+            .mat-header-cell {
+                border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+                line-height: convert-unit(16px, "rem");
+                min-width: convert-unit(120px, "rem");
+                width: 100%;
+                vertical-align: bottom;
+                padding-bottom: map-get($spacers, 10);
+                padding-top: map-get($spacers, 10);
+                @include media-max("l") {
+                    min-width: convert-unit(100px, "rem");
+                }
+            }
+
+            .mat-header-cell:first-child {
+                width: 100%;
+                @include media-max("m") {
+                    width: 100%;
+                    min-width: 0;
+                }
+            }
+
+            .mat-header-cell:not(:first-child) {
+                text-align: right;
+            }
+        }
+        .mat-row {
+            &:nth-child(even) {
+                background-color: get("color.white") !important;
+            }
+
+            &:hover {
+                outline: none;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom-color: rgba(0, 0, 0, 0.12);
+            }
+            & td {
+                border-bottom-color: rgba(0, 0, 0, 0.12);
+                font-family: Roboto, sans-serif;
+                font-weight: 300;
+                &:not(:first-child) {
+                    text-align: right;
+                }
+            }
+        }
+        .mat-footer-row {
+            padding-left: map-get($spacers, 10);
+            .mat-footer-cell {
+                padding: map-get($spacers, 10);
+                color: $black;
+                font-size: convert-unit(16px, "rem");
+                font-family: "Roboto-bold", sans-serif;
+
+                &:not(:first-child) {
+                    text-align: right;
+                    vertical-align: bottom;
+                }
+
+                .mat-icon-button {
+                    height: convert-unit(30px, "rem");
+                    margin-right: convert-unit(-10px, "rem");
+                }
+
+                .pay-frequency-container {
+                    display: flex;
+                    flex-direction: column;
+                    .total-price {
+                        color: $black;
+                        font-size: convert-unit(16px, "rem");
+                    }
+                    .pay-frequency {
+                        font-size: convert-unit(12px, "rem");
+                        font-family: Roboto, sans-serif;
+                        font-weight: normal;
+                    }
+                }
+
+                .plan-prices {
+                    display: flex;
+                    flex-direction: column;
+                    .mat-radio-group {
+                        display: flex;
+                        justify-content: flex-end;
+                        .mat-radio-button {
+                            margin: convert-unit(15px, "rem") convert-unit(-10px, "rem") convert-unit(0px, "rem") convert-unit(0px, "rem");
+                        }
+                    }
+                }
+            }
+        }
+
+        .checked-plan {
+            background-color: get("color.gray.100");
+            @media all and (-ms-high-contrast: none) {
+                padding-top: map-get($spacers, 15) !important;
+                margin-bottom: convert-unit(1px, "rem");
+            }
+        }
+    }
+}

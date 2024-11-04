@@ -1,0 +1,50 @@
+<div class="dialog-content">
+    <div class="request-policy-change">
+        <h3 class="mon-mt-0">
+            {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.requestPolicyChanges.requestPolicyChanges"]}}
+        </h3>
+        <div class="find-policyholder-content">
+            <form [formGroup]="policyTransactionForm">
+                <div>
+                    <div class="list">
+                        <div class="item mon-mb-5" *ngFor="let transaction of policyTransactions; let i = index">
+                            <ng-container formArrayName="transactions">
+                                <mat-checkbox
+                                    [ngClass]="{'pcrcheckbox': showErrorMessage}"
+                                    [formControlName]="i"
+                                    value="{{transaction}}"
+                                >
+                                    <span>{{transaction}}</span>
+                                </mat-checkbox>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div *ngIf="showErrorMessage" class="errormsg">
+                        <span
+                            language="primary.portal.dashboard.policyChangeRequestFlow.requestPolicyChanges.selectionRequired"
+                        ></span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" (click)="onCancel()" mat-flat-button>
+            <span>{{languageStrings["primary.portal.common.cancel"]}}</span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button type="button" class="mon-btn-secondary" (click)="onBack()" mat-flat-button>
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings["primary.portal.common.back"]}}</span>
+        </button>
+        <button type="submit" class="mon-btn-primary mon-ml-20" (click)="onNext()" mat-flat-button>
+            <span>{{languageStrings["primary.portal.common.next"]}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>
+<div class="app-overlay-container"></div>

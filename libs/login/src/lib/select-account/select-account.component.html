@@ -1,0 +1,57 @@
+<form class="mon-card-wrapper mon-my-25" role="form" (ngSubmit)="onSubmit()" [formGroup]="form">
+    <mat-card>
+        <mat-card-content>
+            <mon-alert alertType="danger" *ngIf="apiError" class="mon-alert">
+                <span>{{ apiError }}</span>
+            </mon-alert>
+            <mat-card-title>{{languageStrings['primary.portal.multipleAccountLogin.selectAccount']}}</mat-card-title>
+            <mat-card-subtitle
+                >{{languageStrings['primary.portal.multipleAccountLogin.selectAccountDescription']}}</mat-card-subtitle
+            >
+            <mat-form-field class="w-300">
+                <mat-select
+                    class="select-arrow"
+                    disableOptionCentering="true"
+                    attr.aria-required="true"
+                    formControlName="account"
+                >
+                    <mat-select-trigger>
+                        {{ form.value?.account?.accountName }}
+                    </mat-select-trigger>
+                    <mat-option
+                        *ngFor="let account of associatedAccounts$ | async"
+                        [value]="account"
+                        class="selected-account"
+                    >
+                        <div>
+                            <div>{{account.accountName}}</div>
+                            <div class="account-description">{{account.accountAddress}}</div>
+                        </div>
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.controls?.account?.errors?.required"
+                    ><span language="primary.portal.common.selectionRequired"></span
+                ></mat-error>
+            </mat-form-field>
+        </mat-card-content>
+        <mat-card-footer class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-btn-primary mon-mb-30"
+                mat-flat-button
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.common.loginToAccount']"
+            >
+                {{languageStrings['primary.portal.common.loginToAccount']}}
+            </button>
+            <p class="text-center">
+                <a
+                    href="javascript:void(0)"
+                    routerLink="../../login"
+                    [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                >
+                    {{languageStrings['primary.portal.common.back']}}</a
+                >
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

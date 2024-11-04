@@ -1,0 +1,426 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content payroll">
+    <form [formGroup]="transferToPayrollForm">
+        <div class="mon-px-30">
+            <div class="flex-form-wrapper">
+                <h3>
+                    {{languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.header']}}
+                </h3>
+                <div>
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item policy-checkbox">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.affectedPolicies"
+                                ></span>
+                            </mat-label>
+                            <mat-checkbox
+                                *ngIf="policyList.length > 7"
+                                [indeterminate]="isIndeterminate"
+                                type="checkbox"
+                                [checked]="isAllPolicySelected"
+                                class="transfer-payroll-checkbox"
+                                (change)="selectAll($event.checked)"
+                                [disabled]="isMultipleAccounts"
+                            >
+                                <span language="primary.portal.policyChangeRequest.transactions.selectAll"></span>
+                            </mat-checkbox>
+                            <div>
+                                <div
+                                    formArrayName="policyNumbers"
+                                    *ngFor="let item of formControl['policyNumbers'].controls; let i = index"
+                                >
+                                    <mat-checkbox
+                                        [ngClass]="{'pcrcheckbox': counter === 0 && isSubmitted}"
+                                        (change)="selectSingle($event.checked, policyList[i])"
+                                        [formControlName]="i"
+                                        class="transfer-payroll-checkbox"
+                                        [disabled]="selectedAccountNumber && policyList[i]?.accountNumber !== selectedAccountNumber"
+                                    >
+                                        {{policyList[i]?.policyName}}
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <mat-error *ngIf="counter === 0 && isSubmitted">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.selectionRequired"
+                                ></span>
+                            </mat-error>
+                        </div>
+                    </div>
+
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountName"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountName']"
+                                    matInput
+                                    formControlName="currentAccountName"
+                                />
+                                <mat-error *ngIf="formControl['currentAccountName'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountNumber"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountNumber']"
+                                    matInput
+                                    formControlName="currentAccountNumber"
+                                />
+                                <mat-error *ngIf="formControl['currentAccountNumber'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['currentAccountNumber'].errors?.pattern">
+                                    <span
+                                        >{{languageStrings["primary.portals.accounts.importAccount.errors.invalidGroupNumber"]}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <h3 class="mon-mt-0">
+                        {{languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.newAccountLabel']}}
+                    </h3>
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.newAccountName"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.newAccountName']"
+                                    matInput
+                                    formControlName="newAccountName"
+                                />
+                                <mat-error *ngIf="formControl['newAccountName'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.newAccountNumber"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.newAccountNumber']"
+                                    formControlName="newAccountNumber"
+                                    [maxlength]="accountMaxLength"
+                                />
+                                <mat-error *ngIf="formControl['newAccountNumber'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['newAccountNumber'].errors?.pattern">
+                                    <span
+                                        >{{languageStrings["primary.portals.accounts.importAccount.errors.invalidGroupNumber"]}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.deptNumber"
+                                ></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.deptNumber']"
+                                    matInput
+                                    formControlName="departmentNumber"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.empOrMemberNumber"
+                                ></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.empOrMemberNumber']"
+                                    formControlName="employeeNumber"
+                                    [maxlength]="employeeNumberMaxLength"
+                                />
+                            </mat-form-field>
+                            <mat-error *ngIf="formControl['employeeNumber'].errors?.maxlength">
+                                max 5 characters
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['employeeNumber'].errors?.pattern"
+                                language="primary.portals.accounts.importAccount.errors.invalidGroupNumber"
+                            >
+                            </mat-error>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3>
+                        {{languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.billingNameLabel']}}
+                    </h3>
+                    <div class="d-md-flex flex-wrap" formGroupName="billingName">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.firstname"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    matInput
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.firstname']"
+                                    formControlName="firstName"
+                                />
+                                <mat-error *ngIf="billingFormControl['firstName'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['firstName'].errors?.length"
+                                    language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['firstName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingFormControl['firstName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['firstName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingFormControl['firstName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.policyChangeRequest.transactions.transferPayroll.mi">
+                                </span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.mi']"
+                                    matInput
+                                    formControlName="middleName"
+                                />
+                            </mat-form-field>
+                            <mat-error
+                                *ngIf="billingFormControl['middleName'].errors?.length"
+                                language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingFormControl['middleName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingFormControl['middleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="billingFormControl['middleName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingFormControl['middleName'].value)"
+                                language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                            >
+                            </mat-error>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.lastName"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    class="mon-input"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.lastName']"
+                                    matInput
+                                    formControlName="lastName"
+                                />
+                                <mat-error *ngIf="billingFormControl['lastName'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['lastName'].errors?.length"
+                                    language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['lastName'].hasError('pattern') && ! nameWithHypenApostrophesValidation.test(billingFormControl['lastName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="billingFormControl['lastName'].hasError('pattern') &&  nameWithHypenApostrophesValidation.test(billingFormControl['lastName'].value)"
+                                    language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.policyChangeRequest.transactions.transferPayroll.suffix"
+                                    >Suffix
+                                </span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    placeholder="Select"
+                                    matNativeControl
+                                    class="mon-input"
+                                    formControlName="suffix"
+                                >
+                                    <mat-option
+                                        *ngFor="let item of suffixes$ | async"
+                                        value="{{item}}"
+                                        title="{{item}}"
+                                    >
+                                        {{item}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeName.supportiveDocs"
+                                ></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                                <div class="pcr-fileupload">
+                                    <empowered-pcr-file-upload
+                                        [uploadApi]="uploadApi"
+                                        [isFileUploadFromTransaction]="true"
+                                        [documentIds]="documentIdArray"
+                                        [mpGroup]="mpGroup"
+                                        [memberId]="memberId"
+                                        [cifNumber]="cifNumber"
+                                        (getDocumentId)="getDocumentId($event)"
+                                    >
+                                    </empowered-pcr-file-upload>
+                                </div>
+                            </mat-label>
+                        </div>
+                    </div>
+                    <div class="d-md-flex flex-wrap mon-mt-20">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.effectiveDate"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field class="mon-date-field  w-200">
+                                <input
+                                    [matDatepicker]="picker"
+                                    formControlName="effectiveDate"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.effectiveDate']"
+                                    matInput
+                                    [min]="minDate"
+                                    (keyup)="transform($event)"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-hint
+                                    language="primary.portal.policyChangeRequest.transactions.transferPayroll.dateFormat"
+                                >
+                                </mat-hint>
+                                <mat-error *ngIf="formControl['effectiveDate'].errors?.required">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.requiredField"
+                                    ></span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['effectiveDate'].hasError('matDatepickerMin')">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.transferPayroll.validationError.noPasteffectiveDate"
+                                    ></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="dialog-footer">
+    <button
+        class="mon-btn-link"
+        [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+        mat-flat-button
+        (click)="cancel()"
+    >
+        {{languageStrings['primary.portal.common.cancel']}}
+    </button>
+    <div>
+        <button
+            type="button"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button
+            type="submit"
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+            class="mon-btn-primary mon-ml-20"
+            (click)="transferToPayroll()"
+            mat-flat-button
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

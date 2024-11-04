@@ -1,0 +1,123 @@
+<empowered-modal type="POPUP" size="LG" [showCancel]="false" class="producer-info-wrapper">
+    <empowered-modal-header>
+        <span>{{languageStrings['primary.portals.subproducerInfo.producerInformation']}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div class="done-btn">
+            <button mat-flat-button class="mon-btn-primary" (click)="closePopup()">
+                {{languageStrings['primary.portal.common.done']}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="infomodal-content">
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.nationalNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{data.producerInfo.npn}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.writingNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <div *ngFor="let writingNumber of data.producerInfo.writingNumbers">
+                    <span>{{writingNumber.number}}</span>
+                    <span *ngFor="let sitCode of writingNumber.sitCodes">
+                        <!-- (SIT:{{sitCode.code}})  -->
+                        {{"primary.portal.subproducerInfo.sitCodes"| replaceTag: { "##sitecode##": sitCode.code } }}
+                    </span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.carrierAppointments']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <div *ngFor="let carrierAppointment of carrierAppointments">
+                    {{carrierAppointment.name}}
+                    <span>(</span>
+                    <span>{{carrierAppointment.validity.effectiveStarting}}-</span>
+                    <span>
+                        {{carrierAppointment.validity.expiresAfter}}
+                    </span>
+                    <span>)</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licensedStates']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{data.producerInfo.licenses.length}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="leftlabel-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.state']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <mat-form-field class="state-dropdown">
+                    <mat-select
+                        disableOptionCentering="true"
+                        [placeholder]="initState"
+                        (selectionChange)="getLicenseData($event)"
+                    >
+                        <div class="filter-options">
+                            <mat-option *ngFor="let state of data.producerInfo.licenses" [value]="state"
+                                >{{state.state.abbreviation}}</mat-option
+                            >
+                        </div>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="leftlabel-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{licenseNumber}}</div>
+        </div>
+
+        <div class="flex-cont">
+            <div class="leftlabel-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseeffectiveDate']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{effectiveDate}}</div>
+        </div>
+
+        <div class="flex-cont">
+            <div class="leftlabel-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseExpiration']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{expiration}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="leftlabel-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseAuthority']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                {{linesOfAuthority}}
+            </div>
+        </div>
+    </div>
+</empowered-modal>

@@ -1,0 +1,61 @@
+<div class="aflac-always-card" [ngClass]="{'aflac-always-card-review-page': isReviewEnrollmentPage}">
+    <mon-icon iconSize="48" iconName="aflac-always-feather" alt=""></mon-icon>
+    <div class="aflac-always-card-content">
+        <h3>{{ headerText }}</h3>
+        <p>
+            {{ bodyText }}
+            <a
+                *ngIf="!isReviewEnrollmentPage"
+                href="javascript:void(0)"
+                language="primary.portal.applicationFlow.confirmation.aflacAflaysCard.linkText"
+                (click)="openLearnMoreModal()"
+            >
+                <mon-icon iconSize="15" iconName="link-text-arrow"></mon-icon>
+            </a>
+        </p>
+        <button
+            *ngIf="!isEnrolled && !isReviewEnrollmentPage"
+            class="mon-btn-primary mat-flat-button"
+            language="primary.portal.applicationFlow.confirmation.aflacAflaysCard.buttonText"
+            (click)="enrollInAflacAlways()"
+        ></button>
+        <button
+            *ngIf="isEnrolled"
+            [class]="'mon-btn-primary mat-flat-button ' + (statusText === pendingSignatureText? 'pending-signature' : 'enrolled')"
+        >
+            <div *ngIf="statusText === pendingSignatureText;then pending_signature; else enrolled"></div>
+        </button>
+        <ng-template #enrolled><span>{{statusText}}</span></ng-template>
+        <ng-template #pending_signature>{{statusText}}</ng-template>
+    </div>
+    <div class="review-button">
+        <button
+            *ngIf="isReviewEnrollmentPage && (!reviewAflacAlwaysStatus || isDisabled)"
+            [disabled] = "isDisabled"
+            class="mon-btn-secondary mat-flat-button"
+            aria-label="languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.header']"
+            language="primary.portal.enrollment.review.review"
+            (click)="openReviewAflacAlwaysModal()"
+        ></button>
+        <div class="align-sm-success" *ngIf="isReviewEnrollmentPage && (reviewAflacAlwaysStatus && !isDisabled)">
+            <span class="status-icon" *ngIf="reviewAflacAlwaysStatus === APPROVE">
+                <mon-icon iconName="Filled-check" iconSize="20" class="icon-success" alt=""> </mon-icon
+                ><span aria-label="primary.portal.review.Completed" language="primary.portal.review.Completed"></span>
+            </span>
+            <span class="status-icon" *ngIf="reviewAflacAlwaysStatus === REJECT">
+                <mon-icon iconName="Filled-X" iconSize="20" class="icon-danger"></mon-icon>
+                <span aria-label="primary.portal.review.Rejected" language="primary.portal.review.Rejected"></span>
+            </span>
+            <span>
+                <a
+                    class="edit"
+                    (click)="openReviewAflacAlwaysModal()"
+                    language="primary.portal.enrollment.review.edit"
+                    tabindex="0"
+                    [attr.aria-label]="languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.editAflacAlways']"
+                    href="javascript:void(0)"
+                ></a>
+            </span>
+        </div>
+    </div>
+</div>

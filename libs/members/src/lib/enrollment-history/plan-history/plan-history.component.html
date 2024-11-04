@@ -1,0 +1,85 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div *ngIf="enrollmentDetail" class="plan-details">
+    <div class="d-flex main-header-mat-tab">
+        <p class="left-content">{{languageStrings['primary.portal.activityHistory.planDetails']}}</p>
+        <p class="right-content">
+            {{languageStrings['primary.portal.activityHistory.updateFirstLast']}}&nbsp;{{enrollmentDetail.updateAdmin.name}}
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.policy']}} #</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.policyNumber">
+            {{enrollmentDetail.auditedEnrollment.policyNumber}}
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.policyStatus']}}</p>
+        <mon-icon iconName="Filled-check" [iconSize]="20" *ngIf="iconStatus===iconStatuses.SUCCESS" class="mon-icon-status icon-success">
+        </mon-icon>
+        <mon-icon iconName="Filled-dash" [iconSize]="20" *ngIf="iconStatus===iconStatuses.WARNING" class="mon-icon-status icon-warning">
+        </mon-icon>
+        <mon-icon
+            class="mon-icon-close icon-danger"
+            *ngIf="iconStatus===iconStatuses.DANGER"
+            [iconSize]="20"
+            iconName="Filled-X"
+        ></mon-icon>
+        <p class="label-value label-value-icon">{{enrollmentDetail.policyStatus}}</p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.coverageDates']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.validity">
+            <span *ngIf="enrollmentDetail.auditedEnrollment.validity.effectiveStarting">
+                {{enrollmentDetail.auditedEnrollment.validity.effectiveStarting | date:dateFormat}}
+            </span>
+            <span *ngIf="enrollmentDetail.auditedEnrollment.validity.expiresAfter">
+                - {{enrollmentDetail.auditedEnrollment.validity.expiresAfter | date:dateFormat}}
+            </span>
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.coverageLevel']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.coverageLevel">
+            {{enrollmentDetail.auditedEnrollment.coverageLevel.name}}
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.employerContr']}}</p>
+        <p class="label-value">{{employeeContribution | currency:'USD'}} {{payFrequency}}</p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.employerPremium']}}</p>
+        <p class="label-value">{{memberCostPerPayPeriod | currency:'USD'}} {{payFrequency}}</p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.rider']}}</p>
+        <ng-container *ngIf="enrollmentRider?.length>0; else noRiders">
+            <p *ngFor="let rider of enrollmentRider" class="label-value">{{rider.name}}</p>
+        </ng-container>
+        <ng-template #noRiders>
+            <p class="label-value">{{languageStrings['primary.portal.activityHistory.none']}}</p>
+        </ng-template>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.taxStatus']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.taxStatus">{{enrollmentDetail.auditedEnrollment.taxStatus}}</p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.tobacoStatus']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.tobaccoStatus">
+            {{enrollmentDetail.auditedEnrollment.tobaccoStatus}}
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.benefitAmount']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.benefitAmount">
+            {{enrollmentDetail.auditedEnrollment.benefitAmount}}
+        </p>
+    </div>
+    <div class="plan-details-content d-flex">
+        <p class="text-bold-label">{{languageStrings['primary.portal.activityHistory.salaryMulti']}}</p>
+        <p class="label-value" *ngIf="enrollmentDetail.auditedEnrollment.salaryMultiplier">
+            {{enrollmentDetail.auditedEnrollment.salaryMultiplier}}
+        </p>
+    </div>
+</div>

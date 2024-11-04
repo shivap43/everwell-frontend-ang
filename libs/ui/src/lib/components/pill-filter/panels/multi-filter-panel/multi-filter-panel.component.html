@@ -1,0 +1,14 @@
+<ng-container *ngIf="selectionModel$ | async as selectionModelAsync">
+    <mat-label class="mat-label" [ngClass]="{'cdk-visually-hidden': !combined}">{{ selectionModelAsync.title }}</mat-label>
+    <ng-container *ngIf="selectionModelAsync.multi.options.length > 7">
+        <mat-checkbox [checked]="allSelected$ | async" (change)="toggleAll($event)" class="select-all">Select All</mat-checkbox>
+        <mat-divider></mat-divider>
+    </ng-container>
+
+    <mat-checkbox
+        *ngFor="let option of selectionModelAsync.multi.options"
+        [checked]="option.selected"
+        (change)="toggle(option.value, $event)"
+        >{{ option.label }}</mat-checkbox
+    >
+</ng-container>

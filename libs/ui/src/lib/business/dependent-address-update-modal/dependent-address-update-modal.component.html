@@ -1,0 +1,68 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="addressUpdateModalForm" class="info-modal" (ngSubmit)="updateDependantAddress()">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            type="button"
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.dependent.address.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <ng-template [ngIf]="showSpinner">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+    <div mat-dialog-content>
+        <h2 mat-dialog-title [attr.aria-label]="languageStrings['primary.portal.dependent.address.header']">
+            {{languageStrings['primary.portal.dependent.address.header']}}
+        </h2>
+        <p class="padding-bottom" [attr.aria-label]="languageStrings['primary.portal.dependent.address.content']">
+            {{languageStrings['primary.portal.dependent.address.content']}}
+        </p>
+        <div class="padding-bottom" *ngIf="apiError">
+            <mon-alert alertType="danger" closeButton="true">
+                <span [innerHtml]="apiError"></span>
+            </mon-alert>
+        </div>
+        <div class="label">{{memberAddress}}</div>
+        <div class="dependent-padding-top">
+            <div *ngFor="let dependent of dependentList">
+                <mat-checkbox
+                    class="dependent-checkbox"
+                    formControlName="dependents"
+                    (change)="checkDependentSelection($event)"
+                    attr.aria-label="{{dependent.name.firstName}} {{dependent.name.lastName}}"
+                    [value]="dependent.id.toString()"
+                    >{{dependent.name.firstName}} {{dependent.name.lastName}}</mat-checkbox
+                >
+            </div>
+            <mat-error
+                *ngIf="addressUpdateModalForm.controls.dependents.errors?.required"
+                language="primary.portal.dependent.address.selectionRequired"
+            >
+            </mat-error>
+        </div>
+    </div>
+    <mat-dialog-actions class="dependent-modal-footer">
+        <button
+            mat-flat-button
+            type="button"
+            class="mon-btn-secondary mon-mr-15"
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.dependent.address.button.skip']"
+        >
+            {{languageStrings['primary.portal.dependent.address.button.skip']}}
+        </button>
+        <button
+            mat-flat-button
+            color="primary"
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            type="submit"
+            [disabled]="apiError"
+            [attr.aria-label]="languageStrings['primary.portal.dependent.address.button.update']"
+        >
+            {{languageStrings['primary.portal.dependent.address.button.update']}}
+        </button>
+    </mat-dialog-actions>
+</form>

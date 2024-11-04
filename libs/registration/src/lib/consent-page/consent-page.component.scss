@@ -1,0 +1,38 @@
+@import "shared";
+
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-mobile {
+    @include media-max("s") {
+        margin: map-get($spacers, 0) !important;
+        height: 100%;
+        width: 100% !important;
+    }
+}
+
+.mon-card-wrapper {
+    .mat-card {
+        .mat-card-content {
+            margin-right: 0;
+            margin-left: 0;
+            margin-bottom: convert-unit(50px, "rem");
+
+            .mat-card-title,
+            p {
+                padding-left: convert-unit(50px, "rem");
+            }
+
+            .mon-consent-content {
+                overflow-y: auto;
+                max-height: convert-unit(200px, "rem");
+                line-height: convert-unit(24px, "rem");
+                padding: 0 convert-unit(50px, "rem");
+                text-align: justify;
+            }
+        }
+    }
+}

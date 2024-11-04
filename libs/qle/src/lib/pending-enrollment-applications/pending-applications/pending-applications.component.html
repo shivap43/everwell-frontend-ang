@@ -1,0 +1,94 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div *ngIf="!isLoading" class="enrollment-main-section">
+    <div class="section-header">
+        <div class="" *ngIf="this.sampleData.length>0">
+            <h1>{{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollments']}}</h1>
+            <span *ngIf="!isDirect">
+                <p>{{languageStrings['primary.portal.accountPendingEnrollments.includeLifeEvent']}}</p>
+                <a href="javascript:void(0)" (click)="navigateToAccountEnrollments()">
+                    <span>{{languageStrings['primary.portal.accountPendingEnrollments.viewAll']}}</span>&nbsp;
+                    <span>{{mpGroup.name}}</span>&nbsp;
+                    <span>{{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollmentsSmall']}}</span>
+                </a>
+            </span>
+        </div>
+        <div class="" *ngIf="this.sampleData.length===0">
+            <h1 class="mon-my-20">
+                {{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollments']}}
+            </h1>
+            <p *ngIf="!isDirect && !error">
+                {{languageStrings['primary.portal.pendingApplication.noPendingEmployee']}}
+            </p>
+            <p *ngIf="isDirect && !error">{{languageStrings['primary.portal.pendingApplication.noPendingCustomer']}}</p>
+        </div>
+    </div>
+    <mon-alert alertType="danger" *ngIf="error">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+    <div [hidden]="testData.length===0" class="results-grid table-mask-wrapper">
+        <div class="">
+            <table mat-table [dataSource]="testData">
+                <ng-container matColumnDef="plan">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.plan']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a
+                            href="javascript:void(0)"
+                            *ngIf="!element.disable"
+                            (click)="goToPendingEnrollments(element, $event)"
+                            >{{element.product.plan.product.name}} | {{element.plan.plan.name}}</a
+                        >
+                        <span *ngIf="element.disable">
+                            {{element.product.plan.product.name}} | {{element.plan.plan.name}}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="reason">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.reason']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <mon-icon class="icon-warning" iconName="Filled-warning" [iconSize]="10"></mon-icon>
+                        <span *ngIf="element.reason && element.reason.type && element.reason.type.description"
+                            >Life event:&nbsp;{{element.reason.type.description}}</span
+                        ><span *ngIf="element.reason && !element.reason.type">{{element.reason}}</span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="lifeEventDate">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.lifeEventDate']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element.lifeEventDate}}</td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.filterStatus']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.status==='Unspecified'">&nbsp;</span>
+                        <span *ngIf="element.status!=='Unspecified'">{{element.status}}</span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.manage']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button
+                            mat-icon-button
+                            class="mon-btn-link visible-on-row-hover"
+                            (click)="openEditStatus(element,$event)"
+                            *ngIf="!element.disable"
+                        >
+                            {{languageStrings['primary.portal.accountPendingEnrollments.editStatus']}}
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

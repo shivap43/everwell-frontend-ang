@@ -1,0 +1,177 @@
+.mat-form-field {
+    display: block;
+    font-size: convert-unit(16px, "rem");
+    margin-bottom: convert-unit(20px, "rem");
+
+    &.textarea {
+        .mat-form-field-flex {
+            padding: 0 convert-unit(2px, "rem");
+        }
+        .mat-form-field-infix {
+            padding: convert-unit(4px, "rem") 0;
+        }
+        textarea.mat-input-element {
+            padding: convert-unit(6px, "rem") convert-unit(8px, "rem");
+        }
+    }
+
+    &.mat-form-field-disabled {
+        .mat-form-field-flex {
+            color: get("color.gray.700");
+            background: get("color.gray.300");
+            border-radius: convert-unit(4px, "rem");
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: get("color.gray.400");
+            }
+        }
+
+        * {
+            cursor: not-allowed;
+        }
+    }
+
+    &.mat-form-field-readonly {
+        .mat-form-field-flex {
+            color: get("color.gray.700");
+            background: get("color.gray.300");
+            border-radius: convert-unit(4px, "rem");
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: get("color.gray.400");
+            }
+        }
+
+        * {
+            cursor: not-allowed;
+        }
+    }
+
+    &.mat-form-field-invalid {
+        .mat-form-field-outline-thick > div {
+            border-color: get("color.info.danger.500");
+            background-color: get("color.info.danger.100");
+        }
+        .mat-form-field-infix {
+            color: get("color.info.danger.500");
+        }
+    }
+
+    .mat-form-field-suffix {
+        top: 0;
+    }
+
+    .mat-form-field-wrapper {
+        margin: 0;
+        padding: 0;
+    }
+
+    .mat-form-field-subscript-wrapper {
+        padding: 0;
+        margin: 0;
+        position: static;
+
+        .mat-hint,
+        .mat-error {
+            margin-top: convert-unit(5px, "rem");
+        }
+    }
+
+    .mat-form-field-label-wrapper {
+        padding: 0;
+    }
+
+    .mat-form-field-infix {
+        border: none;
+        padding: convert-unit(10px, "rem") 0;
+        .mat-input-element {
+            caret-color: get("color.black");
+        }
+    }
+
+    .mat-form-field-outline {
+        top: 0;
+    }
+
+    &.mat-focused {
+        .mat-form-field-outline-thick {
+            box-shadow: 0 0 convert-unit(3px, "rem") convert-unit(4px, "rem") get("color.primary.300");
+            border-radius: convert-unit(4px, "rem");
+            > div {
+                border-color: get("color.primary.300");
+                border-width: 2px;
+            }
+        }
+    }
+
+    .mat-form-field-flex {
+        margin-top: 0;
+        padding: 0 convert-unit(10px, "rem");
+        background-color: #fff;
+
+        .mat-form-field-outline-end,
+        .mat-form-field-outline-start {
+            border-color: get("color.gray.600");
+        }
+
+        .mat-form-field-outline-start {
+            border-radius: convert-unit(4px, "rem") 0 0 convert-unit(4px, "rem");
+        }
+
+        .mat-form-field-outline-end {
+            border-radius: 0 convert-unit(4px, "rem") convert-unit(4px, "rem") 0;
+        }
+
+        .mat-form-field-outline-gap {
+            border-radius: convert-unit(4px, "rem");
+        }
+
+        .mat-form-field-outline-thick {
+            opacity: 1;
+
+            > div {
+                border-width: convert-unit(1px, "rem");
+            }
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            .mat-form-field-outline-thick {
+                opacity: 1;
+
+                > div {
+                    border-color: get("color.gray.600");
+                }
+            }
+        }
+    }
+
+    .mat-hint {
+        font-size: convert-unit(12px, "rem");
+        color: get("color.gray.600");
+    }
+
+    /* For Firefox */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    /* Webkit browsers like Safari and Chrome */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    &.highlight-required {
+        .mat-form-field-flex {
+            background-color: get("color.paleYellow");
+        }
+    }
+}
+
+.mat-error {
+    font-size: convert-unit(12px, "rem");
+    color: get("color.info.danger.500");
+    font-weight: 400;
+    @include fontFace("primary.regular");
+}

@@ -1,0 +1,62 @@
+@import "shared";
+
+.pill-filter {
+    &-label {
+        font-size: convert-unit(14px, "rem");
+        border-radius: convert-unit(50px, "rem");
+        display: inline-block;
+        cursor: pointer;
+        height: convert-unit(32px, "rem");
+        line-height: convert-unit(32px, "rem");
+        white-space: nowrap;
+        padding: map-get($spacers, 0) map-get($spacers, 20);
+
+        &-active,
+        &[aria-expanded="true"] {
+            font-weight: 800;
+            background-color: get("color.gray.800");
+            color: get("color.white");
+
+            &:hover {
+                background-color: get("color.gray.900");
+            }
+
+            &:active {
+                background-color: get("color.gray.1000");
+            }
+        }
+
+        &-inactive {
+            font-weight: 400;
+            background-color: get("color.gray.200");
+            color: get("color.black");
+            border: convert-unit(1px, "rem") solid get("color.gray.500");
+
+            &:hover {
+                background-color: get("color.gray.300");
+            }
+
+            &:active {
+                background-color: get("color.gray.500");
+            }
+        }
+    }
+
+    &-panel.mat-menu-panel {
+        margin-top: map-get($spacers, 10);
+        max-height: convert-unit(320px, "rem");
+        max-width: convert-unit(400px, "rem");
+        border: convert-unit(1px, "rem") solid black;
+        box-shadow: none;
+        border-radius: convert-unit(4px, "rem") ();
+
+        .mat-menu-content {
+            height: 100%;
+            padding: map-get($spacers, 0);
+        }
+
+        .apply-button {
+            font-size: convert-unit(14px, "rem");
+        }
+    }
+}

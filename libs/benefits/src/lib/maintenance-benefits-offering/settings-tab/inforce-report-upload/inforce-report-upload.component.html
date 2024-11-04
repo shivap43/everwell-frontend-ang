@@ -1,0 +1,35 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.uploadReport']}}
+    </empowered-modal-header>
+    <mat-label class="mat-label"
+        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.upload']}}</mat-label
+    >
+    <empowered-mon-upload
+        [isFileViewable]="false"
+        [accept]="acceptableFormats"
+        (uploadFile)="uploadFile($event)"
+        (cancelUpload)="cancelUpload()"
+        [files]="[fileDetails?.file]"
+        [isSucess]="[fileDetails?.isSuccess]"
+        [hasError]="[fileDetails?.hasError]"
+        [uploadSucessStatus]="[fileDetails?.uploadSuccessStatus]"
+        [uploadErrorStatus]="[fileDetails?.uploadErrorStatus]"
+        [isFileError]="fileDetails?.isFileError"
+        [isProgressBarEnabled]="[fileDetails?.isProgressBarEnabled]"
+        [isFileSelected]="[fileDetails?.isFileSelected]"
+        [modeProgress]="fileDetails?.modeProgress"
+        [isUploadingStarted]="fileDetails?.isUploadingStarted"
+        [fileUploadPercentage]="fileDetails?.fileUploadPercentage"
+        [isExistingDoc]="isExistingDoc"
+        [lastUploadedFileDate]="data.lastUploadedFileDate"
+        [lastUploadFileName]="data.lastUploadFileName"
+        [uploadedAdminName]="data.uploadedAdminName"
+    >
+    </empowered-mon-upload>
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" type="button" mat-flat-button (click)="onSave()">
+            <span>{{languageStrings['primary.portal.common.save']}}</span>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

@@ -1,0 +1,16 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="enableSpinner"></empowered-mon-spinner>
+<div class="form-repository-wrapper">
+    <div class="top-header-container">
+        <div>
+            <h2 class="top-header-icon-text">
+                <span>{{languageStrings['primary.portal.formRepository.aflacForms']}}</span>
+            </h2>
+        </div>
+    </div>
+    <empowered-aflac-forms-filters
+        (formsList)="this.formsList=$event"
+        (enableSpinner)="enableSpinner = $event"
+        [formsLength]="formsList.length"
+    ></empowered-aflac-forms-filters>
+    <empowered-aflac-forms-list [formsList]="formsList"></empowered-aflac-forms-list>
+</div>

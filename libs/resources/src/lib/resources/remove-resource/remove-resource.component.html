@@ -1,0 +1,31 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2><span>{{languageStrings['primary.portal.resources.removeResource']}}</span>{{ data.resource.name }}?</h2>
+    </div>
+
+    <mat-divider></mat-divider>
+    <div mat-dialog-actions class="dialog-footer d-md-flex justify-content-between">
+        <a mat-button mat-dialog-close class="mon-btn-link" aria-label="Cancel" (click)="onCancelClick()"
+            >{{languageStrings['primary.portal.common.cancel']}}
+        </a>
+        <button
+            mat-button
+            mat-flat-button
+            class="mon-btn-danger"
+            aria-label="Submit"
+            (click)="onRemoveClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+        >
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </div>
+</div>

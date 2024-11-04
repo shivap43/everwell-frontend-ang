@@ -1,0 +1,296 @@
+<ng-template [ngIf]="isLoading">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+
+<ng-template #productNavComponentView [ngIf]="!isLoading">
+    <div [ngClass]="{'tpi-stepper' : isTpi}" *ngIf="!isTpi || isSsoToShop">
+        <a matButton class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+            <mon-icon
+                class="tpi-shop-plan-name"
+                [iconName]="selectedProductOffering.product.name"
+                [fetchedIconPath]="selectedProductOffering.product.iconSelectedLocation"
+                [iconSize]="40"
+            ></mon-icon>
+            <span class="shop-title-tpi"> {{selectedProductOffering.product.name}} </span>
+            <span class="selected-step-label d-none"></span>
+            <mon-icon class="icon-right" iconName="down" [iconSize]="20"></mon-icon>
+        </a>
+    </div>
+    <div [ngClass]="isTpi && !tpiLnlMode  ? 'tpi-product-nav' : 'product-nav-wrapper' ">
+        <div class="product-nav" [ngClass]="isNavWizard ? 'wizard-view' : 'a-la-carte-view'" *ngIf="!isTpi || isSsoToShop">
+            <a href="javascript:void(0)" (click)="showShopPage()" class="product-nav-bt-back" *ngIf="!isTpi || tpiLnlMode">
+                <mon-icon class="icon-primary" iconName="left" iconSize="12"></mon-icon>
+                <span>{{languageStrings['primary.portal.shoppingExperience.back']}}</span>
+            </a>
+            <ng-container>
+                <div app-Overlaystepper="stepperTrigger" stepperId="shopStepper" [tpiLnlMode]="tpiLnlMode" [ngClass]="{'shown': !display}">
+                    <mat-vertical-stepper
+                        [selectedIndex]="this.presentProductIndex"
+                        [linear]="isNavWizard"
+                        #stepper
+                        (selectionChange)="onStepChange($event)"
+                        id="shopStepper"
+                    >
+                        <mat-step *ngFor="let products of productOfferings; let i=index">
+                            <ng-template matStepLabel>
+                                <div
+                                    [ngClass]="productIconClass[products?.id].name"
+                                    [ngStyle]="{'border-left-color': presentProductIndex === i ? '#'+products.product.cardColorCode : COLOR_WHITE}"
+                                    (click)="autoScroll()"
+                                >
+                                    <mon-icon
+                                        [iconName]="productIconClass[products?.id].name!='nav-future' ? products.product.name : products.product.name + '-disabled'"
+                                        [fetchedIconPath]="productIconClass[products?.id].name!='nav-future' ? products.product.iconSelectedLocation : products.product.iconLocation"
+                                        class="plan-in-cart"
+                                        [iconSize]="22"
+                                    ></mon-icon
+                                    ><span>{{products.product.name}}</span>
+                                    <mon-icon
+                                        *ngIf="productIcon[products?.id]"
+                                        [iconName]="productIcon[products?.id].name"
+                                        [iconSize]="19"
+                                        [class]="productIcon[products?.id].class"
+                                    >
+                                    </mon-icon>
+                                </div>
+                            </ng-template>
+                        </mat-step>
+                    </mat-vertical-stepper>
+                </div>
+            </ng-container>
+        </div>
+        <ng-container>
+            <div [ngClass]="{'shopping-experience-container':  isTpi, 'mmp-shopping-experience-container': !isTpi}">
+                <div [ngClass]="{'tpi-content-wrapper' : isTpi&&!tpiLnlMode, 'product-details' : !isTpi }">
+                    <div [ngClass]="{'tpi-content' : (isTpi && !tpiLnlMode) , 'lnl-products' : tpiLnlMode}">
+                        <div *ngIf="!isTpi || isSsoToShop">
+                            <a
+                                href="javascript:void(0)"
+                                (click)="showShopPage()"
+                                class="mon-btn-link btn-back"
+                                *ngIf="!isTpi || tpiLnlMode"
+                            >
+                                <mon-icon class="icon-primary" iconName="left" iconSize="12"></mon-icon>
+                                <span>{{languageStrings['primary.portal.shoppingExperience.back']}}</span>
+                            </a>
+                        </div>
+                        <empowered-product-details
+                            id="product-details"
+                            *ngIf="!aflacPassProduct"
+                            [productOffering]="selectedProductOffering"
+                            [grandFatherPlan]="grandFatherPlan"
+                            [expandCartItemId]="expandCartItemId"
+                            [reinstateIndex]="reinstateIndex"
+                            (productChangedEvent)="onProductChange($event)"
+                            (hideFooterEvent)="onHideFooter($event)"
+                        ></empowered-product-details>
+                        <empowered-aflac-pass-product
+                            *ngIf="aflacPassProduct"
+                            [productOffering]="selectedProductOffering"
+                        ></empowered-aflac-pass-product>
+                        <div class="button-bar" *ngIf="!isTpi">
+                            <button
+                                mat-flat-button
+                                class="mon-btn-secondary mon-mr-20"
+                                color="primary"
+                                type="button"
+                                (click)="gotoPreviousProduct()"
+                            >
+                                <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                                {{ previousProductName }}
+                            </button>
+                            <button class="mon-btn-primary" mat-flat-button (click)="gotoNextProduct()">
+                                {{ nextProductName }}
+                                <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tpi-footer" *ngIf="isTpi && isSsoToShop && !isFooterHidden">
+                        <ng-container *ngIf="productOfferings?.length === 1">
+                            <div>
+                                <a
+                                    *ngIf="isTpi && !tpiLnlMode"
+                                    [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+                                    href="javascript:void(0)"
+                                    class="mon-btn-link"
+                                    mat-flat-button
+                                    (click)="onExit()"
+                                >
+                                    {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                                </a>
+                            </div>
+                            <div>
+                                <button
+                                    mat-flat-button
+                                    class="mon-btn-secondary mon-mr-20"
+                                    color="primary"
+                                    type="button"
+                                    (click)="showShopPage()"
+                                >
+                                    <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                                    {{languageStrings['primary.portal.shoppingExperience.backToShop']}}
+                                </button>
+                                <button
+                                    class="mon-btn-primary"
+                                    mat-flat-button
+                                    (click)="navigateToReviewPage()"
+                                    [disabled]="isReviewDisable"
+                                >
+                                    {{languageStrings['primary.portal.tpi.reviewApply']}}
+                                </button>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="productOfferings?.length > 1">
+                            <ng-container *ngIf="presentProductIndex === 0">
+                                <div>
+                                    <a
+                                        *ngIf="isTpi && !tpiLnlMode"
+                                        [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+                                        href="javascript:void(0)"
+                                        class="mon-btn-link"
+                                        mat-flat-button
+                                        (click)="onExit()"
+                                    >
+                                        {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                                    </a>
+                                </div>
+                                <div>
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-secondary mon-mr-20"
+                                        color="primary"
+                                        type="button"
+                                        (click)="showShopPage()"
+                                    >
+                                        <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                                        {{languageStrings['primary.portal.shoppingExperience.backToShop']}}
+                                    </button>
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-secondary mon-mr-20"
+                                        color="primary"
+                                        type="button"
+                                        (click)="navigateToReviewPage()"
+                                        [disabled]="isReviewDisable"
+                                    >
+                                        {{languageStrings['primary.portal.tpi.reviewApply']}}
+                                    </button>
+                                    <button class="mon-btn-primary" mat-flat-button (click)="gotoNextTPIProduct()">
+                                        {{languageStrings['primary.portal.tpi.nextProduct']}}
+                                        <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="presentProductIndex === (productOfferings.length - 1)">
+                                <div>
+                                    <a
+                                        *ngIf="isTpi && !tpiLnlMode"
+                                        [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+                                        href="javascript:void(0)"
+                                        class="mon-btn-link"
+                                        mat-flat-button
+                                        (click)="onExit()"
+                                    >
+                                        {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                                    </a>
+                                </div>
+                                <div>
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-secondary mon-mr-20"
+                                        color="primary"
+                                        type="button"
+                                        (click)="gotoPreviousTPIProduct()"
+                                    >
+                                        <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                                        {{languageStrings['primary.portal.tpi.prevProduct']}}
+                                    </button>
+                                    <button
+                                        class="mon-btn-primary"
+                                        mat-flat-button
+                                        (click)="navigateToReviewPage()"
+                                        [disabled]="isReviewDisable"
+                                    >
+                                        {{languageStrings['primary.portal.tpi.reviewApply']}}
+                                    </button>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="(presentProductIndex !== 0 && (presentProductIndex !== (productOfferings.length - 1)))">
+                                <div>
+                                    <a
+                                        *ngIf="isTpi && !tpiLnlMode"
+                                        [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+                                        href="javascript:void(0)"
+                                        class="mon-btn-link"
+                                        mat-flat-button
+                                        (click)="onExit()"
+                                    >
+                                        {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                                    </a>
+                                </div>
+                                <div>
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-secondary mon-mr-20"
+                                        color="primary"
+                                        type="button"
+                                        (click)="gotoPreviousTPIProduct()"
+                                    >
+                                        <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                                        {{languageStrings['primary.portal.tpi.prevProduct']}}
+                                    </button>
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-secondary mon-mr-20"
+                                        color="primary"
+                                        type="button"
+                                        (click)="navigateToReviewPage()"
+                                        [disabled]="isReviewDisable"
+                                    >
+                                        {{languageStrings['primary.portal.tpi.reviewApply']}}
+                                    </button>
+                                    <button class="mon-btn-primary" mat-flat-button (click)="gotoNextTPIProduct()">
+                                        {{languageStrings['primary.portal.tpi.nextProduct']}}
+                                        <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                    <div class="tpi-footer" *ngIf="isTpi && (isSsoToProduct || isSsoToPlan)">
+                        <ng-container *ngIf="!isProductDisabled">
+                            <div>
+                                <a
+                                    *ngIf="isTpi && !tpiLnlMode"
+                                    [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+                                    href="javascript:void(0)"
+                                    class="mon-btn-link"
+                                    mat-flat-button
+                                    (click)="onExit()"
+                                >
+                                    {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                                </a>
+                            </div>
+                            <div *ngIf="selectedProductOffering.planOfferings?.length">
+                                <button
+                                    mat-flat-button
+                                    class="mon-btn-primary"
+                                    (click)="navigateToTpiAppFlow()"
+                                    [disabled]="isReviewDisable"
+                                >
+                                    {{languageStrings['primary.portal.tpi.applyForTheseBenefits']}}
+                                </button>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="isProductDisabled">
+                            <button mat-flat-button class="mon-btn-primary" (click)="onExit()">
+                                {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</ng-template>

@@ -1,0 +1,21 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header
+        >{{ languageStrings["primary.portal.commission.producer.invitation.title"] | replaceTag: { "##producername##":
+        invitingProducerName ,"##accountname##": data.invitation.account.name, "##role##": this.roleText }
+        }}</empowered-modal-header
+    >
+    <div *ngIf="data.invitation.message.trim()">
+        <p>
+            {{languageStrings['primary.portal.commission.producer.invitation.welcomeMessage'] | replaceTag: {
+            "##message##": data.invitation.message} }}
+        </p>
+    </div>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-danger" (click)="acceptOrReject(false)" [mat-dialog-close]="true">
+            {{ languageStrings["primary.portal.common.reject"]}}
+        </button>
+        <button mat-button class="mon-btn-primary" (click)="acceptOrReject(true)" [mat-dialog-close]="true">
+            {{ languageStrings["primary.portal.common.accept"]}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

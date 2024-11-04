@@ -1,0 +1,15 @@
+<form [formGroup]="form" data-test="eb-occupation-class__form">
+    <ng-container *ngIf="riskClassFormValues$ | async as riskClassFormValues" formArrayName="riskClasses">
+        <ng-container *ngFor="let formControl of riskClassesFormArray.controls; let i = index">
+            <div *ngIf="riskClassFormValues[i].label" class="label">{{ riskClassFormValues[i].label }}</div>
+
+            <mat-radio-group [formControl]="formControl" data-test="eb-occupation-class__mat-radio-group--risk-classes">
+                <mat-radio-button
+                    *ngFor="let riskClass of riskClassFormValues[i].riskClasses; trackBy: trackByRiskClassName"
+                    [value]="riskClass"
+                    >{{ riskClass.name }}</mat-radio-button
+                >
+            </mat-radio-group>
+        </ng-container>
+    </ng-container>
+</form>

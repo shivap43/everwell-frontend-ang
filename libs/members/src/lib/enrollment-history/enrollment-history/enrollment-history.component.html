@@ -1,0 +1,202 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="auditing-employee">
+    <div class="d-flex">
+        <h1 class="heading">{{languageStrings['primary.portal.activityHistory.enrollment']}}</h1>
+    </div>
+    <div *ngIf="!isDataFound" class="d-flex">
+        {{languageStrings[isDirect ? 'primary.portal.direct.activityHistory.noEnrollment' : 'primary.portal.activityHistory.noEnrollment']}}
+    </div>
+    <div *ngIf="isDataFound">
+        <form (submit)="searchEnrollmentAudits()">
+            <div *ngIf="isDataFound" [formGroup]="enrollmentHistoryForm" class="d-flex form-control-wrapper-div">
+                <div class="form-control-responsive-wrapper">
+                    <div class="mon-ml-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.activityHistory.startDate']}}</mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                matInput
+                                [max]="maxStartDate"
+                                [matDatepicker]="startDatepicker"
+                                formControlName="startDate"
+                                name="startDatePicker"
+                                #startDatePickerInput
+                                [attr.aria-label]="languageStrings['primary.portal.activityHistory.startDate']"
+                                (keyup)="transform($event)"
+                            />
+                            <mat-datepicker #startDatepicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix [for]="startDatepicker">
+                                <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                            <mat-error *ngIf="isDateInvalid">{{validateDate('startDate', startDatePickerInput.value)}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="mon-ml-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.common.endDate']}}</mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                matInput
+                                [max]="maxEndDate"
+                                [matDatepicker]="endDatepicker"
+                                formControlName="endDate"
+                                name="endDatePicker"
+                                #endDatePickerInput
+                                (dateChange)="assignMaxStartDate()"
+                                [attr.aria-label]="languageStrings['primary.portal.common.endDate']"
+                                (keyup)="transform($event)"
+                            />
+                            <mat-datepicker #endDatepicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix [for]="endDatepicker">
+                                <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                            <mat-error *ngIf="isDateInvalid && !enrollmentHistoryForm.get('endDate').hasError('matDatepickerMax')"
+                                >{{validateDate('startDate', endDatePickerInput.value)}}</mat-error
+                            >
+                            <mat-error *ngIf="enrollmentHistoryForm.get('endDate').hasError('required') && !endDatePickerInput.value">
+                                {{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="form-control-responsive-wrapper">
+                    <div class="mon-ml-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.activityHistory.product']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                (selectionChange)="onSelectionChange($event.value, 'product')"
+                                class="mon-input"
+                                placeholder="All"
+                                disableOptionCentering="true"
+                                panelClass="allign-select-options-audit-enrol"
+                                formControlName="productSelect"
+                            >
+                                <mat-option value="0">{{languageStrings['primary.portal.activityHistory.all']}}</mat-option>
+                                <mat-option *ngFor="let item of productList" value="{{item.id}}"> {{item.name}} </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="mon-ml-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.activityHistory.recordType']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                (selectionChange)="onSelectionChange($event.value, 'recordType')"
+                                class="mon-input"
+                                placeholder="Select"
+                                disableOptionCentering="true"
+                                panelClass="allign-select-options-second-audit-enrol"
+                                formControlName="recordTypeSelect"
+                            >
+                                <mat-option *ngFor="let item of recordTypes" value="{{item}}"> {{recordtypeEnum[item]}} </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="mon-ml-15">
+                        <button
+                            mat-flat-button
+                            [disabled]="false"
+                            aria-label="Search producer"
+                            type="submit"
+                            class="search-primary-btn mon-btn-primary"
+                            color="primary"
+                        >
+                            <mon-icon iconName="search" class="search-icon mon-m-0" iconSize="24"></mon-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="error-wrapper-div">
+                <div
+                    *ngIf="enrollmentHistoryForm.get('endDate').hasError('matDatepickerMax')||
+            (enrollmentHistoryForm.get('startDate').hasError('matDatepickerMax') &&
+            enrollmentHistoryForm.get('startDate').value > maxEndDate)"
+                >
+                    {{languageStrings['primary.portal.activityHistory.dateFuture']}}
+                </div>
+                <div
+                    *ngIf="enrollmentHistoryForm.get('startDate').value &&
+            enrollmentHistoryForm.get('endDate').value &&
+            enrollmentHistoryForm.get('startDate').value > enrollmentHistoryForm.get('endDate').value"
+                >
+                    {{languageStrings['primary.portal.activityHistory.dateRange']}}
+                </div>
+            </div>
+        </form>
+        <div class="search-main-content">
+            <ng-container *ngIf="auditEnrollment">
+                <h4 class="heading">
+                    {{ auditEnrollment.length>0?auditEnrollment.length:languageStrings['primary.portal.activityHistory.No']}}
+                    {{languageStrings['primary.portal.activityHistory.enroll']}}
+                    {{auditEnrollment.length>1?languageStrings['primary.portal.activityHistory.activeMultiple']:languageStrings['primary.portal.activityHistory.activeSingle']}}
+                    {{languageStrings['primary.portal.activityHistory.found']}}
+                </h4>
+            </ng-container>
+            <ng-container *ngIf="!auditEnrollment">
+                <h4 class="heading">{{languageStrings['primary.portal.activityHistory.enrolResult']}}</h4>
+            </ng-container>
+            <div class="accordion-content" *ngIf="auditEnrollment">
+                <table mat-table class="accordion-content-wrapper-outer-table" [dataSource]="dataSource">
+                    <ng-container matColumnDef="name">
+                        <td mat-cell class="accordion-outer-table-td" *matCellDef="let element; let i = index">
+                            <mat-accordion class="accordion-default">
+                                <mat-expansion-panel [expanded]="i===0">
+                                    <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                                        <mon-icon iconSize="10" iconName="Caret-down" class="accordion-indicator icon-black"></mon-icon>
+
+                                        <div class="d-flex mat-panel-content">
+                                            <mat-panel-title *ngIf="element.auditedEnrollment.plan">
+                                                {{element.auditedEnrollment.plan.name}}
+                                                <span
+                                                    *ngIf="(+element.auditedEnrollment.totalCostPerPayPeriod - +element.auditedEnrollment.memberCostPerPayPeriod) === element.auditedEnrollment.totalCostPerPayPeriod"
+                                                    >&nbsp;({{languageStrings['primary.portal.activityHistory.employerFunded']}})</span
+                                                >
+                                            </mat-panel-title>
+                                            <mat-panel-description>
+                                                {{(element.auditedEnrollment.canceledDate ?? element.auditedEnrollment.createDate) |
+                                                date:dateTimeFormat}}
+                                            </mat-panel-description>
+                                        </div>
+                                    </mat-expansion-panel-header>
+                                    <mat-tab-group animationDuration="0ms">
+                                        <!-- plan details code starts -->
+                                        <mat-tab>
+                                            <ng-template mat-tab-label>
+                                                {{languageStrings['primary.portal.activityHistory.planDetails']}}
+                                            </ng-template>
+                                            <empowered-plan-history [enrollmentDetail]="element"></empowered-plan-history>
+                                        </mat-tab>
+                                        <!-- plan details code ends -->
+                                    </mat-tab-group>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </td>
+                    </ng-container>
+                    <tr class="accordion-outer-table-row" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </div>
+        <ng-container *ngIf="auditEnrollment && auditEnrollment.length>10" class="paginator">
+            <div class="paginator-wrapper">
+                <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+                <form>
+                    <div [formGroup]="paginatorForm">
+                        <mat-form-field class="paginator-input-wrapper">
+                            {{languageStrings['primary.portal.common.page']}}
+                            <input
+                                [attr.aria-label]="languageStrings['primary.portal.common.enterPageNumber']"
+                                class="paginator-input"
+                                (input)="pageInputChanged($event.target.value)"
+                                formControlName="paginatorInput"
+                                matInput
+                                type="number"
+                                min="1"
+                                max="{{this.paginator?.getNumberOfPages()}}"
+                            />
+                            {{languageStrings['primary.portal.activityHistory.of']}} {{this.paginator?.getNumberOfPages()}}
+                        </mat-form-field>
+                    </div>
+                </form>
+            </div>
+        </ng-container>
+    </div>
+</div>

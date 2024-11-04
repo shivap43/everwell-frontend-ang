@@ -1,0 +1,4 @@
+export enum EnrollmentType {
+    QUALIFYING_LIFE_EVENT = "QUALIFYING_LIFE_EVENT",
+    OPEN_ENROLLMENT = "OPEN_ENROLLMENT",
+}

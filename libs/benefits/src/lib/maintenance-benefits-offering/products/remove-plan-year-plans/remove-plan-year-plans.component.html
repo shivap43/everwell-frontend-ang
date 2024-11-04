@@ -1,0 +1,33 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        {{"primary.portal.maintenanceBenefitsOffering.removePlanYearPlans.title" | replaceTag: { "##product##":
+        carrierName + " " + productName } }}
+        <p class="subheader-text">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.planYearQuasi.updatesToPlanYear']}}
+        </p>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            type="submit"
+            mat-flat-button
+            class="mon-px-30 mon-btn-primary"
+            (click)="onAllPlansRemoved()"
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            {{languageStrings['primary.portal.common.next']}}
+        </button>
+    </empowered-modal-footer>
+    <form [formGroup]="removePlanYearPlansForm">
+        <div class="form-field-container radio-wrapper">
+            <mat-radio-group formControlName="planYearOptionSelected">
+                <mat-radio-button
+                    class="form-radio-button-stacked"
+                    *ngFor="let planYear of planYearData"
+                    [value]="planYear.id"
+                    (change)="planYearSelected($event.value)"
+                    >{{planYear.name}}</mat-radio-button
+                >
+            </mat-radio-group>
+        </div>
+    </form>
+</empowered-modal>

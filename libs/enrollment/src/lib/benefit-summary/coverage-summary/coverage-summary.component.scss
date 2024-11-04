@@ -1,0 +1,1072 @@
+@import "shared";
+
+.coverage-state {
+    padding: 0 map-get($spacers, 50) map-get($spacers, 20);
+    position: relative;
+
+    .empty-state-header {
+        font-size: convert-unit(36px, "rem");
+        @include fontFace("primary.light");
+        color: get("color.gray.600");
+    }
+    .coverage-filter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .coverage-utilities-wrapper {
+        display: flex;
+        align-items: center;
+        font-size: convert-unit(14px, "rem");
+
+        .coverage-utilities {
+            @include media-max("l") {
+                background: none;
+            }
+
+            display: flex;
+            align-items: center;
+
+            .filter-wrapper {
+                background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                background-position: left;
+                background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                background-repeat: repeat-y;
+                padding-right: map-get($spacers, 20);
+            }
+
+            .filter-sub-wrapper {
+                display: flex;
+
+                > div:first-child .date-dropdown {
+                    margin-right: map-get($spacers, 20);
+                }
+            }
+        }
+    }
+
+    .zero-state-section {
+        border-top: map-get($spacers, 5) solid get("color.accent.500");
+        box-shadow: 0 0 convert-unit(6px, "rem") 0 rgba(0, 0, 0, 0.25);
+        padding: 0 map-get($spacers, 25) map-get($spacers, 25) map-get($spacers, 25);
+        display: flex;
+        margin: 0 0 map-get($spacers, 40) 0;
+        flex-direction: column;
+
+        &-summary {
+            width: convert-unit(435px, "rem");
+            margin: 0;
+        }
+
+        .flex-item {
+            p {
+                margin: map-get($spacers, 15) 0 map-get($spacers, 15) 0;
+            }
+        }
+    }
+
+    .empty-state-section {
+        margin: 0 0 map-get($spacers, 40) 0;
+
+        p {
+            margin: map-get($spacers, 20) 0 map-get($spacers, 10) 0;
+        }
+    }
+
+    .available-state-section {
+        .flex-item {
+            p {
+                margin-bottom: map-get($spacers, 20);
+            }
+        }
+
+        margin: 0 0 map-get($spacers, 40) 0;
+        padding: 0 map-get($spacers, 25) map-get($spacers, 25) map-get($spacers, 15);
+        display: flex;
+
+        span {
+            color: get("color.black");
+            font-size: convert-unit(16px, "rem");
+        }
+
+        .enroll {
+            color: get("color.gray.700");
+            font-size: convert-unit(12px, "rem");
+            margin-top: map-get($spacers, 20);
+        }
+
+        .dotted-border-right {
+            margin-bottom: map-get($spacers, 40);
+            width: map-get($spacers, 10);
+        }
+
+        .mon-btn-primary {
+            margin: convert-unit(10px, "rem") 0 0 0;
+
+            span {
+                color: get("color.white");
+            }
+        }
+    }
+
+    .product-list {
+        margin-bottom: map-get($spacers, 5);
+    }
+
+    .dotted-border-bottom {
+        height: convert-unit(1px, "rem");
+        margin: map-get($spacers, 10) 0;
+    }
+
+    .expansion-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .final-cost {
+        border-top: convert-unit(1px, "rem") solid get("color.divider");
+        padding-top: map-get($spacers, 10);
+        margin-top: map-get($spacers, 10);
+        display: flex;
+        @include fontFace("primary.bold");
+
+        span {
+            text-align: right;
+        }
+
+        .payfrequency {
+            display: flex;
+            flex-direction: row-reverse;
+            @include fontFace("primary.regular");
+        }
+    }
+
+    .has-star-right:after {
+        content: "*";
+    }
+
+    .has-star-left:before {
+        content: "*";
+    }
+
+    .icon-warning {
+        ::ng-deep.mat-icon.mat-primary {
+            color: get("color.info.warn");
+
+            .cls-1 {
+                fill: get("color.info.warn");
+            }
+        }
+    }
+
+    .your-selection {
+        margin: map-get($spacers, 30) convert-unit(-25px, "rem") convert-unit(-15px, "rem") convert-unit(55px, "rem");
+    }
+
+    .content-column {
+        > div {
+            display: flex;
+            font-size: convert-unit(16px, "rem");
+            justify-content: space-between;
+
+            > span {
+                padding-bottom: convert-unit(8px, "rem");
+            }
+
+            > span.content-label {
+                text-align: left !important;
+                color: get("color.black");
+
+                &.base-adjustment-cost {
+                    @include fontFace("primary.regular");
+                }
+            }
+
+            > div.content-label {
+                color: get("color.black");
+                display: flex;
+
+                .icon-black {
+                    margin: map-get($spacers, 0) map-get($spacers, 5);
+                }
+            }
+        }
+
+        .final-cost-currency {
+            display: flex;
+            flex-direction: column;
+
+            .currency {
+                color: get("color.black");
+                font-size: convert-unit(22px, "rem");
+            }
+        }
+
+        &.align-right {
+            margin-left: convert-unit(100px, "rem");
+        }
+
+        .content-action {
+            flex-direction: column;
+
+            button {
+                margin-top: map-get($spacers, 20);
+            }
+
+            .link {
+                margin-top: map-get($spacers, 20);
+                display: flex;
+                flex-direction: column;
+
+                a {
+                    width: auto;
+                    font-size: convert-unit(16px, "rem");
+                    display: flex;
+                }
+            }
+
+            .end-coverage-link,
+            .withdraw-application {
+                margin-top: map-get($spacers, 10);
+
+                .danger {
+                    color: get("color.info.danger.500");
+                }
+                .disable-link {
+                    color: get("color.gray.600");
+                }
+            }
+        }
+
+        .cost-calculation {
+            flex-direction: column;
+
+            div {
+                justify-content: space-between;
+            }
+
+            .content-label {
+                @include fontFace("primary.regular", sans-serif, true);
+            }
+        }
+
+        .edit {
+            margin-left: map-get($spacers, 10);
+        }
+    }
+
+    ::ng-deep {
+        .coverage-wrapper {
+            .card-list {
+                &.mat-accordion {
+                    .mat-expansion-indicator {
+                        opacity: 1;
+                    }
+
+                    .mat-expansion-panel {
+                        &.panel-disabled {
+                            &:hover {
+                                border: convert-unit(1px, "rem") solid get("color.gray.300");
+                                background: get("color.white");
+                                border-left: map-get($spacers, 10) solid get("color.gray.300");
+                                box-shadow: none;
+                            }
+                        }
+
+                        border: convert-unit(1px, "rem") solid get("color.gray.300");
+                        border-left-width: map-get($spacers, 10);
+
+                        &:hover {
+                            border: convert-unit(1px, "rem") solid get("color.gray.400");
+                            background: get("color.gray.100");
+                            border-left-width: map-get($spacers, 10);
+                        }
+
+                        .mat-expansion-panel-header-description {
+                            justify-content: space-between;
+                            max-width: convert-unit(500px, "rem");
+
+                            .plan-rates {
+                                text-align: right;
+                                @include fontFace("primary.regular");
+
+                                font-size: convert-unit(16px, "rem");
+
+                                .plan-rate {
+                                    @include fontFace("primary.bold");
+
+                                    font-size: convert-unit(22px, "rem");
+                                }
+                            }
+                        }
+
+                        .mat-expansion-panel-header {
+                            background: inherit;
+                            min-height: convert-unit(120px, "rem") !important;
+                            margin: 0 map-get($spacers, 15) 0;
+                            padding: convert-unit(27px, "rem") 0 convert-unit(27px, "rem") convert-unit(65px, "rem");
+
+                            .plan-name {
+                                @include fontFace("primary.bold");
+                            }
+
+                            &-title {
+                                @include fontFace("primary.regular");
+                                align-items: flex-start;
+                            }
+
+                            &[aria-disabled="true"] {
+                                .mat-expansion-panel-header-description {
+                                    color: get("color.gray.600");
+                                }
+                            }
+                        }
+
+                        &.mat-expanded {
+                            box-shadow: none;
+                            border-left-width: map-get($spacers, 10);
+
+                            ::ng-deep {
+                                .mat-expansion-indicator {
+                                    bottom: 0;
+
+                                    &::after {
+                                        border-color: get("color.info.success");
+                                    }
+                                }
+                            }
+
+                            &.Accident {
+                                border-color: get("color.product.teal");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.teal");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Cancer {
+                                border-color: get("color.product.darkorchid");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.darkorchid");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Critical {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Dental {
+                                border-color: get("color.product.yellow");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.yellow");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Disability {
+                                border-color: get("color.product.sandybrown");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.sandybrown");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Deduction {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Assistance {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Hospital {
+                                border-color: get("color.product.purple");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.purple");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Life {
+                                border-color: get("color.info.danger.500");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.info.danger.500");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Medical {
+                                border-color: get("color.product.crimson");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.crimson");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Vision {
+                                border-color: get("color.info.success");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.info.success");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .content-label {
+                @include fontFace("primary.bold");
+                width: convert-unit(150px, "rem");
+                margin-right: map-get($spacers, 20);
+
+                @include media-max("l") {
+                    width: convert-unit(100px, "rem");
+                    min-width: convert-unit(100px, "rem");
+                }
+            }
+
+            .align-left {
+                div {
+                    justify-content: flex-start !important;
+
+                    .covered-values {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                }
+            }
+
+            .content-column {
+                &.align-right {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+.status {
+    display: flex;
+    flex-direction: row;
+
+    .status-icon {
+        position: static !important;
+
+        .mon-icon {
+            margin: 0 map-get($spacers, 5) 0 0;
+        }
+    }
+
+    .approved-status {
+        display: block;
+    }
+}
+
+.riders-list {
+    display: flex;
+    flex-direction: column;
+    min-width: convert-unit(216px, "rem");
+}
+
+.flex-form-wrapper {
+    border: convert-unit(1px, "rem") solid get("color.gray.400");
+    border-top: map-get($spacers, 5) solid get("color.accent.500");
+    padding: 0 map-get($spacers, 20) map-get($spacers, 20) map-get($spacers, 20);
+    width: convert-unit(600px, "rem");
+    margin-bottom: map-get($spacers, 20);
+}
+
+.contact-form {
+    margin-bottom: map-get($spacers, 20);
+
+    .contacts {
+        display: flex;
+        flex-direction: column;
+        color: get("color.gray.900");
+        margin-top: 10px;
+        .mat-radio-button {
+            margin-bottom: map-get($spacers, 10);
+        }
+    }
+    .tick-icon {
+        margin: map-get($spacers, 0) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+    }
+}
+
+//Member portal
+::ng-deep {
+    .member-portal,
+    .tpi-coverage-summary {
+        .coverage-state {
+            .deduction-wrapper {
+                .card-list {
+                    &.mat-accordion {
+                        .mat-expansion-panel {
+                            &:hover {
+                                border: convert-unit(-1px, "rem") solid get("color.white");
+                                border-left-width: 0;
+                                box-shadow: 0 3px 3px get("color.gray.500");
+
+                                .mat-expansion-panel-header {
+                                    padding: map-get($spacers, 20);
+                                    margin: 0;
+                                }
+                            }
+
+                            &:last-of-type {
+                                border-radius: 0.2rem !important;
+                            }
+
+                            box-shadow: 0 convert-unit(3px, "rem") convert-unit(3px, "rem") get("color.gray.500");
+                            border-left: 0;
+                            border-top: map-get($spacers, 5) solid get("color.accent.500");
+
+                            &-header {
+                                padding: map-get($spacers, 20);
+                                margin: 0;
+                                height: convert-unit(95px, "rem") !important;
+
+                                .title {
+                                    margin: 0 0 map-get($spacers, 10) 0;
+                                    color: get("color.black");
+                                    @include fontFace("secondary.regular");
+                                }
+
+                                .sub-title {
+                                    font-size: convert-unit(28px, "rem");
+                                }
+
+                                .subtitle-section {
+                                    display: flex;
+                                    flex-direction: column;
+                                }
+
+                                &-title {
+                                    @include fontFace("primary.regular");
+                                    justify-content: space-between;
+                                    flex-direction: row;
+                                    margin: 0;
+
+                                    span {
+                                        color: get("color.gray.900");
+                                        @include fontFace("primary.regular");
+                                    }
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-panel-body {
+                                    padding: 0;
+                                }
+                            }
+
+                            .tax-section-wrapper {
+                                .tax-section {
+                                    display: flex;
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-indicator {
+                                    opacity: 1;
+
+                                    &:after {
+                                        border-color: get("color.accent.500");
+                                    }
+                                }
+                            }
+
+                            &.mat-expanded {
+                                &:last-of-type {
+                                    border-color: transparent;
+                                    border-top: map-get($spacers, 5) solid get("color.accent.500");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .final-cost {
+                    border-top: 0;
+                    @include fontFace("primary.regular");
+
+                    .payfrequency {
+                        color: get("color.gray.500");
+                        margin-top: map-get($spacers, 5);
+                    }
+                }
+
+                .content-column {
+                    min-width: convert-unit(220px, "rem");
+
+                    > div {
+                        > span {
+                            color: get("color.gray.600");
+
+                            &.content-label {
+                                color: get("color.black");
+                            }
+                        }
+                    }
+                }
+
+                .header {
+                    color: get("color.black");
+                }
+            }
+
+            .empty-state-header {
+                margin: map-get($spacers, 30) 0;
+            }
+
+            .coverage-utilities-wrapper {
+                padding: 0;
+
+                .coverage-utilities {
+                    background: none;
+                }
+            }
+        }
+    }
+}
+
+//Producer portal
+
+::ng-deep {
+    .producer-portal,
+    .admin-portal,
+    .tpi-coverage-summary {
+        .coverage-state {
+            padding: 0 map-get($spacers, 20);
+
+            .deduction-wrapper {
+                .card-list {
+                    &.mat-accordion {
+                        .mat-expansion-panel {
+                            &:hover {
+                                border-left-width: 1px;
+                                box-shadow: none;
+
+                                .mat-expansion-panel-header {
+                                    padding: map-get($spacers, 20);
+                                    margin: 0;
+                                }
+                            }
+
+                            &:last-of-type {
+                                border-radius: 0.2rem;
+                                box-shadow: none;
+                            }
+
+                            border: convert-unit(1px, "rem") solid get("color.gray.600");
+                            box-shadow: none;
+
+                            &-header {
+                                padding: map-get($spacers, 20);
+                                margin: 0;
+                                height: convert-unit(95px, "rem") !important;
+
+                                .title {
+                                    margin: 0 0 convert-unit(10px, "rem") 0;
+                                    color: get("color.gray.600");
+                                    @include fontFace("primary.regular");
+                                }
+
+                                .sub-title {
+                                    margin: 0 0 map-get($spacers, 10) 0;
+                                    font-size: convert-unit(28px, "rem");
+                                }
+
+                                .subtitle-section {
+                                    display: flex;
+                                    flex-direction: column;
+                                    text-align: right;
+
+                                    .view {
+                                        text-align: right;
+
+                                        .icon-down {
+                                            position: relative;
+                                            top: convert-unit(3px, "rem");
+                                            margin: 0 0 0 map-get($spacers, 5);
+
+                                            ::ng-deep {
+                                                .cls-1 {
+                                                    fill: get("color.primary.500");
+                                                }
+                                            }
+                                        }
+
+                                        .icon-up {
+                                            position: relative;
+                                            top: 0;
+                                            margin: 0;
+                                            transform: rotate(180deg);
+
+                                            ::ng-deep {
+                                                .cls-1 {
+                                                    fill: get("color.primary.500");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                &-title {
+                                    @include fontFace("primary.regular");
+                                    justify-content: space-between;
+                                    flex-direction: row;
+                                    margin: 0;
+
+                                    span {
+                                        color: get("color.gray.900");
+                                        @include fontFace("primary.regular");
+                                    }
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-panel-body {
+                                    padding: 0;
+                                }
+                            }
+
+                            .tax-section-wrapper {
+                                .tax-section {
+                                    display: flex;
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-indicator {
+                                    display: none;
+                                }
+                            }
+
+                            &.mat-expanded {
+                                &:last-of-type {
+                                    border: convert-unit(1px, "rem") solid get("color.gray.600");
+                                    box-shadow: none;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .final-cost {
+                    border-top: 0;
+                    @include fontFace("primary.regular");
+
+                    .payfrequency {
+                        color: get("color.gray.500");
+                        margin-top: map-get($spacers, 5);
+                    }
+                }
+
+                .content-column {
+                    min-width: convert-unit(220px, "rem");
+
+                    > div {
+                        > span {
+                            color: get("color.gray.600");
+
+                            &.content-label {
+                                color: get("color.black");
+                            }
+                        }
+                    }
+                }
+
+                .header {
+                    color: get("color.black");
+                }
+            }
+
+            .coverage-utilities-wrapper {
+                .coverage-utilities {
+                    @include media-max("l") {
+                        background: none;
+                    }
+
+                    background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                    background-position: left;
+                    background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                    background-repeat: repeat-y;
+                    height: auto !important;
+
+                    .filter-wrapper {
+                        background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                        background-position: left;
+                        background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                        background-repeat: repeat-y;
+                        @include media-max("m") {
+                            margin-bottom: map-get($spacers, 20);
+                        }
+                    }
+                }
+            }
+
+            .empty-state-header {
+                margin: map-get($spacers, 30) map-get($spacers, 0);
+            }
+        }
+    }
+    .empowered-portal-wrapper.enroll-date-filter {
+        margin-top: map-get($spacers, 10);
+        padding: map-get($spacers, 20);
+
+        .mon-clear {
+            padding: map-get($spacers, 0);
+        }
+        .view-coverage {
+            margin-bottom: map-get($spacers, 15);
+        }
+    }
+}
+
+.shop {
+    @include fontFace("primary.bold");
+}
+
+.btn-shop {
+    margin: map-get($spacers, 20) 0;
+}
+
+.btn-view {
+    margin: map-get($spacers, 20) 0;
+}
+
+.beneficiary-block {
+    display: flex;
+    flex-direction: column;
+
+    span {
+        margin-bottom: map-get($spacers, 5);
+    }
+}
+.tpi-coverage-summary {
+    .coverage-state {
+        padding: map-get($spacers, 0);
+        .your-selection {
+            margin-left: map-get($spacers, 25);
+        }
+        .empty-state-section {
+            margin-bottom: map-get($spacers, 30);
+            p {
+                margin: map-get($spacers, 0);
+            }
+        }
+        .tpi-coverage-filter {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: map-get($spacers, 30);
+            .filter-wrapper {
+                background: none;
+            }
+        }
+        .tpi-contact-form {
+            border: convert-unit(1px, "rem") solid get("color.gray.600");
+            padding: map-get($spacers, 20);
+            border-radius: convert-unit(4px, "rem");
+            h3 {
+                margin-top: map-get($spacers, 0);
+            }
+            .contacts {
+                margin: map-get($spacers, 20) map-get($spacers, 0) map-get($spacers, 10);
+            }
+        }
+        .riders-list {
+            @include media-max("l") {
+                max-width: convert-unit(240px, "rem");
+            }
+        }
+    }
+}
+.existing-coverage {
+    .enrollment {
+        font-size: map-get($spacers, 20);
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+        border: convert-unit(1px, "rem") solid get("color.gray.500");
+        border-radius: convert-unit(4px, "rem");
+        padding: map-get($spacers, 20);
+        margin-bottom: map-get($spacers, 20);
+        span {
+            display: block;
+            font-size: convert-unit(14px, "rem");
+            @include fontFace("primary.bold");
+        }
+    }
+}
+.new-coverage {
+    margin-bottom: map-get($spacers, 20);
+    .info-txt {
+        margin-bottom: map-get($spacers, 20);
+    }
+    .plan-years {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        margin-bottom: map-get($spacers, 20);
+        .enrollment {
+            padding: map-get($spacers, 20);
+            border: convert-unit(1px, "rem") solid get("color.gray.500");
+            border-radius: convert-unit(4px, "rem");
+            width: 100%;
+            margin-left: map-get($spacers, 20);
+            .name {
+                font-size: convert-unit(20px, "rem");
+                margin-bottom: map-get($spacers, 20);
+            }
+            .coverage-details {
+                margin-bottom: map-get($spacers, 20);
+            }
+            &:first-child {
+                margin-left: map-get($spacers, 0);
+            }
+        }
+    }
+}
+
+.filter-by-date {
+    .price-filter {
+        display: flex;
+        flex-direction: column;
+        .mat-radio-button {
+            margin-bottom: map-get($spacers, 20);
+        }
+    }
+    .specific-date-wrapper {
+        margin-bottom: map-get($spacers, 20);
+
+        .specific-date {
+            margin: map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 25);
+        }
+    }
+    .date-range {
+        display: flex;
+        .start-date {
+            margin-right: map-get($spacers, 15);
+        }
+    }
+    .mat-form-field {
+        margin-bottom: map-get($spacers, 0);
+    }
+}
+
+.date-dropdown {
+    padding: convert-unit(8px, "rem") map-get($spacers, 20);
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    border-radius: convert-unit(20px, "rem");
+    background-color: get("color.gray.200");
+    color: get("color.black");
+    outline: none;
+    font-size: convert-unit(14px, "rem");
+
+    &:hover {
+        background-color: get("color.gray.300");
+    }
+    &.filter-applied {
+        background-color: get("color.gray.800");
+        color: get("color.white");
+        @include fontFace("primary.bold");
+    }
+}
+
+.ebs-info-msg {
+    margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 40) map-get($spacers, 0);
+}
+
+.ebs-error-msg {
+    margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 0);
+    flex-basis: 100%;
+    height: 0;
+}
+
+::ng-deep {
+    .empowered .mat-snack-bar-container {
+        margin-top: 4em !important;
+    }
+}
+
+.pay-frequency-name-short {
+    width: 150px;
+    text-align: right;
+    word-wrap: keep-all;
+    color: get("color.gray.500");
+    margin-top: map-get($spacers, 5);
+}
+
+.pay-frequency-name-long {
+    width: 110px;
+    text-align: right;
+    word-wrap: break-all;
+    color: get("color.gray.500");
+    margin-top: map-get($spacers, 5);
+}
+
+.aflac-always {
+    margin: convert-unit(30px, "rem") 0;
+}

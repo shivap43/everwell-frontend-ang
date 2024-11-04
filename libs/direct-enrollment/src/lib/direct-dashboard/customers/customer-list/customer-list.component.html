@@ -1,0 +1,157 @@
+<div class="mon-sub-wrapper">
+    <div class="results-grid table-mask-wrapper">
+        <div>
+            <table mat-table [dataSource]="dataSource" matSort class="mat-table">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="countExceedsMaximum">
+                        {{languageStrings['primary.portal.direct.customerList.name']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a (click)="routeToCustomerDashboard(element)">{{element.name}}</a>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="coverage">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="countExceedsMaximum">
+                        {{languageStrings['primary.portal.direct.customerList.coverage']}}
+                    </th>
+                    <td class="mon-pl-10" mat-cell [ngClass]="{'sorted-column': activeCol === 'coverage'}" *matCellDef="let member">
+                        <div *ngIf="member.products">
+                            <span *ngIf="member.hasPending; else noPending" [attr.aria-label]="languageStrings.warning">
+                                <mon-icon class="icon-warning" iconName="Filled-warning" [iconSize]="15"></mon-icon
+                                ><span>{{languageStrings['primary.portal.qle.pendingText']}}</span>
+                            </span>
+                            <ng-template #noPending
+                                >{{ member.coverageNameList.length }}
+                                <span *ngIf="member.coverageNameList.length>1; else oneProduct"
+                                    >{{languageStrings['primary.portal.direct.policies']}}</span
+                                ></ng-template
+                            >
+                            <ng-template #oneProduct>{{languageStrings['primary.portal.direct.policy']}}</ng-template>
+                            <a
+                                href="javascript:void(0)"
+                                matTooltipPosition="above"
+                                attr.aria-label="{{ member.totalCost | currency: 'USD':'symbol':'1.0-0' }} {{ member.coverageNameList.join(', ') }}"
+                                [richTooltip]="member.matTooltipContent"
+                            >
+                                <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="15"></mon-icon>
+                            </a>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dependents">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="hidden-max-xl" [disabled]="countExceedsMaximum">
+                        {{languageStrings['primary.portal.direct.customerList.dependents']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="hidden-max-xl">{{element.dependents | relations}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="phoneNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="hidden-max-xl" [disabled]="countExceedsMaximum">
+                        {{languageStrings['primary.portal.direct.customerList.phoneNumber']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="hidden-max-xl">{{element.phoneNumber ? element.phoneNumber : ""}}</td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="hidden-max-xl" [disabled]="countExceedsMaximum">
+                        {{languageStrings['primary.portal.direct.customerList.emailAdress']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="hidden-max-xl">{{element.email ? element.email : ""}}</td>
+                </ng-container>
+                <ng-container matColumnDef="notificationCount">
+                    <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="countExceedsMaximum">
+                        <span class="sr-only">{{languageStrings['primary.portal.notification.count']}}</span>
+                        <mon-icon [iconSize]="14" iconName="bell" class="icon-gray"></mon-icon>
+                    </th>
+                    <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'notificationCount'}">
+                        <span
+                            [richTooltip]="getNotificationToolTipContent(element.notifications)"
+                            matTooltipPosition="above"
+                            class="notification-badge"
+                            *ngIf="element.notificationSum > 0"
+                        >
+                            <mat-icon
+                                [matBadge]="element.notificationSum"
+                                matBadgeSize="medium"
+                                [matBadgeHidden]="element.notificationSum > 99"
+                                [attr.aria-label]="languageStrings['Get notification details']"
+                            >
+                            </mat-icon>
+                            <mat-icon
+                                matBadge="99+"
+                                matBadgeSize="medium"
+                                [matBadgeHidden]="element.notificationSum < 100"
+                                [attr.aria-label]="languageStrings['Get notification details']"
+                            >
+                            </mat-icon>
+                        </span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.direct.customerList.manage']}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button [matMenuTriggerFor]="beforeMenu">
+                            <span class="sr-only">menu icon</span>
+                            <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary"></mon-icon>
+                        </button>
+                        <mat-menu #beforeMenu="matMenu" xPosition="before">
+                            <button mat-menu-item class="text-danger" (click)="removeCustomer.emit(element.id)">
+                                <span>{{languageStrings['primary.portal.common.remove']}}</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="shop">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <span class="sr-only">shop</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="text-right">
+                        <ng-container *hasPermission="'core.shopping.read'">
+                            <button
+                                mat-icon-button
+                                class="mon-btn-link visible-on-row-hover"
+                                *ngIf="!unpluggedFeatureFlag"
+                                (click)="specificShopNav(element)"
+                            >
+                                <span>{{languageStrings['primary.portal.direct.customerList.shop']}}</span>
+                                <mon-icon class="icon-primary" iconName="right" [iconSize]="10"></mon-icon>
+                            </button>
+                        </ng-container>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="noResults">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                        {{languageStrings['primary.portal.direct.customerList.noResultsFound']}}
+                    </th>
+                </ng-container>
+                <ng-container matColumnDef="thresholdWarning">
+                    <th
+                        mat-header-cell
+                        *matHeaderCellDef
+                        [attr.colspan]="8"
+                        class="text-center"
+                        language="primary.portal.direct.customerList.thresholdWarning"
+                    ></th>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-header-row *matHeaderRowDef="['thresholdWarning']" [hidden]="!countExceedsMaximum"></tr>
+                <tr mat-header-row [hidden]=" dataSource && dataSource.data.length > 0" *matHeaderRowDef="['noResults']"></tr>
+            </table>
+        </div>
+        <div [hidden]="!dataSource?.filteredData?.length || dataSource.paginator?.getNumberOfPages() === 1">
+            <empowered-paginator
+                [data]="dataSource?.data"
+                [itemPerPageLabel]="languageStrings['primary.portal.customerList.paginator.customersPerPage']"
+                [item]="languageStrings['primary.portal.customerList.paginator.customers']"
+            ></empowered-paginator>
+        </div>
+        <div [hidden]="!dataSource?.data?.length || dataSource?.paginator?.getNumberOfPages() > 1" class="min-range-label">
+            {{languageStrings['primary.portal.direct.customerList.showingResults'].replace("#no", dataSource.data.length?.toString() )}}
+        </div>
+    </div>
+</div>

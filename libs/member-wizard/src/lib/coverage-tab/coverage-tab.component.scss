@@ -1,0 +1,101 @@
+@import "shared";
+
+.wizard-content {
+    padding: convert-unit(30px, "rem");
+    overflow: auto;
+    height: calc(100vh - 270px);
+
+    .wizard-title {
+        margin: 0 0 convert-unit(20px, "rem");
+        color: get("color.black");
+        @include fontFace("secondary.light");
+        font-size: convert-unit(36px, "rem");
+        font-weight: 300;
+        line-height: convert-unit(40px, "rem");
+    }
+
+    .wizard-note {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+
+    .align-content-right {
+        text-align: right;
+    }
+
+    tr {
+        background-color: transparent;
+
+        td.mat-cell {
+            vertical-align: top;
+
+            &:first-of-type {
+                @include fontFace("primary.regular");
+            }
+
+            .product-name,
+            .current-cost {
+                @include fontFace("primary.bold");
+            }
+
+            .benefit-wrapper {
+                display: flex;
+
+                .mon-icon::ng-deep {
+                    margin: convert-unit(5px, "rem") 0;
+                }
+
+                .product-info {
+                    display: flex;
+                    flex-direction: column;
+                    font-size: convert-unit(16px, "rem");
+                    column-width: convert-unit(280px, "rem");
+                    padding: convert-unit(10px, "rem");
+                }
+            }
+
+            .eligible-update {
+                background-color: get("color.primary.50");
+            }
+
+            .plan-wrapper,
+            .current-cost-wrapper {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        td.mat-footer-cell {
+            &:last-of-type {
+                padding: convert-unit(30px, "rem") convert-unit(10px, "rem");
+                border-bottom: 0;
+            }
+
+            &.footer-wrapper {
+                border-width: 0;
+
+                .footer-total-wrapper {
+                    display: flex;
+                    justify-content: flex-end;
+                    font-size: convert-unit(22px, "rem");
+                    color: get("color.black");
+
+                    .footer-total {
+                        margin-left: convert-unit(65px, "rem");
+                    }
+                }
+            }
+        }
+    }
+
+    .highlighted {
+        background-color: get("color.primary.50");
+        text-align: right;
+    }
+}
+
+.wizard-footer {
+    background-color: get("color.gray.100");
+    border-top: convert-unit(2px, "rem") solid get("color.gray.400");
+    padding: convert-unit(40px, "rem") convert-unit(30px, "rem");
+    text-align: right;
+}

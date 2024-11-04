@@ -1,0 +1,26 @@
+<div class="mon-card-wrapper w-600 mon-my-25">
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title language="secondary.portal.login.consent.title"></mat-card-title>
+            <p language="secondary.portal.login.consent.subTitle"></p>
+            <div class="mon-consent-content" scrollBottom #appScrollElement="scrollBottom">
+                <div class="mon-py-10">
+                    <div [innerHtml]="consentContent"></div>
+                </div>
+            </div>
+        </mat-card-content>
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a href="javascript:void(0)" class="mon-btn-link mon-pt-10" routerLink="{{ backRoute }}" language="primary.portal.common.back">
+            </a>
+            <button
+                (click)="acceptConsent()"
+                [disabled]="!appScrollElement.disableBtn"
+                class="mon-btn-primary mon-px-30"
+                mat-flat-button
+                [attr.aria-label]="languageStrings['primary.portal.common.iAgree']"
+            >
+                {{languageStrings['primary.portal.common.iAgree']}}
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</div>

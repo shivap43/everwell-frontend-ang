@@ -1,0 +1,35 @@
+export enum DateFormat {
+    YEAR_MONTH_DAY = "yyyy-MM-dd",
+    YEAR_MONTH_DAY_UPPERCASE = "YYYY-MM-DD",
+    MONTH_DAY_YEAR = "MM/dd/yyyy",
+    MONTH_DAY_YEAR_UPPERCASE = "MM/DD/YYYY",
+    YEAR_MONTH = "YYYY-MM",
+    COMPLETE_MONTH_YEAR = "MMMM YYYY",
+    LONG_MONTH_YEAR = "MMM YYYY",
+    MONTH_YEAR = "MM/YYYY",
+    MONTH_YEAR_LOWERCASE = "MM/yyyy",
+    MONTH_DAY = "MM/dd",
+    LONG_MONTH_DAY = "MMMM dd",
+    DATE_TIME = "MM/dd/yyyy hh:mm:ss",
+    DATE_TIME_24_HOUR = "MM/dd/yyyy HH:mm:ss",
+    DATE_TIME_AM_PM = "MM/dd/yyyy hh:mm a",
+    TIME_AM_PM = "hh:mm a",
+    DAY = "d",
+    LONG_MONTH = "MMMM",
+    YEAR = "yyyy",
+    DATE_MASK = "09/09/0000",
+    DATE_FORMAT_M_D_YY = "M/d/yy",
+    DATE_FORMAT_MM_DD_YY = "MM/dd/yy",
+    LONG_MONTH_AND_DAY = "MMMM Do",
+    DATE_FORMAT_Y_M_D_TH_M_S = "YYYY-MM-DDTHH:mm:ss",
+    LONG_MONTH_SHORT_DAY_YEAR = "LL",
+}
+
+// Formats related to DateFns
+export enum DateFnsFormat {
+    MONTH_DAY_COMMA_YEAR = "MMMM d, yyyy",
+    LOCALIZED_TIME = "p",
+    LONG_MONTH_AND_DAY = "MMMM do",
+    COMPLETE_MONTH_YEAR = "MMMM yyyy",
+    LONG_MONTH_YEAR_LOWERCASE = "MMM yyyy",
+}

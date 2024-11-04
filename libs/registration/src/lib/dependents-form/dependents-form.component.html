@@ -1,0 +1,330 @@
+<!-- TODO: replace placeholder with languages -->
+<div class="mon-card-wrapper mon-my-50 w-600">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+    <mat-card role="dependent">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card-content>
+                <mat-card-title *ngIf="formType === 'add'"
+                    >{{languageStrings['primary.portal.register.dependents.addDependent']}}</mat-card-title
+                >
+                <mat-card-title *ngIf="formType === 'edit'"
+                    >{{languageStrings['primary.portal.register.dependents.updateDependent']}}</mat-card-title
+                >
+
+                <div class="mon-mb-20">
+                    <mon-alert *ngIf="error" alertType="danger">
+                        <span> {{ this.errorMsg | replaceTag: { "#fielderror": this.fieldErrorMessage } }} </span>
+                    </mon-alert>
+                </div>
+
+                <div formGroupName="name">
+                    <div>
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.register.dependents.dependentFirstName']}}</mat-label
+                        >
+                        <mat-form-field class="w-300">
+                            <input
+                                formControlName="firstName"
+                                matInput
+                                [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentFirstName']"
+                            />
+                            <!-- TODO: Check error message bindings -->
+                            <mat-error>
+                                <span *ngIf="name.controls['firstName'].hasError('required')"
+                                    >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                >
+                                <span
+                                    *ngIf="name.controls['firstName'].hasError('pattern') && !nameWithHyphenApostrophesValidation.test(name.controls['firstName'].value)"
+                                    >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.firstNameMsg1']}}
+                                </span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="name.controls['firstName'].hasError('pattern') && nameWithHyphenApostrophesValidation.test(name.controls['firstName'].value)"
+                                >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.firstNameMsg2']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label">
+                            <span>{{languageStrings['primary.portal.register.dependents.dependentMiddleName']}}</span>
+                            <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                        </mat-label>
+                        <mat-form-field class="w-200">
+                            <input
+                                formControlName="middleName"
+                                matInput
+                                [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentMiddleName']"
+                            />
+                            <mat-error>
+                                <span *ngIf="name.controls['middleName'].hasError('required')"
+                                    >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                >
+                                <span
+                                    *ngIf="name.controls['middleName'].hasError('pattern') && !nameWithHyphenApostrophesValidation.test(name.controls['middleName'].value)"
+                                    >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.middleName']}}
+                                </span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="name.controls['middleName'].hasError('pattern') && nameWithHyphenApostrophesValidation.test(name.controls['middleName'].value)"
+                                >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.firstNameMsg2']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <!-- TODO: Check error message bindings -->
+                    <div>
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.register.dependents.dependentLastName']}}</mat-label>
+                        <mat-form-field class="w-300">
+                            <input
+                                formControlName="lastName"
+                                matInput
+                                [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentLastName']"
+                            />
+                            <mat-error>
+                                <span *ngIf="name.controls['lastName'].hasError('required')"
+                                    >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                >
+                                <span
+                                    *ngIf="name.controls['lastName'].hasError('pattern') && !nameWithHyphenApostrophesValidation.test(name.controls['lastName'].value)"
+                                    >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.firstNameMsg1']}}
+                                </span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="name.controls['lastName'].hasError('pattern') && nameWithHyphenApostrophesValidation.test(name.controls['lastName'].value)"
+                                >{{languageSecondStringsArray['secondary.portal.members.personalValidationMsg.firstNameMsg2']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.register.dependents.dependentBirthDate']}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field w-200">
+                            <input
+                                [matDatepicker]="picker"
+                                formControlName="birthDate"
+                                matInput
+                                [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentBirthDate']"
+                                maxlength="{{maxLength}}"
+                                [max]="this.today"
+                                #datePickerInput
+                                empoweredDateTransform
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error>
+                                <span *ngIf="form.controls['birthDate'].hasError('requirements')">
+                                    {{languageSecondStringsArray["secondary.portal.register.dependents.futureDate.error"]}}
+                                </span>
+                                <span> {{validateDate('birthDate', datePickerInput.value)}} </span>
+                            </mat-error>
+                            <mat-hint>{{languageStrings['primary.portal.register.dependents.dependentBirthDateHint']}}</mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-5 mon-pt-25">
+                        <mat-checkbox formControlName="disabled">
+                            <span>{{languageStrings['primary.portal.register.dependents.myDependentDisabled']}}</span></mat-checkbox
+                        >
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-label class="mat-label">
+                            <span>{{languageStrings['primary.portal.register.dependents.dependentSocialSecurityNumber']}}</span>
+                            <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                        </mat-label>
+                        <div [formGroup]="ssnForm">
+                            <mat-form-field class="w-200">
+                                <input
+                                    formControlName="ssn"
+                                    matInput
+                                    maxlength="9"
+                                    type="text"
+                                    [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentSocialSecurityNumber']"
+                                />
+                                <mat-error>{{languageSecondStringsArray['secondary.portal.register.dependents.ssnRequired']}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <mat-label class="mat-label" id="relationshipToEmployee"
+                            >{{languageStrings['primary.portal.register.dependents.relationshipToEmployee']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="dependentRelationId"
+                                placeholder="Select"
+                                disableOptionCentering="true"
+                                aria-labelledby="relationshipToEmployee"
+                            >
+                                <mat-option *ngFor="let relation of RelationshipOptions" [value]="relation.value">
+                                    {{ relation.viewValue | titlecase }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error>{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div>
+                    <mat-label class="mat-label" id="dependentGender"
+                        >{{languageStrings['primary.portal.register.dependents.dependentGender']}}</mat-label
+                    >
+                    <mat-form-field class="w-200">
+                        <mat-select
+                            formControlName="gender"
+                            matNativeControl
+                            required
+                            placeholder="Select"
+                            disableOptionCentering="true"
+                            aria-labelledby="dependentGender"
+                        >
+                            <mat-option value="MALE">{{languageStrings['primary.portal.register.dependents.dependentMale']}}</mat-option>
+                            <mat-option value="FEMALE"
+                                >{{languageStrings['primary.portal.register.dependents.dependentFemale']}}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error>{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="divider"></div>
+                <div class="mon-py-20">
+                    <mat-checkbox formControlName="adress">
+                        <span>{{languageStrings['primary.portal.register.dependents.DependentSameAddress']}}</span>
+                    </mat-checkbox>
+                </div>
+
+                <div *ngIf="!form.controls.adress.value">
+                    <div formGroupName="dependentAddress">
+                        <div formGroupName="address">
+                            <div>
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.register.dependents.dependentStreetAddress1']}}</mat-label
+                                >
+                                <mat-form-field class="w-400">
+                                    <input
+                                        formControlName="address1"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentStreetAddress1']"
+                                    />
+                                    <mat-error>
+                                        <span *ngIf="address.controls.address1.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                        >
+                                        <span *ngIf="address.controls.address1.hasError('pattern')">
+                                            {{ "primary.portal.register.dependnets.patternError" | replaceTag: { "#fieldname": "address" }
+                                            }}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.register.dependents.DependentStreetAddress2']}}</span>
+                                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-400">
+                                    <input
+                                        formControlName="address2"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.register.dependents.DependentStreetAddress2']"
+                                    />
+                                    <mat-hint
+                                        >{{languageStrings['primary.portal.register.dependents.DependentStreetAddress2Hint']}}</mat-hint
+                                    >
+                                    <mat-error>
+                                        <span *ngIf="address.controls.address2.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                        >
+                                        <span *ngIf="address.controls.address2.hasError('pattern')">
+                                            {{ "primary.portal.register.dependnets.patternError" | replaceTag: { "#fieldname": "address" }
+                                            }}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.register.dependents.dependentCity']}}</mat-label
+                                    >
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="city"
+                                            matInput
+                                            [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentCity']"
+                                        />
+                                        <mat-error
+                                            >{{languageSecondStringsArray['secondary.portal.register.dependents.cityRequired']}}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-label class="mat-label" id="dependentState"
+                                        >{{languageStrings['primary.portal.register.dependents.dependentState']}}</mat-label
+                                    >
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="state"
+                                            placeholder="Select"
+                                            disableOptionCentering="true"
+                                            aria-labelledby="dependentState"
+                                        >
+                                            <mat-option *ngFor="let state of stateOptions" [value]="state.value">
+                                                {{ state.value }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error>{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.register.dependents.dependentZip']}}</mat-label
+                                    >
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="zip"
+                                            matInput
+                                            (focusout)="validateZipCode()"
+                                            maxlength="5"
+                                            [attr.aria-label]="languageStrings['primary.portal.register.dependents.dependentZip']"
+                                        />
+                                        <mat-error>
+                                            <span *ngIf="address.controls.zip.hasError('required')"
+                                                >{{languageSecondStringsArray['secondary.portal.register.requiredField']}}</span
+                                            >
+                                            <span *ngIf="address.controls.zip.hasError('pattern')">
+                                                {{ "primary.portal.register.dependnets.patternError" | replaceTag: { "#fieldname": "zipcode"
+                                                } }}
+                                            </span>
+                                            <span *ngIf="address.controls.zip.hasError('requirements')"
+                                                >{{languageSecondStringsArray['secondary.portal.register.dependentsForm.zipCodeValid']}}
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+            <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+                <!-- TODO: add Routerlink -->
+                <a class="mon-btn-link mon-pt-10" routerLink="../../manage">{{languageStrings['primary.portal.common.cancel']}}</a>
+                <!-- TODO: enable validation -->
+                <button
+                    type="submit"
+                    class="mon-px-30 mon-btn-primary"
+                    mat-button
+                    mat-flat-button
+                    [attr.aria-label]="languageStrings['primary.portal.common.saveDependent']"
+                >
+                    {{languageStrings['primary.portal.common.saveDependent']}}
+                </button>
+            </mat-card-footer>
+        </form>
+    </mat-card>
+</div>

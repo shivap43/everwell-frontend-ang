@@ -1,0 +1,34 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content class="flex-form-wrapper">
+        <h1 mat-dialog-title>{{languageStrings['primary.portal.quickQuote.resetnote']}}</h1>
+    </div>
+
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            aria-label="Cancel adding note"
+            language="primary.portal.common.cancel"
+            (click)="closeForm()"
+        ></a>
+        <button
+            mat-flat-button
+            class="mon-btn-primary"
+            type="button"
+            (click)="resetSetting()"
+            [attr.aria-label]="languageStrings['primary.portal.common.reset']"
+        >
+            {{languageStrings['primary.portal.common.reset']}}
+        </button>
+    </mat-dialog-actions>
+</div>

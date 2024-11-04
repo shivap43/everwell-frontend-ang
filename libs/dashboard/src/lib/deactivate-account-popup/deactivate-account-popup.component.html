@@ -1,0 +1,41 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            (click)="onCancelClick()"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="flex-form-wrapper">
+        <div mat-dialog-content>
+            <h1 mat-dialog-title>
+                {{deactivateTitle}}
+            </h1>
+            <div class="mon-mb-20">
+                <mon-alert alertType="danger" *ngIf="isAccountCheckedOut">
+                    <span>
+                        {{ languageStrings["primary.portal.dashboard.deactivateAccount.disableDiactivateMessage"] }}
+                    </span>
+                </mon-alert>
+            </div>
+            <div class="d-md-flex">
+                {{deactivateMsg}}
+            </div>
+        </div>
+
+        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">{{data.cancelButton}}</a>
+            <button
+                mat-button
+                mat-flat-button
+                class="mon-btn-danger"
+                (click)="onDeActivateAccount()"
+                [disabled]="isAccountCheckedOut"
+            >
+                {{data.deactivateButton}}
+            </button>
+        </div>
+    </div>
+</div>

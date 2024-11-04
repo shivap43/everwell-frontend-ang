@@ -1,0 +1,281 @@
+@import "shared";
+
+.quasi-modal {
+    .scroll-content {
+        max-height: calc(100vh - 400px);
+    }
+}
+
+.flex-form-wrapper {
+    h3 {
+        margin-top: map-get($spacers, 6);
+    }
+}
+
+.policy-table {
+    margin-bottom: map-get($spacers, 20);
+
+    table {
+        @include fontFace("primary.regular");
+        max-width: 80vw;
+
+        mat-label,
+        .mat-label {
+            @include fontFace("primary.regular");
+            margin-bottom: map-get($spacers, 0);
+
+            @include media-max("l") {
+                width: convert-unit(95px, "rem");
+            }
+        }
+
+        .mat-form-field {
+            margin: map-get($spacers, 0);
+            width: convert-unit(140px, "rem");
+            display: inline-block;
+
+            @include media-max("l") {
+                width: convert-unit(95px, "rem");
+            }
+        }
+
+        .mat-error {
+            text-align: left;
+        }
+
+        .mat-header-row {
+            .mat-header-cell {
+                padding: convert-unit(10px, "rem");
+                text-align: center;
+                flex: 0 0 18% !important;
+                width: 18%;
+                @include fontFace("primary.bold");
+                color: get("color.black");
+
+                .mat-form-field {
+                    text-align: center;
+                    @include fontFace("primary.regular");
+                }
+
+                &:last-child {
+                    border-bottom: convert-unit(0px, "rem");
+                    flex: 0 0 10% !important;
+                    width: 10%;
+                }
+            }
+        }
+
+        .mat-row {
+            .mat-cell {
+                border-bottom-color: get("color.gray.600");
+                border-bottom-width: convert-unit(1px, "rem");
+                @include fontFace("primary.regular");
+                padding: map-get($spacers, 15) map-get($spacers, 10);
+                position: relative;
+                text-align: center;
+
+                .mat-form-field {
+                    text-align: center;
+                    @include fontFace("primary.regular");
+                }
+
+                &:first-child {
+                    text-align: left;
+
+                    .mat-form-field {
+                        text-align: left;
+                    }
+                }
+
+                &:last-child {
+                    background-color: get("color.white");
+                    border-bottom: convert-unit(0px, "rem");
+                    text-align: left;
+
+                    a {
+                        color: get("color.info.danger.500") !important;
+                        text-decoration: none !important;
+                    }
+                }
+            }
+
+            &.life,
+            &.employee {
+                .mat-cell {
+                    border-bottom: convert-unit(0px, "rem");
+                }
+            }
+
+            &.dependent,
+            &.employee {
+                .mat-cell {
+                    &:first-child {
+                        text-align: center;
+                    }
+                }
+            }
+
+            &:hover {
+                outline: none;
+                outline-offset: 0;
+            }
+        }
+
+        .mat-footer-row {
+            .mat-footer-cell {
+                color: get("color.black");
+                padding: map-get($spacers, 15) map-get($spacers, 10);
+                text-align: center;
+                flex: 0 0 18% !important;
+                width: 18%;
+
+                &:first-child {
+                    text-align: left;
+                }
+
+                &:last-child {
+                    border-bottom: convert-unit(0px, "rem");
+                    flex: 0 0 10% !important;
+                    width: 10%;
+                }
+            }
+
+            &:last-child {
+                .mat-footer-cell {
+                    border: convert-unit(0px, "rem");
+                    padding: map-get($spacers, 10);
+                }
+            }
+
+            &.odd-footer {
+                background-color: get("color.gray.200");
+
+                .mat-footer-cell {
+                    &:last-child {
+                        background-color: get("color.white");
+                    }
+                }
+
+                &:hover {
+                    background-color: get("color.primary.50");
+                }
+            }
+
+            &.even-footer {
+                background-color: get("color.white");
+
+                .mat-footer-cell {
+                    &:last-child {
+                        background-color: get("color.white");
+                    }
+                }
+
+                &:hover {
+                    background-color: get("color.primary.50");
+                }
+            }
+        }
+
+        &.oddLength {
+            .mat-row {
+                &:nth-child(odd) {
+                    background-color: get("color.gray.200");
+
+                    &:hover {
+                        background-color: get("color.primary.50");
+                    }
+                }
+
+                &:nth-child(even) {
+                    background-color: get("color.white");
+
+                    &:hover {
+                        background-color: get("color.primary.50");
+                    }
+                }
+            }
+        }
+    }
+}
+:host .suspend-amount.mat-form-field ::ng-deep .mat-form-field-prefix {
+    top: map-get($spacers, 0);
+}
+
+::ng-deep .producer-info {
+    > div {
+        align-items: center;
+    }
+
+    mat-label,
+    .mat-label {
+        font-size: convert-unit(16px, "rem");
+        margin-bottom: map-get($spacers, 0);
+    }
+}
+
+::ng-deep .mat-form-field {
+    &.taxValueReq {
+        .mat-form-field-flex {
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: get("color.info.danger.500");
+            }
+        }
+    }
+}
+
+::ng-deep .waiver-participation {
+    .mat-radio-button {
+        .mat-radio-label {
+            white-space: normal;
+        }
+    }
+}
+
+.employee-sign {
+    margin-bottom: map-get($spacers, 0);
+}
+
+h3.employee-sign {
+    margin-top: map-get($spacers, 30) !important;
+}
+
+.sign-date-info {
+    margin-top: map-get($spacers, 10);
+
+    .info-wrapper {
+        display: flex;
+        margin-top: map-get($spacers, 10);
+
+        span:first-child {
+            flex: 0 0 10%;
+            @include fontFace("primary.bold");
+        }
+
+        span:last-child {
+            flex: 0 0 90%;
+        }
+    }
+}
+
+::ng-deep {
+    .tpi-mode-page-view.pr-form {
+        padding: map-get($spacers, 0) !important;
+
+        .quasi-modal {
+            .scroll-content {
+                max-height: calc(100vh - 139px) !important;
+            }
+        }
+    }
+}
+
+.error {
+    font-size: convert-unit(12px, "rem");
+    color: get("color.info.danger.500");
+    height: map-get($spacers, 0);
+    @include fontFace("primary.regular");
+}
+.deduction-error {
+    display: inline-flex;
+}

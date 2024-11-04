@@ -1,0 +1,36 @@
+@import "shared";
+
+:host {
+    flex: 1 0 auto;
+    .mat-side-nav {
+        width: auto;
+        height: 100%;
+
+        &-closeBtn.mat-icon-button {
+            position: absolute;
+            right: convert-unit(5px, "rem");
+        }
+    }
+}
+.content-header {
+    margin: 0;
+    padding: convert-unit(17px, "rem") convert-unit(30px, "rem");
+    font-weight: normal;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    background-color: get("color.gray.100");
+    color: get("color.gray.1000");
+    display: flex;
+    align-items: flex-end;
+    .openSideNavBtn {
+        .hamburgerMenu {
+            height: convert-unit(24px, "rem") !important;
+            width: convert-unit(24px, "rem") !important;
+        }
+    }
+    .account-labels {
+        width: 100%;
+        .account-name {
+            font-size: convert-unit(28px, "rem");
+        }
+    }
+}

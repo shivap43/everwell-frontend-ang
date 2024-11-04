@@ -1,0 +1,90 @@
+<form [formGroup]="verifyAddressForm" (ngSubmit)="afterVerifyAddress()" *ngIf="!errorStatus">
+    <empowered-modal type="POPUP" size="MD" [showCancel]="true" class="address-verification">
+        <empowered-modal-header>
+            <h1 mat-dialog-title>{{languageStrings['primary.portal.direct.addCustomer.verifyAddress']}}</h1>
+            <div class="mon-mb-20" *ngIf="data.addressResp">
+                <p class="description">{{languageStrings['primary.portal.direct.addCustomer.warningTittle']}}</p>
+                <mon-alert alertType="warning">
+                    <p *ngFor="let message of data.addressMessage, let i = index">{{i + 1 }}. {{ message }}</p>
+                </mon-alert>
+            </div>
+            <p class="description" *ngIf="!data.addressResp">{{languageStrings['primary.portal.direct.addCustomer.verifyAddressMsg']}}</p>
+        </empowered-modal-header>
+
+        <mat-radio-group [attr.aria-label]="languageStrings['primary.portal.common.selectOption']" formControlName="selectAddress">
+            <div class="address-block" *ngIf="!data.addressResp">
+                <div *ngIf="this.data.option !=='singleOption'">
+                    <mat-radio-button value="suggestedAddress">
+                        <span class="description">{{languageStrings['primary.portal.direct.addCustomer.suggestedAddress']}}</span>
+                    </mat-radio-button>
+                </div>
+
+                <div [ngClass]="{'address-details': this.data.option !== 'singleOption'}">
+                    <p>{{data.suggestedAddress?.address1}}</p>
+                    <p>{{data.suggestedAddress?.address2}}</p>
+                    <p>{{data.suggestedAddress?.country}}</p>
+                    <p>{{data.suggestedAddress?.city}}, {{data.suggestedAddress?.state}} {{data.suggestedAddress?.zip}}</p>
+                </div>
+            </div>
+            <div class="address-block">
+                <div *ngIf="this.data.option !=='singleOption'">
+                    <mat-radio-button value="providedAddress">
+                        <span class="description">{{languageStrings['primary.portal.direct.addCustomer.providedAddress']}}</span>
+                    </mat-radio-button>
+                </div>
+
+                <div [ngClass]="{'address-details': this.data.option !== 'singleOption'}">
+                    <p>{{data.providedAddress?.address1}}</p>
+                    <p>{{data.providedAddress?.address2}}</p>
+                    <p>{{data.providedAddress?.country}}</p>
+                    <p>{{data.providedAddress?.city}}, {{data.providedAddress?.state}} {{data.providedAddress?.zip}}</p>
+                </div>
+            </div>
+        </mat-radio-group>
+
+        <empowered-modal-footer>
+            <button
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.common.next']"
+            >
+                <span *ngIf="data.option === bothOption else elsepart"
+                    >{{languageStrings['primary.portal.direct.addCustomer.useSelectedAddress']}}</span
+                >
+                <ng-template #elsepart>
+                    <span>{{languageStrings['primary.portal.direct.addCustomer.continueWithoutChanges']}}</span>
+                </ng-template>
+            </button>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>
+<form [formGroup]="verifyAddressForm" (ngSubmit)="afterVerifyAddress()" *ngIf="errorStatus">
+    <empowered-modal type="POPUP" size="MD" [showCancel]="true" class="address-verification">
+        <empowered-modal-header>
+            <h1 mat-dialog-title>{{languageStrings['primary.portal.verifyAddress.serviceUnavailable.title']}}</h1>
+        </empowered-modal-header>
+        <div class="mon-mb-10" *ngIf="data.addressResp">
+            <p class="description">{{languageStrings['primary.portal.verifyAddress.serviceUnavailable.description']}}</p>
+        </div>
+        <div class="address-block confirm-address-block">
+            <div class="address-details">
+                <p>{{data.providedAddress?.address1}}</p>
+                <p>{{data.providedAddress?.address2}}</p>
+                <p>{{data.providedAddress?.country}}</p>
+                <p>{{data.providedAddress?.city}}, {{data.providedAddress?.state}} {{data.providedAddress?.zip}}</p>
+            </div>
+        </div>
+
+        <empowered-modal-footer>
+            <button
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.verifyAddress.serviceUnavailable.buttonText']"
+            >
+                <span>{{languageStrings['primary.portal.verifyAddress.serviceUnavailable.buttonText']}}</span>
+            </button>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>

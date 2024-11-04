@@ -1,0 +1,169 @@
+<div class="forms-filters">
+    <div class="search-type">
+        <mat-label class="mat-label">{{languageStrings['primary.portal.formRepository.searchType']}}</mat-label>
+        <mat-radio-group [(ngModel)]="searchType" class="filter-type" aria-label="Select an option">
+            <mat-radio-button value="FILTER_SEARCH"
+                >{{languageStrings['primary.portal.coverage.filter']}}</mat-radio-button
+            >
+            <mat-radio-button value="FORM_SEARCH"
+                >{{languageStrings['primary.portal.formRepository.form']}}</mat-radio-button
+            >
+        </mat-radio-group>
+    </div>
+    <form [formGroup]="filterForm" (ngSubmit)="updateFormsList(false)">
+        <div *ngIf="searchType === 'FILTER_SEARCH' , else formSearch" class="filter">
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.formRepository.formType']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="formType"
+                        disableOptionCentering="true"
+                        (selectionChange)="updateFilterOptions(FilterTypes.channels)"
+                        [placeholder]="languageStrings['primary.portal.editCoverage.select']"
+                    >
+                        <mat-option [value]="null"
+                            >{{languageStrings['primary.portal.editCoverage.select']}}</mat-option
+                        >
+                        <mat-option
+                            *ngFor="let formTypeFilterOption of formTypeFilterOptions"
+                            [value]="formTypeFilterOption.value"
+                            >{{formTypeFilterOption.viewValue}}</mat-option
+                        >
+                    </mat-select>
+                    <mat-error>
+                        {{secondaryLanguageStrings["secondary.portal.formRepository.filters.selectionrequired"]}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.formRepository.channel']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="channel"
+                        disableOptionCentering="true"
+                        (selectionChange)="updateFilterOptions(FilterTypes.products)"
+                        [placeholder]="languageStrings['primary.portal.customer.all']"
+                    >
+                        <mat-option [value]="null">{{languageStrings['primary.portal.customer.all']}}</mat-option>
+                        <mat-option
+                            *ngFor="let chanelFilterOption of chanelFilterOptions"
+                            [value]="chanelFilterOption.value"
+                            >{{chanelFilterOption.viewValue }}</mat-option
+                        >
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.formRepository.product']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="productId"
+                        disableOptionCentering="true"
+                        (selectionChange)="updateFilterOptions(FilterTypes.policySeries)"
+                        [placeholder]="languageStrings['primary.portal.customer.all']"
+                    >
+                        <mat-option [value]="null">{{languageStrings['primary.portal.customer.all']}}</mat-option>
+                        <mat-option
+                            *ngFor="let productsFilterOption of productsFilterOptions"
+                            [value]="productsFilterOption.value"
+                            >{{productsFilterOption.viewValue}}</mat-option
+                        >
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.formRepository.policySeries']}}</mat-label
+                >
+                <mat-form-field>
+                    <mat-select
+                        formControlName="policySeries"
+                        disableOptionCentering="true"
+                        (selectionChange)="updateFilterOptions(FilterTypes.states)"
+                        [placeholder]="languageStrings['primary.portal.customer.all']"
+                    >
+                        <mat-option [value]="null">{{languageStrings['primary.portal.customer.all']}}</mat-option>
+                        <mat-option
+                            *ngFor="let policySeriesOption of policySeriesFilterOptions"
+                            [value]="policySeriesOption.value"
+                            >{{policySeriesOption.viewValue }}</mat-option
+                        >
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.formRepository.state']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="state"
+                        disableOptionCentering="true"
+                        [placeholder]="languageStrings['primary.portal.customer.all']"
+                    >
+                        <mat-option [value]="null">{{languageStrings['primary.portal.customer.all']}}</mat-option>
+                        <mat-option *ngFor="let stateOption of statesFilterOptions" [value]="stateOption.value"
+                            >{{stateOption.viewValue}}</mat-option
+                        >
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form-search">
+                <button
+                    #submit
+                    mat-flat-button
+                    class="mon-btn-search mon-btn-primary"
+                    color="primary"
+                    type="submit"
+                    [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                >
+                    <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                </button>
+            </div>
+        </div>
+    </form>
+    <div *ngIf="searchType === 'FILTER_SEARCH' && formsLength === 0">
+        {{languageStrings['primary.portal.formRepository.filtersSelected']}}
+    </div>
+    <ng-template #formSearch>
+        <form (ngSubmit)="updateFormsList(true)">
+            <div class="form">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.formRepository.searchForms']}}</mat-label
+                >
+                <div>
+                    <mat-form-field>
+                        <input
+                            [formControl]="numberSearchInput"
+                            matInput
+                            (keypress)="updateFormNumberInputValue($event)"
+                            autocomplete="off"
+                            [attr.aria-label]="languageStrings['primary.portal.formRepository.searchForms']"
+                        />
+                        <mat-hint>{{languageStrings['primary.portal.formRepository.form']}}</mat-hint>
+                        <mat-error>
+                            {{secondaryLanguageStrings["secondary.portal.formRepository.formNumber.required"]}}</mat-error
+                        >
+                    </mat-form-field>
+                    <button
+                        #submit
+                        mat-flat-button
+                        class="mon-btn-search mon-btn-primary"
+                        color="primary"
+                        type="submit"
+                    >
+                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                    </button>
+                </div>
+            </div>
+            <div *ngIf="noResultsFound && formsLength === 0 ">
+                {{languageStrings['primary.portal.forms.repository.zeroState'] + " " + searchTerm}}
+            </div>
+            <div *ngIf="(!noResultsFound) && formsLength === 0 ">
+                {{languageStrings['primary.portal.formRepository.formNumberRequired']}}
+            </div>
+        </form>
+    </ng-template>
+</div>

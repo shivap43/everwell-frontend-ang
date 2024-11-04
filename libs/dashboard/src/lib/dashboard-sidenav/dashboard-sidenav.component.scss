@@ -1,0 +1,133 @@
+@import "shared";
+
+.mat-nav-list {
+    padding: convert-unit(0px, "rem");
+}
+
+.matSideNav {
+    margin-top: convert-unit(50px, "rem");
+    width: convert-unit(240px, "rem");
+    .mat-sidenav {
+        background-color: get("color.gray.100");
+        border-right: convert-unit(1px, "rem") solid get("color.gray.400");
+    }
+}
+.dotted-divider {
+    height: convert-unit(1px, "rem");
+    color: get("color.gray.600");
+    border-style: dotted;
+    margin: convert-unit(0px, "rem") convert-unit(25px, "rem") convert-unit(5px, "rem");
+    letter-spacing: convert-unit(3px, "rem");
+}
+
+.back-btn {
+    padding: convert-unit(10px, "rem");
+    text-align: center;
+    min-height: convert-unit(55px, "rem");
+}
+
+.sub-menu {
+    padding: convert-unit(0px, "rem") convert-unit(0px, "rem") convert-unit(0px, "rem") convert-unit(65px, "rem") !important;
+    font-weight: 400;
+}
+
+.mat-accordion .mat-expansion-panel:last-of-type {
+    border-bottom: none;
+}
+.mat-expansion-panel {
+    min-height: convert-unit(45px, "rem");
+    font-size: convert-unit(16px, "rem");
+    background-color: get("color.gray.100");
+    ::ng-deep .mat-expansion-panel-body {
+        padding: 0px !important;
+        font-weight: 400;
+        background-color: get("color.gray.300");
+    }
+}
+.mat-expansion-panel-header {
+    padding-left: convert-unit(0px, "rem");
+    padding-right: convert-unit(15px, "rem");
+}
+
+// ::ng-deep .mat-expansion-panel-body {
+//     padding: convert-unit(0px, "rem") !important;
+//     font-weight: 400;
+//     background-color: get("color.gray.200");
+// }
+.mat-expansion-panel-header-title {
+    align-items: center;
+    .title {
+        padding-top: convert-unit(4px, "rem");
+        margin-right: convert-unit(15px, "rem");
+        font-size: convert-unit(16px, "rem");
+        font-weight: 800;
+    }
+
+    .icon {
+        height: convert-unit(20px, "rem");
+        max-width: convert-unit(20px, "rem");
+        margin-left: convert-unit(30px, "rem");
+        margin-right: convert-unit(10px, "rem");
+        margin-top: convert-unit(8px, "rem");
+    }
+}
+
+.mat-expansion-panel:not(.mat-expanded) {
+    .mat-expansion-panel-header:not([aria-disabled="true"]).cdk-keyboard-focused,
+    .mat-expansion-panel-header:not([aria-disabled="true"]).cdk-program-focused,
+    .mat-expansion-panel-header:not([aria-disabled="true"]):hover {
+        background-color: get("color.gray.700");
+        .mat-expansion-panel-header-title {
+            color: get("color.white") !important;
+            font-weight: 500;
+
+            ::ng-deep .icon-diamond {
+                .cls-1 {
+                    fill: get("color.white");
+                    fill-rule: evenodd;
+                }
+            }
+        }
+        ::ng-deep .mat-expansion-indicator::after {
+            color: get("color.white") !important;
+        }
+    }
+}
+.mat-expansion-panel.mat-expanded {
+    .mat-expansion-panel-header {
+        border-left: convert-unit(10px, "rem") solid $mon--accent-base;
+        background: get("color.gray.800");
+        .mat-expansion-panel-header-title {
+            color: get("color.white") !important;
+            font-weight: 500;
+            margin-left: -10px;
+
+            ::ng-deep .icon-diamond {
+                .cls-1 {
+                    fill: get("color.white");
+                    fill-rule: evenodd;
+                }
+            }
+        }
+    }
+    ::ng-deep .mat-expansion-indicator::after {
+        color: get("color.white") !important;
+    }
+}
+
+::ng-deep .icon-left {
+    .cls-1 {
+        fill: get("color.primary.500");
+        fill-rule: evenodd;
+    }
+}
+::ng-deep .mat-list-item-content {
+    padding: convert-unit(0px, "rem") convert-unit(10px, "rem") convert-unit(0px, "rem") convert-unit(0px, "rem") !important;
+}
+::ng-deep .router-link-active .mat-list-item-content::before {
+    content: "\00B7";
+    margin-right: convert-unit(5px, "rem") !important;
+    color: get("color.primary.500");
+    font-size: convert-unit(42px, "rem");
+    margin-left: convert-unit(-16px, "rem") !important;
+}

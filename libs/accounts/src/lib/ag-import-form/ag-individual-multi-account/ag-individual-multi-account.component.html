@@ -1,0 +1,36 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div mat-dialog-content class="ag-individualContact">
+    <h2 role="heading" mat-dialog-title *ngIf="isAiOnly">
+        {{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroupTaxId']}}
+    </h2>
+    <h2 role="heading" mat-dialog-title *ngIf="!isAiOnly">
+        {{accessibleAIs.length > MIN_ACCESSIBLE_AIS_LEN ?
+        languageStrings['primary.portal.aflacgroup.importaccount.aflacIndividualAccountsTaxId'] :
+        languageStrings['primary.portal.aflacgroup.importaccount.aflacIndividualTaxId']}}
+    </h2>
+
+    <div *ngIf="showContent && accessibleAIs.length && !nonAccessibleAIs">
+        <div *ngIf="accessibleAIs.length === MIN_ACCESSIBLE_AIS_LEN">
+            {{isAiOnly ? languageStrings['primary.portal.aflacgroup.importaccount.aflacIndividualAccount'] :
+            languageStrings['primary.portal.aflacgroup.importaccount.aflacSingleAccount']}}
+        </div>
+        <div *ngIf="accessibleAIs.length > MIN_ACCESSIBLE_AIS_LEN">
+            {{languageStrings['primary.portal.aflacgroup.importaccount.aflacMultiAccount']}}
+        </div>
+        <div class="ag-accountList">
+            <ul *ngFor="let ai of accessibleAIs">
+                <li><a href="javascript:void(0)" (click)="gotoCarrierPage(ai)">{{ai.name}}</a></li>
+            </ul>
+        </div>
+    </div>
+    <div *ngIf="showContent && nonAccessibleAIs">
+        <div>
+            {{isAiOnly ? languageStrings['primary.portal.aflacgroup.importaccount.noAccessGroup'] :
+            languageStrings['primary.portal.aflacgroup.importaccount.noAccess']}}
+        </div>
+    </div>
+    <p *ngIf="!nonAccessibleAIs">
+        {{isAiOnly ? languageStrings['primary.portal.aflacgroup.importaccount.individual.aflacGroupNewAccount']
+        :languageStrings['primary.portal.aflacgroup.importaccount.individual.linkWarning']}}
+    </p>
+</div>

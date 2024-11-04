@@ -1,0 +1,257 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content class="mon-p-0">
+            <div class="create-account-header">
+                <h2 mat-dialog-title>{{languageStrings['primary.portal.accounts.newAccount']}}</h2>
+            </div>
+            <div class="create-account-container">
+                <div class="mon-my-20" *ngIf="errorResponse || successResponse">
+                    <mon-alert *ngIf="errorResponse" alertType="danger">
+                        <span>{{errorMessage}}</span>
+                    </mon-alert>
+                    <mon-alert *ngIf="successResponse" alertType="success">
+                        <span [language]="successMessage"></span>
+                    </mon-alert>
+                    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading">
+                    </empowered-mon-spinner>
+                </div>
+                <mat-label class="mat-label" language="primary.portal.accounts.companyName"></mat-label>
+                <mat-form-field>
+                    <input
+                        formControlName="companyname"
+                        [attr.aria-label]="languageStrings['primary.portal.accounts.companyName']"
+                        matInput
+                        type="text"
+                        maxlength="100"
+                        attr.aria-required="true"
+                        required
+                    />
+                    <mat-error [language]="getErrorCompanyName()"></mat-error>
+                </mat-form-field>
+                <div formGroupName="contact">
+                    <div formGroupName="address">
+                        <mat-label class="mat-label" language="primary.portal.accounts.addressOne"></mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="address1"
+                                [attr.aria-label]="languageStrings['primary.portal.accounts.addressOne']"
+                                matInput
+                                type="text"
+                                attr.aria-required="true"
+                                maxlength="100"
+                                required
+                            />
+                            <mat-error [language]="getErrorAddress1()"></mat-error>
+                        </mat-form-field>
+                        <mat-label class="mat-label"
+                            ><span>{{languageStrings['primary.portal.accounts.addressTwo']}}</span>
+                            <span class="optional-text"
+                                >{{languageStrings['primary.portal.common.optional']}}</span
+                            ></mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                formControlName="address2"
+                                attr.aria-label="{{languageStrings['primary.portal.accounts.addressTwo']}} {{languageStrings['primary.portal.common.optional']}}"
+                                matInput
+                                type="text"
+                                maxlength="100"
+                            />
+                            <mat-error [language]="getErrorAddress2()"></mat-error>
+                            <mat-hint language="primary.portal.accounts.floor"></mat-hint>
+                        </mat-form-field>
+                        <div class="d-flex justify-content-between">
+                            <div class="w-260 mon-mr-20">
+                                <mat-label class="mat-label" language="primary.portal.accounts.city"></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="city"
+                                        [attr.aria-label]="languageStrings['primary.portal.accounts.city']"
+                                        matInput
+                                        type="text"
+                                        attr.aria-required="true"
+                                        required
+                                    />
+                                    <mat-error [language]="getErrorCity()">getErrorCity()</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="w-80 mon-mr-20">
+                                <mat-label class="mat-label" id="state"
+                                    >{{languageStrings['primary.portal.accounts.state']}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        (selectionChange)="changeClient($event)"
+                                        class="mon-select-arrow"
+                                        disableOptionCentering="true"
+                                        formControlName="state"
+                                        attr.aria-required="true"
+                                        aria-labelledby="state"
+                                    >
+                                        <mat-option value="" selected
+                                            >{{languageStrings['primary.portal.common.select']}}</mat-option
+                                        >
+                                        <mat-option *ngFor="let state of state" [value]="state.abbreviation">
+                                            {{ state.abbreviation }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error [language]="getErrorState()"></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="w-120">
+                                <mat-label class="mat-label" language="primary.portal.accounts.zip"></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="zip"
+                                        [attr.aria-label]="languageStrings['primary.portal.accounts.zip']"
+                                        matInput
+                                        type="text"
+                                        maxlength="5"
+                                        (paste)="numberValidation($event);"
+                                        (keypress)="numberValidation($event);"
+                                        attr.aria-required="true"
+                                        required
+                                    />
+                                    <mat-error [language]="getErrorZip()"></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="w-285 mon-mr-20">
+                            <div
+                                *ngFor="let item of emailAdressessArray.controls; let i = index"
+                                formArrayName="emailAddresses"
+                            >
+                                <div [formGroupName]="i">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.accounts.contactEmail"
+                                    ></mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="email"
+                                            [attr.aria-label]="languageStrings['primary.portal.accounts.contactEmail']"
+                                            matInput
+                                            type="text"
+                                            maxlength="100"
+                                            attr.aria-required="true"
+                                            required
+                                        />
+                                        <mat-error [language]="getErrorEmail()"></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-195">
+                            <div
+                                *ngFor="let item of phoneNumbersArray.controls; let i = index"
+                                formArrayName="phoneNumbers"
+                            >
+                                <div [formGroupName]="i">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.accounts.contactPhone"
+                                    ></mat-label>
+                                    <mat-form-field class="w-195">
+                                        <input
+                                            class="mon-input"
+                                            formControlName="phoneNumber"
+                                            [attr.aria-label]="languageStrings['primary.portal.accounts.contactPhone']"
+                                            matInput
+                                            empoweredNumberValidation
+                                            [allowDashes]="true"
+                                            empoweredPhoneNumberFormat
+                                            type="text"
+                                            [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                                            attr.aria-required="true"
+                                            required
+                                        />
+                                        <mat-error [language]="getErrorPhone()"></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="w-200">
+                        <mat-label class="mat-label" id="payFrequency"
+                            >{{languageStrings['primary.portal.accounts.payFrequency']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <mat-select
+                                disableOptionCentering="true"
+                                (selectionChange)="changeClientPayFrequency($event)"
+                                formControlName="payFrequencyId"
+                                attr.aria-required="true"
+                                required
+                                aria-labelledby="payFrequency"
+                            >
+                                <mat-option value="" selected
+                                    >{{languageStrings['primary.portal.common.select']}}</mat-option
+                                >
+                                <mat-option *ngFor="let payFrequency of payFrequency" [value]="payFrequency.id">
+                                    {{ payFrequency.name }}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error [language]="getErrorPayFrequency()"></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <!--Primary Producer start here-->
+                <div class="primary-producer d-none">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.accounts.primaryProducer']}}</mat-label
+                    >
+                    <mat-radio-group [attr.aria-label]="languageStrings['primary.portal.common.selectOption']">
+                        <div>
+                            <mat-radio-button value="1" class="primary-radio"
+                                >{{languageStrings['primary.portal.accounts.me']}}</mat-radio-button
+                            >
+                        </div>
+                        <div>
+                            <mat-radio-button value="2" class="primary-radio"
+                                >{{languageStrings['primary.portal.accounts.someonefromMyteam']}}</mat-radio-button
+                            >
+                            <mat-form-field class="producer-input">
+                                <input
+                                    type="text"
+                                    matInput
+                                    [attr.aria-label]="languageStrings['primary.portal.accounts.primaryProducer']"
+                                />
+                                <mat-error>{{languageStrings['primary.portal.accounts.producernotFound']}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-group>
+                </div>
+                <!--Primary Producer end here-->
+            </div>
+        </div>
+
+        <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link mon-px-0"
+                mat-button
+                mat-dialog-close
+                (click)="closeForm()"
+            >
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button class="mon-btn-primary mon-dialog-button mon-px-30" mat-flat-button type="submit">
+                {{languageStrings['primary.portal.accounts.createAccount']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

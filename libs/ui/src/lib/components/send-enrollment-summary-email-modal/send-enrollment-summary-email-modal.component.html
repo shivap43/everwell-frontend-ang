@@ -1,0 +1,218 @@
+<div class="send-enrollment-summary-email-modal" aria-labelledby="modalTitle" role="dialog">
+    <div class="row modal-header">
+        <div class="d-flex align-items-center justify-content-start modal-header-title">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+        </div>
+        <div class="col d-flex align-items-center justify-content-end modal-header-cancel">
+            <ng-container *ngTemplateOutlet="headerCloseButton"></ng-container>
+        </div>
+    </div>
+    <mat-dialog-content>
+        <div class="row modal-container-title">
+            <div class="col">
+                <!-- <ng-container *ngTemplateOutlet="headerTitle"></ng-container> -->
+                <p id="helpText" [language]="LanguageKey.ENROLLMENT_SUMMARY_HELP_TEXT"></p>
+            </div>
+        </div>
+        <div class="row content-wrapper modal-container-content">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <mat-radio-group aria-label="Select any option" formControlName="selected" role="radiogroup" required>
+                    <ng-container *ngTemplateOutlet="emailRadioGroup; context: { form: form }"></ng-container>
+                    <ng-container *ngTemplateOutlet="phoneRadioGroup; context: { form: form }"></ng-container>
+                </mat-radio-group>
+                <mat-error *ngIf="form.controls.selected.invalid && form.controls.selected.touched"
+                    >{{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SELECTION_REQUIRED] }}</mat-error
+                >
+            </form>
+        </div>
+    </mat-dialog-content>
+    <div class="row">
+        <div class="col">
+            <mat-dialog-actions class="dialog-footer modal-footer">
+                <div class="d-flex justify-content-end flex-fill m-0">
+                    <ng-container *ngTemplateOutlet="skipButton"></ng-container>
+                    <ng-container *ngTemplateOutlet="sendButton"></ng-container>
+                </div>
+            </mat-dialog-actions>
+        </div>
+    </div>
+</div>
+
+<!--
+    The radio group for phone options
+-->
+<ng-template #phoneRadioGroup let-form="form">
+    <ng-container [formGroup]="form">
+        <ng-container *ngFor="let option of data.contactList">
+            <div class="row" role="radiogroup" *ngIf="option.type === 'phone' && !option.disableField">
+                <div class="col">
+                    <mat-radio-button
+                        #phoneOption
+                        role="radio"
+                        [value]="option"
+                        [attr.aria-checked]="phoneOption.checked"
+                        (change)="onPhoneSelection(option)"
+                        aria-label="{{languageStrings[LanguageKey.ENROLLMENT_SUMMARY_TEXT_TO]}}"
+                    >
+                        {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_TEXT_TO] }} {{option.formatted | phone: country}}
+                    </mat-radio-button>
+                </div>
+            </div>
+        </ng-container>
+        <div class="row">
+            <div class="col">
+                <mat-radio-button
+                    #phoneNotOnFile
+                    role="radio"
+                    value="phoneNotOnFile"
+                    [attr.aria-checked]="phoneNotOnFile.checked"
+                    (change)="onPhoneNotOnFile()"
+                    aria-label="{{languageStrings[LanguageKey.ENROLLMENT_SUMMARY_TEXT_TO_MOBILE_NOT_ON_FILE]}}"
+                >
+                    {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_TEXT_TO_MOBILE_NOT_ON_FILE] }}
+                </mat-radio-button>
+            </div>
+        </div>
+        <div class="row" *ngIf="showPhone">
+            <div class="col one-time-use-container">
+                <div id="mobileHelpText" class="sr-only" [language]="LanguageKey.ENROLLMENT_SUMMARY_MOBILE_HELP_TEXT">
+                    Enter mobile number
+                </div>
+                <mat-form-field>
+                    <input
+                        required
+                        title="{{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_MOBILE_HELP_TEXT] }}"
+                        matInput
+                        type="text"
+                        (input)="onPhoneInput($event)"
+                        [attr.aria-label]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_MOBILE_HELP_TEXT]"
+                        [attr.aria-describedby]="'mobileHelpText'"
+                        formControlName="phone"
+                        empoweredNumberValidation
+                        [allowDashes]="true"
+                        empoweredPhoneNumberFormat
+                    />
+                    <mat-error *ngIf="form.controls.phone.errors?.pattern">
+                        {{ languageStrings[LanguageKey.INVALID_PHONE_NUMBER] }}
+                    </mat-error>
+                    <mat-error *ngIf="form.controls.phone.errors?.required"
+                        >{{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_MOBILE_REQUIRED_FIELD] }}</mat-error
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<!--
+    The radio group for email options
+-->
+<ng-template #emailRadioGroup let-form="form">
+    <ng-container [formGroup]="form">
+        <ng-container *ngFor="let option of data.contactList">
+            <div class="row" role="radiogroup" *ngIf="option.type === 'email' && !option.disableField">
+                <div class="col">
+                    <mat-radio-button
+                        #emailOption
+                        role="radio"
+                        [value]="option"
+                        [attr.aria-checked]="emailOption.checked"
+                        (change)="onEmailSelection(option)"
+                        aria-label="{{languageStrings[LanguageKey.ENROLLMENT_SUMMARY_EMAIL_TO]}}"
+                    >
+                        {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_EMAIL_TO] }} {{option.contact}}
+                    </mat-radio-button>
+                </div>
+            </div>
+        </ng-container>
+        <div class="row">
+            <div class="col">
+                <mat-radio-button
+                    #emailNotOnFile
+                    role="radio"
+                    [attr.aria-checked]="emailNotOnFile.checked"
+                    value="emailNotOnFile"
+                    (change)="onEmailNotOnFile()"
+                    aria-label="{{languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SEND_TO_EMAIL_NOT_ON_FILE]}}"
+                >
+                    {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SEND_TO_EMAIL_NOT_ON_FILE] }}
+                </mat-radio-button>
+            </div>
+        </div>
+        <div class="row" *ngIf="showEmail">
+            <div class="col one-time-use-container">
+                <div id="emailHelpText" class="sr-only" [language]="LanguageKey.ENROLLMENT_SUMMARY_EMAIL_HELP_TEXT"></div>
+                <mat-form-field>
+                    <input
+                        required
+                        title="{{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_EMAIL_HELP_TEXT] }}"
+                        matInput
+                        type="text"
+                        class="mon-input"
+                        (input)="onEmailInput($event)"
+                        [attr.aria-label]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_EMAIL_HELP_TEXT]"
+                        [attr.aria-describedby]="'emailHelpText'"
+                        formControlName="email"
+                    />
+                    <mat-error *ngIf="form.controls.email.errors?.pattern">{{ languageStrings[LanguageKey.INVALID_EMAIL] }} </mat-error>
+                    <mat-error *ngIf="form.controls.email.errors?.required"
+                        >{{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_EMAIL_REQUIRED_FIELD] }}</mat-error
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<!--
+    The header close button for the modal
+-->
+<ng-template #headerCloseButton>
+    <button
+        type="button"
+        (click)="skip()"
+        [attr.aria-label]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_CLOSE_MODAL]"
+        class="header-close-icon-button"
+    >
+        <mon-icon
+            class="mon-icon-close"
+            [iconSize]="25"
+            iconName="close"
+            [alt]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_CLOSE_MODAL]"
+        ></mon-icon>
+    </button>
+</ng-template>
+
+<!--
+    The skip button for the modal
+-->
+<ng-template #skipButton>
+    <button
+        class="mon-btn-secondary"
+        type="button"
+        mat-flat-button
+        (click)="skip()"
+        [attr.aria-label]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SKIP_ARIA_LABEL]"
+    >
+        {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SKIP_ENROLLMENT_SUMMARY] }}
+    </button>
+</ng-template>
+
+<!--
+    The send button for the modal
+-->
+<ng-template #sendButton>
+    <button
+        class="mon-btn-primary send-button"
+        type="submit"
+        mat-flat-button
+        (click)="onSubmit()"
+        [attr.aria-label]="languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SEND_ARIA_LABEL]"
+    >
+        {{ languageStrings[LanguageKey.ENROLLMENT_SUMMARY_SEND_ENROLLMENT_SUMMARY] }}
+    </button>
+</ng-template>
+
+<ng-template #headerTitle>
+    <h2 #modalTitle [tabIndex]="0" mat-dialog-title id="modalTitle" [language]="LanguageKey.ENROLLMENT_SUMMARY_TITLE"></h2>
+</ng-template>

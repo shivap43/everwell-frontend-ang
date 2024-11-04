@@ -1,0 +1,60 @@
+@import "shared";
+
+.product-filter-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: map-get($spacers, 20);
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    box-shadow: 0 0 0 0;
+    border-radius: convert-unit(4px, "rem");
+    background-color: get("color.white");
+    width: convert-unit(300px, "rem");
+
+    .show-title {
+        margin: 0 0 map-get($spacers, 10);
+    }
+
+    .mat-radio-button {
+        height: map-get($spacers, 20);
+        margin-top: map-get($spacers, 20);
+        width: 100%;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .mon-reset {
+        color: get("color.black");
+    }
+
+    .mon-clear {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        padding: convert-unit(25px, "rem") 0 0 0;
+        font-size: convert-unit(14px, "rem");
+    }
+
+    .search-box {
+        margin-top: map-get($spacers, 20);
+        margin-left: convert-unit(28px, "rem");
+        display: flex;
+
+        .search-producer {
+            margin-bottom: map-get($spacers, 0);
+            width: convert-unit(165px, "rem");
+        }
+
+        .search-icon-wrapper {
+            padding: map-get($spacers, 0);
+            margin-left: map-get($spacers, 15);
+            min-width: map-get($spacers, 50);
+
+            .mon-icon {
+                margin: map-get($spacers, 5) map-get($spacers, 0);
+            }
+        }
+    }
+}

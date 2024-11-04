@@ -1,0 +1,203 @@
+<div *ngIf="editModal">
+    <div *ngIf="paymentMethod === paymentType.BANKDRAFT; else cardEditModal">
+        <form [formGroup]="bankDraftEditForm">
+            <empowered-modal type="POPUP" class="modal" size="LG">
+                <empowered-modal-header>
+                    <span language="primary.portals.payment.bankDraft.pnc.edit.heading"> {{bankDraftDetails?.accountNumberLastFour}}</span>
+                </empowered-modal-header>
+                <empowered-modal-footer>
+                    <button type="submit" mat-raised-button class="mon-btn-primary" (click)="submitBankDraft()">
+                        <span language="primary.portal.common.save"></span>
+                    </button>
+                </empowered-modal-footer>
+                <div class="disclaimer">
+                    <div>
+                        <span language="primary.portals.payment.bankDraft.pnc.edit.disclaimer.first"></span>
+                    </div>
+                    <div class="disclaimer-two">
+                        <span language="primary.portals.payment.bankDraft.pnc.edit.disclaimer.second"></span>
+                    </div>
+                </div>
+                <div>
+                    <mat-label class="mat-label account-type-label"
+                        ><span language="primary.portal.applicationFlow.payments.accountType"></span
+                    ></mat-label>
+                    <!-- dropdown -->
+                    <mat-form-field class="account-type">
+                        <mat-select formControlName="accountType" disableOptionCentering="true" [value]="selectedAccountType">
+                            <mat-option
+                                [value]="accountType.CHECKING"
+                                language="primary.portal.applicationFlow.payments.accountTypeChecking"
+                            >
+                            </mat-option>
+                            <mat-option [value]="accountType.SAVINGS" language="primary.portal.applicationFlow.payments.accountTypeSaving">
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <mat-label class="mat-label account-name-label"
+                        ><span language="primary.portals.payment.accountHolderName"></span
+                    ></mat-label>
+                    <mat-form-field class="account-name">
+                        <input matInput formControlName="accountName" (blur)="onAccountNameBlurEvent($event.target.value)" />
+                        <mat-hint language="secondary.portal.payment.bankDraft.pnc.accountHolderName.hint"></mat-hint>
+                    </mat-form-field>
+                    <mat-error *ngIf="bankDraftEditForm?.controls?.accountName?.errors?.required">
+                        <span language="primary.portal.common.requiredField"></span>
+                    </mat-error>
+                    <mat-error *ngIf="bankDraftEditForm?.controls?.accountName?.errors?.containsInvalidCharacter">
+                        <span language="secondary.portal.paymentDetails.bankDraft.editFlow.invalidSpecialCharacter"></span>
+                    </mat-error>
+                    <mat-error *ngIf="bankDraftEditForm?.controls?.accountName?.errors?.invalidFirstCharacter">
+                        <span language="secondary.portal.paymentDetails.firstAndLastCharactersMustBeLetters"></span>
+                    </mat-error>
+                    <mat-error
+                        *ngIf="bankDraftEditForm?.controls?.accountName?.errors?.noLastName && !bankDraftEditForm?.controls?.accountName?.errors?.required"
+                    >
+                        <span language="secondary.portal.paymentDetails.lastNameRequired"></span>
+                    </mat-error>
+                </div>
+            </empowered-modal>
+        </form>
+    </div>
+    <ng-template #cardEditModal>
+        <form [formGroup]="creditCardForm">
+            <empowered-modal type="POPUP" class="modal" size="MD">
+                <empowered-modal-header>
+                    <span language="primary.portal.applicationFlow.payments.editCard"></span>
+                </empowered-modal-header>
+                <empowered-modal-footer>
+                    <button type="submit" mat-raised-button class="mon-btn-primary" (click)="onSaveOfCardDetails()">
+                        <span language="primary.portal.common.save"></span>
+                    </button>
+                </empowered-modal-footer>
+                <div class="edit-dialog-content">
+                    <div>
+                        <mon-alert alertType="info" closeButton="true">
+                            <span class="info-message" language="primary.portal.paymentDetails.cardNumberChangedMessage"></span>
+                        </mon-alert>
+                    </div>
+                    <div class="error-message-block" *ngIf="incorrectCardInfoErrorMessage">
+                        <mon-alert alertType="danger">
+                            <span class="card-expired-message" language="secondary.portal.paymentDetails.incorrectCardDetailMessage"></span>
+                        </mon-alert>
+                    </div>
+                    <div class="error-message-block" *ngIf="!isCardNotExpired">
+                        <mon-alert alertType="danger">
+                            <span class="card-expired-message" language="secondary.portal.paymentDetails.cardExpiredMessage"></span>
+                        </mon-alert>
+                    </div>
+                    <mat-label
+                        class="mat-label"
+                        class="card-holder-label"
+                        language="primary.portal.paymentDetails.cardHolderName"
+                    ></mat-label>
+                    <mat-form-field class="card-holder-name">
+                        <input matInput formControlName="cardHolder" maxlength="50" (blur)="onCardHolderBlurEvent($event.target.value)" />
+                        <mat-error *ngIf="creditCardForm?.controls?.cardHolder?.errors?.required">
+                            <span language="primary.portal.common.requiredField"></span>
+                        </mat-error>
+                        <mat-error *ngIf="creditCardForm?.controls?.cardHolder?.errors?.containsInvalidCharacter">
+                            <span language="secondary.portal.paymentDetails.invalidSpecialCharacter"></span>
+                        </mat-error>
+                        <mat-error *ngIf="creditCardForm?.controls?.cardHolder?.errors?.invalidFirstCharacter">
+                            <span language="secondary.portal.paymentDetails.firstAndLastCharactersMustBeLetters"></span>
+                        </mat-error>
+                        <mat-error
+                            *ngIf="creditCardForm?.controls?.cardHolder?.errors?.noLastName && !creditCardForm?.controls?.cardHolder?.errors?.required"
+                        >
+                            <span language="secondary.portal.paymentDetails.lastNameRequired"></span>
+                        </mat-error>
+                    </mat-form-field>
+                    <div>
+                        <mat-label class="mat-label card-number-label" language="primary.portal.applicationFlow.payments.cardNumber">
+                        </mat-label>
+                        <mat-form-field class="card-number">
+                            <input matInput formControlName="cardNumber" />
+                            <mat-hint class="card-info" language="primary.portal.applicationFlow.payments.cardTypeHint"></mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="date-content">
+                        <div>
+                            <mat-label class="mat-label" language="primary.portal.paymentDetails.expirationMonth"></mat-label>
+                            <mat-form-field class="expiration-month">
+                                <mat-select
+                                    (selectionChange)="updateDateSelection($event,true,false)"
+                                    class="mon-input"
+                                    [placeholder]="languageStrings['primary.portal.paymentDetails.placeholderExpirationMonth']"
+                                    formControlName="expirationMonth"
+                                >
+                                    <mat-option *ngFor="let month of monthNames" [value]="month">{{month}}</mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="creditCardForm?.controls?.expirationMonth?.errors?.incorrect"
+                                    language="secondary.portal.paymentDetails.pastDateError"
+                                ></mat-error>
+                                <mat-error *ngIf="creditCardForm?.controls?.expirationMonth?.errors?.required">
+                                    <span language="primary.portal.common.requiredField"></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="expiration">
+                            <mat-label class="mat-label" language="primary.portal.paymentDetails.expirationYear"></mat-label>
+                            <mat-form-field class="expiration-year">
+                                <mat-select
+                                    (selectionChange)="updateDateSelection($event,false,true)"
+                                    class="mon-input"
+                                    [placeholder]="languageStrings['primary.portal.paymentDetails.placeholderExpirationYear']"
+                                    formControlName="expirationYear"
+                                >
+                                    <mat-option *ngFor="let year of years" [value]="year">{{year}}</mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="creditCardForm?.controls?.expirationYear?.errors?.required">
+                                    <span language="primary.portal.common.requiredField"></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="zip-code">
+                        <empowered-zip-code-input [formControl]="creditCardForm?.controls?.zipCode">
+                            <mat-error *ngIf="creditCardForm?.controls?.zipCode?.errors?.required">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                        </empowered-zip-code-input>
+                    </div>
+                </div>
+            </empowered-modal>
+        </form>
+    </ng-template>
+</div>
+<div class="iframe-container" *ngIf="!editModal">
+    <empowered-modal type="INFORMATIONAL" [showCancel]="false">
+        <empowered-modal-header *ngIf="paymentMethod === paymentType.BANKDRAFT; else card">
+            <span language="primary.portal.applicationFlow.payments.addNewAccount"></span>
+        </empowered-modal-header>
+        <div class="warning-message-block" *ngIf="paymentMethod === paymentType.BANKDRAFT && isACHPartnerAccountType" #routingNumAlert>
+            <mon-alert alertType="warning" class="message-block">
+                <span class="routing-number-text">{{defaultRoutingNumberText}}</span>
+                <button
+                    mat-icon-button
+                    *ngIf="!isRoutingNumCopied"
+                    class="copy-to-clipboard-btn"
+                    [cdkCopyToClipboard]="defaultRoutingNumber"
+                    (cdkCopyToClipboardCopied)="copyToClipboard()"
+                >
+                    <mat-icon svgIcon="copy" aria-hidden="true"></mat-icon>
+                    <span language="primary.portal.paymentDetails.displayRoutingNumberAlert.copyToClipboard"></span>
+                </button>
+                <button mat-icon-button *ngIf="isRoutingNumCopied" class="copied-btn">
+                    <mat-icon svgIcon="icon-left" aria-hidden="true"></mat-icon>
+                    <span language="primary.portal.paymentDetails.displayRoutingNumberAlert.copied"></span>
+                </button>
+            </mon-alert>
+        </div>
+
+        <ng-template #card>
+            <empowered-modal-header>
+                <span language="primary.portal.applicationFlow.payments.addNewCard"></span>
+            </empowered-modal-header>
+        </ng-template>
+        <iframe [src]="url" class="payment-iframe" frameborder="0" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+    </empowered-modal>
+</div>

@@ -1,0 +1,62 @@
+@import "shared";
+
+:host {
+    display: block;
+}
+
+$spacer-30: map-get($spacers, 30);
+$spacer-20: map-get($spacers, 20);
+$spacer-10: map-get($spacers, 10);
+$spacer-5: map-get($spacers, 5);
+
+.rider-form {
+    box-sizing: border-box;
+
+    mat-checkbox {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: normal;
+        font-size: convert-unit(16px, "rem");
+        line-height: $spacer-20;
+        margin: 0, $spacer-10, $spacer-5;
+    }
+
+    > div {
+        padding-bottom: $spacer-20;
+    }
+
+    > div:last-of-type {
+        padding-bottom: 0;
+    }
+
+    mat-form-field {
+        margin: 0 $spacer-30;
+    }
+
+    .selector-label {
+        padding: $spacer-10 $spacer-30 $spacer-5;
+        font-family: Roboto-Bold;
+        font-style: normal;
+        font-weight: bold;
+        font-size: convert-unit(14px, "rem");
+        line-height: convert-unit(16px, "rem");
+        overflow-wrap: break-word;
+    }
+}
+
+.checkbox-bottom-label {
+    margin-top: $spacer-5;
+    // margin left is supposed to match width of checkbox and its padding/margin from its label
+    margin-left: convert-unit(28px, "rem");
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: convert-unit(14px, "rem");
+    line-height: $spacer-20;
+}
+
+.loader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

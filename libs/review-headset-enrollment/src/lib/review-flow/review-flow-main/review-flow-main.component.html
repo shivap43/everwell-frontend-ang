@@ -1,0 +1,49 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<div *ngIf="linkExpired && showComponents && agentName">
+    <h2 class="expired-link">{{languageStrings['primary.portal.review.expired']}}</h2>
+    <p>To request a new enrollment link, please contact your agent, {{agentName}}, by email at</p>
+    <p>{{agentEmail}} or by calling {{agentPhone}} Mon-Fri, 8am-8pm.</p>
+</div>
+
+<div *ngIf="linkExpired && showComponents && !agentName">
+    <h2 class="expired-link">{{languageStrings['primary.portal.review.expired']}}</h2>
+</div>
+
+<div *ngIf="showComponents">
+    <div class="review-enrollments" *ngIf="!linkExpired">
+        <mat-horizontal-stepper #stepper [linear]="true">
+            <mat-step *ngIf="!memberId " [editable]="false" [completed]="completedStep>=1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.enrollment.review.verifyidentity']}} </ng-template>
+                <empowered-verify-user [userDetails]="memberRouteDetails"></empowered-verify-user>
+            </mat-step>
+            <mat-step [editable]="false" [completed]="completedStep>=2" *ngIf="isPendingEnrollments || guid">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.enrollment.review.reviewandsign']}} </ng-template>
+                <empowered-enrollment-review [userDetails]="memberRouteDetails" *ngIf="currentStep === stepTitle.REVIEW_SIGN">
+                </empowered-enrollment-review>
+            </mat-step>
+            <mat-step [editable]="false" *ngIf="groupId && isPendingPDA && isPda" [completed]="completedStep>=3">
+                <ng-template matStepLabel> {{ pdaTitle }} </ng-template>
+                <empowered-pda-review
+                    [userDetails]="memberRouteDetails"
+                    [formType]="formType"
+                    [formId]="formId"
+                    *ngIf="currentStep === stepTitle.PDA"
+                >
+                </empowered-pda-review>
+            </mat-step>
+            <mat-step [editable]="false" [completed]="completedStep>=4">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.enrollment.review.confirmation']}} </ng-template>
+                <empowered-confirmation
+                    [userDetails]="memberRouteDetails"
+                    *ngIf="completedStep >= approvalSteps.PDA_STEP"
+                ></empowered-confirmation>
+            </mat-step>
+            <ng-template matStepperIcon="done">
+                <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+            </ng-template>
+        </mat-horizontal-stepper>
+    </div>
+</div>

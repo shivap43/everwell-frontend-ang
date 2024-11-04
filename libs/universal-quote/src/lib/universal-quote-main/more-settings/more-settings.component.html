@@ -1,0 +1,221 @@
+<div class="more-setting-wrapper">
+    <div class="scrollable-control-content">
+        <form [formGroup]="salaryForm">
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.income']}}</mat-label>
+                <mat-radio-group formControlName="salarySelection" (change)="resetIfInvalid($event)">
+                    <mat-radio-button class="mon-mr-15" value="annual"
+                        >{{languageStrings['primary.portal.quickQuote.annual']}}</mat-radio-button
+                    >
+                    <mat-radio-button value="hourly"
+                        >{{languageStrings['primary.portal.quickQuote.hourly']}}</mat-radio-button
+                    >
+                </mat-radio-group>
+                <div>
+                    <div
+                        *ngIf="salaryForm.controls['salarySelection'].value && salaryForm.controls['salarySelection'].value === annual"
+                        class="mon-mt-20"
+                    >
+                        <mat-form-field class="w-200">
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                [allowDecimals]="true"
+                                formControlName="annually"
+                            />
+                            <mat-error>
+                                <span
+                                    *ngIf="salaryForm.controls.annually.hasError('pattern')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.taxID"
+                                ></span
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div
+                        *ngIf="salaryForm.controls['salarySelection'].value && salaryForm.controls['salarySelection'].value === hourly"
+                        class="mon-mt-20"
+                    >
+                        <mat-form-field class="w-200">
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                formControlName="hourlyRate"
+                                [allowDecimals]="true"
+                                (change)="setHourlySalary()"
+                                [placeholder]="languageStrings['primary.portal.quickQuote.hourlyrate']"
+                            />
+                        </mat-form-field>
+                        <div class="mon-mb-5">x</div>
+                        <mat-form-field class="w-200">
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                formControlName="hoursPerWeek"
+                                [allowDecimals]="true"
+                                (change)="setHourlySalary()"
+                                [placeholder]="languageStrings['primary.portal.quickQuote.hourlyperweek']"
+                            />
+                        </mat-form-field>
+                        <div class="mon-mb-5">x</div>
+                        <mat-form-field class="w-200">
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                formControlName="weeksPerYear"
+                                [allowDecimals]="true"
+                                (change)="setHourlySalary()"
+                                [placeholder]="languageStrings['primary.portal.quickQuote.hourlyperyear']"
+                            /> </mat-form-field
+                        >=
+                        <mat-form-field class="w-200">
+                            <input matInput formControlName="hourlyAnnually" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form [formGroup]="moreSettingForm">
+            <div class="mon-mt-20">
+                <h4 class="mon-mb-5">{{languageStrings['primary.portal.quickQuote.applicantInfo']}}</h4>
+                <div class="d-flex">
+                    <div class="mon-mr-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.age']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                formControlName="age"
+                                [maxlength]="ageMaxLength"
+                            />
+                            <mat-error></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.gender']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                class="mon-select-arrow"
+                                formControlName="gender"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                            >
+                                <mat-option *ngFor="let gender of genders" [value]="gender"
+                                    >{{ gender | titlecase }}</mat-option
+                                >
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div>
+                    <mat-checkbox formControlName="tobaccoUser"
+                        >{{languageStrings['primary.portal.quickQuote.tobaccoUser']}}</mat-checkbox
+                    >
+                </div>
+            </div>
+
+            <div class="mon-mt-20">
+                <h4 class="mon-mb-5">{{languageStrings['primary.portal.quickQuote.spouseInfo']}}</h4>
+                <div class="d-flex">
+                    <div class="mon-mr-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.age']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                formControlName="spouseAge"
+                                [maxlength]="ageMaxLength"
+                            />
+                            <mat-error></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.gender']}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                class="mon-select-arrow"
+                                formControlName="spouseGender"
+                                [placeholder]="languageStrings['primary.portal.common.select']"
+                                disableOptionCentering="true"
+                            >
+                                <mat-option *ngFor="let gender of genders" [value]="gender"
+                                    >{{gender | titlecase}}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div>
+                    <mat-checkbox formControlName="spouseTobaccoUser"
+                        >{{languageStrings['primary.portal.quickQuote.tobaccoUser']}}</mat-checkbox
+                    >
+                </div>
+            </div>
+
+            <div class="mon-mt-20">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.quickQuote.nonSpouseDependants']}}</mat-label
+                >
+                <mat-form-field class="w-200 mon-mb-0">
+                    <input matInput empoweredNumberValidation formControlName="numberDependentsExcludingSpouse" />
+                </mat-form-field>
+            </div>
+
+            <ng-container *ngIf="settings.channel === payrollChannel">
+                <h4 class="mon-mb-5">{{languageStrings['primary.portal.dashboard.accountInfo']}}</h4>
+                <div class="d-flex">
+                    <div class="mon-mr-15">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.sicCode']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                empoweredNumberValidation
+                                autocomplete="false"
+                                formControlName="sicCode"
+                                [maxlength]="sicCodeMaxLength"
+                            />
+                            <mat-hint>{{ languageStrings["primary.portal.quickQuote.sicCodeHint"] }}</mat-hint>
+                            <mat-error>{{ languageStrings["primary.portal.quickQuote.sicCodeRangeError"] }}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="mon-mr-15">
+                        <empowered-zip-code-input
+                            #zipCode
+                            [formControl]="moreSettingForm?.controls?.zipCode"
+                            [stateControlValue]="state"
+                        ></empowered-zip-code-input>
+                    </div>
+                </div>
+                <div class="mon-mr-15">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.census.eligibleEmployee']}}</mat-label
+                    >
+                    <mat-form-field class="w-200 mon-mb-0">
+                        <input
+                            matInput
+                            empoweredNumberValidation
+                            formControlName="eligibleSubscribers"
+                            [maxlength]="eligibleSubscribersMaxLength"
+                        />
+                        <mat-error>{{ languageStrings["primary.portal.census.editEstimate.nonZero"] }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </ng-container>
+        </form>
+    </div>
+    <div class="mon-clear">
+        <div>
+            <a href="javascript:void(0)" language="primary.portal.common.clear" (click)="resetSetting()"></a>
+        </div>
+        <div>
+            <a
+                href="javascript:void(0)"
+                class="mon-apply"
+                language="primary.portal.common.apply"
+                (click)="applySetting()"
+            ></a>
+        </div>
+    </div>
+</div>

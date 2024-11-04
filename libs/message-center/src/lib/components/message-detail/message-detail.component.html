@@ -1,0 +1,229 @@
+<form [formGroup]="replyForm" (submit)="onReply()">
+    <empowered-sheet>
+        <empowered-sheet-header>{{ headerTitle | async }}</empowered-sheet-header>
+    
+        <empowered-sheet-footer>
+            <button *ngIf="!replying"
+                    mat-button
+                    mat-raised-button
+                    class="mon-btn-primary"
+                    color="primary"
+                    type="button"
+                    (click)="close()"
+                    [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_CLOSE">
+            </button>
+            <button *ngIf="replying"
+                    mat-button
+                    mat-raised-button
+                    class="mon-btn-primary"
+                    color="primary"
+                    type="submit"
+                    [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_SEND">
+            </button>
+        </empowered-sheet-footer>
+    
+        <div class="content-wrapper">
+            <ng-container *ngIf="thread$ | async as thread">
+                <ng-container *ngIf="box$ | async as box">
+                    <ng-container *ngIf="messages$ | async as messages">
+                        <!--Compose reply-->
+                        <ng-container *ngIf="replying">
+                            <div class="body-section">
+                                <empowered-reply-meta-detail
+                                    [to]="thread.from"
+                                    [subject]="thread.subject"
+                                    [category]="category$ | async">
+                                </empowered-reply-meta-detail>
+                            </div>
+                
+                            <!--Message-->
+                            <form [formGroup]="replyForm">
+                                <mat-label [language]="MessageCenterLanguage.MESSAGE_DETAIL_MESSAGE_LABEL"></mat-label>
+                                <mat-form-field>
+                                    <textarea matInput formControlName="replyMessage" matTextareaAutosize [matAutosizeMinRows]="7"></textarea>
+                                    <mat-error *ngIf="replyForm?.controls['replyMessage']?.errors?.required">
+                                        <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_ERROR_MESSAGE_REQUIRED"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </form>
+                
+                            <!--File upload-->
+                            <empowered-file-uploader
+                                    [label]="uploadFileLabel"
+                                    [hint]="uploadFileHint"
+                                    [acceptableFileTypes]="allowedFileTypes"
+                                    [uploadFunction]="uploadFunction"
+                                    [deleteFunction]="deleteFunction"
+                                    (uploads)="onUploadDocuments($event)">
+                            </empowered-file-uploader>
+                        </ng-container>
+                
+                        <div class="message-detail-thread-header body-section">
+                            <div class="message-detail-thread-header-meta">
+                                <empowered-thread-meta-detail
+                                    [thread]="thread"
+                                    [message]="latestMessage"
+                                    [isAdminPortal]="isAdmin"
+                                    [showChange]="box == INBOX_BOXTYPE && isAdmin">
+                                </empowered-thread-meta-detail>
+                            </div>
+                
+                            <!--Message actions-->
+                            <div *ngIf="!replying" class="detail-actions">
+                                <ng-container *ngIf="box == INBOX_BOXTYPE && (thread.adminDeletedOn || thread.memberDeletedOn || thread.producerDeletedOn); else canDelete">
+                                    <span [richTooltip]="replyTooltip">
+                                        <button mat-stroked-button 
+                                                color="primary" 
+                                                class="mon-btn-secondary" 
+                                                [disabled]="true"
+                                                (click)="toggleReply()"
+                                                [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_REPLY">
+                                        </button>
+                                    </span>
+                                </ng-container>
+                                <ng-template #canDelete>
+                                    <button *ngIf="box == INBOX_BOXTYPE"
+                                            mat-stroked-button 
+                                            color="primary"
+                                            class="mon-btn-secondary"
+                                            (click)="toggleReply()"
+                                            [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_REPLY">
+                                    </button>
+                                </ng-template>
+                                <button *ngIf="box == INBOX_BOXTYPE"
+                                        mat-stroked-button
+                                        color="primary"
+                                        class="mon-btn-secondary"
+                                        (click)="clickDeleteMessage()"
+                                        [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_DELETE">
+                                </button>
+                                <button *ngIf="box == SENT_BOXTYPE" 
+                                        mat-stroked-button color="primary" 
+                                        [disabled]="recalledOnDate || lastReadOnDate" 
+                                        class="mon-btn-secondary"
+                                        (click)="clickDeleteMessage()"
+                                        [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_RECALL">
+                                </button>
+                                <button *ngIf="box == DELETE_BOXTYPE"
+                                        mat-stroked-button
+                                        color="primary"
+                                        class="mon-btn-secondary"
+                                        (click)="clickMoveToInbox()"
+                                        [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_MOVE">
+                                </button>
+                            </div>
+                        </div>
+            
+                        <mon-alert *ngIf="lastReadOnDate" alertType="info" class="body-section">
+                            <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_ALERT_READ"></span>
+                            <span>{{ lastReadOnDate }}</span>
+                        </mon-alert>
+            
+                        <mon-alert *ngIf="recalledOnDate" alertType="info" class="body-section">
+                            <ng-container *ngIf="thread.recalledCount === 1; else totalRecall">
+                                <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_ALERT_RECALL_SINGLE"></span>
+                                <span>{{ recalledOnDate }}</span>
+                            </ng-container>
+                            <ng-template #totalRecall>
+                                <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_ALERT_RECALL_PLURAL"></span>
+                                <span>{{ thread.recalledCount ? thread.recalledCount : 0 }}</span>
+                                <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_ALERT_RECALL_RECIPIENTS"></span>
+                                <span>{{ recalledOnDate }}</span>
+                            </ng-template>
+                        </mon-alert>
+                
+                        <p class="body-section">
+                            {{ latestMessage?.body }}
+                        </p>
+                
+                        <!--Attachments-->
+                        <div class="container body-section">
+                            <div class="row">
+                                <mat-label class="col-2" [language]="MessageCenterLanguage.MESSAGE_DETAIL_LABEL_ATTACHMENTS">
+                                </mat-label>
+                                <div class="col-10">
+                                    <empowered-message-attachments
+                                            [attachments]="latestMessage.attachments">
+                                    </empowered-message-attachments>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!--admin comments-->
+                        <div *ngIf="isAdmin" class="container body-section">
+                            <div class="row">
+                                <div class="col-2">
+                                    <mat-label [language]="MessageCenterLanguage.MESSAGE_DETAIL_LABEL_NOTES"></mat-label>
+                                </div>
+                                <div class="col-10">
+                                    <ng-container *ngIf="adminComments$ | async as comments">
+                                        <ng-container *ngFor="let comment of comments">
+                                            <div class="container admin-note">
+                                                <div class="row justify-content-between">
+                                                    <div class="col-10">
+                                                        {{ comment.text }}
+                                                    </div>
+                                                    <div class="col-2 admin-note-actions">
+                                                        <button class="mon-btn-link remove-note"
+                                                                (click)="clickDeleteNote(comment)"
+                                                                [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_REMOVE_NOTE">
+                                                        </button>
+                                                        <button class="mon-btn-link"
+                                                                (click)="clickEditNote(comment)"
+                                                                [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_EDIT_NOTE">
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <mat-hint class="row col-12">
+                                                    <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_META_NOTES_POST_BY"></span>
+                                                    <span>{{ comment?.createAdmin?.name?.firstName | titlecase }} {{ comment?.createAdmin?.name?.lastName | titlecase }}</span>
+                                                    <span [language]="MessageCenterLanguage.MESSAGE_DETAIL_META_NOTES_ON"></span>
+                                                    <span>{{ comment?.updateOn ? comment?.updateOn : comment?.createdOn }}</span>
+                                                </mat-hint>
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+                
+                                    <button class="mon-btn-link"
+                                            (click)="clickAddNote()"
+                                            [language]="MessageCenterLanguage.MESSAGE_DETAIL_BUTTON_ADD_NOTE">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <ng-container *ngFor="let message of messages">
+                            <hr />
+                            <div class="body-section n-message">
+                                <empowered-thread-meta-detail
+                                        [thread]="thread"
+                                        [message]="message"
+                                        [isAdminPortal]="isAdmin">
+                                </empowered-thread-meta-detail>
+                            </div>
+                
+                            <p class="body-section">
+                                {{ message.body }}
+                            </p>
+                
+                            <!--Attachments-->
+                            <div class="container body-section" *ngIf="message?.attachments">
+                                <div class="row">
+                                    <mat-label
+                                            class="col-2"
+                                            [language]="MessageCenterLanguage.MESSAGE_DETAIL_LABEL_ATTACHMENTS">
+                                    </mat-label>
+                                    <div class="col-10">
+                                        <empowered-message-attachments
+                                                [attachments]="message.attachments">
+                                        </empowered-message-attachments>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+    </empowered-sheet>
+</form>

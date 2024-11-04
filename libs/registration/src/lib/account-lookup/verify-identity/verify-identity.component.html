@@ -1,0 +1,78 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-50 w-600 form-mobile">
+    <!-- <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner> -->
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title language="primary.portal.register.verifyIdentityTitle"></mat-card-title>
+            <p
+                *ngIf="partnerId !== aflacPartner; else nonPartners"
+                class="mon-mt-0 mon-mb-30"
+                language="primary.portal.register.verifyIdentitySubtitle"
+            ></p>
+            <ng-template #nonPartners>
+                <p class="mon-mt-0 mon-mb-30" language="primary.portal.register.aflacPartner.verifyIdentitySubtitle"></p>
+            </ng-template>
+            <mat-radio-group
+                formControlName="verifyMethod"
+                [attr.aria-label]="languageStrings['primary.portal.register.aflacPartner.verifyIdentitySubtitle']"
+            >
+                <div>
+                    <mat-radio-button
+                        (change)="updateSelection()"
+                        [ngClass]="{'field-invalid': error}"
+                        (click)="setcommunicationMode()"
+                        (input)="error = false"
+                        id="verifyMethod-2"
+                        value="email"
+                        class="mon-mb-10"
+                    >
+                        <span language="primary.portal.register.verifyIdentityMethod.email"></span>
+                    </mat-radio-button>
+                </div>
+                <ng-container *configEnabled="textConfigKey">
+                    <div>
+                        <mat-radio-button
+                            (change)="updateSelection()"
+                            [ngClass]="{'field-invalid': error}"
+                            (click)="setcommunicationMode()"
+                            (input)="error = false"
+                            id="verifyMethod-1"
+                            value="Text"
+                            class="mon-mb-10"
+                        >
+                            <span language="primary.portal.register.verifyIdentityMethod.text"></span>
+                        </mat-radio-button>
+                    </div>
+                </ng-container>
+            </mat-radio-group>
+            <mat-error *ngIf="error" [language]="errorMsg"></mat-error>
+        </mat-card-content>
+
+        <mat-card-footer *ngIf="isSelfService" class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-px-30 mon-mb-30 mon-btn-primary"
+                language="primary.portal.common.next"
+                mat-flat-button
+                type="submit"
+            ></button>
+            <mat-divider></mat-divider>
+            <p class="mon-m-0 mon-my-15">
+                <a
+                    href="javascript:void(0)"
+                    class="mon-btn-link mon-pt-10"
+                    language="primary.portal.common.back"
+                    routerLink="../../login"
+                ></a>
+            </p>
+        </mat-card-footer>
+        <mat-card-footer *ngIf="!isSelfService" class="d-flex justify-content-between bg-gray-100">
+            <a href="javascript:void(0)" class="mon-btn-link mon-pt-10" language="primary.portal.common.back" routerLink="../../login"></a>
+            <button
+                class="mon-px-30 mon-btn-primary"
+                language="primary.portal.common.next"
+                mat-button
+                mat-flat-button
+                type="submit"
+            ></button>
+        </mat-card-footer>
+    </mat-card>
+</form>

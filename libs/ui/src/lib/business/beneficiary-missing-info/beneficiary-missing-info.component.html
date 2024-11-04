@@ -1,0 +1,241 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<form [formGroup]="form" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onSubmit()" class="beneficiary-wrapper">
+    <empowered-sheet>
+        <empowered-sheet-header> {{languageStrings['primary.portal.beneficiaryMissingInfo.title']}} </empowered-sheet-header>
+        <div class="content">
+            <div class="alert-wrapper" *ngIf="showErrorMessage">
+                <mon-alert alertType="danger">
+                    <span>{{errorMessage}}</span>
+                </mon-alert>
+            </div>
+            <h2 *ngIf="firstName && lastName">
+                {{languageStrings['primary.portal.beneficiaryMissingInfo.beneficiaryInfo'] | replaceTag: {"##firstname##": firstName ,
+                "##lastname##": lastName } }}
+            </h2>
+            <p>{{languageStrings['primary.portal.beneficiaryMissingInfo.description']}}</p>
+            <div class="flex-form-wrapper">
+                <div class="form-fields" *ngIf="form?.controls?.ssn && injectedData?.isJuvenilePlan">
+                    <div class="flex-item">
+                        <mat-label class="mat-label" id="ssn"
+                            >{{languageStrings['primary.portal.member.ssn_itin']}}
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                empoweredSsnFormat
+                                formControlName="ssn"
+                                name="ssn"
+                                aria-labelledby="ssn"
+                                hiddenInput="true"
+                                [maxlength]="ssnMaxLength"
+                                [mask]="ssnFormat"
+                                [patterns]="customPattern"
+                                (focusout)="ssnMaskingToggler(false)"
+                                (keydown)="onSSNValueChange()"
+                                (click)="ssnMaskingToggler(true)"
+                                (change)="maskValue()"
+                            />
+                            <span matSuffix *ngIf="isShowHideButtonVisible && form?.controls?.ssn?.valid && isSSNValue">
+                                <a
+                                    href="javascript:void(0)"
+                                    *ngIf="isMaskedTrue && form?.controls?.ssn?.value"
+                                    (click)="ssnMaskingToggler(true)"
+                                    >{{languageStrings['primary.portal.common.show']}}</a
+                                >
+                                <a
+                                    href="javascript:void(0)"
+                                    *ngIf="!isMaskedTrue && (form?.controls?.ssn?.value !== '')"
+                                    (click)="ssnMaskingToggler(false)"
+                                    >{{languageStrings['primary.portal.common.hide']}}</a
+                                >
+                            </span>
+                            <mat-error *ngIf="form?.controls?.ssn?.errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error *ngIf="form?.controls?.ssn?.errors?.pattern && form?.controls?.ssn?.value.length === ssnMaxLength"
+                                >{{languageStrings['primary.portal.members.beneficiaryValidationMsg.ssnInvalidEntry']}}</mat-error
+                            >
+                            <mat-error *ngIf="form?.controls?.ssn?.errors?.pattern && form?.controls?.ssn?.value.length !== ssnMaxLength"
+                                >{{languageStrings['primary.portal.members.beneficiaryValidationMsg.mustBeDigits']}}</mat-error
+                            >
+                            <mat-error *ngIf="form?.controls?.ssn?.errors?.duplicate"
+                                >{{languageStrings['primary.portal.beneficiaryMissingInfo.duplicateSsn']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="form-fields" *ngIf="form?.controls?.address1 || form?.controls?.address2">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="form?.controls?.address1">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label" id="address-1">
+                                    {{languageStrings['primary.portal.appFlow.homeStreetAddress1']}}
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="address1"
+                                        [attr.aria-label]="languageStrings['primary.portal.appFlow.homeStreetAddress1']"
+                                    />
+                                    <mat-error *ngIf="form?.controls?.address1?.errors?.required">
+                                        {{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                    >
+                                    <mat-error *ngIf="form?.controls?.address1?.errors?.pattern">
+                                        {{languageStrings['primary.portal.members.dependentValidationMsg.streetAddress1Msg1']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form?.controls?.address1?.errors?.maxlength as maxLengthError">
+                                        {{secondaryLanguageStrings['secondary.portal.applicationFlow.dependents.error.maxLength']
+                                        .replace("##num##",maxLengthError.requiredLength)}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="form?.controls?.address2">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" id="address-2">
+                                    {{languageStrings['primary.portal.appFlow.homeStreetAddress2']}}
+
+                                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="address2"
+                                        [attr.aria-label]="languageStrings['primary.portal.appFlow.homeStreetAddress2']"
+                                    />
+                                    <mat-hint>{{languageStrings['primary.portal.members.streetAddressHint1']}}</mat-hint>
+                                    <mat-error *ngIf="form?.controls?.address2?.errors?.required"
+                                        >{{languageStrings['primary.portal.common.requiredField']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form?.controls?.address2?.errors?.pattern">
+                                        {{languageStrings['primary.portal.members.dependentValidationMsg.streetAddress1Msg1']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form?.controls?.address2?.errors?.maxlength as maxLengthError">
+                                        {{secondaryLanguageStrings['secondary.portal.applicationFlow.dependents.error.maxLength']
+                                        .replace("##num##",maxLengthError.requiredLength)}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="form-fields" *ngIf="form?.controls?.city|| form?.controls?.state">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="form?.controls?.city">
+                            <div class="flex-item">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.members.dependent.personalInfo.city']}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="city"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.members.dependent.personalInfo.city']"
+                                    />
+                                    <mat-error *ngIf="form?.controls?.city?.errors?.required">
+                                        {{languageStrings['primary.portal.common.requiredField']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form?.controls?.city?.errors?.pattern">
+                                        {{languageStrings['primary.portal.members.beneficiaryValidationMsg.city']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form?.controls?.city?.errors?.maxlength" as maxLengthError>
+                                        {{secondaryLanguageStrings['secondary.portal.applicationFlow.dependents.error.maxLength']
+                                        .replace("##num##",maxLengthError.requiredLength)}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="form?.controls?.state">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label" id="state">
+                                    {{languageStrings['primary.portal.members.dependent.personalInfo.state']}}
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="state"
+                                        disableOptionCentering="true"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                        [attr.aria-label]="languageStrings['primary.portal.members.dependent.personalInfo.state']"
+                                    >
+                                        <mat-option *ngFor="let state of (states$ | async)" [value]="state.abbreviation">
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="form?.controls?.state?.errors?.required">
+                                        {{secondaryLanguageStrings['secondary.portal.members.selectionRequired']}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="form?.controls?.zip as zip">
+                            <div class="flex-item w-100">
+                                <empowered-zip-code-input
+                                    [formControl]="zip"
+                                    inputLabel="primary.portal.accounts.zip"
+                                    stateMismatchError="primary.portal.applicationFlow.payments.matchState"
+                                    patternError="primary.portal.members.workValidationMsg.zip"
+                                    [stateControlValue]="stateControlValue$ | async"
+                                    [validateOnStateChange]="true"
+                                >
+                                    <mat-error *ngIf="form?.controls?.zip?.errors?.required">
+                                        {{languageStrings['primary.portal.common.requiredField']}}
+                                    </mat-error>
+                                </empowered-zip-code-input>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="form-fields" *ngIf="form?.controls?.isMobile">
+                    <div class="flex-item">
+                        <mat-label class="mat-label" id="phone-number"
+                            >{{languageStrings['primary.portal.profile.accountContacts.addUpdateContact.phone']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                formControlName="phone"
+                                (blur)="setIsMobile()"
+                                [maxlength]="phoneMaxLength"
+                                matInput
+                                type="text"
+                                empoweredNumberValidation
+                                [allowDashes]="true"
+                                empoweredPhoneNumberFormat
+                                aria-labelledby="phone-number"
+                            />
+                            <mat-error *ngIf="form?.controls?.phone?.errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+
+                            <mat-error *ngIf="form?.controls?.phone?.errors?.pattern"
+                                >{{languageStrings['primary.portal.members.beneficiaryValidationMsg.phoneNumber']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item phone-type">
+                        <mat-label class="mat-label" id="memberPhoneType"
+                            >{{languageStrings['primary.portal.census.manualEntry.phoneType']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <mat-select formControlName="phoneType" aria-labelledby="memberPhoneType" disableOptionCentering="true">
+                                <mat-option *ngFor="let phoneTypeItem of phoneNumberTypes" [value]="phoneTypeItem"
+                                    >{{phoneTypeItem}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="flex-item mobile-number">
+                        <mat-checkbox formControlName="isMobile" [disabled]="form?.controls?.phone?.invalid">
+                            {{languageStrings['primary.portal.beneficiaryMissingInfo.isMobileNumber']}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <empowered-sheet-footer>
+            <button mat-button class="mon-btn-primary" type="submit">{{languageStrings['primary.portal.continueToApplication']}}</button>
+        </empowered-sheet-footer>
+    </empowered-sheet>
+</form>

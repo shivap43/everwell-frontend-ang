@@ -1,0 +1,108 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="info-modal size-extra-large">
+    <form
+        [formGroup]="mainForm"
+        *ngIf="data.form?.pages&&data.form?.pages.length > 0"
+        [empoweredFocusOnFirstInvalidField]="queryString"
+        (ngSubmit)="onSubmit(false)"
+    >
+        <div class="modal-header">
+            <div>
+                <mat-label class="mat-label">{{getModalHeaderTitle()}} </mat-label>
+                <h2 mat-dialog-title>{{data.form.formName}}</h2>
+            </div>
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <div class="dialog-content">
+            <mat-dialog-content class="scroll-content">
+                <div [ngSwitch]="true">
+                    <div *ngSwitchCase="formIsRelianceCustomForm">
+                        <mat-horizontal-stepper class="dialog-horizontal-stepper">
+                            <mat-step>
+                                <ng-container *ngTemplateOutlet="form"></ng-container>
+                            </mat-step>
+                            <mat-step>
+                                <ng-container *ngTemplateOutlet="form"></ng-container>
+                            </mat-step>
+                        </mat-horizontal-stepper>
+                    </div>
+                    <div *ngSwitchDefault>
+                        <ng-container *ngTemplateOutlet="form"></ng-container>
+                    </div>
+                </div>
+            </mat-dialog-content>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <button type="button" class="mon-btn-link" mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.cancel']">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <div>
+                <button
+                    *ngIf="!data.viewOnly && isPendingCf"
+                    mat-button
+                    type="button"
+                    class="mon-btn-secondary"
+                    (click)="onSubmit(true)"
+                    [disabled]="isSaveDisabled"
+                >
+                    {{languageStrings['primary.portal.viewform.save&close']}}
+                </button>
+                <!-- This button is only for Reliance form -->
+                <button
+                    mat-button
+                    type="button"
+                    class="mon-btn-secondary"
+                    (click)="goToStep()"
+                    *ngIf="formIsRelianceCustomForm && matStepper?.selectedIndex === 1"
+                >
+                    <span *ngIf="matStepper?.selectedIndex === 1">
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                            iconSize="12"
+                            iconName="left"
+                        ></mon-icon>
+                        {{languageStrings["primary.portal.common.back"]}}
+                    </span>
+                </button>
+                <button
+                    mat-button
+                    type="submit"
+                    class="mon-btn-secondary"
+                    (click)="goToStep()"
+                    *ngIf="formIsRelianceCustomForm && matStepper?.selectedIndex === 0"
+                >
+                    <span *ngIf="matStepper?.selectedIndex === 0">
+                        {{languageStrings["primary.portal.common.next"]}}
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                            iconSize="12"
+                            iconName="right"
+                        ></mon-icon>
+                    </span>
+                </button>
+                <button *ngIf="showFinishButton()" [disabled]="isSaveDisabled" mat-button type="submit" class="mon-btn-primary mon-ml-20">
+                    {{languageStrings['primary.portal.viewform.finish']}}
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</div>
+<ng-template #form>
+    <div *ngFor="let page of data.form?.pages; let i = index">
+        <h2 mat-dialog-title class="subsection-title" *ngIf="showPageTitle(i)">{{page.name}}</h2>
+        <div *ngFor="let question of page.questions">
+            <empowered-form-page-question
+                [question]="question"
+                [form]="mainForm.get('allQuestions')"
+                [allQuestions]="page.questions"
+                [isQ60Form]="formIsQ60Form"
+                [formId]="carrierFormId"
+                [groupSitusState]="groupSitusState"
+                [hidden]="hideQuestion(question)"
+                (formCheckEvent)="saveButtonEventHandler($event)"
+            ></empowered-form-page-question>
+        </div>
+    </div>
+</ng-template>

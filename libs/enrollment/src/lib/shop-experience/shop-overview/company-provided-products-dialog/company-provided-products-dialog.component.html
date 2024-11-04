@@ -1,0 +1,24 @@
+<div>
+    <mat-dialog-content>
+        <h2 mat-dialog-title>
+            {{languageString['primary.portal.shoppingExperience.companyProvidedProductsDialog.title']}}
+        </h2>
+        <p *ngIf="!data?.firstName">
+            {{languageString['primary.portal.shoppingExperience.companyProvidedProductsDialog.description']}}
+        </p>
+        <p *ngIf="data?.firstName">
+            {{ "primary.portal.shoppingExperience.companyProvidedProductsDialog.companyOffer" | replaceTag: {
+            "#firstname": data?.firstName } }}
+        </p>
+        <ul>
+            <li *ngFor="let product of data?.products">
+                {{product}}
+            </li>
+        </ul>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button class="mon-btn-primary" mat-flat-button (click)="save()">
+            {{languageString['primary.portal.shoppingExperience.companyProvidedProductsDialog.gotit']}}
+        </button>
+    </mat-dialog-actions>
+</div>

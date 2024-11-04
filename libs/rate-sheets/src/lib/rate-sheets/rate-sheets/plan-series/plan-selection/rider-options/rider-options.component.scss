@@ -1,0 +1,65 @@
+@import "shared";
+
+.riders-container {
+    margin-bottom: map-get($spacers, 20);
+
+    .plans {
+        font-size: convert-unit(16px, "rem");
+        margin-bottom: map-get($spacers, 10);
+        width: fit-content;
+    }
+
+    mat-form-field {
+        width: convert-unit(181px, "rem");
+    }
+
+    .multiple-riders {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .radio-option {
+        line-height: convert-unit(35px, "rem");
+
+        ::ng-deep .mat-radio-label {
+            align-items: center;
+        }
+    }
+
+    .rider-multiple-coverage-level-section {
+        margin-left: convert-unit(28px, "rem");
+        margin-top: convert-unit(5px, "rem");
+    }
+
+    .spouse-rider-custom-option {
+        .width-fit-rider-name {
+            width: fit-content;
+        }
+
+        ::ng-deep .mat-form-field-infix {
+            width: 100%;
+        }
+
+        ::ng-deep .mat-select-value {
+            max-width: max-content;
+            padding-right: convert-unit(5px, "rem");
+        }
+    }
+}
+
+.default-section-text {
+    font-weight: 400;
+    font-size: convert-unit(16px, "rem");
+    line-height: convert-unit(22px, "rem");
+    color: get("color.gray.700");
+}
+.selector-label {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 700;
+    font-size: convert-unit(14px, "rem");
+}
+.rider-params-container {
+    margin-left: map-get($spacers, 30);
+}

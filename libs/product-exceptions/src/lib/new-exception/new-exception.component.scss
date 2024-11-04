@@ -1,0 +1,77 @@
+@import "shared";
+.mat-dialog-content {
+    .exception-wrapper {
+        width: convert-unit(350px, "rem");
+        .field-wrapper {
+            width: convert-unit(167px, "rem");
+        }
+    }
+    .add-plan-wrapper {
+        padding-top: convert-unit(20px, "rem");
+        border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+        .add-plan {
+            display: flex;
+            justify-content: space-between;
+            .plan-form {
+                width: convert-unit(415px, "rem");
+                ::ng-deep .state-input {
+                    .mat-form-field-infix,
+                    .mat-form-field-flex {
+                        padding: 0;
+                        display: flex;
+                        min-height: convert-unit(38px, "rem");
+                        .chiplist-wrapper {
+                            max-height: convert-unit(105px, "rem");
+                            overflow: auto;
+                        }
+                    }
+                    .mat-chip-list {
+                        width: 100%;
+                    }
+                    .mat-chip-list-wrapper {
+                        margin: 0;
+                        padding: convert-unit(3px, "rem");
+                        padding-bottom: 2px;
+                        cursor: text;
+                        .mat-standard-chip {
+                            margin: 0 convert-unit(5px, "rem") convert-unit(3px, "rem") 0;
+                            .mon-icon {
+                                margin-bottom: convert-unit(2px, "rem");
+                            }
+                        }
+                    }
+                }
+            }
+            .link-danger {
+                color: get("color.info.danger.500");
+                height: convert-unit(20px, "rem");
+            }
+        }
+    }
+    .field-wrapper {
+        margin-right: convert-unit(15px, "rem");
+    }
+}
+.mat-option.selected-state {
+    background: get("color.primary.500") !important;
+    color: get("color.white") !important;
+    &:hover {
+        background: get("color.primary.600") !important;
+    }
+}
+.cancel-button {
+    margin-left: convert-unit(-10px, "rem");
+}
+
+.state-select {
+    ::ng-deep {
+        .mat-button-wrapper {
+            margin-right: map-get($spacers, 10);
+        }
+    }
+}
+
+/*---plan dropdown----------*/
+.plan-name {
+    width: convert-unit(600px, "rem");
+}

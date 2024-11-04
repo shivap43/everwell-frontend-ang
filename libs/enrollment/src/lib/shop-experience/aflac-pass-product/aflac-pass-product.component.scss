@@ -1,0 +1,51 @@
+@import "shared";
+
+.product-info {
+    width: 100%;
+
+    h1 {
+        margin: 0;
+        font-size: convert-unit(36px, "rem");
+    }
+}
+
+.product-carrier {
+    color: get("color.black");
+    font-size: convert-unit(14px, "rem");
+    @include fontFace("primary.bold");
+    line-height: convert-unit(22px, "rem");
+}
+
+.product-description {
+    color: get("color.gray.700");
+    font-size: convert-unit(16px, "rem");
+    @include fontFace("primary.regular");
+    line-height: convert-unit(22px, "rem");
+    margin: map-get($spacers, 20) map-get($spacers, 180) 0 0;
+}
+
+h2.module-title {
+    margin: map-get($spacers, 20) 0;
+    font-size: convert-unit(22px, "rem");
+    color: get("color.black");
+}
+
+.product-header {
+    display: flex;
+}
+
+.product-icon {
+    margin-right: convert-unit(22px, "rem");
+}
+
+.pass-product-accordion {
+    .mat-expansion-panel-header {
+        min-height: convert-unit(72px, "rem");
+    }
+
+    .footer-button {
+        display: flex;
+        justify-content: flex-end;
+        margin: map-get($spacers, 30) convert-unit(-15px, "rem") 0 convert-unit(-15px, "rem");
+    }
+}

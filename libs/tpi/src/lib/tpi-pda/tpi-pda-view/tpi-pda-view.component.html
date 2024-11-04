@@ -1,0 +1,156 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<empowered-tpi-secondary-header>
+    <span *ngIf="isAgent"> {{langStrings['primary.portal.tpiEnrollment.pdaForms']}} </span>
+    <span *ngIf="!isAgent"> {{langStrings['primary.portal.tpiEnrollment.pdaFormsMember']}} </span>
+</empowered-tpi-secondary-header>
+<div class="tpi-content">
+    <div *ngIf="showErrorMessage" class="mon-mb-20">
+        <mon-alert alertType="danger">
+            <span>{{ errorMessage }}</span>
+        </mon-alert>
+    </div>
+    <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_DOCUMENTS_SEND_REMINDER">
+        <ng-container *ngIf="showContact && unsignedPDAForms.length && hasMemberContact">
+            <form [formGroup]="contactForm" class="contact-form">
+                <h3>{{ firstName | titlecase }} {{ langStrings['primary.portal.pda.signed'] }}</h3>
+                <p>{{ "primary.portal.pda.notify" | replaceTag: { "##firstname##": firstName } }}</p>
+                <mat-radio-group ariaLabel="stepData.step.question.text" formControlName="contacts" class="contacts">
+                    <ng-container *ngFor="let option of contactList">
+                        <mat-radio-button [value]="option" [disabled]="option.disableField || requestSent">
+                            <div *ngIf="option.type === 'email'">
+                                <span language="primary.portal.headset.email"> {{ option.contact }}</span>
+                            </div>
+                            <div *ngIf="option.type === 'phoneNumber'">
+                                <span language="primary.portal.headset.text">{{ option.formatted }}</span>
+                            </div>
+                            <div *ngIf="!option.type">{{ option.contact }}</div>
+                        </mat-radio-button>
+                    </ng-container>
+                </mat-radio-group>
+                <button class="mon-btn-primary" *ngIf="!requestSent && hasMemberContact" mat-flat-button (click)="sendToCustomer()">
+                    <span language="primary.portal.common.send"></span>
+                </button>
+                <button class="mon-btn-primary" *ngIf="!hasMemberContact" mat-flat-button (click)="addContactInfo()">
+                    <span language="primary.portal.coverage.addcontactInfo"></span>
+                </button>
+                <button *ngIf="requestSent" class="mon-btn-success" mat-flat-button>
+                    <mon-icon class="tick-icon" iconName="check" iconSize="15"></mon-icon>
+                    <span language="primary.portal.coverage.sent"></span>
+                </button>
+            </form>
+        </ng-container>
+    </ng-container>
+    <div class="mon-mb-20" *ngIf="(!notes || !(notes.length > 0))">
+        <p *ngIf="isAgent">{{langStrings["primary.portal.members.document.noPDA"]}}</p>
+        <p *ngIf="!isAgent">{{langStrings["primary.portal.members.document.noSubscriberPDA"]}}</p>
+    </div>
+
+    <div [ngClass]="!notes || !(notes.length > 0)? '' : 'd-flex justify-content-end'">
+        <button
+            mat-flat-button
+            class="btn-sm"
+            *ngIf="isAgent && !isCompletePdaPartnerAccountType"
+            [ngClass]="!notes || !(notes.length > 0)? 'mon-btn-primary' : 'mon-btn-secondary'"
+            [attr.aria-label]="langStrings['primary.portal.member.Document.createNewPDA']"
+            type="button"
+            (click)="pdaForm()"
+        >
+            {{langStrings['primary.portal.member.Document.createNewPDA']}}
+        </button>
+    </div>
+    <div class="mon-mt-20" *ngIf="dataSource.data.length > 0">
+        <table mat-table matSort [dataSource]="dataSource">
+            <ng-container matColumnDef="documents">
+                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.tpiEnrollment.pda.forms"]}}</th>
+                <td mat-cell *matCellDef="let element; let i = index">
+                    <ng-container *ngIf="(element.document!=null && element.formInfo==null);else formType">
+                        <span *ngFor="let doc of element.document">
+                            <div>{{doc.modifiedName}} ( signed {{element.modifiedOn | date : dateFormat}} )</div>
+                        </span>
+                    </ng-container>
+                    <ng-template #formType>
+                        <div *ngIf="!isAgent && !element.eSignature">
+                            {{element.formInfo?.type}} ({{langStrings["primary.portal.tpiEnrollment.pda.form.pendingPda"]}})
+                        </div>
+                        <div *ngIf="!isAgent && element.eSignature">
+                            {{element.formInfo?.type}} ( signed {{element.modifiedOn | date : dateFormat}} )
+                        </div>
+                        <div *ngIf="isAgent">{{element.formInfo?.type}}</div>
+                    </ng-template>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="modifiedOn">
+                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.members.completedForms.dateSigned"]}}</th>
+                <td mat-cell *matCellDef="let element">
+                    <p href="" *ngIf="(element.eSignature);else formDate">
+                        {{element.modifiedOn | date : appSettings.DATE_FORMAT_MM_DD_YYYY }}
+                        <button
+                            mat-icon-button
+                            [richTooltip]="element.tooltipString"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [attr.aria-label]="langStrings['primary.portal.common.info']"
+                        >
+                            <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="18"></mon-icon>
+                        </button>
+                    </p>
+                </td>
+            </ng-container>
+            <ng-template #formDate>
+                <p>{{langStrings["primary.portal.tpiEnrollment.pda.form.pendingPdaSignature"]}}</p>
+            </ng-template>
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.members.document.table.manage"]}}</th>
+                <td mat-cell *matCellDef="let element;">
+                    <ng-container *ngIf="(element.document!=null && element.formInfo==null);else formType">
+                        <span *ngFor="let doc of element.document">
+                            <button (click)="downloadDoc(doc.id, doc.fileName)" class="mon-btn-link visible-on-row-hover">
+                                {{langStrings["primary.portal.qle.viewLabel"]}}
+                            </button>
+                        </span>
+                    </ng-container>
+                    <ng-template #formType>
+                        <button
+                            (click)="displayForm(element.formInfo.type, element.formInfo.id)"
+                            class="mon-btn-link visible-on-row-hover"
+                            *ngIf="(element.eSignature)"
+                        >
+                            {{langStrings["primary.portal.qle.viewLabel"]}}
+                        </button>
+                    </ng-template>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsDocs"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsDocs"></tr>
+        </table>
+    </div>
+    <div class="min-range-label" [hidden]="dataSource?.data.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1">
+        <span *ngIf="dataSource.data.length !== 1">
+            {{ langStrings["primary.portal.document.showingItems"].replace("##length##", dataSource?.data.length ) }}
+        </span>
+        <span *ngIf="dataSource.data.length === 1">
+            {{ langStrings["primary.portal.document.showingItem"].replace("##length##" , dataSource?.data.length ) }}
+        </span>
+    </div>
+    <div
+        class="paginator-wrapper"
+        [hidden]="dataSource?.data.length === 0 || dataSource?.paginator?.getNumberOfPages() === 1"
+        [ngClass]="{'range-actions-hide': dataSource?.paginator?.getNumberOfPages() === 1}"
+    >
+        <mat-paginator [pageSizeOptions]="pageSizeOption" showFirstLastButtons></mat-paginator>
+        <mat-form-field class="paginator-input-wrapper">
+            {{langStrings["primary.portal.members.document.manageMenu.page"]}}
+            <input
+                class="paginator-input"
+                (input)="pageInputChanged($event.target.value)"
+                [formControl]="pageNumberControl"
+                matInput
+                type="number"
+                min="1"
+                max="{{ dataSource?.paginator?.getNumberOfPages() }}"
+                [attr.aria-label]="langStrings['primary.portal.common.enterPageNumber']"
+            />
+            {{langStrings["primary.portal.common.of"]}} {{ dataSource?.paginator?.getNumberOfPages() }}
+        </mat-form-field>
+    </div>
+</div>

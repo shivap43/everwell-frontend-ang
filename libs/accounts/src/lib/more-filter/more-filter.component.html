@@ -1,0 +1,58 @@
+<form [formGroup]="moreFilterForm">
+    <div class="product-filter-wrapper" *ngIf="forMobileDevices || forMediumDevices">
+        <div class="filter-options">
+            <div class="d-flex justify-content-between">
+                <h3 class="mon-mt-0">{{languageStrings['primary.portal.common.filters']}}</h3>
+            </div>
+
+            <div class="status" formArrayName="statusFilter">
+                <mat-checkbox
+                    *ngFor="let status of statusFilterData; let i = index"
+                    [formControlName]="i"
+                    [value]="status.value.toLowerCase()"
+                >
+                    {{ status.name }}
+                </mat-checkbox>
+            </div>
+
+            <mat-divider class="mon-my-10"></mat-divider>
+
+            <div class="status" formArrayName="companyFilter">
+                <mat-checkbox
+                    *ngFor="let employeeCount of companyFilterData; let i = index"
+                    [formControlName]="i"
+                    [value]="employeeCount.id"
+                >
+                    {{ employeeCount.name }}
+                </mat-checkbox>
+            </div>
+
+            <mat-divider class="mon-my-10"></mat-divider>
+
+            <div>
+                <div class="status" formArrayName="notificationFilter">
+                    <mat-checkbox
+                        *ngFor="let notification of notificationFilterData; let i = index"
+                        [formControlName]="i"
+                        [value]="notification"
+                    >
+                        {{notification.displayText}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </div>
+        <div class="mon-clear">
+            <div>
+                <a href="javascript:void(0)" language="primary.portal.common.clear" (click)="resetMoreFilter()"></a>
+            </div>
+            <div>
+                <a
+                    href="javascript:void(0)"
+                    class="mon-apply"
+                    (click)="moreFilterApply()"
+                    language="primary.portal.common.apply"
+                ></a>
+            </div>
+        </div>
+    </div>
+</form>

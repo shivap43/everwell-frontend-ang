@@ -1,0 +1,108 @@
+@import "shared";
+
+.coverage-wrapper {
+    & > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: get("color.gray.200");
+        min-height: convert-unit(54px, "rem");
+        flex-wrap: wrap;
+
+        & > div {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .mat-form-field {
+        margin-bottom: 0;
+    }
+}
+
+.mon-date-field {
+    width: convert-unit(138px, "rem");
+}
+
+.plan-count {
+    width: convert-unit(75px, "rem");
+    text-align: right;
+}
+
+::ng-deep .mat-form-field {
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+
+        .mat-form-field-flex {
+            margin-top: 0;
+            background: get("color.white");
+        }
+    }
+}
+
+::ng-deep .add-plan-year {
+    max-width: none;
+    width: 100%;
+}
+
+:host ::ng-deep .mat-select-panel {
+    margin-left: convert-unit(6px, "rem") !important;
+}
+
+.read-only-control {
+    display: flex;
+    align-items: flex-start;
+
+    mat-label,
+    .mat-label {
+        min-width: convert-unit(150px, "rem");
+        font-size: convert-unit(16px, "rem");
+        margin: convert-unit(10px, "rem") 0 0;
+    }
+
+    .mon-date-field {
+        width: convert-unit(200px, "rem");
+    }
+}
+
+.existing-plan-year {
+    display: flex;
+    flex-direction: column;
+
+    > div {
+        width: convert-unit(200px, "rem");
+        margin-top: map-get($spacers, 20);
+    }
+}
+
+.coverage-period,
+.enrollment-period {
+    display: flex;
+    margin-right: map-get($spacers, 20);
+}
+
+.earliest-coverage-start-info {
+    margin: map-get($spacers, 0);
+}
+
+.non-aflac-date-wrapper {
+    ::ng-deep .date-range-control {
+        position: relative;
+    }
+}
+
+.aflac-year {
+    .mat-form-field {
+        max-width: convert-unit(200px, "rem");
+    }
+}
+
+.apply-carriers-check {
+    ::ng-deep {
+        .mat-checkbox-layout {
+            &:focus-within {
+                outline: none;
+            }
+        }
+    }
+}

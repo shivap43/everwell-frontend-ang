@@ -1,0 +1,147 @@
+<form [formGroup]="reviewForm">
+    <empowered-modal type="POPUP" size="LG" [showCancel]="true">
+        <empowered-modal-header>
+            <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.header" class="review-modal-header"></span>
+        </empowered-modal-header>
+        <div>
+            <p language="primary.portal.enrollment.summary.aflacalways.reviewmodal.subheader" class="review-description"></p>
+        </div>
+        <ng-container *ngFor="let detail of paymentData">
+            <div *ngIf="detail?.paymentMethod?.paymentType === CREDIT_CARD && detail?.enrolledPlans?.length" class="pd-tp-bt-15">
+                <h4 language="primary.portal.enrollment.summary.aflacalways.reviewmodal.payment.card" class="payment-header mg-tp-bt-0">
+                    {{detail?.paymentMethod?.lastFour}}
+                </h4>
+                <div class="pd-bt-5 disp-flex">
+                    <span
+                        language="primary.portal.enrollment.summary.aflacalways.reviewmodal.enrolledplans"
+                        class="payment-details vert-aln"
+                    ></span>
+                    <span class="disp-inl-blk">
+                        <div *ngFor="let plan of detail.enrolledPlans">{{plan.planName}}</div>
+                    </span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.amount" class="payment-details"></span>
+                    <span>{{languageStrings['primary.portal.setPrices.dollar']}}{{detail?.paymentAmount | number: '1.2-2'}}</span
+                    ><span class="mg-lt-5">{{detail?.paymentFrequency}}</span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.cardtype" class="payment-details"></span>
+                    <span>{{detail?.paymentMethod?.type}}</span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.cardnumber" class="payment-details"></span>
+                    <span
+                        >{{languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.paymentmask']}}{{detail?.paymentMethod?.lastFour}}</span
+                    >
+                </div>
+                <div>
+                    <span
+                        language="primary.portal.enrollment.summary.aflacalways.reviewmodal.expirationdate"
+                        class="payment-details"
+                    ></span>
+                    <span
+                        >{{detail?.paymentMethod?.expirationMonth}}{{languageStrings['primary.portal.common.slash']}}{{detail?.paymentMethod?.expirationYear}}</span
+                    >
+                </div>
+            </div>
+            <div *ngIf="detail?.paymentMethod?.paymentType === BANK_DRAFT && detail?.enrolledPlans?.length" class="pd-tp-bt-15">
+                <h4 language="primary.portal.enrollment.summary.aflacalways.reviewmodal.payment.bank" class="payment-header mg-tp-bt-0">
+                    {{detail?.paymentMethod?.accountNumberLastFour}}
+                </h4>
+                <div class="pd-bt-5 disp-flex">
+                    <span
+                        language="primary.portal.enrollment.summary.aflacalways.reviewmodal.enrolledplans"
+                        class="payment-details vert-aln"
+                    ></span>
+                    <span class="disp-inl-blk">
+                        <div *ngFor="let plan of detail.enrolledPlans">{{plan.planName}}</div>
+                    </span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.amount" class="payment-details"></span>
+                    <span>{{languageStrings['primary.portal.setPrices.dollar']}}{{detail?.paymentAmount | number: '1.2-2' }}</span
+                    ><span class="mg-lt-5">{{detail?.paymentFrequency}}</span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.accounttype" class="payment-details"></span>
+                    <span>{{formatAccountType(detail?.paymentMethod?.accountType)}}</span>
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.accountnumber" class="payment-details"></span>
+                    <span
+                        >{{languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.paymentmask']}}{{detail?.paymentMethod?.accountNumberLastFour}}</span
+                    >
+                </div>
+                <div class="pd-bt-5">
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.routingnumber" class="payment-details"></span>
+                    <span>
+                        {{languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.routingmask']}}{{getLastFourDigit(detail?.paymentMethod?.routingNumber)}}
+                    </span>
+                </div>
+                <div>
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.banknumber" class="payment-details"></span>
+                    <span>{{detail?.paymentMethod?.bankName}}</span>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="pd-tp-bt-30">
+            <mat-checkbox
+                class="mat-option mon-mt-0"
+                formControlName="reviewCheck"
+                aria-required="true"
+                aria-checked="reviewForm.controls.reviewCheck.value"
+            >
+                {{languageStrings['primary.portal.enrollment.summary.aflacalways.reviewmodal.footer']}}
+            </mat-checkbox>
+            <mat-error *ngIf="reviewForm.controls.reviewCheck.invalid && reviewForm.controls.reviewCheck.touched">
+                {{languageStrings['primary.portal.enrollment.summary.selection.required'] }}
+            </mat-error>
+        </div>
+        <div>
+            <mat-label class="mat-label">
+                <span>{{languageStrings['primary.portal.enrollment.review.initial']}}</span>
+            </mat-label>
+            <mat-form-field class="w-200">
+                <input
+                    type="text"
+                    class="mon-input"
+                    maxlength="3"
+                    formControlName="initials"
+                    [attr.aria-label]="languageStrings['primary.portal.enrollment.review.initial']"
+                    matInput
+                />
+                <mat-error *ngIf="reviewForm.controls.initials?.errors?.required">
+                    {{languageStrings['primary.portal.common.requiredFeild']}}
+                </mat-error>
+                <mat-error *ngIf="reviewForm.controls.initials?.errors?.minlength || reviewForm.controls.initials?.errors?.pattern">
+                    {{secondaryLanguageStrings['secondary.portal.common.invalidFormat']}}
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <empowered-modal-footer>
+            <div>
+                <button
+                    class="mon-btn-danger"
+                    aria-label="primary.portal.enrollment.summary.aflacalways.reviewmodal.rejectsignature"
+                    (click)="rejectAflacAlways()"
+                    mat-flat-button
+                    type="submit"
+                >
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.reject"></span>
+                </button>
+                <button
+                    class="mon-btn-primary mg-lt-20"
+                    aria-label="primary.portal.enrollment.summary.aflacalways.reviewmodal.approvesignature"
+                    (click)="approveAflacAlways()"
+                    mat-flat-button
+                    type="submit"
+                >
+                    <span language="primary.portal.enrollment.summary.aflacalways.reviewmodal.approve"></span>
+                </button>
+            </div>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>

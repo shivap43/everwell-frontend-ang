@@ -1,0 +1,1239 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form
+    *ngIf="mpGroup"
+    [formGroup]="coverageDatesForm"
+    [empoweredFocusOnFirstInvalidField]="queryString"
+    (ngSubmit)="onNext()"
+    class="mon-py-30"
+>
+    <div *ngIf="error" class="mon-mb-20 mon-mx-25">
+        <mon-alert alertType="danger">
+            <span> {{fieldErrorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div id="coverage_dates_start" *ngIf="coveragePeriodPRPlansPanelList.length !== 0">
+        <div formGroupName="planYearform">
+            <section class="mon-mx-25">
+                <h2 class="mon-mb-5">{{languageStringsArray['primary.portal.benefitsOffering.availability.header']}}</h2>
+                <p class="mon-mt-0 mon-mb-20">{{languageStringsArray['primary.portal.benefitsOffering.enroll']}}</p>
+                <p *ngIf="(isAflacGroup$ |async)" class="mon-mt-0 mon-mb-20">
+                    {{languageStringsArray['primary.portal.benefitsOffering.aflacDates']}} {{cafeteriaStartDate}}-{{cafeteriaEndDate}}
+                    <span
+                        [richTooltip]="languageStringsArray['primary.portal.benefitsOffering.cafeteriaDatesInfo']"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.cafeteriaDatesInfo']"
+                    >
+                        <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info icon-primary"> </mon-icon>
+                    </span>
+                </p>
+
+                <div formGroupName="createPlanYearForm" class="create-planyear-form">
+                    <div class="mon-mr-20">
+                        <mat-label class="mat-label">{{languageStringsArray['primary.portal.benefitsOffering.planName']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="name"
+                                type="text"
+                                [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.planName']"
+                            />
+                            <mat-hint>{{languageStringsArray['primary.portal.benefitsOffering.planExample']}}</mat-hint>
+                            <mat-error>
+                                {{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                    <div formGroupName="enrollmentPeriod">
+                        <mat-label class="mat-label">{{languageStringsArray['primary.portal.benefitsOffering.enrollmentDates']}}</mat-label>
+                        <div class="enrollment-period">
+                            <div class="mon-mr-5">
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="enrollmentStartDate"
+                                        formControlName="effectiveStarting"
+                                        (input)="checkDateInput($event,createPlanYearForm.get('enrollmentPeriod').get('effectiveStarting'));"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate"
+                                        autocomplete="off"
+                                        (dateChange)="onStartDateUpdated()"
+                                    />
+                                    <mat-datepicker #enrollmentStartDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentStartDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('required') && !enrollmentDateGroup.controls.effectiveStarting.hasError('requirements') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalid')"
+                                            language="primary.portal.common.requiredField"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('requirements')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('invalid')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('pastDate')"
+                                            >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('invalidStartDate') && !enrollmentDateGroup.controls.effectiveStarting.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidStartDate']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.effectiveStarting.hasError('contiguous')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.contiguous"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="enrollmentEndDate"
+                                        formControlName="expiresAfter"
+                                        (input)="checkDateInput($event,createPlanYearForm.get('enrollmentPeriod').get('expiresAfter'));"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate"
+                                        autocomplete="off"
+                                        (dateChange)="onDatesUpdated(AFLAC_DATE_UPDATE)"
+                                    />
+                                    <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentEndDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.expiresAfter.hasError('required') &&
+                                             !enrollmentDateGroup.controls.expiresAfter.hasError('requirements') &&
+                                              !enrollmentDateGroup.controls.expiresAfter.hasError('invalid')"
+                                            language="primary.portal.common.requiredField"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.expiresAfter.hasError('requirements') && !enrollmentDateGroup.controls.expiresAfter.hasError('invalid')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.expiresAfter.hasError('invalid') && !enrollmentDateGroup.controls.expiresAfter.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.expiresAfter.hasError('pastDate') && !enrollmentDateGroup.controls.expiresAfter.hasError('required') && !enrollmentDateGroup.controls.expiresAfter.hasError('invalidEndDate')"
+                                            >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.expiresAfter.hasError('invalidEndDate') && !enrollmentDateGroup.controls.expiresAfter.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div formGroupName="enrollmentPeriod" *ngIf="isQ60 && isGIEnrollmentDatesOn">
+                        <mat-label class="mat-label" language="primary.portal.benefitsOffering.giEnrollmentDates">
+                            <span
+                                [richTooltip]="languageStringsArray['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.giEnrollmentDatesInfo']"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info icon-primary">
+                                </mon-icon>
+                            </span>
+                        </mat-label>
+                        <div class="enrollment-period">
+                            <div class="mon-mr-5">
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="q60kgiEnrollmentStartDate"
+                                        formControlName="guaranteedIssueEffectiveStarting"
+                                        (input)="checkDateInput($event,createPlanYearForm.get('enrollmentDateGroup').get('guaranteedIssueEffectiveStarting'));"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate"
+                                        autocomplete="off"
+                                    />
+                                    <mat-datepicker #q60kgiEnrollmentStartDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="q60kgiEnrollmentStartDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>
+                                        <div language="primary.portal.common.dateHint"></div>
+                                        <div
+                                            *ngIf="enableGIEligibleDateMessage$ | async"
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.classDInfo"
+                                        ></div>
+                                    </mat-hint>
+                                    <mat-error>
+                                        <span
+                                            language="primary.portal.common.requiredField"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('required') && !enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('requirements')"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('requirements')"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('invalid')"
+                                        ></span>
+                                        <span
+                                            language="primary.portal.coverage.cannotBePast"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('pastDate')"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidStartDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('invalidStartDate') && !enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('required')"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueEffectiveStarting.hasError('contiguous')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.contiguous"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="q60kgiEnrollmentEndDate"
+                                        formControlName="guaranteedIssueExpiresAfter"
+                                        (input)="checkDateInput($event,enrollmentDateGroup.controls.guaranteedIssueExpiresAfter);"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate && giMinDiffDate"
+                                        [max]="giEnrollEndDateDisable? enrollmentDateGroup.controls.expiresAfter.value:
+                                        giMaxDiffDate"
+                                        autocomplete="off"
+                                    />
+                                    <mat-datepicker #q60kgiEnrollmentEndDate></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="q60kgiEnrollmentEndDate.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>
+                                        <div language="primary.portal.common.dateHint"></div>
+                                        <div
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDateAndWithIn45Days"
+                                        ></div>
+                                    </mat-hint>
+                                    <mat-error>
+                                        <span
+                                            language="primary.portal.common.requiredField"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required &&
+                                        !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.requirements &&
+                                         !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalid"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.requirements &&
+                                            !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalid"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalid &&
+                                            !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required"
+                                        ></span>
+                                        <span
+                                            language="primary.portal.coverage.cannotBePast"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.pastDate &&
+                                            !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required &&
+                                            !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.mustBeAfterStartDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.beforeStartDate &&
+                                            !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.mustBeAtLeast5DaysAfterStartDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.lessFiveDays && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.withIn45DaysAfterStartDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.greaterThanStartDateAfter45 && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.greaterOEEndDate && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.afterOpenEnrollmentEndDateAndWithIn45Days"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.greaterThanOEendDateAnd45DaysStartDate && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                        <span
+                                            language="secondary.portal.benefitsOffering.giEnrollmentDates.selectOrEnterOEDate"
+                                            *ngIf="enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.enterEnrollmentDate && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.required && !enrollmentDateGroup.controls.guaranteedIssueExpiresAfter.errors?.invalidEndDate"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div formGroupName="coveragePeriod" class="coverage-period">
+                        <div *ngIf="isAflacIndividualCafeteriaVasOnly">
+                            <mat-label class="mat-label" language="primary.portal.benefitsOffering.coverageDates"> </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="coverageStartDatePicker"
+                                    [matDatepickerFilter]="dateClass"
+                                    formControlName="effectiveStarting"
+                                    (input)="checkDateInput($event,createPlanYearForm.get('coveragePeriod').get('effectiveStarting'));"
+                                    matInput
+                                    [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.coverageDates']"
+                                    empoweredDateTransform
+                                    [maxLength]="maxLength"
+                                    (dateChange)="populateEndDate(createPlanYearForm.get('coveragePeriod').get('effectiveStarting').value)"
+                                    [min]="minDateCoverage"
+                                    autocomplete="off"
+                                />
+                                <mat-datepicker #coverageStartDatePicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="coverageStartDatePicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('required')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('shouldBe180DaysFromToday')">
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sixMonths']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('minimumDays')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.errors?.pastDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.errors?.dateNotAllowed"
+                                        >{{languageStringsArray['primary.portal.coverage.notAllowedDate'] | replaceTag : {'##entereddate##':
+                                        enteredDate } }}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="!isAflacIndividualCafeteriaVasOnly">
+                            <mat-label class="mat-label" language="primary.portal.benefitsOffering.coverageDates"> </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <mat-select formControlName="effectiveStarting">
+                                    <mat-option
+                                        *ngFor="let date of dateArray"
+                                        [value]="date"
+                                        (onSelectionChange)="populateEndDate(date,$event); onChange(date)"
+                                    >
+                                        {{date}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('minimumDays')">
+                                        {{minimumDayErrorMessage}}
+                                    </span>
+                                    <span *ngIf="this.coverageDateGroup.controls.effectiveStarting.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                    >
+                                    <span *ngIf="coverageDateGroup.controls.effectiveStarting.hasError('shouldBe180DaysFromToday')">
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sixMonths']}}
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="mon-ml-5">
+                            <mat-label class="mat-label"> &nbsp;</mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="coverageDatesPicker"
+                                    formControlName="expiresAfter"
+                                    (input)="checkDateInput($event,createPlanYearForm.get('coveragePeriod').get('expiresAfter'));"
+                                    matInput
+                                    [attr.aria-label]="languageStringsArray['primary.portal.common.date']"
+                                    empoweredDateTransform
+                                    [maxLength]="maxLength"
+                                    autocomplete="off"
+                                    [min]="coverageDateGroup.controls.effectiveStarting.value"
+                                />
+                                <mat-datepicker #coverageDatesPicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="coverageDatesPicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span
+                                        *ngIf="this.coverageDateGroup.controls.expiresAfter.hasError('required') && !this.coverageDateGroup.controls.expiresAfter.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroup.controls.expiresAfter.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroup.controls.expiresAfter.hasError('matDatepickerMax')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.maxEndDate']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroup.controls.expiresAfter.hasError('invalidEndDate')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                    >
+                                    <span *ngIf="coverageDateGroup.controls.expiresAfter.errors?.pastDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroup.controls.expiresAfter.hasError('beforeCoverageStartDate')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coverageDate.cannotBeBeforeStartDate']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div *ngIf="variableTaxStatusPlan.length > 0">
+                        <mat-label class="mat-label" id="postTaxCoverageStartDate"
+                            >{{languageStringsArray['primary.portal.benefitsOffering.posttaxCoverageStartDate']}}</mat-label
+                        >
+                        <mat-form-field class="mon-mr-40">
+                            <mat-select
+                                disableOptionCentering="true"
+                                formControlName="coverageStartFunction"
+                                aria-labelledby="postTaxCoverageStartDate"
+                            >
+                                <mat-option
+                                    *ngFor="let coverageStartDate of coverageStartDateOptionsForVariableTaxPlans"
+                                    [value]="coverageStartDate.value"
+                                    [language]="coverageStartDate.viewValue"
+                                >
+                                </mat-option>
+                            </mat-select>
+                            <mat-hint>&nbsp;</mat-hint>
+                            <mat-error>
+                                <span *ngIf="continuousPlan.controls['enrollmentStartDate'].hasError('required')"
+                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="w-300" *ngIf="dateUpdatedMessage">
+                    <mon-alert alertType="info" class="message-block">
+                        <span>{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.infoMessage']}}</span>
+                    </mon-alert>
+                </div>
+
+                <div *ngFor="let coveragePanelPlanYear of coveragePeriodPRPlansPanelList" class="coverage-wrapper mon-my-15">
+                    <div class="mon-py-10 mon-px-20">
+                        <div class="mon-mr-15">
+                            {{coveragePanelPlanYear.product.name}} | {{coveragePanelPlanYear.carrier.name}} |
+                            {{coveragePanelPlanYear.taxBenefitType}}
+                        </div>
+                        <div class="d-inline-flex">
+                            <div class="plan-count" *ngIf="coveragePanelPlanYear.plans.length === 1">
+                                {{languageStringsArray['primary.portal.benefitsOffering.hqSubtitle1Plan']}}
+                            </div>
+                            <div class="plan-count" *ngIf="coveragePanelPlanYear.plans.length > 1">
+                                {{coveragePanelPlanYear.plans.length}}
+                                {{languageStringsArray['primary.portal.benefitsOffering.plansSubTitlePlans']}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="divider mon-my-30"></div>
+        </div>
+    </div>
+
+    <div *ngIf="coveragePeriodContinuousPlansPanelList.length !== 0">
+        <div formGroupName="continuousPlanform">
+            <section class="mon-mx-25">
+                <h2 class="mon-mb-5">{{languageStringsArray['primary.portal.benefitsOffering.nonPlan']}}</h2>
+
+                <div class="mon-mt-15">
+                    <div
+                        formGroupName="continuousPlanDates"
+                        *ngIf="this.continuousPlanform.controls.sameCoveragePlanDate.value"
+                        class="d-flex justify-content-space-between"
+                    >
+                        <div class="mon-mr-20">
+                            <mat-label class="mat-label"
+                                >{{languageStringsArray['primary.portal.benefitsOffering.enrollmentStartDate']}}<a
+                                    *ngIf="isThirdPartyCafeteriaAccount"
+                                    [richTooltip]="languageStringsArray['primary.portal.benefitsOffering.tpi.enrollmentDates.match']"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStartInfo']"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info"> </mon-icon> </a
+                            ></mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="enrollmentPicker"
+                                    [min]="currentDate"
+                                    formControlName="enrollmentStartDate"
+                                    matInput
+                                    [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.enrollmentStartDate']"
+                                    (input)="checkDateInput($event,continuousPlan.get('enrollmentStartDate'))"
+                                    autocomplete="off"
+                                    empoweredDateTransform
+                                />
+                                <mat-datepicker #enrollmentPicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="enrollmentPicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-error>
+                                    <span
+                                        *ngIf="continuousPlan.controls['enrollmentStartDate'].hasError('required') && !continuousPlan.controls['enrollmentStartDate'].hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                    >
+                                    <span
+                                        *ngIf="continuousPlan.controls.enrollmentStartDate?.errors?.requirements"
+                                        language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                    ></span>
+                                    <span *ngIf="continuousPlan.controls['enrollmentStartDate'].hasError('invalid')">
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}
+                                    </span>
+                                    <span *ngIf="continuousPlan.controls['enrollmentStartDate'].errors?.pastDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="mon-mr-20" *ngIf="showContinuousCoverageDates">
+                            <mat-label class="mat-label"
+                                >{{languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStart']}}
+                                <a
+                                    [richTooltip]="earliestCoverageStartDateInfoMsg"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStartInfo']"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info icon-primary">
+                                    </mon-icon>
+                                </a>
+                            </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="earliestStartPicker"
+                                    [min]="currentDate"
+                                    formControlName="earliestCoverageStart"
+                                    matInput
+                                    class="w-200"
+                                    [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStart']"
+                                    (input)="checkDateInput($event,continuousPlan.get('earliestCoverageStart'))"
+                                    autocomplete="off"
+                                    empoweredDateTransform
+                                />
+                                <mat-datepicker #earliestStartPicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="earliestStartPicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-error>
+                                    <span
+                                        *ngIf="continuousPlan.controls['earliestCoverageStart'].hasError('required') && !continuousPlan.controls['earliestCoverageStart'].hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                    >
+                                    <span
+                                        *ngIf="continuousPlan.controls.earliestCoverageStart?.errors?.requirements"
+                                        language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                    ></span>
+                                    <span *ngIf="continuousPlan.controls['earliestCoverageStart'].hasError('invalid')">
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}
+                                    </span>
+                                    <span *ngIf="continuousPlan.controls['earliestCoverageStart'].errors?.pastDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                    <span *ngIf="continuousPlan.controls['earliestCoverageStart'].errors?.beforeEnrollmentStartDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBeBeforeEnrollmentStartDate']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div>
+                            <mat-label class="mat-label"
+                                >{{languageStringsArray['primary.portal.benefitsOffering.coverageStartRule']}}
+                            </mat-label>
+                            <mat-form-field class="mon-mr-40">
+                                <mat-select disableOptionCentering="true" formControlName="coverageStartFunction">
+                                    <mat-option
+                                        *ngFor="let coverageStartDate of coverageStartDateOptions"
+                                        [value]="coverageStartDate.value"
+                                        [language]="coverageStartDate.viewValue"
+                                    >
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error>
+                                    <span *ngIf="continuousPlan.controls['enrollmentStartDate'].hasError('required')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <p *ngIf="coveragePeriodPRPlansPanelList.length != 0">
+                    {{languageStringsArray['primary.portal.benefitsOffering.aflacPostTaxNote']}}
+                </p>
+
+                <div *ngFor="let coveragePanelContinous of coveragePeriodContinuousPlansPanelList" class="coverage-wrapper mon-my-15">
+                    <div class="mon-py-10 mon-px-20">
+                        <div class="mon-mr-15">
+                            {{coveragePanelContinous.product.name}} | {{coveragePanelContinous.carrier.name}} |
+                            {{coveragePanelContinous.taxBenefitType}}
+                        </div>
+                        <div>
+                            <div class="plan-count" *ngIf="coveragePanelContinous.plans.length === 1">
+                                {{languageStringsArray['primary.portal.benefitsOffering.hqSubtitle1Plan']}}
+                            </div>
+                            <div class="plan-count" *ngIf="coveragePanelContinous.plans.length > 1">
+                                {{coveragePanelContinous.plans.length}}
+                                {{languageStringsArray['primary.portal.benefitsOffering.plansSubTitlePlans']}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="divider mon-my-30"></div>
+        </div>
+    </div>
+
+    <div *ngIf="coveragePeriodNonAflacPlanList.length !== 0">
+        <div formGroupName="nonAflacPlanForm">
+            <section class="mon-mx-25">
+                <h2 class="mon-mb-5">{{languageStringsArray['primary.portal.benefitsOffering.partner']}}</h2>
+                <p class="mon-mt-0 mon-mb-30">{{languageStringsArray['primary.portal.benefitsOffering.enroll']}}</p>
+                <div class="mon-mt-10" *ngFor="let exception of exceptions">
+                    <mon-alert *ngIf="exception.isValid" alertType="info">
+                        <span>
+                            {{ "primary.portal.maintenanceBenefitsOffering.products.vasExceptionActive" | replaceTag: {
+                            "##effectivestarting##": exception.validity.effectiveStarting, "##expiresafter##":
+                            exception.validity.expiresAfter, "##vastype##": exception.name }
+                            }}{{languageStringsArray['primary.portal.maintenanceBenefitsOffering.products.coverageDateOverlap']}}
+                        </span>
+                    </mon-alert>
+                    <mon-alert *ngIf="!exception.isValid" alertType="danger">
+                        <span>
+                            {{ "primary.portal.maintenanceBenefitsOffering.products.vasExceptionActive" | replaceTag: {
+                            "##effectivestarting##": exception.validity.effectiveStarting, "##expiresafter##":
+                            exception.validity.expiresAfter, "##vastype##": exception.name }
+                            }}{{languageStringsArray['primary.portal.maintenanceBenefitsOffering.products.coverageDateOverlap']}}
+                        </span>
+                    </mon-alert>
+                </div>
+                <div class="mon-mt-20 mon-mb-10 apply-carriers-check">
+                    <mat-checkbox
+                        *ngIf="coveragePeriodPRPlansPanelList.length"
+                        formControlName="sameAflacIndividualPlanDate"
+                        (change)="checkForSameCafeteriaDates($event.checked)"
+                        [disabled]="isPreTaxAflac"
+                    >
+                        <ng-container *ngIf="currentAccount.importType !== accountImportTypes.SHARED_CASE"
+                            >{{languageStringsArray['primary.portal.benefitsOffering.checkbox']}}<a
+                                *ngIf="isThirdPartyCafeteriaAccount"
+                                [richTooltip]="languageStringsArray['primary.portal.benefitsOffering.tpi.sameIndividualDates.disableInfo']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStartInfo']"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info"> </mon-icon> </a
+                        ></ng-container>
+                        <ng-container *ngIf="currentAccount.importType === accountImportTypes.SHARED_CASE">
+                            {{languageStringsArray['primary.portal.benefitsOffering.aflac.group.dates']}}<a
+                                *ngIf="isThirdPartyCafeteriaAccount"
+                                [richTooltip]="languageStringsArray['primary.portal.benefitsOffering.tpi.sameIndividualDates.disableInfo']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.earliestCoverageStartInfo']"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="14" class="earliest-coverage-start-info"> </mon-icon>
+                            </a>
+                        </ng-container>
+                    </mat-checkbox>
+                </div>
+                <div
+                    class="apply-carriers-check"
+                    *ngIf="multiNonAflacYear && !this.nonAflacPlanForm.controls.sameAflacIndividualPlanDate.value"
+                >
+                    <mat-checkbox formControlName="sameCoveragePlanDate" (change)="enableCoverageDate($event.checked)">
+                        <span>{{languageStringsArray['primary.portal.benefitsOffering.apply']}}</span>
+                    </mat-checkbox>
+                    <div class="mon-mt-15">
+                        <div
+                            formGroupName="nonAflacPlanDates"
+                            *ngIf="this.nonAflacPlanForm.controls.sameCoveragePlanDate.value && !this.nonAflacPlanForm.controls.sameAflacIndividualPlanDate.value"
+                            class="d-flex justify-content-space-between"
+                        >
+                            <div class="mon-mr-20">
+                                <mat-label class="mat-label"
+                                    >{{languageStringsArray['primary.portal.benefitsOffering.planName']}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="name"
+                                        type="text"
+                                        [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.planName']"
+                                    />
+                                    <mat-hint>{{languageStringsArray['primary.portal.benefitsOffering.planExample']}}</mat-hint>
+                                    <mat-error>
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</mat-error
+                                    >
+                                </mat-form-field>
+                                <mon-alert alertType="info" *ngIf="dateUpdatedMessage" class="message-block">
+                                    <span
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.infoMessage']}}</span
+                                    >
+                                </mon-alert>
+                            </div>
+                            <div formGroupName="enrollmentDateGroupForNonAflac">
+                                <mat-label class="mat-label"
+                                    >{{languageStringsArray['primary.portal.benefitsOffering.enrollmentDates']}}</mat-label
+                                >
+                                <div class="enrollment-period">
+                                    <div class="mon-mr-5">
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="enrollmentStartDatePicker"
+                                                formControlName="effectiveStarting"
+                                                (input)="checkDateInput($event,nonAflacPlan.get('enrollmentDateGroupForNonAflac').get('effectiveStarting'));"
+                                                matInput
+                                                [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                                empoweredDateTransform
+                                                [maxLength]="maxLength"
+                                                [min]="currentDate"
+                                                autocomplete="off"
+                                            />
+                                            <mat-datepicker #enrollmentStartDatePicker></mat-datepicker>
+                                            <mat-datepicker-toggle matSuffix (click)="enrollmentStartDatePicker.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('required') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalid')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements')"
+                                                    language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                                ></span>
+                                                <span *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalid')"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                                >
+                                                <span *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('pastDate')"
+                                                    >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                                >
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalidStartDate') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('required')"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidStartDate']}}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="enrollmentEndDatePicker"
+                                                formControlName="expiresAfter"
+                                                (input)="checkDateInput($event,nonAflacPlan.get('enrollmentDateGroupForNonAflac').get('expiresAfter'));"
+                                                matInput
+                                                [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                                empoweredDateTransform
+                                                [maxLength]="maxLength"
+                                                [min]="currentDate"
+                                                autocomplete="off"
+                                                (dateChange)="onDatesUpdated(NON_AFLAC_DATE_UPDATE)"
+                                            />
+                                            <mat-datepicker #enrollmentEndDatePicker></mat-datepicker>
+                                            <mat-datepicker-toggle matSuffix (click)="enrollmentEndDatePicker.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required') &&
+                                            !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('requirements') &&
+                                            !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('requirements') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid')"
+                                                    language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                                ></span>
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required')"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                                >
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('pastDate') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalidEndDate')"
+                                                    >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                                >
+                                                <span
+                                                    *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalidEndDate') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required')"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div formGroupName="coverageDateGroupForNonAflac" class="coverage-period">
+                                <div *ngIf="isNonAflacIndividualCafeteriaVasOnly">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.benefitsOffering.coverageDates"
+                                        id="nonAflacCoverageDates"
+                                    >
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [matDatepicker]="coverageStartDateNonAflacPicker"
+                                            formControlName="effectiveStarting"
+                                            (input)="checkDateInput($event,nonAflacPlan.get('coverageDateGroupForNonAflac').get('effectiveStarting'));"
+                                            matInput
+                                            empoweredDateTransform
+                                            [maxLength]="maxLength"
+                                            (dateChange)="populateNonAflacEndDate(nonAflacPlan.get('coverageDateGroupForNonAflac').get('effectiveStarting').value)"
+                                            [min]="minDateCoverageNonAflac"
+                                            autocomplete="off"
+                                            [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        />
+                                        <mat-datepicker #coverageStartDateNonAflacPicker></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix (click)="coverageStartDateNonAflacPicker.open()">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+
+                                        <mat-error>
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('required')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}
+                                            </span>
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                            </span>
+                                            <span
+                                                *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('shouldBe180DaysFromToday')"
+                                            >
+                                                {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sixMonths']}}
+                                            </span>
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('minimumDays')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                            </span>
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.errors?.pastDate"
+                                                >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                            >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div *ngIf="!isNonAflacIndividualCafeteriaVasOnly">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.benefitsOffering.coverageDates"
+                                        id="nonAflacCoverageDates"
+                                    >
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <mat-select formControlName="effectiveStarting" aria-labelledby="nonAflacCoverageDates">
+                                            <mat-option
+                                                *ngFor="let date of dateArrayForNonAflac"
+                                                [value]="date"
+                                                (onSelectionChange)="populateNonAflacEndDate(date,$event); onChangeForNonAflac(date)"
+                                            >
+                                                {{date}}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-hint> {{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                        <mat-error>
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('minimumDays')">
+                                                {{nonAflacMinimumDayErrorMessage}}
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="mon-ml-5">
+                                    <mat-label class="mat-label"> &nbsp;</mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [matDatepicker]="coverageDatesPicker"
+                                            formControlName="expiresAfter"
+                                            (input)="checkDateInput($event,nonAflacPlan.get('coverageDateGroupForNonAflac').get('expiresAfter'));"
+                                            matInput
+                                            [attr.aria-label]="languageStringsArray['primary.portal.common.date']"
+                                            empoweredDateTransform
+                                            [maxLength]="maxLength"
+                                            autocomplete="off"
+                                            [min]="coverageDateGroupForNonAflac.controls.effectiveStarting.value"
+                                        />
+                                        <mat-datepicker #coverageDatesPicker></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix (click)="coverageDatesPicker.open()">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-hint> {{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                        <mat-error>
+                                            <span
+                                                *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('required') && !this.coverageDateGroup.controls.expiresAfter.hasError('requirements')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                            >
+                                            <span
+                                                *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter?.errors?.requirements"
+                                                language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                            ></span>
+                                            <span
+                                                *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('matDatepickerMax')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.maxEndDate']}}</span
+                                            >
+                                            <span *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('invalidEndDate')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                            >
+                                            <span *ngIf="coverageDateGroupForNonAflac.controls.expiresAfter.errors?.pastDate"
+                                                >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                            >
+                                            <span
+                                                *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('beforeCoverageStartDate')"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coverageDate.cannotBeBeforeStartDate']}}</span
+                                            >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngFor="let coveragePanelNonAflac of coveragePeriodNonAflacPlanList" class="coverage-wrapper mon-my-15">
+                    <div class="mon-py-10 mon-px-20">
+                        <div class="mon-mr-15">
+                            {{coveragePanelNonAflac.product.name}} | {{coveragePanelNonAflac.carrier.name}} |
+                            {{coveragePanelNonAflac.taxBenefitType}}
+                        </div>
+                        <div class="aflac-year">
+                            <div formGroupName="nonAflacPlanYearOptionsForm">
+                                <mat-form-field
+                                    *ngIf="(!this.nonAflacPlanForm.controls.sameAflacIndividualPlanDate.value && !this.nonAflacPlanForm.controls.sameCoveragePlanDate.value && multiNonAflacYear) || (!multiNonAflacYear && !this.nonAflacPlanForm.controls.sameAflacIndividualPlanDate.value)"
+                                    class="mon-mr-10"
+                                >
+                                    <mat-select
+                                        [formControlName]="coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name"
+                                        (selectionChange)="updatePlanYearForNonAflac(coveragePanelNonAflac, $event.value, nonAflacPlanYearOptionsForm.controls[coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name], coveragePanelNonAflac.product.valueAddedService)"
+                                        [placeholder]="languageStrings.selectPlanYear"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let planYear of nonAflacPlanYearOptions" [value]="planYear.value">
+                                            {{ planYear.viewValue }}
+                                        </mat-option>
+                                        <mat-option value="custom">
+                                            <a
+                                                (click)="openModal(coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name, coveragePanelNonAflac.product.valueAddedService, coveragePanelNonAflac.carrier.id)"
+                                                >{{languageStringsArray['primary.portal.benefitsOffering.createNewPlanYear']}}</a
+                                            >
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="nonAflacPlanYearOptionsForm.controls[coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name].errors?.required"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}
+                                        </span>
+                                        <span
+                                            *ngIf="nonAflacPlanYearOptionsForm.controls[coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name].errors?.minimumDays && coveragePanelNonAflac.carrier.id !== carrierIds.AFLAC_DENTAL_AND_VISION"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.fifteenDaysAfterEnrollmentEndDate']}}
+                                        </span>
+                                        <span
+                                            *ngIf="nonAflacPlanYearOptionsForm.controls[coveragePanelNonAflac.product.name+coveragePanelNonAflac.carrier.name].errors?.minimumDays && coveragePanelNonAflac.carrier.id === carrierIds.AFLAC_DENTAL_AND_VISION"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sevenDaysAfterEnrollmentEndDate']}}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="plan-count" *ngIf="coveragePanelNonAflac.plans.length === 1">
+                                {{languageStringsArray['primary.portal.benefitsOffering.hqSubtitle1Plan']}}
+                            </div>
+                            <div class="plan-count" *ngIf="coveragePanelNonAflac.plans.length > 1">
+                                {{coveragePanelNonAflac.plans.length}}
+                                {{languageStringsArray['primary.portal.benefitsOffering.plansSubTitlePlans']}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="divider mon-my-30"></div>
+        </div>
+    </div>
+
+    <div
+        *ngIf="coveragePeriodContinuousPlansPanelList.length !== 0 || coveragePeriodPRPlansPanelList.length !== 0 || coveragePeriodNonAflacPlanList.length !== 0"
+        class="d-flex justify-content-end mon-my-10"
+    >
+        <button
+            class="mon-btn-secondary mon-mr-20"
+            type="button"
+            (click)="onBack()"
+            mat-flat-button
+            [attr.aria-label]="languageStringsArray['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStringsArray['primary.portal.common.back']}}</span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-mr-30"
+            mat-flat-button
+            [attr.aria-label]="languageStringsArray['primary.portal.common.next']"
+            [disabled]="isAccountDeactivated || isLoading"
+        >
+            <span>{{languageStringsArray['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</form>
+
+<ng-template #createPlanYear>
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button (click)="closeModal()" [attr.aria-label]="languageStringsArray['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+
+        <form [formGroup]="nonAflacPlan" (ngSubmit)="createNewPlanYear()" #formDirective="ngForm">
+            <div mat-dialog-content>
+                <div>
+                    <mon-alert *ngIf="dialogError" alertType="danger">
+                        <span> {{fieldErrorMessage}} </span>
+                    </mon-alert>
+                </div>
+                <h2 mat-dialog-title class="mon-mt-0">{{languageStringsArray['primary.portal.benefitsOffering.createNewPlanYear']}}</h2>
+                <div>
+                    <mat-label class="mat-label">{{languageStringsArray['primary.portal.benefitsOffering.planYearName']}}</mat-label>
+                    <mat-form-field class="w-200">
+                        <input
+                            matInput
+                            formControlName="name"
+                            type="text"
+                            (blur)="checkPlanYearName()"
+                            [attr.aria-label]="languageStringsArray['primary.portal.benefitsOffering.planYearName']"
+                        />
+                        <mat-error *ngIf="this.nonAflacPlanForm.controls?.nonAflacPlanDates['controls']['name']?.errors?.required"
+                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</mat-error
+                        >
+                        <mat-error *ngIf="this.nonAflacPlanForm.controls?.nonAflacPlanDates['controls']['name']?.errors?.duplicatePlan"
+                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.duplicatePlanYear']}}</mat-error
+                        >
+                    </mat-form-field>
+                </div>
+                <div class="d-flex">
+                    <div formGroupName="enrollmentDateGroupForNonAflac">
+                        <mat-label class="mat-label">{{languageStringsArray['primary.portal.benefitsOffering.enrollmentDates']}}</mat-label>
+                        <div class="enrollment-period">
+                            <div class="mon-mr-10">
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="enrollmentStartDatePicker"
+                                        formControlName="effectiveStarting"
+                                        (input)="checkDateInput($event,nonAflacPlan.get('enrollmentDateGroupForNonAflac').get('effectiveStarting'));"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate"
+                                        autocomplete="off"
+                                    />
+                                    <mat-datepicker #enrollmentStartDatePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentStartDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('required') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalid')"
+                                            language="primary.portal.common.requiredField"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalid')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('pastDate')"
+                                            >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('invalidStartDate') && !enrollmentDateGroupForNonAflac.controls.effectiveStarting.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidStartDate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="enrollmentEndDatePicker"
+                                        formControlName="expiresAfter"
+                                        (input)="checkDateInput($event,nonAflacPlan.get('enrollmentDateGroupForNonAflac').get('expiresAfter'));"
+                                        matInput
+                                        [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                        empoweredDateTransform
+                                        [maxLength]="maxLength"
+                                        [min]="currentDate"
+                                        autocomplete="off"
+                                        (dateChange)="onDatesUpdated(NON_AFLAC_DATE_UPDATE)"
+                                    />
+                                    <mat-datepicker #enrollmentEndDatePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="enrollmentEndDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                    <mat-error>
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required') &&
+                                             !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('requirements') &&
+                                              !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid')"
+                                            language="primary.portal.common.requiredField"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('requirements') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid')"
+                                            language="secondary.portal.benefitsOffering.coveragedates.invalidDate"
+                                        ></span>
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalid') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('pastDate') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalidEndDate')"
+                                            >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                        >
+                                        <span
+                                            *ngIf="enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('invalidEndDate') && !enrollmentDateGroupForNonAflac.controls.expiresAfter.hasError('required')"
+                                            >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div formGroupName="coverageDateGroupForNonAflac" class="coverage-period">
+                        <div *ngIf="isVasPlan" class="mon-mr-10">
+                            <mat-label class="mat-label" language="primary.portal.benefitsOffering.coverageDates"></mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="individualStartDatePicker"
+                                    formControlName="effectiveStarting"
+                                    (input)="checkDateInput($event,nonAflacPlan.get('coverageDateGroupForNonAflac').get('effectiveStarting'));"
+                                    matInput
+                                    [attr.aria-label]="languageStringsArray['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                    empoweredDateTransform
+                                    [maxLength]="maxLength"
+                                    (dateChange)="populateNonAflacEndDate(nonAflacPlan.get('coverageDateGroupForNonAflac').get('effectiveStarting').value)"
+                                    [min]="minDateCoverageNonAflac"
+                                    autocomplete="off"
+                                />
+                                <mat-datepicker #individualStartDatePicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="individualStartDatePicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('required')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                    </span>
+                                    <span
+                                        *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('shouldBe180DaysFromToday')"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sixMonths']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('minimumDays')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.dateBeforeEnrollmentDate']}}
+                                    </span>
+                                    <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.errors?.pastDate"
+                                        >{{languageStringsArray['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="!isVasPlan" class="mon-mr-10">
+                            <mat-label class="mat-label" language="primary.portal.benefitsOffering.coverageDates"> </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <mat-select formControlName="effectiveStarting">
+                                    <mat-option
+                                        *ngFor="let date of dateArrayForNonAflac"
+                                        [value]="date"
+                                        (onSelectionChange)="populateNonAflacEndDate(date,$event)"
+                                    >
+                                        {{date}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="coverageDateGroupForNonAflac.controls.effectiveStarting.hasError('minimumDays')">
+                                        {{minimumDayErrorModalMessage}}
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div>
+                            <mat-label class="mat-label"> &nbsp;</mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="cvrgPicker"
+                                    (input)="checkDateInput($event,nonAflacPlan.get('coverageDateGroupForNonAflac').get('expiresAfter'));"
+                                    formControlName="expiresAfter"
+                                    matInput
+                                    [attr.aria-label]="languageStringsArray['primary.portal.common.date']"
+                                    empoweredDateTransform
+                                    [maxLength]="maxLength"
+                                    autocomplete="off"
+                                    [min]="coverageDateGroupForNonAflac.controls.effectiveStarting.value"
+                                />
+                                <mat-datepicker #cvrgPicker></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="cvrgPicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStringsArray['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span
+                                        *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('required') && !this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.setting.employeesRequired']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('requirements')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                    >
+                                    <span *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('matDatepickerMax')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.maxEndDate']}}</span
+                                    >
+                                    <span
+                                        *ngIf="this.coverageDateGroupForNonAflac.controls.expiresAfter.hasError('beforeCoverageStartDate')"
+                                        >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coverageDate.cannotBeBeforeStartDate']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <button type="button" class="mon-btn-link" mat-flat-button (click)="closeModal()">
+                    <span language="primary.portal.common.cancel"></span>
+                </button>
+                <button
+                    type="submit"
+                    class="mon-btn-primary mon-ml-20"
+                    mat-flat-button
+                    [attr.aria-label]="languageStringsArray['primary.portal.common.save']"
+                >
+                    <span>{{languageStringsArray['primary.portal.common.save']}}</span>
+                </button>
+            </mat-dialog-actions>
+        </form>
+    </div>
+</ng-template>

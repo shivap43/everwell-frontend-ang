@@ -1,0 +1,109 @@
+@import "shared";
+
+.producer-btn {
+    padding: convert-unit(7px, "rem") convert-unit(20px, "rem");
+    margin-right: convert-unit(10px, "rem");
+    border-radius: convert-unit(20px, "rem");
+    background-color: get("color.gray.200");
+    border: 1px solid get("color.gray.500");
+    font-size: convert-unit(14px, "rem");
+    color: get("color.gray.900");
+    cursor: pointer;
+    vertical-align: top;
+
+    &:hover {
+        background: get("color.gray.300");
+        color: get("color.gray.900");
+    }
+
+    &:active,
+    &:focus,
+    &:focus-within {
+        background: get("color.gray.800");
+        border-color: get("color.gray.800");
+        color: get("color.white");
+        @include fontFace("primary.bold");
+    }
+
+    &.button-color {
+        font-size: convert-unit(14px, "rem");
+        @include fontFace("primary.bold");
+        background: get("color.gray.800");
+        color: get("color.white");
+        margin-right: convert-unit(10px, "rem");
+    }
+
+    &.button-active {
+        font-size: convert-unit(14px, "rem");
+        @include fontFace("primary.bold");
+        background: get("color.gray.800");
+        color: get("color.white");
+        margin-right: convert-unit(10px, "rem");
+
+        &:hover {
+            background: get("color.gray.900");
+            color: get("color.white");
+        }
+
+        &:active {
+            background: get("color.gray.1000");
+            color: get("color.white");
+        }
+    }
+}
+
+.filter-options-wrapper {
+    max-height: convert-unit(120px, "rem");
+    overflow-y: auto;
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    border-top: 0;
+    margin: 0 convert-unit(20px, "rem");
+    transition: max-height 0.3s;
+
+    ::ng-deep .mat-checkbox-layout {
+        flex: 1;
+    }
+
+    .mat-option {
+        &.mat-active {
+            background-color: get("color.gray.200");
+        }
+    }
+}
+
+.state-composite {
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    padding: convert-unit(5px, "rem") 0;
+    margin: convert-unit(20px, "rem") convert-unit(20px, "rem") 0;
+    border-radius: convert-unit(4px, "rem");
+    max-height: convert-unit(120px, "rem");
+    overflow-y: auto;
+    position: relative;
+
+    .icon-clear {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
+
+    &.state-options {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.hideStateOptions {
+    max-height: 0;
+    border-color: transparent;
+}
+
+.info-txt {
+    margin: convert-unit(10px, "rem") 0 convert-unit(20px, "rem") 0;
+}
+
+.search-account-menu {
+    .prospect-name {
+        width: convert-unit(123px, "rem") !important;
+        padding-left: convert-unit(10px, "rem") !important;
+    }
+}

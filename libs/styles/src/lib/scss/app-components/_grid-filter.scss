@@ -1,0 +1,545 @@
+.filter-wrapper {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    padding-left: convert-unit(20px, "rem");
+    font-size: convert-unit(14px, "rem");
+
+    .filter-sub-wrapper {
+        outline: none;
+        font-size: convert-unit(13px, "rem");
+
+        .mat-form-field {
+            padding: 0 convert-unit(10px, "rem") 0 0;
+            display: inline-block;
+            &.mat-focused .mat-form-field-outline-thick {
+                box-shadow: none;
+            }
+
+            .filter-label {
+                cursor: pointer;
+            }
+
+            .mat-select {
+                display: inline;
+                padding: 0;
+                margin: 0;
+                font-size: 0;
+
+                .mat-select-arrow-wrapper {
+                    display: none;
+                }
+            }
+
+            .mat-form-field-infix {
+                width: auto;
+                padding: 0;
+                border-top: none;
+            }
+
+            .mat-form-field-flex {
+                padding: convert-unit(7px, "rem") convert-unit(20px, "rem");
+                margin: 0;
+                border-radius: convert-unit(20px, "rem");
+                background-color: get("color.gray.200");
+                border: 1px solid get("color.gray.500");
+                font-size: convert-unit(14px, "rem");
+                color: get("color.gray.900");
+
+                &:hover {
+                    background: get("color.gray.300");
+                    color: get("color.gray.900");
+                    .mat-select-value-text {
+                        color: get("color.gray.900");
+                    }
+                }
+                &:active,
+                &:focus,
+                &:focus-within {
+                    background: get("color.gray.800");
+                    border-color: get("color.gray.800");
+                    color: get("color.white");
+                    @include fontFace("primary.bold");
+                }
+            }
+
+            .mat-form-field-appearance-outline {
+                border-radius: convert-unit(20px, "rem");
+                padding: 0;
+            }
+
+            .mat-select-arrow {
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .mat-select-arrow-wrapper {
+                display: none;
+            }
+
+            .mat-select-value {
+                display: inline;
+
+                &:focus,
+                &:hover {
+                    color: get("color.white");
+                }
+            }
+
+            &.mat-form-field-should-float,
+            &.filter-selected {
+                .mat-select-value-text {
+                    color: get("color.white") !important;
+                    font-size: convert-unit(14px, "rem");
+                    @include fontFace("primary.bold");
+                }
+                .mat-form-field-flex {
+                    background: get("color.gray.800");
+                    color: get("color.white");
+                    border-color: get("color.gray.800");
+                    @include fontFace("primary.bold");
+                }
+                &:hover .mat-form-field-flex {
+                    background: get("color.gray.900");
+                }
+                &:active .mat-form-field-flex {
+                    background: get("color.gray.1000");
+                }
+            }
+        }
+
+        .mat-form-field-appearance-outline .mat-form-field-outline {
+            &-start,
+            &-end {
+                border: none;
+                min-width: auto;
+            }
+        }
+    }
+}
+
+.mat-select-panel-wrap {
+    .list-grid-filter {
+        position: absolute;
+        margin-top: convert-unit(22px, "rem") !important;
+        font-size: convert-unit(14px, "rem") !important;
+        display: flex;
+        flex-direction: column;
+        max-height: convert-unit(320px, "rem");
+
+        &.filter-status {
+            margin-left: convert-unit(-40px, "rem") !important;
+        }
+
+        &.filter-renewal {
+            margin-left: convert-unit(-49px, "rem") !important;
+        }
+        &.filter-enroll-date {
+            right: convert-unit(-60px, "rem");
+        }
+        &.filter-split-applied {
+            margin-left: convert-unit(-222px, "rem") !important;
+        }
+
+        &.filter-send-date {
+            margin-left: convert-unit(-60px, "rem") !important;
+        }
+        &.filter-producer-status {
+            margin-left: convert-unit(-96px, "rem") !important;
+            width: convert-unit(225px, "rem") !important;
+            .mat-option {
+                height: auto;
+                margin-top: convert-unit(8px, "rem");
+                padding: convert-unit(0px, "rem");
+            }
+            .mon-clear {
+                justify-content: flex-end !important;
+            }
+            .mat-radio-button {
+                display: flex;
+                padding: convert-unit(0px, "rem");
+                &:hover {
+                    background: transparent;
+                    padding: convert-unit(0px, "rem");
+                }
+            }
+        }
+
+        &.filter-carriers {
+            padding-top: convert-unit(20px, "rem");
+            padding-bottom: 0;
+            margin-left: convert-unit(-105px, "rem") !important;
+            margin-top: convert-unit(15px, "rem") !important;
+
+            &.mat-select-panel {
+                .mat-option {
+                    margin-top: 0;
+                    padding: convert-unit(20px, "rem");
+                }
+            }
+        }
+
+        &.filter-riders {
+            padding-top: convert-unit(20px, "rem");
+            padding-bottom: 0;
+            margin-left: convert-unit(-115px, "rem") !important;
+            margin-top: convert-unit(15px, "rem") !important;
+        }
+
+        &.filter-planstate {
+            padding-top: convert-unit(20px, "rem");
+            padding-bottom: 0;
+            margin-left: convert-unit(-128px, "rem") !important;
+            margin-top: convert-unit(15px, "rem") !important;
+        }
+
+        &.filter-covergeprice {
+            margin-left: convert-unit(-84px, "rem") !important;
+            font-size: convert-unit(14px, "rem");
+            .no-mat-pseudo-checkbox {
+                display: none;
+            }
+            .mat-radio-button {
+                margin-top: 0;
+                &:hover {
+                    background: transparent;
+                }
+            }
+        }
+
+        &.filter-covergedate {
+            @include media-max("l") {
+                margin-left: convert-unit(-208px, "rem") !important;
+            }
+            margin-left: convert-unit(-192px, "rem") !important;
+            padding-top: convert-unit(20px, "rem");
+            max-width: none !important;
+            .no-mat-pseudo-checkbox {
+                display: none;
+            }
+            .mat-radio-button {
+                margin-top: 0;
+                &:hover {
+                    background: transparent;
+                }
+            }
+        }
+
+        &.filter-state {
+            margin-left: convert-unit(-32px, "rem") !important;
+            width: convert-unit(345px, "rem");
+            padding: 0;
+
+            &.mat-select-panel {
+                min-width: convert-unit(350px, "rem") !important;
+                .mat-option {
+                    padding: convert-unit(20px, "rem");
+                    margin-top: 0;
+                    &:hover {
+                        background-color: get("color.gray.200");
+                    }
+                    &.mat-selected {
+                        background-color: get("color.primary.500");
+                        .mat-option-text {
+                            color: get("color.white");
+                        }
+                        &:hover {
+                            background-color: get("color.primary.600") !important;
+                            .mat-option-text {
+                                color: get("color.white");
+                            }
+                        }
+                    }
+                    .mat-pseudo-checkbox,
+                    .mat-checkbox-inner-container {
+                        opacity: 0;
+                        margin: 0;
+                        height: 0 !important;
+                        width: 0 !important;
+                        border: 0;
+                    }
+                }
+                .mon-clear {
+                    padding: convert-unit(25px, "rem") convert-unit(20px, "rem") convert-unit(20px, "rem");
+                }
+            }
+
+            .mat-chip-list-wrapper {
+                margin: 0;
+                .mat-standard-chip {
+                    margin-top: 0;
+                    justify-content: space-between;
+                    min-width: convert-unit(74px, "rem");
+                    padding: convert-unit(6px, "rem") convert-unit(10px, "rem");
+
+                    .mat-chip-trailing-icon {
+                        width: auto;
+                    }
+                }
+            }
+            .mat-input-element {
+                padding: convert-unit(5px, "rem") convert-unit(6px, "rem");
+                margin: 0;
+            }
+            div.filter-options {
+                padding: 0;
+            }
+            .mat-checkbox {
+                margin-top: 0;
+            }
+        }
+        &.filter-date-submitted {
+            max-width: convert-unit(500px, "rem") !important;
+            margin-left: -100px;
+        }
+
+        &.filter-account {
+            max-width: convert-unit(500px, "rem") !important;
+            margin-left: -55px;
+            .filter-options {
+                min-width: 28rem !important;
+            }
+        }
+        &.filter-coverge {
+            .mat-radio-button {
+                display: flex;
+            }
+        }
+        &.filter-coverage {
+            margin-left: convert-unit(-55px, "rem") !important;
+        }
+        &.filter-coverage-notification {
+            margin-left: convert-unit(-60px, "rem") !important;
+        }
+        &.filter-employeeCount {
+            margin-left: convert-unit(-83px, "rem") !important;
+        }
+        &.filter-notification {
+            margin-left: convert-unit(-73px, "rem") !important;
+        }
+        .mat-option {
+            padding: 0;
+            height: convert-unit(18px, "rem");
+            margin-top: convert-unit(20px, "rem");
+            color: get("color.gray.900") !important;
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+        .mat-radio-button {
+            display: flex;
+            padding: convert-unit(10px, "rem") convert-unit(20px, "rem");
+            &:hover {
+                background: get("color.gray.200");
+            }
+        }
+        &.mat-select-panel {
+            border: convert-unit(1px, "rem") solid get("color.gray.600");
+            min-width: convert-unit(180px, "rem") !important;
+
+            &:not([class*="mat-elevation-z"]) {
+                box-shadow: 0 0 0 0;
+                border-radius: convert-unit(4px, "rem");
+            }
+
+            .mat-option {
+                &.mat-active {
+                    color: get("color.gray.900");
+                    background: transparent;
+                }
+
+                &:focus:not(.mat-option-disabled) {
+                    color: get("color.gray.900");
+                    background: transparent;
+                }
+
+                &:hover:not(.mat-option-disabled) {
+                    color: get("color.gray.900");
+                    background: transparent !important;
+                }
+
+                .mat-pseudo-checkbox {
+                    width: convert-unit(18px, "rem") !important;
+                    height: convert-unit(18px, "rem") !important;
+
+                    &.mat-pseudo-checkbox-checked {
+                        border-color: get("color.gray.800");
+                        background: get("color.gray.800");
+                    }
+
+                    &.mat-pseudo-checkbox-indeterminate {
+                        border-color: get("color.gray.800");
+                    }
+
+                    &-checked::after {
+                        top: convert-unit(3px, "rem");
+                        left: convert-unit(2px, "rem");
+                    }
+                }
+            }
+
+            .filter-options {
+                flex-grow: 1;
+                overflow-y: auto;
+                min-width: convert-unit(160px, "rem");
+                padding: convert-unit(3px, "rem") convert-unit(20px, "rem") 0;
+            }
+
+            .mon-clear {
+                display: flex;
+                justify-content: space-between;
+                flex-direction: row;
+                padding: convert-unit(15px, "rem") convert-unit(20px, "rem") convert-unit(10px, "rem");
+                font-size: convert-unit(14px, "rem");
+
+                a {
+                    text-decoration: none;
+                    color: get("color.gray.900");
+                }
+
+                .mon-apply {
+                    color: get("color.primary.500");
+                }
+
+                .mat-flat-button {
+                    line-height: 1;
+                    padding: 0;
+                }
+            }
+            &.product-availability {
+                min-width: convert-unit(250px, "rem") !important;
+                .filter-options {
+                    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+                    .mat-radio-button {
+                        padding: 0;
+                    }
+                }
+            }
+            &.filter-enroll-date {
+                .filter-options {
+                    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+                    .mat-radio-button {
+                        padding: map-get($spacers, 0);
+                    }
+                }
+            }
+            &.filter-send-date {
+                .filter-options {
+                    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+                    .mat-radio-button {
+                        padding: map-get($spacers, 0);
+                    }
+                }
+            }
+            &.filter-coveragedate {
+                min-width: convert-unit(400px, "rem") !important;
+                padding: map-get($spacers, 20);
+                margin-left: convert-unit(-370px, "rem") !important;
+            }
+
+            &.product-status {
+                .filter-options {
+                    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+                    .mat-radio-button {
+                        padding: map-get($spacers, 0);
+                    }
+                }
+            }
+
+            &.filter-unsent {
+                min-width: convert-unit(400px, "rem") !important;
+                margin-left: convert-unit(-222px, "rem") !important;
+            }
+        }
+        .mat-divider {
+            margin-top: convert-unit(10px, "rem");
+            margin-bottom: convert-unit(10px, "rem");
+            border-color: get("color.gray.500");
+        }
+        .mat-radio-button {
+            margin-top: 20px;
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+}
+.results-grid {
+    .infoicon {
+        .mat-icon {
+            vertical-align: bottom;
+        }
+    }
+}
+.table-mask-wrapper {
+    position: relative;
+
+    &:before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 0;
+        background-color: get("color.white");
+        opacity: 0.78;
+        z-index: 1;
+    }
+
+    &.grid-overlay {
+        &:before {
+            height: 100%;
+        }
+    }
+}
+.no-results-found {
+    border-bottom: convert-unit(2px, "rem") solid get("color.gray.600");
+}
+
+.mat-select-panel-wrap {
+    .filter-riders {
+        right: convert-unit(-45px, "rem") !important;
+    }
+
+    .filter-carriers {
+        left: convert-unit(-45px, "rem") !important;
+    }
+
+    .filter-planstate {
+        left: convert-unit(-32px, "rem") !important;
+    }
+
+    .filter-product {
+        left: convert-unit(-10px, "rem") !important;
+        .mat-radio-button {
+            padding: 0 convert-unit(20px, "rem") convert-unit(5px, "rem");
+        }
+    }
+
+    .filter-activity {
+        left: convert-unit(-12px, "rem") !important;
+        .mat-radio-button {
+            padding: 0 convert-unit(20px, "rem") convert-unit(5px, "rem");
+        }
+    }
+    .product-availability {
+        left: convert-unit(-86px, "rem") !important;
+        padding-bottom: 0;
+        .mat-radio-button {
+            display: flex;
+        }
+        .mon-date-field {
+            margin: convert-unit(10px, "rem") 0 0 convert-unit(22px, "rem");
+        }
+    }
+
+    .filter-enroll-date {
+        .mon-date-field {
+            margin: convert-unit(10px, "rem") 0 0 convert-unit(22px, "rem") !important;
+        }
+    }
+
+    .product-status {
+        left: convert-unit(-50px, "rem");
+        padding-bottom: 0;
+    }
+}

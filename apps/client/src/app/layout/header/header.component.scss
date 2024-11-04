@@ -1,0 +1,289 @@
+@import "shared";
+
+$brandingWidth: 240px;
+$exitBtnWidth: 82px;
+
+.app {
+    &-header {
+        display: flex;
+        background-color: get("color.gray.800");
+        color: get("color.white");
+        height: convert-unit(50px, "rem");
+
+        &.member-portal {
+            background-color: get("color.white") !important;
+            color: get("color.black") !important;
+            border-bottom: 1px solid get("color.gray.600");
+        }
+
+        &-open-sidenav-btn {
+            height: 100%;
+        }
+
+        &-branding {
+            flex: 0 0 $brandingWidth;
+
+            @include media-max("s") {
+                flex: 0 0 convert-unit(155px, "rem");
+            }
+        }
+
+        &-loginBranding {
+            flex: 1 0 $brandingWidth !important;
+        }
+
+        &-menu {
+            margin-right: auto;
+            height: 100%;
+
+            @include media-max("s") {
+                width: map-get($spacers, 20);
+            }
+        }
+
+        &-content {
+            display: flex;
+            flex: 1 0;
+            justify-content: flex-start;
+            align-items: center;
+            width: calc(100% - (#{$brandingWidth} + #{$exitBtnWidth}));
+
+            &-shopPage {
+                margin-left: map-get($spacers, 20);
+                font-size: convert-unit(22px, "rem");
+                @include fontFace("primary.light");
+            }
+
+            &-review {
+                margin-top: convert-unit(8px, "rem");
+                margin-left: map-get($spacers, 20);
+                font-size: convert-unit(22px, "rem");
+                @include fontFace("primary.light");
+            }
+
+            &-supportbtn {
+                width: auto;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0;
+                border: none;
+                padding: map-get($spacers, 0) map-get($spacers, 20);
+                &:hover {
+                    text-decoration: none !important;
+                    background: get("color.gray.300");
+                    color: $black;
+                }
+
+                &.producer-portal {
+                    padding: map-get($spacers, 0) map-get($spacers, 10);
+                }
+
+                &-active {
+                    background: get("color.gray.300");
+                    color: $black;
+                    font-weight: bold;
+                }
+
+                @media (min-width: 0px) and (max-width: 992px) {
+                    width: 50px;
+                }
+            }
+
+            &-supportIcon {
+                width: convert-unit(25px, "rem") !important;
+                height: convert-unit(25px, "rem") !important;
+                margin: map-get($spacers, 0) map-get($spacers, 5);
+
+                @include media-max("l") {
+                    margin-right: map-get($spacers, 0);
+                }
+            }
+        }
+
+        &-exitShopBtn {
+            height: map-get($spacers, 50);
+            width: convert-unit(100px, "rem");
+            padding: map-get($spacers, 0);
+            line-height: 0;
+
+            &-text {
+                font-size: convert-unit(14px, "rem");
+                color: get("color.white");
+
+                font-weight: 400;
+                text-align: left;
+            }
+        }
+
+        &-exitIcon {
+            height: convert-unit(24px, "rem");
+            width: convert-unit(24px, "rem");
+            margin-right: map-get($spacers, 5);
+        }
+
+        &-homeIcon {
+            align-items: center;
+            margin: map-get($spacers, 0) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+        }
+    }
+}
+
+a[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.sidenav-content-without-margin {
+    margin-left: map-get($spacers, 0) !important;
+}
+
+.sidenav-content-with-margin {
+    margin-left: convert-unit(240px, "rem") !important;
+}
+
+.app-sidenav-hidden {
+    width: map-get($spacers, 0) !important;
+}
+
+.app-sidenav-visible {
+    width: 100vw !important;
+}
+
+.visually-hidden {
+    visibility: hidden !important;
+}
+
+.visually-shown {
+    visibility: visible !important;
+}
+
+.mon-btn-pulldown {
+    font-size: convert-unit(16px, "rem");
+    border-radius: 0%;
+
+    &:hover,
+    &:focus,
+    &[aria-expanded] {
+        text-decoration: none !important;
+        background: get("color.gray.300");
+        color: $black;
+    }
+
+    @include media-max("l") {
+        line-height: convert-unit(48px, "rem");
+        font-size: convert-unit(16px, "rem");
+    }
+
+    &-icon-right {
+        width: convert-unit(25px, "rem") !important;
+        height: convert-unit(25px, "rem") !important;
+        margin-right: map-get($spacers, 5);
+    }
+
+    &-indicator {
+        font-size: map-get($spacers, 10);
+        margin: map-get($spacers, 0) map-get($spacers, 5);
+
+        @include media-max("l") {
+            margin-left: map-get($spacers, 0);
+        }
+    }
+}
+
+.utilityNav-btn {
+    line-height: 0;
+    height: 100%;
+    padding: map-get($spacers, 0) map-get($spacers, 10);
+    &.mon-btn-pulldown {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mon-btn-pulldown-wrapper {
+        &.not-member-portal {
+            color: get("color.gray.400");
+        }
+    }
+}
+
+mat-menu {
+    margin-right: convert-unit(15px, "rem") !important;
+}
+
+.mat-menu-item:hover {
+    text-decoration: none !important;
+}
+
+.user-icon {
+    @include media-max("s") {
+        margin-right: map-get($spacers, 0);
+        margin-top: map-get($spacers, 20) !important;
+    }
+}
+
+.producer-portal {
+    &:hover,
+    &:focus,
+    &[aria-expanded] {
+        text-decoration: none !important;
+        background: get("color.gray.1000");
+        color: $white;
+    }
+}
+
+.notification-badge-header {
+    min-width: convert-unit(14px, "rem");
+    height: convert-unit(14px, "rem");
+    background: get("color.info.danger.500");
+    font-size: convert-unit(11px, "rem");
+    text-align: center;
+    color: get("color.white");
+    border-radius: convert-unit(8px, "rem");
+    padding: convert-unit(7px, "rem") convert-unit(4px, "rem");
+    margin: convert-unit(4px, "rem") convert-unit(5px, "rem") 0 0;
+    position: absolute;
+    top: map-get($spacers, 5);
+}
+
+// Skip nav styles for accessibility
+.skipnav {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.skipnav a {
+    display: block;
+    padding: map-get($spacers, 10);
+    position: absolute;
+    left: -1000rem;
+    top: 0;
+    background-color: rgba($color: get("color.product.goldenglow"), $alpha: 1);
+    @include fontFace("primary.regular");
+    width: convert-unit(270px, "rem");
+}
+
+.skipnav a:focus,
+.skipnav a:active {
+    outline: 0;
+    z-index: 99;
+    top: 3rem;
+    left: 12rem;
+    border: convert-unit(1px, "rem") solid get("color.black");
+}
+
+.logout:focus {
+    box-shadow: none !important;
+}
+
+.user-section {
+    height: 100%;
+    .mon-btn-pulldown {
+        margin: map-get($spacers, 0);
+        padding: map-get($spacers, 0) map-get($spacers, 10);
+    }
+}

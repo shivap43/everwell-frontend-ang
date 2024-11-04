@@ -1,0 +1,107 @@
+@import "shared";
+
+.info-modal {
+    width: convert-unit(600px, "rem");
+    max-width: 100%;
+}
+
+.carrier-header {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.account-details-wrapper {
+    display: flex;
+}
+
+.text-bold {
+    font-weight: bold;
+    width: convert-unit(120px, "rem");
+}
+
+.zero-state {
+    margin-top: map-get($spacers, 20);
+}
+
+.carriers-wrapper {
+    padding: map-get($spacers, 30);
+
+    .header {
+        display: flex;
+        mon-icon {
+            margin-left: map-get($spacers, 0);
+        }
+    }
+
+    .aflac-group {
+        h3 {
+            margin-top: map-get($spacers, 0);
+            margin-bottom: map-get($spacers, 20);
+        }
+        .ag-heading {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin: map-get($spacers, 30) map-get($spacers, 0) map-get($spacers, 20);
+            h2 {
+                margin: map-get($spacers, 0);
+            }
+            .more-option-wrapper {
+                border: convert-unit(1px, "rem") solid get("color.primary.500");
+                min-width: auto;
+                padding: map-get($spacers, 0) map-get($spacers, 15);
+                height: convert-unit(32px, "rem");
+                .more-option {
+                    margin: map-get($spacers, 0);
+                }
+            }
+        }
+
+        .aflac-info {
+            margin-bottom: map-get($spacers, 40);
+            > div {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                margin-bottom: map-get($spacers, 15);
+                &:last-child {
+                    margin-bottom: map-get($spacers, 0);
+                }
+                .label {
+                    width: convert-unit(200px, "rem");
+                    @include fontFace("primary.bold");
+                }
+            }
+        }
+        .agent-info {
+            margin-bottom: map-get($spacers, 40);
+        }
+        .billing-acc-info {
+            margin-bottom: map-get($spacers, 40);
+        }
+        .agent-info .mat-table .mat-row:hover,
+        .billing-acc-info .mat-table .mat-row:hover {
+            background-color: transparent;
+        }
+    }
+
+    .location-info {
+        .address-info {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin-bottom: map-get($spacers, 15);
+            font-size: convert-unit(16px, "rem");
+
+            &:last-child {
+                margin-bottom: map-get($spacers, 0);
+            }
+
+            .label {
+                width: convert-unit(200px, "rem");
+                @include fontFace("primary.bold");
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+<div *ngIf="combinedQuickQuotePlansAndPlanSeries$ | async as combinedQuickQuotePlansAndPlanSeries">
+    <mat-tab-group (selectedTabChange)="onProductSelection($event.index)" class="vertical-tab eb-products-tab">
+        <mat-tab *ngFor="let productDetails of combinedQuickQuotePlansAndPlanSeries">
+            <ng-template mat-tab-label>
+                <div class="products-nav">
+                    <span class="product-label">{{ productDetails.product.name }}</span>
+                    <mon-icon
+                        *ngIf="(rateSheetProductSelections$ | async)[productDetails.product.id]"
+                        iconName="circle-check"
+                        class="icon-success"
+                        [iconSize]="16"
+                    ></mon-icon>
+                </div>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</div>

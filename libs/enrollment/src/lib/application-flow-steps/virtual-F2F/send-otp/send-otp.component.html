@@ -1,0 +1,86 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="application-review-block">
+    <h2>{{sendOtpStepInfo?.title}}</h2>
+    <mon-alert alertType="danger" *ngIf="isSendOtpFailed">
+        <span>{{languageStrings['primary.portal.vf2f.otp.error']}}</span>
+    </mon-alert>
+    <p>
+        {{sendOtpStepInfo?.steps[0]?.directions}}
+    </p>
+    <form [formGroup]="sendOtpForm" (ngSubmit)="sendOtp()">
+        <!-- electronic address form control -->
+        <mat-radio-group
+            formControlName="electronicAddress"
+            [attr.aria-label]="languageStrings['primary.portal.vf2f.selected.electronicAddress']"
+            class="send-otp-container"
+        >
+            <mat-radio-button
+                class="primary-radio"
+                [value]="{sendToEmail: emailInfo}"
+                [disabled]="!emailInfo"
+                [checked]="sendOtpForm.value?.electronicAddress?.sendToEmail"
+            >
+                {{emailInfo ? ("primary.portal.vf2f.email"| replaceTag: { "##emailinfo##" : emailInfo}):
+                languageStrings['primary.portal.vf2f.missingEmail']}}
+            </mat-radio-button>
+            <mat-radio-button
+                class="primary-radio"
+                [value]="{sendToPhone: phoneNumber}"
+                [disabled]="!phoneNumber"
+                [checked]="sendOtpForm.value?.electronicAddress?.sendToPhone"
+            >
+                {{phoneNumber ? ("primary.portal.vf2f.phone"| replaceTag: { '##phone##': phoneNumber}) :
+                languageStrings['primary.portal.vf2f.missingPhone']}}
+            </mat-radio-button>
+            <mat-radio-button
+                class="primary-radio"
+                [value]="{isTempAddressRequired: true}"
+                [checked]="sendOtpForm.value?.electronicAddress?.isTempAddressRequired"
+            >
+                {{languageStrings['primary.portal.vf2f.tempElectronicAddress']}}
+            </mat-radio-button>
+            <mat-error
+                *ngIf="sendOtpForm.controls.electronicAddress?.touched && sendOtpForm.controls.electronicAddress?.invalid"
+            >
+                {{languageStrings['primary.portal.common.selectionRequired']}}
+            </mat-error>
+        </mat-radio-group>
+        <!-- temp electronic address form control -->
+        <div *ngIf="sendOtpForm.controls.electronicAddress.value?.isTempAddressRequired">
+            <mat-form-field class="w-300">
+                <input
+                    matInput
+                    formControlName="tempElectronicAddress"
+                    autocomplete="off"
+                    [attr.aria-label]="languageStrings['primary.portal.vf2f.electronicAddress']"
+                />
+                <mat-hint>
+                    {{languageStrings['primary.portal.vf2f.electronicAddress']}}
+                </mat-hint>
+                <mat-error
+                    *ngIf="sendOtpForm.controls.tempElectronicAddress?.touched && sendOtpForm.controls.tempElectronicAddress?.invalid"
+                >
+                    <span *ngIf="sendOtpForm.controls.tempElectronicAddress?.errors?.required">
+                        {{languageStrings['primary.portal.vf2f.required']}}
+                    </span>
+                    <span *ngIf="sendOtpForm.controls.tempElectronicAddress?.errors?.pattern">
+                        {{languageStrings['primary.portal.vf2f.invalidEmail']}}
+                    </span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <!-- confirmation form control -->
+        <div>
+            <mat-checkbox formControlName="confirmation" class="confirmation-checkbox">
+                {{languageStrings['primary.portal.vf2f.acknowledgement']}}
+            </mat-checkbox>
+        </div>
+        <div *ngIf="sendOtpForm.controls.confirmation?.touched && !sendOtpForm.controls.confirmation?.value">
+            <mat-error>{{languageStrings['primary.portal.vf2f.missingAcknowledgement']}}</mat-error>
+        </div>
+        <button class="mon-btn-primary submit-app-flow-form" type="submit" mat-flat-button>
+            <span>{{languageStrings['primary.portal.vf2f.sendCode']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </form>
+</div>

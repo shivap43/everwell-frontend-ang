@@ -1,0 +1,112 @@
+<form [formGroup]="form">
+    <empowered-modal type="POPUP" size="LG">
+        <empowered-modal-header>
+            <span>{{languageStrings['primary.portal.endCoverage.qle.reviewRequest']}} </span>
+        </empowered-modal-header>
+        <mon-alert alertType="danger" *ngIf="errorResponse">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+        <empowered-modal-footer>
+            <mat-dialog-actions>
+                <button class="mon-btn-danger" mat-flat-button (click)="approveDenyRequest(false)">
+                    {{languageStrings['primary.portal.endCoverage.qle.deny']}}
+                </button>
+                <button class="mon-btn-primary" mat-flat-button (click)="approveDenyRequest(true)">
+                    {{languageStrings['primary.portal.endCoverage.qle.approve']}}
+                </button>
+            </mat-dialog-actions>
+        </empowered-modal-footer>
+        <div class="review-end-coverage">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.endCoverage.qle.eventDate']}}</mat-label>
+            <div class="date">
+                <mat-form-field class="mon-date-field">
+                    <input
+                        matInput
+                        disabled="true"
+                        formControlName="eventDate"
+                        [matDatepicker]="eventDate"
+                        [attr.aria-label]="languageStrings['primary.portal.endCoverage.qle.eventDate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="eventDate" (click)="eventDate.open()">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #eventDate></mat-datepicker>
+                    <mat-error> </mat-error>
+                </mat-form-field>
+            </div>
+
+            <mat-label class="mat-label">{{languageStrings['primary.portal.endCoverage.qle.requestedCoverageEndDate']}}</mat-label>
+            <div class="date">
+                <mat-form-field class="mon-date-field">
+                    <input
+                        matInput
+                        #datePickerInput
+                        formControlName="coverageEndDate"
+                        [matDatepicker]="coverageEndDate"
+                        [min]="todayDate"
+                        [attr.aria-label]="languageStrings['primary.portal.endCoverage.qle.requestedCoverageEndDate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="coverageEndDate" (click)="coverageEndDate.open()">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #coverageEndDate></mat-datepicker>
+                    <mat-error> {{validateDate(datePickerInput.value)}} </mat-error>
+                    <mat-error *ngIf="this.form.controls.coverageEndDate.hasError('maxAgeError')">
+                        {{languageStrings['primary.portal.common.datePast']}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="notes">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.qle.notesLabel']}}</mat-label>
+                <mat-form-field class="mon-mb-0">
+                    <textarea
+                        matInput
+                        formControlName="adminComment"
+                        [attr.aria-label]="languageStrings['primary.portal.qle.notesLabel']"
+                        [maxLength]="TEXT_AREA_LENGTH"
+                    ></textarea>
+                    <mat-hint>{{languageStrings['primary.portal.endCoverage.maxCharacters']}}</mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="notes" *ngIf="selectedQLE.memberComment && !isMemberCommentValid">
+                <mat-label *ngIf="selectedQLE.createdBy === PRODUCER" class="mat-label"
+                    >{{languageStrings['primary.portal.qle.producerComments']}}</mat-label
+                >
+                <mat-label *ngIf="selectedQLE.createdBy === SUBSCRIBER" class="mat-label"
+                    >{{languageStrings['primary.portal.qle.employeeComments']}}</mat-label
+                >
+                <mat-form-field class="mon-mb-0">
+                    <textarea matInput disabled="true" [maxLength]="TEXT_AREA_LENGTH" [value]="selectedQLE.memberComment"></textarea>
+                </mat-form-field>
+            </div>
+            <div class="supporting-docs">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.qle.addNewQle.fileUploadText']}}<span class="optional-text"
+                        >{{languageStrings['primary.portal.common.optional']}}</span
+                    ></mat-label
+                >
+                <empowered-mon-upload
+                    [accept]="acceptableFormats"
+                    (uploadFile)="validateFileAndUpload($event)"
+                    (viewFile)="viewFile($event)"
+                    (cancelUpload)="cancelFileUpload($event)"
+                    [isFileAvailable]="isFileAvailable"
+                    [isFileSelected]="isFileSelected"
+                    [isProgressBarEnabled]="isProgressBarEnabled"
+                    [files]="files"
+                    [uploadErrorStatus]="uploadErrorStatus"
+                    [uploadSucessStatus]="uploadSuccessStatus"
+                    [hasError]="hasError"
+                    [isSucess]="isSuccess"
+                    [modeProgress]="modeProgress"
+                    [isUploadingStarted]="isUploadingStarted"
+                    [fileUploadPercentage]="fileUploadPercentage"
+                    [isFileViewable]="isFileViewable"
+                    [isQLE]="true"
+                ></empowered-mon-upload>
+            </div>
+        </div>
+    </empowered-modal>
+</form>

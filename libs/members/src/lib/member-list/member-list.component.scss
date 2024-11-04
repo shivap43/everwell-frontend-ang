@@ -1,0 +1,131 @@
+@import "shared";
+
+.member-list-wrapper {
+    margin: 0px convert-unit(30px, "rem");
+
+    .member-list-header {
+        margin-top: convert-unit(40px, "rem");
+        margin-bottom: convert-unit(30px, "rem");
+    }
+
+    .w-100-percent {
+        width: 100%;
+    }
+
+    .mon-alert {
+        ::ng-deep {
+            .alert-success,
+            .alert-danger,
+            .alert-warning {
+                margin-bottom: convert-unit(20px, "rem");
+            }
+        }
+    }
+}
+
+th.mat-column-header-row-first-group {
+    border-bottom: none;
+    background-color: get("color.lightYellow");
+    color: get("color.black");
+}
+
+.icon-warning {
+    ::ng-deep .mat-icon {
+        height: convert-unit(18px, "rem") !important;
+        width: convert-unit(18px, "rem") !important;
+        vertical-align: bottom;
+    }
+}
+
+.member-list-wrapper .member-list-table-detail .mat-table {
+    td.mat-cell:last-of-type {
+        max-width: convert-unit(150px, "rem");
+        width: convert-unit(150px, "rem");
+    }
+
+    th.mat-column-registered,
+    td.mat-cell.mat-column-registered {
+        max-width: convert-unit(200px, "rem");
+        width: convert-unit(200px, "rem");
+    }
+
+    th.mat-column-coverageNameList,
+    td.mat-cell.mat-column-coverageNameList {
+        max-width: convert-unit(200px, "rem");
+        width: convert-unit(200px, "rem");
+    }
+
+    th.mat-column-dependents,
+    td.mat-cell.mat-column-dependents {
+        max-width: convert-unit(200px, "rem");
+        width: convert-unit(200px, "rem");
+    }
+
+    th.mat-column-employeeId,
+    td.mat-cell.mat-column-employeeId {
+        max-width: convert-unit(150px, "rem");
+        width: convert-unit(150px, "rem");
+    }
+
+    th.mat-column-quickActions,
+    td.mat-cell.mat-column-quickActions {
+        max-width: convert-unit(150px, "rem");
+        width: convert-unit(150px, "rem");
+    }
+
+    .mat-sort-header-container,
+    th.mat-column-fullName,
+    td.mat-column-fullName,
+    td.mat-column-manage {
+        width: inherit;
+    }
+
+    .term {
+        font-size: 14px;
+    }
+}
+
+::ng-deep .filter-wrapper {
+    .filter-sub-wrapper {
+        .mat-form-field {
+            .mat-form-field-flex {
+                padding: convert-unit(7px, "rem") convert-unit(20px, "rem") !important;
+            }
+        }
+    }
+}
+
+.search-filter-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .search-wrapper {
+        padding-right: convert-unit(20px, "rem");
+    }
+
+    .search-action-buttons {
+        margin-top: convert-unit(20px, "rem");
+        display: flex;
+    }
+}
+
+.notification-badge {
+    display: inline-block;
+    margin-left: map-get($spacers, 5);
+}
+
+.notification-count {
+    min-width: convert-unit(20px, "rem");
+    height: convert-unit(20px, "rem");
+    background: get("color.info.danger.500");
+    font-size: convert-unit(11px, "rem");
+    line-height: normal;
+    color: get("color.white");
+    border-radius: convert-unit(10px, "rem");
+    padding: map-get($spacers, 0) map-get($spacers, 5);
+    margin: map-get($spacers, 5) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}

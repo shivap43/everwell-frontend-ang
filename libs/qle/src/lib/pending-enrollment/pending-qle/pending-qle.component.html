@@ -1,0 +1,291 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="form" *ngIf="!this.data.editLifeEvent" class="quasi-modal">
+    <div class="dialog-content">
+        <div class="mon-mb-20" *ngIf="errorResponse">
+            <mon-alert *ngIf="errorResponse" alertType="danger">
+                <span language="{{errorMessage}}"></span>
+            </mon-alert>
+        </div>
+        <h2 class="mon-mt-0"><span [language]="formTitle"></span></h2>
+        <div>
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.eventTypeLabel"></mat-label>
+            <mat-form-field class="w-285">
+                <mat-select
+                    (selectionChange)="changeInEvent($event)"
+                    formControlName="eventsType"
+                    aria-required="true"
+                    [(value)]="type"
+                    [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.eventTypeLabel']"
+                >
+                    <mat-option *ngFor="let event of eventTypes" [value]="event.id">{{event.description}} </mat-option>
+                </mat-select>
+                <mat-error></mat-error>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.eventDateLabel"></mat-label>
+            <mat-form-field class="w-200 mon-date-field">
+                <input
+                    matInput
+                    formControlName="eventDate"
+                    [matDatepicker]="picker"
+                    [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.eventDateLabel']"
+                    #Eventdate
+                />
+                <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                <mat-error>
+                    <span *ngIf="form.controls['eventDate'].errors?.requirementDate" [language]="getDateError()"></span>
+                    <span *ngIf="form.controls['eventDate'].errors?.requirements">
+                        {{ "secondary.portal.qle.pendingEnrollment.dateValidationMsg.dataPast" | replaceTag: { "#mindate": this.minDate,
+                        "#maxdate": this.maxDate } }}
+                    </span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.QLEaddedLabel"></mat-label>
+            <mat-form-field class="w-200 mon-date-field">
+                <input
+                    [matDatepicker]="qlePicker"
+                    matInput
+                    formControlName="createDate"
+                    [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.QLEaddedLabel']"
+                />
+                <mat-datepicker-toggle matSuffix>
+                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #qlePicker [disabled]="true"></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.notesLabel"></mat-label>
+            <mat-form-field class="w-400 textarea">
+                <textarea
+                    matInput
+                    formControlName="adminComment"
+                    [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.notesLabel']"
+                    rows="6"
+                ></textarea>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.employeeCommentsLabel"></mat-label>
+            <mat-form-field class="w-400 textarea">
+                <textarea
+                    matInput
+                    formControlName="memberComment"
+                    [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.employeeCommentsLabel']"
+                    rows="4"
+                    value="this.eventType.memberComment"
+                ></textarea>
+            </mat-form-field>
+        </div>
+
+        <div *ngIf="this.eventType.status ==='PENDING'">
+            <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.fileUploadLabel"></mat-label>
+            <div class="w-600">
+                <empowered-mon-upload
+                    (uploadFile)="validateFileAndUpload($event)"
+                    (viewFile)="viewFile($event)"
+                    (cancelUpload)="cancelFileUpload($event)"
+                    [isFileAvailable]="isFileAvailable"
+                    [isFileSelected]="isFileSelected"
+                    [isProgressBarEnabled]="isProgressBarEnabled"
+                    [files]="files"
+                    [uploadErrorStatus]="uploadErrorStatus"
+                    [uploadSucessStatus]="uploadSuccessStatus"
+                    [hasError]="hasError"
+                    [isSucess]="isSucess"
+                    [modeProgress]="modeProgress"
+                    [isUploadingStarted]="isUploadingStarted"
+                    [fileUploadPercentage]="fileUploadPercentage"
+                    [isFileViewable]="isFileViewable"
+                >
+                </empowered-mon-upload>
+            </div>
+        </div>
+        <div
+            class="read-only-control"
+            *ngIf="(this.eventType.status ==='APPROVED' || this.eventType.status ==='DENIED') && this.eventType.documents.length>0"
+        >
+            <mat-label class="mat-label" language="primary.portal.qle.documentsLabel"></mat-label>
+            <div class="content">
+                <div class="document-list" *ngFor="let document of this.eventType.documents">
+                    <div class="doc-icon">
+                        <mon-icon [iconSize]="34" iconName="file"></mon-icon>
+                    </div>
+                    <div class="doc-info">
+                        <strong [attr.aria-label]="document.fileName">{{document.fileName | titlecase}}</strong>
+                        <p>
+                            <mat-hint>
+                                <span language="primary.portal.qle.uploadedOnLabel"></span>
+                                {{document.uploadDate | date:'MM/dd/yyyy hh:mm:ss'}}
+                            </mat-hint>
+                        </p>
+                        <a href="javascript:void(0)" class="mon-btn-link" (click)="viewFile(document)">
+                            <span class="sr-only">{{document.fileName}}</span>
+                            <span language="primary.portal.qle.viewLabel"></span>
+                            {{document.fileName.split(".").pop()}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog-footer">
+        <div class="d-flex justify-content-between flex-fill align-items-center">
+            <button class="mon-btn-secondary" mat-flat-button mat-dialog-close (click)="closeForm()">
+                {{languageStrings['primary.portal.common.close']}}
+            </button>
+            <div *ngIf="this.eventType.status ==='PENDING'">
+                <button class="mon-btn-danger mon-mr-20" (click)="qleDeclined()" mat-flat-button>
+                    {{languageStrings['primary.portal.qle.pendingEnrollment.denyButtonLabel']}}
+                </button>
+                <button class="mon-btn-primary" (click)="qleApproved()" mat-flat-button>
+                    {{languageStrings['primary.portal.qle.pendingEnrollment.approveButtonLabel']}}
+                </button>
+            </div>
+            <div *ngIf="(this.eventType.status ==='APPROVED' || this.eventType.status ==='DENIED') && this.enableNext">
+                <button class="mon-btn-primary" (click)="onNext()" mat-flat-button>
+                    {{languageStrings['primary.portal.common.next']}}
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<form [formGroup]="form" *ngIf="this.data.editLifeEvent" class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.cancel']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <div class="header">
+            <h2 mat-dialog-title><span>{{ formTitle }}</span></h2>
+            <div class="mon-mt-20">
+                <mon-alert *ngIf="errorResponse" alertType="danger">
+                    <span language="{{errorMessage}}"></span>
+                </mon-alert>
+            </div>
+        </div>
+        <div class="scroll-content">
+            <div>
+                <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.eventTypeLabel"></mat-label>
+                <mat-form-field class="w-285">
+                    <mat-select
+                        (selectionChange)="changeInEvent($event)"
+                        formControlName="event"
+                        aria-required="true"
+                        [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.eventTypeLabel']"
+                    >
+                        <mat-option *ngFor="let event of eventTypes" [value]="event.id">{{event.description}} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.eventDateLabel"></mat-label>
+                <mat-form-field class="w-200 mon-date-field">
+                    <input
+                        matInput
+                        formControlName="eventDate"
+                        [matDatepicker]="picker"
+                        attr.aria-label="Event sate"
+                        #Eventdate
+                        [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.eventDateLabel']"
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                    <mat-error>
+                        <span *ngIf="form.controls['eventDate'].errors?.requirementDate" [language]="getDateError()"></span>
+                        <span *ngIf="form.controls['eventDate'].errors?.requirements">
+                            {{ "secondary.portal.qle.pendingEnrollment.dateValidationMsg.dataPast" | replaceTag: { "#mindate": this.minDate,
+                            "#maxdate": this.maxDate } }}
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.QLEaddedLabel"></mat-label>
+                <mat-form-field class="w-200 mon-date-field">
+                    <input
+                        [matDatepicker]="qlePicker"
+                        matInput
+                        formControlName="createDate"
+                        [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.QLEaddedLabel']"
+                    />
+                    <mat-datepicker-toggle matSuffix>
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #qlePicker [disabled]="true"></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div *ngIf="!isMember">
+                <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.notesLabel"></mat-label>
+                <mat-form-field class="w-400 textarea">
+                    <textarea
+                        matInput
+                        formControlName="adminComment"
+                        [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.notesLabel']"
+                    ></textarea>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label" language="primary.portal.qle.pendingEnrollment.employeeCommentsLabel"></mat-label>
+                <mat-form-field class="textarea">
+                    <textarea
+                        matInput
+                        formControlName="memberComment"
+                        [attr.aria-label]="languageStrings['primary.portal.qle.pendingEnrollment.employeeCommentsLabel']"
+                    ></textarea>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-label class="mat-label">
+                    <span class="subHeaderLabel" language="primary.portal.qle.addNewQle.fileUploadText"></span>
+                    <span class="optional-text" language="primary.portal.common.optional"></span>
+                </mat-label>
+                <div>
+                    <empowered-mon-upload
+                        [accept]="acceptableFormats"
+                        (uploadFile)="validateFileAndUpload($event)"
+                        (viewFile)="viewFile($event)"
+                        (cancelUpload)="cancelFileUpload($event)"
+                        [isFileAvailable]="isFileAvailable"
+                        [isFileSelected]="isFileSelected"
+                        [isProgressBarEnabled]="isProgressBarEnabled"
+                        [files]="files"
+                        [uploadErrorStatus]="uploadErrorStatus"
+                        [uploadSucessStatus]="uploadSuccessStatus"
+                        [hasError]="hasError"
+                        [isSucess]="isSucess"
+                        [modeProgress]="modeProgress"
+                        [isUploadingStarted]="isUploadingStarted"
+                        [fileUploadPercentage]="fileUploadPercentage"
+                        [isFileViewable]="isFileViewable"
+                        [isQLE]="true"
+                    ></empowered-mon-upload>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" aria-label="Cancel" (click)="closeForm()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button class="mon-btn-primary" mat-flat-button (click)="saveQLE()" mat-flat-button>
+            {{languageStrings['primary.portal.common.save']}}
+        </button>
+    </mat-dialog-actions>
+</form>

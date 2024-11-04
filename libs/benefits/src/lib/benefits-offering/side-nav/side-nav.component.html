@@ -1,0 +1,61 @@
+<mat-vertical-stepper
+    #progressIndicator
+    (selectionChange)="onStepChange($event)"
+    class="side-nav-stepper"
+    [linear]="true"
+    *ngIf="(InitialOfferingSteps$ | async) as InitialOfferingSteps"
+>
+    <ul #ulOfferingSteps>
+        <li class="offering-steps">
+            <mat-step [completed]="defaultStepPosition>+InitialOfferingSteps.SETTINGS+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.settings']}} </ng-template>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step [completed]="defaultStepPosition>+InitialOfferingSteps.PRODUCTS+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.products']}} </ng-template>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step [completed]="defaultStepPosition>InitialOfferingSteps.PLANS+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.plans']}} </ng-template>
+                <ul #ulPlansList *ngIf="showPlansList" class="sub-step">
+                    <li
+                        *ngFor="let product of productList;let i=index"
+                        [ngClass]="{'active' : presentProductIndex == i, 'future-step': (presentProductIndex != i && !productList[i].completed) }"
+                    >
+                        <button mat-flat-button class="sub-step-title" (click)="initiateChangeProduct(product.id)">{{product.name}}</button>
+                    </li>
+                </ul>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step [completed]="defaultStepPosition>InitialOfferingSteps.COVERAGE_DATES+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.benefitsOffering.avaliablity']}} </ng-template>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step
+                *ngIf="InitialOfferingSteps['PRICES_ELIGIBILITY']"
+                [completed]="defaultStepPosition>InitialOfferingSteps.PRICES_ELIGIBILITY+1"
+            >
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.pricesEligibility']}} </ng-template>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step [completed]="defaultStepPosition>InitialOfferingSteps.CARRIER_FORMS+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.carrierForms']}} </ng-template>
+            </mat-step>
+        </li>
+        <li class="offering-steps">
+            <mat-step *ngIf="InitialOfferingSteps['REVIEW_SUBMIT']" [completed]="defaultStepPosition>InitialOfferingSteps.REVIEW_SUBMIT+1">
+                <ng-template matStepLabel> {{languageStrings['primary.portal.sidenav.reviewSubmit']}} </ng-template>
+            </mat-step>
+        </li>
+    </ul>
+    <!-- Icon overrides -->
+    <ng-template matStepperIcon="done">
+        <span class="sr-only">{{languageStrings['primary.portal.sidenav.completedStepText']}}</span>
+        <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+    </ng-template>
+</mat-vertical-stepper>

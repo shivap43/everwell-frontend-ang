@@ -1,0 +1,533 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit(true)" class="quasi-modal">
+    <div class="dialog-content plan-wrapper">
+        <div class="mon-px-20 mon-pt-30">
+            <mon-alert
+                *ngIf="isError || isSingleAflacError || singleCarrierError || productPlansNotSelected"
+                alertType="danger"
+                (openedChange)="matSelectOpenHandler($event)"
+            >
+                <span>{{errorMessage}}</span>
+            </mon-alert>
+        </div>
+        <div class="mon-mx-20 mon-mt-20">
+            <mon-alert *ngIf="isVasMaxValid" alertType="danger">
+                <span>{{languageStrings["primary.portal.benefitOffering.plans.maxValueExceeded"]}}</span>
+            </mon-alert>
+        </div>
+        <div *ngIf="overlappingPlanError" class="alert-wrapper">
+            <mon-alert alertType="danger">
+                <span> {{overlappingErrorMessage}}</span>
+            </mon-alert>
+        </div>
+        <div *ngIf="plans.length">
+            <section class="mon-px-20">
+                <h2 class="mon-mb-0">
+                    <span language="primary.portal.benefitsOffering.plansTitle"></span>
+                    <span *ngIf="isHQFunded || isEmpFunded" language="primary.portal.benefitsOffering.vas"></span>
+                    <span *ngIf="isHQFunded || isEmpFunded"> &#x2013; </span>
+                    {{productList[presentProductIndex].name}}
+                </h2>
+                <div language="primary.portal.benefitsOffering.plansSubTitle" *ngIf="!(isHQFunded || isEmpFunded)"></div>
+                <div *ngIf="isHQFunded">
+                    <span language="primary.portal.benefitsOffering.hqSubtitleOffer"></span>
+                    <strong><span language="primary.portal.benefitsOffering.hqSubtitle1Plan"></span></strong>
+                    <span language="primary.portal.benefitsOffering.hqSubtitleNoCost"></span>
+                </div>
+                <div *ngIf="isEmpFunded">
+                    <span language="primary.portal.benefitsOffering.plansSubTitleWhat"></span>
+                    <strong><span language="primary.portal.benefitsOffering.plansSubTitlePlans"></span></strong>
+                    <span language="primary.portal.benefitsOffering.plansSubTitleOffering"></span>
+                </div>
+                <div *ngIf="isHQFunded" class="mon-my-10 text-wrap">
+                    <mat-radio-button (change)="updateReceivingHQ()" [checked]="!isReceivingHQ"> </mat-radio-button>
+                    <mat-card-subtitle language="primary.portal.benefitsOffering.rbReceivingHQ"></mat-card-subtitle>
+                </div>
+                <div class="carrierfilterwrp">
+                    <ng-container *ngIf="hasCarrierRestriction">
+                        <div class="radio-button-container carrieroptionwrp">
+                            <div class="carrieroptionlabel">{{languageStrings["primary.portal.benefitsOffering.carrieroptionlabel"]}}</div>
+                            <mat-radio-group (change)="loadCarrierPlans()" formControlName="carrier" class="form-radio-button">
+                                <ng-container *ngFor="let carrier of restrictedCarriers">
+                                    <mat-radio-button [value]="carrier.carrierIds" class="form-radio-button" [disabled]="carrier.disabled">
+                                        {{carrier.text}}
+                                    </mat-radio-button>
+                                </ng-container>
+                                <mat-radio-button [checked]="!isCarrierSelected">
+                                    {{ languageStrings["primary.portal.benefitsOffering.none"]}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="planTypeWrp" *ngIf="isADVEROption">
+                    <div class="radio-button-container planTypeoptionwrp">
+                        <div class="planTypeoptionlabel text-bold">
+                            <span language="primary.portal.benefitsOffering.planTypelabel"></span>
+                        </div>
+                        <mat-radio-group (change)="loadCarrierPlans()" formControlName="planType" class="form-radio-grp">
+                            <mat-radio-button [value]="eeSelected" class="form-radio-button" [checked]="!isERSelected">
+                                <span language="primary.portal.benefitsOffering.planTypeEEOption"></span>
+                            </mat-radio-button>
+                            <mat-radio-button [value]="erSelected" class="form-radio-button" [checked]="isERSelected">
+                                <span language="primary.portal.benefitsOffering.planTypeEROption"></span>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+                <ng-container *ngIf="isCarrierSelected">
+                    <div class="filter-wrapper text-right" *ngIf="!(isEmpFunded||isHQFunded)">
+                        <span class="d-none" language="primary.portal.common.apply"></span>
+                        <div (click)="configureFilters()" class="filter-sub-wrapper">
+                            <mat-form-field
+                                *ngIf="filtersData[fromCarriers] && filtersData[fromCarriers].length>1 && !hasCarrierRestriction"
+                            >
+                                <label
+                                    class="filter-label"
+                                    language="primary.portal.benefitsOffering.filterCarrier"
+                                    [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.filterCarrier']"
+                                ></label>
+                                <label class="filter-label" *ngIf="filterValue[fromCarriers].length"
+                                    >{{isDisplayFilter[fromCarriers]}}</label
+                                >
+                                <mat-select
+                                    #carriersFilterDropdown
+                                    formControlName="carriersFilter"
+                                    [panelClass]="filterClassNames.carriers"
+                                    multiple
+                                    disableOptionCentering
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-checkbox
+                                            class="mon-pb-0 mon-pt-20"
+                                            *ngIf="filtersData[fromCarriers].length>
+                                    7"
+                                            class="mat-option"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate(fromCarriers)"
+                                            [checked]="isChecked(fromCarriers)"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event, fromCarriers)"
+                                        >
+                                            <span
+                                                *ngIf="filtersData[fromCarriers].length>
+                                        7"
+                                                language="primary.portal.benefitsOffering.product.selectAll"
+                                            ></span>
+                                        </mat-checkbox>
+                                        <mat-divider *ngIf="filtersData[fromCarriers].length> 7"></mat-divider>
+                                        <mat-option *ngFor="let carrier of filtersData[fromCarriers]" [value]="carrier.name">
+                                            <span
+                                                [richTooltip]="carrier.name"
+                                                matTooltipPosition="above"
+                                                *ngIf="carrier.name.length > 23"
+                                                matTooltipClass="pos-above"
+                                            >
+                                                {{carrier.name|truncate:23}}</span
+                                            >
+
+                                            <span *ngIf="carrier.name.length <= 23"> {{carrier.name}}</span>
+                                        </mat-option>
+                                    </div>
+                                    <div [ngClass]="filtersData[fromCarriers].length> 7 ? 'mon-clear' : 'remove-clear'">
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="resetVal(fromCarriers)"
+                                                *ngIf="filterValue[fromCarriers].length"
+                                                >{{languageStrings['primary.portal.common.clear']}}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="filterApply(fromCarriers)" class="mon-apply"
+                                                >{{languageStrings['primary.portal.common.apply']}}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field *ngIf="filtersData[fromRiders].length>1">
+                                <label
+                                    class="filter-label"
+                                    language="primary.portal.benefitsOffering.filterRiders"
+                                    [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.filterRiders']"
+                                ></label
+                                ><label class="filter-label" *ngIf="filterValue[fromRiders].length"
+                                    >{{((isDisplayFilter[fromRiders]).length>30)? (isDisplayFilter[fromRiders] |
+                                    truncate:30):(isDisplayFilter[fromRiders] | titlecase)}}
+                                </label>
+                                <mat-select
+                                    #ridersFilterDropdown
+                                    formControlName="ridersFilter"
+                                    multiple
+                                    [panelClass]="filterClassNames.riders"
+                                    disableOptionCentering
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-checkbox
+                                            *ngIf="filtersData[fromRiders].length > 7"
+                                            class="mat-option mon-pt-20 mon-pb-20"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate(fromRiders)"
+                                            [checked]="isChecked(fromRiders)"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event, fromRiders)"
+                                        >
+                                            <span language="primary.portal.benefitsOffering.product.selectAll"></span>
+                                        </mat-checkbox>
+                                        <mat-divider *ngIf="filtersData[fromRiders].length > 7"></mat-divider>
+                                        <mat-option *ngFor="let rider of filtersData[fromRiders] " [value]="rider.name">
+                                            <span
+                                                [richTooltip]="rider.name"
+                                                matTooltipPosition="above"
+                                                *ngIf="rider.name.length > 23"
+                                                matTooltipClass="pos-above"
+                                            >
+                                                {{rider.name|truncate:23}}</span
+                                            >
+
+                                            <span *ngIf="rider.name.length <= 23"> {{rider.name}}</span>
+                                        </mat-option>
+                                    </div>
+                                    <div [ngClass]="filtersData[fromRiders].length> 7 ? 'mon-clear' : 'remove-clear'">
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="resetVal(fromRiders)"
+                                                *ngIf="filterValue[fromRiders].length"
+                                                >{{languageStrings['primary.portal.common.clear']}}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="filterApply(fromRiders)" class="mon-apply"
+                                                >{{languageStrings['primary.portal.common.apply']}}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field *ngIf="filtersData[fromStates].length>1">
+                                <label
+                                    class="filter-label"
+                                    language="primary.portal.benefitsOffering.filterStates"
+                                    [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.filterStates']"
+                                ></label
+                                ><label class="filter-label" *ngIf="filterValue[fromStates].length">{{isDisplayFilter[fromStates]}}</label>
+                                <mat-select
+                                    #statesFilterDropdown
+                                    formControlName="statesFilter"
+                                    multiple
+                                    [panelClass]="filterClassNames.state"
+                                    disableOptionCentering
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-checkbox
+                                            *ngIf="filtersData[fromStates].length > 7"
+                                            class="mat-option mon-pt-20 mon-pb-20"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate(fromStates)"
+                                            [checked]="isChecked(fromStates)"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event, fromStates)"
+                                        >
+                                            <span language="primary.portal.benefitsOffering.product.selectAll"></span>
+                                        </mat-checkbox>
+                                        <mat-divider *ngIf="filtersData[fromStates].length > 7"></mat-divider>
+                                        <mat-option *ngFor="let state of filtersData[fromStates]" [value]="state.name">
+                                            {{ state.name }}
+                                        </mat-option>
+                                    </div>
+                                    <div [ngClass]="filtersData[fromStates].length> 7 ? 'mon-clear' : 'remove-clear'">
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="resetVal(fromStates)"
+                                                *ngIf="filterValue[fromStates].length"
+                                                >{{languageStrings['primary.portal.common.clear']}}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="filterApply(fromStates)" class="mon-apply"
+                                                >{{languageStrings['primary.portal.common.apply']}}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <mon-alert alertType="warning" *ngIf="isHcfsaPlan">
+                        <span language="primary.portal.benefitsOffering.hcfsaInfoMessage"></span>
+                    </mon-alert>
+                    <mon-alert alertType="info" *ngIf="showDisclaimerForRSLICarrier && disclaimerMessage !== ''" class="message-block">
+                        <span>{{disclaimerMessage}}</span>
+                    </mon-alert>
+                    <mon-alert
+                        alertType="info"
+                        *ngIf="!isAccountRSLIEligible && productList[presentProductIndex].id === ProductId.LTD"
+                        class="message-block"
+                    >
+                        <span language="primary.portal.benefitsOffering.rsliEligibilityInfoMessage"></span>
+                    </mon-alert>
+                    <mon-alert alertType="danger" *ngIf="(errorMessageKey$ | async) as errorMessageKey" class="message-block">
+                        <span [language]="errorMessageKey"></span>
+                    </mon-alert>
+                    <div *ngIf="isRestrictedToSinglePlan && !hasCarrierRestriction">
+                        <mat-radio-button (change)="deselectPlans()" [checked]="!isSelected">
+                            {{ languageStrings["primary.portal.benefitsOffering.noneOfAbove"]}}
+                        </mat-radio-button>
+                    </div>
+                    <div
+                        *ngIf="!isNoneSelected"
+                        class="results-grid table-mask-wrapper mon-mb-50"
+                        [ngClass]="{'grid-overlay' : filterOpen || isSingleAflacError}"
+                    >
+                        <table [dataSource]="allPlans" mat-table matSort>
+                            <ng-container matColumnDef="selected">
+                                <th mat-header-cell *matHeaderCellDef class="w-20">
+                                    <mat-checkbox
+                                        (change)="masterToggle(fromPlans)"
+                                        [checked]="selection[fromPlans].hasValue() && isAllSelected(fromPlans)"
+                                        [indeterminate]="selection[fromPlans].hasValue() && !isAllSelected(fromPlans)"
+                                        *ngIf="!(isHQFunded || isRestrictedToSinglePlan) || (isVasException && isHQFunded)"
+                                        [disabled]="isExceptionProduct || isArgusPlans"
+                                    >
+                                    </mat-checkbox>
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <mat-radio-button
+                                        [name]="'id-'+element.productIdNumber"
+                                        (change)="updateHQPlan(element)"
+                                        [checked]="element.selected"
+                                        [disabled]="element.isPlanDisabled || disablePlanOption || (element.isRelianceStdPlan && !isAccountRSLIEligible) || isSingleAflacError"
+                                        *ngIf="(!isHQFunded && isRestrictedToSinglePlan) || (!isVasException && isHQFunded)"
+                                    >
+                                    </mat-radio-button>
+                                    <mat-checkbox
+                                        [checked]="selection[fromPlans].isSelected(element)"
+                                        (change)="updateCheckedPlans($event, element, fromPlans)"
+                                        *ngIf="!(isHQFunded || isRestrictedToSinglePlan) || (isVasException && isHQFunded)"
+                                        [disabled]="(isEmpFunded && element.isEmpFundedPlanDisabled)
+                                        || (element.isPlanDisabled) || disableArgusTierPlans[element.planId]"
+                                    >
+                                    </mat-checkbox>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="carrier">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.Carrier"></th>
+                                <td mat-cell *matCellDef="let element">{{ element.carrier }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="planName">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.Plan"></th>
+                                <td mat-cell *matCellDef="let element" (mouseEnter)="true">
+                                    <div [innerHTML]="element.planName"></div>
+                                    <a href="javascript:void(0)" class="infoicon" (click)="showPlanDetails(element)"
+                                        >{{languageStrings['primary.portal.benefitsOffering.details']}}
+                                    </a>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="riders">
+                                <th
+                                    class="text-right"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    language="primary.portal.benefitsOffering.availableRiders"
+                                ></th>
+                                <td class="text-right" mat-cell *matCellDef="let element">
+                                    {{ element.riders.length }}
+                                    <a
+                                        ng
+                                        [ngClass]="!element.riders.length ? 'invisible':'' "
+                                        href="javascript:void(0)"
+                                        richTooltip="{{displayValues(element.riders, 'tooltip', fromRiders)}}"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="rider-tooltip"
+                                        [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.altRiders']"
+                                    >
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            class="infoicon icon-primary"
+                                            [iconSize]="15"
+                                            [alt]="languageStrings['primary.portal.benefitsOffering.altRiders']"
+                                        ></mon-icon>
+                                    </a>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="states">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.filterStates"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{ displayValues(element.states,"display", fromStates) }}
+                                    <a
+                                        href="javascript:void(0)"
+                                        richTooltip="{{ displayValues(element.states,'tooltip', fromStates) }}"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above tooltip-wrapper available-riders-tooltip"
+                                        [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.altStates']"
+                                    >
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            class="infoicon icon-primary"
+                                            [iconSize]="15"
+                                            [alt]="languageStrings['primary.portal.benefitsOffering.altStates']"
+                                        ></mon-icon>
+                                    </a>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="preTax" *ngIf="preTaxSetPerPlan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.preTax"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <mat-radio-button
+                                        [value]="TaxStatus.PRETAX"
+                                        [disabled]="(!element.selected) || element.taxStatusReadOnly"
+                                        class="form-radio-button-stacked"
+                                        [name]="'id-'+element.planId"
+                                        [checked]="element.taxStatus === TaxStatus.PRETAX"
+                                        (change)="updateCheckedPlans($event, element, fromPretax)"
+                                    >
+                                    </mat-radio-button>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="postTax" *ngIf="preTaxSetPerPlan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.postTax"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <mat-radio-button
+                                        [value]="TaxStatus.POSTTAX"
+                                        [disabled]="(!element.selected) || element.taxStatusReadOnly "
+                                        (change)="updateCheckedPlans($event, element, fromPretax)"
+                                        [name]="'id-'+element.planId"
+                                        [checked]="element.taxStatus === TaxStatus.POSTTAX"
+                                        class="form-radio-button-stacked"
+                                    >
+                                    </mat-radio-button>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="both" *ngIf="preTaxSetPerPlan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.benefitsOffering.both"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <mat-radio-button
+                                        [value]="TaxStatus.VARIABLE"
+                                        [disabled]="(!element.selected) || element.taxStatusReadOnly"
+                                        (change)="updateCheckedPlans($event, element, fromPretax)"
+                                        [name]="'id-'+element.planId"
+                                        [checked]="element.taxStatus === TaxStatus.VARIABLE"
+                                        class="form-radio-button-stacked"
+                                    >
+                                    </mat-radio-button>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedPlansColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedPlansColumns"></tr>
+                        </table>
+                    </div>
+                </ng-container>
+            </section>
+            <div class="divider"></div>
+            <ng-container *ngIf="isCarrierSelected && !isNoneSelected">
+                <section class="plan-option">
+                    <div *ngIf="!hideBothTaxStatus">
+                        <span class="status" language="primary.portal.benefitsOffering.taxStatus"></span
+                        ><a
+                            href="javascript:void(0)"
+                            class="d-inline-flex mon-mx-5"
+                            (click)="togglePretaxCafeteria(fromPretax)"
+                            *ngIf="!preTaxSetPerPlan && isPreTaxEligible && isReceivingHQ"
+                            language="primary.portal.benefitsOffering.setPlan"
+                        >
+                        </a>
+                    </div>
+                    <div *ngIf="!preTaxSetPerPlan else message">
+                        <mat-radio-group (change)="masterToggle(fromPretax, $event)">
+                            <mat-radio-button
+                                [value]="TaxStatus.PRETAX"
+                                class="form-radio-button-stacked"
+                                [disabled]="globalTaxStatusDisable"
+                                [checked]="isPreTax"
+                            >
+                                <span language="primary.portal.benefitsOffering.preTax"> </span>
+                            </mat-radio-button>
+                            <mat-radio-button
+                                [value]="TaxStatus.POSTTAX"
+                                class="form-radio-button-stacked"
+                                [disabled]="globalTaxStatusDisable"
+                                [checked]="isPostTax"
+                            >
+                                <span language="primary.portal.benefitsOffering.postTax"></span>
+                            </mat-radio-button>
+                            <mat-radio-button
+                                *ngIf="!hideBothTaxStatus"
+                                [value]="TaxStatus.VARIABLE"
+                                class="form-radio-button-stacked"
+                                [disabled]="globalTaxStatusDisable"
+                                [checked]="isVariable"
+                            >
+                                <span language="primary.portal.benefitsOffering.bothTax"></span>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <div>
+                        <ng-template #message>
+                            {{languageStrings['primary.portal.benefitsOffering.taxStatus.setAtPlanLevel']}}
+                        </ng-template>
+                        <mat-checkbox
+                            (change)="masterToggle(fromAssistanceRequired)"
+                            [checked]="(situsState === companyCode.NY  && !isRole20User) ||
+                  (selection[fromAssistanceRequired].hasValue() && isAllSelected(fromAssistanceRequired)) || (!minEmployees && !isTPPAccount) || isRestrictedPlanSelected"
+                            [indeterminate]="selection[fromAssistanceRequired].hasValue() && !isAllSelected(fromAssistanceRequired)"
+                            [disabled]="!isReceivingHQ  || !isAllowChange || (situsState === companyCode.NY  && !isRole20User) || (!minEmployees && !isTPPAccount) || isRestrictedPlanSelected || (isVasEmployeeFunded$ | async) === false || (isVasHQFunded$ | async) === false"
+                            class="d-inline-flex"
+                        >
+                            <span class="mat-card-subtitle">{{languageStrings['primary.portal.benefitsOffering.agentRequired']}}</span>
+                        </mat-checkbox>
+                        <a
+                            href="javascript:void(0)"
+                            class="d-inline-flex mon-ml-5"
+                            (click)="togglePretaxCafeteria(fromAssistanceRequired)"
+                            *ngIf="(!assitancePerCarrier && filtersData[fromCarriers].length>1 && isReceivingHQ) && !(!this.isAllowChange || (!this.minEmployees && !this.isTPPAccount) || this.isRestrictedPlanSelected) || (isVasEmployeeFunded$ | async) === false || (isVasHQFunded$ | async) === false"
+                        >
+                            <span>{{languageStrings['primary.portal.benefitsOffering.setPerCarrier']}}</span>
+                            <span class="d-none">{{languageStrings['primary.portal.benefitsOffering.agentAssistance']}}</span>
+                        </a>
+                    </div>
+                    <div class="self-service-enrollment" *ngIf="(!minEmployees && !isTPPAccount)">{{ minEligibleCountMsg}}</div>
+                    <div class="self-service-enrollment" *ngIf="isRestrictedPlanSelected">{{restrictedStateAlert}}</div>
+
+                    <div class="mon-pt-5 mon-ml-20" *ngIf="assitancePerCarrier && isReceivingHQ">
+                        <div class="aflac-check" *ngFor="let carrier of filtersData[fromCarriers]">
+                            <mat-checkbox
+                                [checked]="selection[fromAssistanceRequired].isSelected(carrier) || (!minEmployees && !isTPPAccount) "
+                                (change)="updateCheckedPlans($event, carrier, fromAssistanceRequired)"
+                                [disabled]="carrier.agentAssistedDisabled || (!minEmployees && !isTPPAccount)"
+                                >{{ carrier.name }}
+                            </mat-checkbox>
+                            <div class="self-service-enrollment" *ngIf="(!minEmployees && !isTPPAccount)">{{ minEligibleCountMsg}}</div>
+                            <div class="self-service-enrollment" *ngIf="restrictedStatesCarrierSpecific && restrictedStatesrow === carrier">
+                                {{restrictedStateAlertCarrier}}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="divider mon-my-30"></div>
+            </ng-container>
+        </div>
+    </div>
+    <div class="dialog-footer justify-content-end" *ngIf="plans.length">
+        <span *ngIf="this.data.planType !== 'false'">
+            <button type="button" (click)="onBack()" class="mon-btn-secondary" [disabled]="backButtonClicked" mat-flat-button>
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+        </span>
+        <button type="submit" class="mon-btn-primary mon-ml-20" [disabled]="disableNextButon" mat-flat-button>
+            {{languageStrings['primary.portal.common.next']}}
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</form>

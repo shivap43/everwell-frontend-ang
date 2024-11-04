@@ -1,0 +1,346 @@
+<!-- AG benefit offering -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="ag-ibo-wrapper">
+    <form [formGroup]="aflacGroupOfferingForm" (ngSubmit)="onSubmitOffering()">
+        <h1 class="header">
+            {{languageStrings['primary.portal.benefitsOffering.newAflacGroupOffering']}}
+        </h1>
+        <div *ngIf="errorMessage" class="alert-wrapper">
+            <mon-alert alertType="danger">
+                <span> {{errorMessage}}</span>
+            </mon-alert>
+        </div>
+        <p
+            class="sub-title"
+            *ngIf="!eligiblePlansInfo?.aflacGroupOfferingError?.error && !errorMessage && productDataSource?.length"
+        >
+            {{languageStrings['primary.portal.benefitsOffering.confirmEnrollmentDates']}}
+        </p>
+        <div class="alert-wrapper" *ngIf="eligiblePlansInfo?.aflacGroupOfferingError?.error">
+            <mon-alert alertType="{{alertType}}" *ngIf="aflacGroupOfferingError">
+                <p class="info-text">
+                    {{aflacGroupOfferingError}}
+                </p>
+                <div *ngIf="nonSelfServiceProducts?.length">
+                    <ul class="product-list">
+                        <li *ngFor="let product of nonSelfServiceProducts">
+                            {{product}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="mon-mt-5" *ngIf="contactBroker">{{contactBroker}}</div>
+                <div *ngIf="brokerList && brokerList.length > 1">
+                    <span>{{languageStrings["primary.portal.benefitsOffering.product.brokerSalesProfessional"]}}</span>
+                    <ul class="mon-m-0">
+                        <li *ngFor="let item of brokerList">
+                            {{item.fullName}} - <a href="mailto:{{item.email}}">{{item.email}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="brokerList && brokerList.length === 1">
+                    {{brokerList[0].partyKey}}, {{brokerList[0].fullName}} -
+                    <a href="javascript:void(0)">{{brokerList[0].email}}</a>
+                </div>
+                <div class="mon-mb-5" *ngIf="clientManagerList && clientManagerList.length > 1">
+                    <span>{{languageStrings["primary.portal.benefitsOffering.product.clientManager"]}}</span>
+                    <ul class="mon-m-0">
+                        <li *ngFor="let item of clientManagerList">
+                            {{item.fullName}} - <a href="mailto:{{item.email}}">{{item.email}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="clientManagerList && clientManagerList.length === 1">
+                    {{clientManagerList[0].partyKey}}, {{clientManagerList[0].fullName}} -
+                    <a href="javascript:void(0)">{{clientManagerList[0].email}}</a>
+                </div>
+                <div *ngIf="agentDetails">
+                    <p>
+                        <span>
+                            {{languageStrings["primary.portal.benefitsOffering.assistanceInfo"] | replaceTag:
+                            {"##name##": agentDetails.fullName} }}
+                        </span>
+                        <a href="javascript:void(0)">
+                            {{languageStrings["primary.portal.benefitsOffering.contactEmail"] | replaceTag:
+                            {"##email##": agentDetails.email} }}</a
+                        >
+                    </p>
+                </div>
+            </mon-alert>
+        </div>
+        <ng-container *ngIf="!productDataSource?.length && isAccountSharedCase">
+            <p>
+                {{languageStrings["primary.portal.aflacGroupOffering.zeroState"]}}
+            </p>
+            <button
+                type="button"
+                class="mon-btn-primary"
+                (click)="navigateToBO('false')"
+                [attr.aria-label]="languageStrings['primary.portal.aflacGroupOffering.setUpNonAg.label']"
+                mat-flat-button
+            >
+                {{languageStrings["primary.portal.aflacGroupOffering.setUpNonAg.label"]}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="productDataSource?.length">
+            <table mat-table [dataSource]="productDataSource" [hidden]="!productDataSource?.length">
+                <!-- Product Column -->
+                <ng-container matColumnDef="product">
+                    <th mat-header-cell *matHeaderCellDef id="product">
+                        {{languageStrings['primary.portal.benefitsOffering.product']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element.product.name}}</td>
+                </ng-container>
+                <!-- Plan Column -->
+                <ng-container matColumnDef="plan">
+                    <th mat-header-cell *matHeaderCellDef id="plan">
+                        {{languageStrings['primary.portal.benefitsOffering.Plan']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+                </ng-container>
+
+                <!-- Available riders Column -->
+                <ng-container matColumnDef="availableRiders">
+                    <th mat-header-cell *matHeaderCellDef id="availableRiders">
+                        {{languageStrings['primary.portal.benefitsOffering.availableRiders']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.riders.length}}<a
+                            *ngIf="element.riders.length"
+                            [richTooltip]="element.ridersTooltipInfo"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.availableRiders']"
+                        >
+                            <mon-icon
+                                iconName="Filled-info"
+                                iconSize="14"
+                                class="earliest-coverage-start-info"
+                            ></mon-icon>
+                        </a>
+                    </td>
+                </ng-container>
+
+                <!-- Tax status required Column -->
+                <ng-container matColumnDef="taxStatus">
+                    <th mat-header-cell *matHeaderCellDef id="taxStatus">
+                        {{languageStrings['primary.portal.benefitsOffering.taxStatus']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span [ngSwitch]="element.taxStatus">
+                            <span *ngSwitchCase="taxStatus.PRETAX"
+                                >{{languageStrings["primary.portal.benefitsOffering.preTax"]}}</span
+                            >
+                            <span *ngSwitchCase="taxStatus.POSTTAX"
+                                >{{languageStrings["primary.portal.coverage.posttax"]}}</span
+                            >
+                            <span *ngSwitchDefault
+                                >{{languageStrings["primary.portal.benefitsOffering.prePostTax"]}}</span
+                            >
+                        </span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="productDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: productDisplayedColumns;"></tr>
+            </table>
+
+            <div class="flex-form-wrapper">
+                <div class="d-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.benefitsOffering.planName']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                type="text"
+                                formControlName="planYearName"
+                                [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.planName']"
+                                autocomplete="off"
+                            />
+                            <mat-hint>{{languageStrings['primary.portal.benefitsOffering.planExample']}}</mat-hint>
+                            <mat-error>
+                                <span *ngIf="aflacGroupOfferingForm.controls.planYearName.errors?.required"
+                                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.benefitsOffering.enrollmentDates']}}
+                    </mat-label>
+                    <div class="d-flex" formGroupName="enrollmentPeriod">
+                        <div class="flex-item">
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="enrollmentStartDate"
+                                    matInput
+                                    formControlName="effectiveStarting"
+                                    [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                    empoweredDateTransform
+                                    autocomplete="off"
+                                    [min]="today"
+                                    [max]="coverageDateGroup.controls.effectiveStarting.value"
+                                    (blur)="onBlur($event, enrollmentDateGroup.controls.effectiveStarting)"
+                                    (input)="checkDateInput($event, enrollmentDateGroup.controls.effectiveStarting)"
+                                />
+                                <mat-datepicker #enrollmentStartDate></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="enrollmentStartDate.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="enrollmentDateGroup.controls.effectiveStarting.errors?.required"
+                                        >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.effectiveStarting.errors?.pastDate"
+                                        >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.effectiveStarting.errors?.invalid"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.invalidDate']}}</span
+                                    >
+                                    <span
+                                        *ngIf="enrollmentDateGroup.controls.effectiveStarting.errors?.invalidStartDate"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.cannotBeAfterEnrollmentDate']}}</span
+                                    >
+                                    <span
+                                        *ngIf="enrollmentDateGroup.controls.effectiveStarting.errors?.greaterThanCoverageDate"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.cannotBeAfterCoverageDate']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="enrollmentEndDate"
+                                    matInput
+                                    formControlName="expiresAfter"
+                                    [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.nonAflacCoverageDates']"
+                                    empoweredDateTransform
+                                    autocomplete="off"
+                                    [min]="today"
+                                    [max]="coverageDateGroup.controls.effectiveStarting.value"
+                                    (blur)="onBlur($event,enrollmentDateGroup.controls.expiresAfter)"
+                                    (input)="checkDateInput($event,enrollmentDateGroup.controls.expiresAfter)"
+                                />
+                                <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="enrollmentEndDate.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                <mat-error>
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.required"
+                                        >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.pastDate"
+                                        >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.invalid"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.invalidDate']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.invalidEndDate"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.cannotBeBeforeEnrollmentDate']}}</span
+                                    >
+                                    <span
+                                        *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.greaterThanCoverageDate"
+                                        >{{languageStrings['primary.portal.benefits.agOffering.cannotBeAfterCoverageDate']}}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.minimumDays"
+                                        >{{
+                                        languageStrings['primary.portal.benefits.agOffering.boDaysBetweenOeAndCoverage']
+                                        | replaceTag : { "##mindays##" : agMinDaysDifference } }}</span
+                                    >
+                                    <span *ngIf="enrollmentDateGroup.controls.expiresAfter.errors?.maximumDays"
+                                        >{{
+                                        languageStrings['primary.portal.benefits.agOffering.maxDaysBetweenOeAndCoverage']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex" formGroupName="coveragePeriod">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.benefitsOffering.coverageStartDate']}}
+                            <a
+                                [richTooltip]="languageStrings['primary.portal.benefitsOffering.aflacOffering.coverageDateInfo']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.availableRiders']"
+                            >
+                                <mon-icon
+                                    iconName="Filled-info"
+                                    iconSize="14"
+                                    class="earliest-coverage-start-info"
+                                ></mon-icon>
+                            </a>
+                        </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [matDatepicker]="coverageStartDatePicker"
+                                matInput
+                                formControlName="effectiveStarting"
+                                [attr.aria-label]="languageStrings['primary.portal.benefitsOffering.coverageDates']"
+                                empoweredDateTransform
+                                autocomplete="off"
+                            />
+                            <mat-datepicker #coverageStartDatePicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix (click)="coverageStartDatePicker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.editPlanYear.coverageEndDate']}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [matDatepicker]="coverageDatesPicker"
+                                matInput
+                                formControlName="expiresAfter"
+                                [attr.aria-label]="languageStrings['primary.portal.common.date']"
+                                empoweredDateTransform
+                                autocomplete="off"
+                            />
+                            <mat-datepicker #coverageDatesPicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix (click)="coverageDatesPicker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="submit-offering">
+                <button
+                    type="submit"
+                    *ngIf="!isAccountSharedCase"
+                    mat-button
+                    class="mon-btn-primary"
+                    [disabled]="disableSubmitOffering || isSubmitted"
+                    [attr.aria-label]="languageStrings['primary.portal.reviewSubmit.submitOffering']"
+                >
+                    {{languageStrings['primary.portal.reviewSubmit.submitOffering']}}
+                </button>
+                <button
+                    type="submit"
+                    *ngIf="isAccountSharedCase"
+                    mat-button
+                    class="mon-btn-primary"
+                    [attr.aria-label]="languageStrings['primary.portal.common.next']"
+                >
+                    {{languageStrings['primary.portal.common.next']}}
+                </button>
+            </div>
+        </ng-container>
+    </form>
+</div>

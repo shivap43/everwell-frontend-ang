@@ -1,0 +1,286 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<ng-container>
+    <form [formGroup]="form" (ngSubmit)="validatePolicy()">
+        <div *ngIf="body">
+            <section class="section-container">
+                <div class="section-subheader">
+                    <p>{{stepData.directions}}</p>
+                </div>
+                <div class="question-container">
+                    <div class="question-block">
+                        <p [innerHTML]="body"></p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group (change)="getImportRadioValue($event)" formControlName="question">
+                                <!-- TODO Static text should come from language -->
+                                <mat-radio-button value="yes"
+                                    >{{languageStrings['primary.portal.common.yes']}}</mat-radio-button
+                                >
+                                <mat-radio-button value="no"
+                                    >{{languageStrings['primary.portal.common.no']}}</mat-radio-button
+                                >
+                                <mat-error *ngIf="radioError && !form.controls['question'].value && body"
+                                    >{{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                </mat-error>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="action-btns"
+                    [ngClass]="{'last-step': this.planObject.lastStep}"
+                    *ngIf="(importRadioValue === 'no' && !isDiscard) || !importRadioValue || (!importRequired && !isReinstateRequired)
+          || (importRadioValue === 'yes' && isReinstateRequired)"
+                >
+                    <button (click)="saveChoice()" type="button" class="mon-btn-primary" mat-flat-button>
+                        <span language="primary.portal.common.next"></span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+        <ng-container>
+            <div *ngIf="policyToBeShown">
+                <section class="section-container">
+                    <div class="question-container">
+                        <div class="question-block">
+                            <p [innerHTML]="policyText"></p>
+                        </div>
+                        <div class="response-block">
+                            <div class="response-type input">
+                                <!-- TODO Static text should come from language -->
+                                <mat-label class="mat-label"
+                                    >{{"primary.portal.applicationFlow.reinstate.productPolicyimport"| replaceTag: {
+                                    "#productname": this.productName } }}</mat-label
+                                >
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.applicationFlow.conversion.policyNumber']}}</mat-label
+                                >
+                                <mat-form-field class="d-md-flex">
+                                    <input
+                                        matInput
+                                        formControlName="policy"
+                                        maxlength="8"
+                                        (change)="resetImports($event)"
+                                        [attr.aria-label]="languageStrings['primary.portal.applicationFlow.conversion.policyNumber']"
+                                    />
+                                    <!-- TODO Static text should come from language -->
+                                    <mat-error *ngIf="form.controls['policy'].errors?.pattern">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.reinstate.musteightalphnum']}}
+                                    </mat-error>
+                                    <!-- TODO Static text should come from language -->
+                                    <mat-error *ngIf="!form.controls['policy'].value"
+                                        >{{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}</mat-error
+                                    >
+                                    <!-- TODO Static text should come from language -->
+                                    <mat-error
+                                        *ngIf="form.controls['policy'].errors?.policy && form.controls['policy'].value"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.reinstate.invalidPolicynumber']}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <!-- TODO Static text should come from language -->
+                                <ng-container *ngIf="body">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.applicationFlow.reinstate.policyholderBirthdate']}}</mat-label
+                                    >
+                                    <mat-form-field class="d-md-flex mon-date-field">
+                                        <input
+                                            matInput
+                                            disabled
+                                            [value]="form.controls['date'].value"
+                                            formContolName="date"
+                                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.reinstate.policyholderBirthdate']"
+                                        />
+                                        <mat-datepicker #dp></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix [for]="dp">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                    </mat-form-field>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="action-btns"
+                        [ngClass]="{'last-step': this.planObject.lastStep}"
+                        *ngIf="!(this.isNotEligible || this.isMandatory || this.isOptional)"
+                    >
+                        <button type="submit" class="mon-btn-primary" mat-flat-button>
+                            <span language="primary.portal.common.next"></span>
+                            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </ng-container>
+        <div *ngIf="isMandatory">
+            <section class="section-container">
+                <!-- TODO Static text should come from language -->
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.applicationFlow.reinstate.matchingPolicyfound']}}</mat-label
+                >
+                <div class="question-container">
+                    <div class="question-block">
+                        <p
+                            innerHTML="We found a matching policy that must be reinstated before you qualify for {{productName}} coverage. Reinstate policy?"
+                        ></p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group (change)="reinstateRadioValue($event)" formControlName="mandatoryQuestion">
+                                <!-- TODO Static text should come from language -->
+                                <mat-radio-button value="yes">Yes</mat-radio-button>
+                                <mat-radio-button value="no">No</mat-radio-button>
+                                <mat-error
+                                    *ngIf="radioError && isMandatory && !form.controls['mandatoryQuestion'].value"
+                                >
+                                    {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}</mat-error
+                                >
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}" *ngIf="!isDiscard">
+                    <button (click)="reinstate()" type="button" class="mon-btn-primary" mat-flat-button>
+                        <span language="primary.portal.common.next"></span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+        <div *ngIf="isOptional">
+            <section class="section-container">
+                <!-- TODO Static text should come from language -->
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.applicationFlow.reinstate.matchingPolicyfound']}}</mat-label
+                >
+                <div class="question-container">
+                    <div class="question-block">
+                        <!-- TODO Static text should come from language -->
+                        <p id="reinstateeligiblePolicy">
+                            {{languageStrings['primary.portal.applicationFlow.reinstate.eligiblePolicy']}}
+                        </p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group
+                                formControlName="optionalQuestion"
+                                aria-labelledby="reinstateeligiblePolicy"
+                            >
+                                <!-- TODO Static text should come from language -->
+                                <mat-radio-button value="yes">Yes</mat-radio-button>
+                                <mat-radio-button value="no">No</mat-radio-button>
+                                <mat-error *ngIf="radioError && isOptional && !form.controls['optionalQuestion'].value">
+                                    {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                </mat-error>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}" *ngIf="!isDiscard">
+                    <button (click)="reinstate()" type="button" class="mon-btn-primary" mat-flat-button>
+                        <span language="primary.portal.common.next"></span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+        <div *ngIf="isNotEligible">
+            <section class="section-container">
+                <!-- TODO Static text should come from language -->
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.applicationFlow.reinstate.matchingPolicyfound']}}</mat-label
+                >
+                <div class="question-container">
+                    <div class="question-block">
+                        <p
+                            innerHTML="We found a matching policy that's no longer available for reinstatement. You can continue with the {{productName}} application"
+                        ></p>
+                    </div>
+                </div>
+                <div class="action-btns">
+                    <button (click)="saveChoice(noValue)" type="button" class="mon-btn-primary" mat-flat-button>
+                        <span language="primary.portal.common.next"></span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+        <div *ngIf="isDiscard">
+            <section class="section-container">
+                <!-- TODO Static text should come from language -->
+                <mat-label class="mat-label"
+                    >{{"primary.portal.applicationFlow.reinstate.productnameCoverage"| replaceTag: {
+                    "#productname":this.productName } }}</mat-label
+                >
+                <div class="question-container">
+                    <div class="question-block">
+                        <p innerHTML="{{deniedText}}"></p>
+                    </div>
+                </div>
+                <div class="action-btns">
+                    <button (click)="discardApplication()" type="button" class="mon-btn-primary" mat-flat-button>
+                        <span
+                            >{{"primary.portal.applicationFlow.reinstate.withoutProductname"| replaceTag: {
+                            "#productname":this.productName } }}</span
+                        >
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </form>
+</ng-container>
+<div>
+    <ng-template #reinstateInfoModal>
+        <empowered-modal type="POPUP" size="MD" [showCancel]="false">
+            <empowered-modal-header>
+                <span>{{languageStrings["primary.portal.applicationFlow.reinstate.complete"]}}</span>
+            </empowered-modal-header>
+            <empowered-modal-footer>
+                <div>
+                    <button
+                        class="mon-btn-primary popup-btn-update"
+                        mat-flat-button
+                        (click)="updateReinstateSelection()"
+                    >
+                        {{languageStrings["primary.portal.common.next"]}}
+                    </button>
+                </div>
+            </empowered-modal-footer>
+            <div class="section-container">
+                <div class="question-container">
+                    <div class="question-block">
+                        <p>{{languageStrings["primary.portal.applicationFlow.reinstate.option"]}}</p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group (change)="reinstateSelection($event.value)">
+                                <mat-radio-button [value]="KEEP">
+                                    {{languageStrings["primary.portal.applicationFlow.reinstate.keep"]}}{{reinstatedPlanName}}
+                                </mat-radio-button>
+                                <mat-radio-button [value]="APPLY">
+                                    {{languageStrings["primary.portal.applicationFlow.reinstate.allow"]}}{{planObject.application.planName}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <mat-error *ngIf="reinstateOptionSelectionError">
+                                {{languageSecondStringsArray["secondary.portal.applicationFlow.question.selectionRequired"]}}
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </empowered-modal>
+    </ng-template>
+</div>
+
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

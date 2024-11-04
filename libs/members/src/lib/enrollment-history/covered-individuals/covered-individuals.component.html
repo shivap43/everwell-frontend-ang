@@ -1,0 +1,29 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="covered-individuals">
+    <div class="d-flex main-header-mat-tab">
+        <p class="left-content">{{languageStrings['primary.portal.activityHistory.coveredIndividuals']}}</p>
+        <p class="right-content">{{languageStrings['primary.portal.activityHistory.updateFirstLast']}}</p>
+    </div>
+
+    <table mat-table [dataSource]="enrollmentDependent">
+        <ng-container matColumnDef="Name">
+            <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.activityHistory.name']}}</th>
+            <td mat-cell *matCellDef="let element">{{element.name}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="Coveragedate">
+            <th mat-header-cell *matHeaderCellDef>
+                {{languageStrings['primary.portal.activityHistory.coverageDate']}}
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <span *ngIf="element.validity">
+                    {{element.validity.effectiveStarting | date: dateFormat}} - {{element.validity.expiresAfter| date:
+                    dateFormat}}
+                </span>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>

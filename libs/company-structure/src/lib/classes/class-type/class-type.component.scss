@@ -1,0 +1,95 @@
+@import "shared";
+
+:host {
+    margin-bottom: convert-unit(15px, "rem");
+
+    .mat-expansion-panel {
+        padding: 0 !important;
+        &:hover {
+            .link-danger {
+                opacity: 1;
+            }
+        }
+        .classtype-panel-desc {
+            color: get("color.gray.700");
+            @include fontFace("primary.regular");
+            font-size: convert-unit(16px, "rem");
+            margin-top: convert-unit(2px, "rem");
+        }
+    }
+
+    .classtype-panel-title {
+        > * {
+            margin-right: convert-unit(10px, "rem") !important;
+        }
+        p {
+            &.class-type-name {
+                color: get("color.gray.1000");
+                @include fontFace("primary.bold");
+                font-size: convert-unit(18px, "rem");
+            }
+        }
+        h4.classtype-newclass-title {
+            @include fontFace("primary.regular");
+            font-size: convert-unit(22px, "rem") !important;
+            color: get("color.black");
+            font-weight: normal !important;
+        }
+        .mat-button {
+            @include fontFace("primary.regular");
+        }
+    }
+
+    ::ng-deep .mat-expansion-panel.group-expand.mat-expanded.panel-active {
+        .mat-expansion-panel-content {
+            border-bottom: 1px solid get("color.gray.700");
+        }
+    }
+}
+
+.mat-expansion-panel {
+    &.group-expand {
+        .prevent-click {
+            padding-left: 0 !important;
+            min-height: convert-unit(52px, "rem");
+            height: auto !important;
+            &:hover {
+                background-color: get("color.white") !important;
+            }
+            &:focus {
+                background-color: get("color.white");
+            }
+            &.zero-state.mat-expansion-panel-header {
+                border-top: 0;
+                .mat-expansion-panel-header-title {
+                    margin-left: 0;
+                }
+            }
+        }
+        &.panel-active {
+            .zero-state.mat-expansion-panel-header {
+                border-top: 1px solid get("color.gray.700") !important;
+                .mat-expansion-panel-header-title {
+                    margin-left: convert-unit(15px, "rem");
+                }
+            }
+        }
+    }
+}
+.classtype-removeedit-wrapper {
+    font-size: convert-unit(16px, "rem");
+    font-weight: normal;
+}
+.classtype-newclass-title {
+    @include fontFace("primary.bold");
+    font-size: convert-unit(16px, "rem") !important;
+}
+.panel-desc {
+    overflow-wrap: normal;
+}
+.mon-btn-link.mon-alert-btn-link {
+    line-height: 20px;
+}
+.mon-alert {
+    margin: map-get($spacers, 30);
+}

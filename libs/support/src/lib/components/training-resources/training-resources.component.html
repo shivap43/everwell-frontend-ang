@@ -1,0 +1,77 @@
+<div class="unplugged-wrapper">
+    <div class="flex-grid">
+        <div class="right-content">
+            <div class="softdoc">
+                <span language="primary.portal.support.userProcessGuide.leftNavLink"></span>
+            </div>
+            <div *ngIf="!trainingResourceConfig">
+                <!-- User process guide header -->
+                <div class="everwell">
+                    <span language="primary.portal.support.userProcessGuide.header"></span>
+                </div>
+                <!-- User Process Guide Information -->
+                <p language="primary.portal.support.userProcessGuide.info"></p>
+                <!-- On click of the link user can access user process guide -->
+                <div class="viewProcessGuide">
+                    <a href="{{userAccessGuideUrl | async}}" target="_blank">
+                        <span language="primary.portal.support.userProcessGuide.link"></span>
+                    </a>
+                </div>
+            </div>
+            <div *ngIf="trainingResourceConfig">
+                <table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+                    <ng-container matColumnDef="resource">
+                        <th id="resource" *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                            <span language="primary.portal.resources.resource"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'resource'}">
+                            <span class="status-text"> {{ element.resource }} </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="description">
+                        <th id="description" *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                            <span language="primary.portal.reportList.description"></span>
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'description'}"
+                        >
+                            <span class="status-text"> {{ element.description }} </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="updatedDate">
+                        <th
+                            id="lastUpdatedDate"
+                            *matHeaderCellDef
+                            mat-header-cell
+                            mat-sort-header
+                            [disabled]="threshold"
+                        >
+                            <span language="primary.portal.reportList.lastUpdated"></span>
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'updatedDate'}"
+                        >
+                            <span class="status-text"> {{ element.updatedDate }} </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="link">
+                        <th id="links" *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                            <span language="primary.portal.planDetails.links"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'link'}">
+                            <a href="{{element.link}}" target="_blank">
+                                <span language="primary.portal.reportList.viewGuide"></span>
+                            </a>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+                    <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,128 @@
+@import "shared";
+
+.isDisabled {
+    color: currentColor;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+.step-two-header {
+    table {
+        text-align: left;
+
+        th {
+            padding-right: 50px;
+
+            .info-icon {
+                height: convert-unit(18px, "rem");
+                line-height: convert-unit(18px, "rem");
+
+                .infoicon {
+                    line-height: 20px;
+                    margin: convert-unit(0px, "rem");
+                }
+            }
+
+            &:last-child {
+                font-weight: normal;
+            }
+        }
+    }
+}
+
+.step-two-content {
+    .split-details {
+        .split-content {
+            padding-top: convert-unit(15px, "rem");
+
+            .split-content-data {
+                display: flex;
+                justify-content: flex-start;
+
+                div {
+                    padding-right: convert-unit(20px, "rem");
+                }
+
+                .producer-id-field {
+                    min-width: calc(100% + 0px) !important;
+                }
+            }
+
+            .comm-prod-id {
+                width: convert-unit(180px, "rem");
+            }
+
+            .comm-prod-fields {
+                width: convert-unit(120px, "rem");
+            }
+
+            .text-danger {
+                &:hover {
+                    color: get("color.info.danger.500");
+                }
+            }
+        }
+    }
+
+    .select-role {
+        width: convert-unit(200px, "rem");
+
+        .select-role-title {
+            margin-top: convert-unit(15px, "rem");
+            margin-bottom: convert-unit(5px, "rem");
+            @include fontFace("primary.bold");
+
+            span {
+                font-size: convert-unit(14px, "rem");
+
+                .infoicon {
+                    margin: 0 0 0 convert-unit(5px, "rem");
+                    height: convert-unit(18px, "rem");
+                    width: convert-unit(18px, "rem");
+                    vertical-align: sub;
+                }
+            }
+
+            button {
+                height: convert-unit(18px, "rem");
+                line-height: convert-unit(28px, "rem");
+            }
+        }
+    }
+
+    .welcome-message {
+        .welcome-message-title {
+            span {
+                font-size: convert-unit(14px, "rem");
+                font-weight: bold;
+            }
+        }
+
+        .welcome-message-content {
+            .mat-form-field {
+                margin-bottom: 0;
+            }
+
+            margin-bottom: convert-unit(25px, "rem");
+        }
+    }
+}
+
+.duplicate-error {
+    color: get("color.info.danger.500") !important;
+    display: flex;
+    align-items: center;
+
+    a {
+        color: get("color.info.danger.500") !important;
+    }
+}
+
+.mat-dialog-content {
+    padding-top: 0 !important;
+}
+
+.split-info {
+    padding-bottom: map-get($spacers, 15);
+}

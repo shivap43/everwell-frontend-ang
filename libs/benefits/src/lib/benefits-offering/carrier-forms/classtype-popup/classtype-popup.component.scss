@@ -1,0 +1,58 @@
+@import "shared";
+
+::ng-deep .classtype-select.mat-select-panel {
+    min-width: calc(100% + 22px) !important;
+}
+
+.info-modal.classtype-modal {
+    .modal-header {
+        h2 {
+            margin: 0 convert-unit(50px, "rem") convert-unit(30px, "rem") convert-unit(50px, "rem");
+        }
+    }
+    .mat-dialog-content {
+        max-height: calc(65vh - 100px);
+        h2 {
+            margin: 0 0 convert-unit(30px, "rem") 0;
+        }
+        p {
+            margin: 0 0 convert-unit(30px, "rem") 0;
+        }
+        .mat-radio-button {
+            margin-bottom: convert-unit(15px, "rem");
+        }
+        .step-fields {
+            .classtype-name {
+                width: convert-unit(350px, "rem");
+            }
+            .classtype-industrycode {
+                width: convert-unit(110px, "rem");
+            }
+        }
+        .steptwo-fields,
+        .steptwo-actions {
+            border-top: 1px dotted get("color.gray.700");
+            padding-top: convert-unit(20px, "rem");
+        }
+
+        .steptwo-fields {
+            .classtype-name {
+                width: convert-unit(350px, "rem");
+                textarea {
+                    overflow: hidden;
+                    min-height: 22px !important;
+                }
+            }
+            .classtype-industrycode {
+                width: convert-unit(110px, "rem");
+            }
+            .remove-link {
+                display: flex;
+                align-items: center;
+            }
+        }
+        .import-peo {
+            margin: 0 0 map-get($spacers, 15) map-get($spacers, 30);
+        }
+    }
+}

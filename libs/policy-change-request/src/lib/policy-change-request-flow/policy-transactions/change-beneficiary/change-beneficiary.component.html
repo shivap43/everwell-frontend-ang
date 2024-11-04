@@ -1,0 +1,443 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content">
+    <form [formGroup]="changeBeneficiaryForm">
+        <div class="flex-form-wrapper mon-px-30 mon-mb-30">
+            <h3>{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.header']}}</h3>
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span>
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.affectedPolicies']}}
+                        </span>
+                        <a
+                            href="javascript:void(0)"
+                            [richTooltip]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.affectedPolicyTooltip']"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.affectedPolicyTooltip']"
+                        >
+                            <mon-icon iconName="Filled-info" [iconSize]="15" class="username-info-icon icon-primary">
+                            </mon-icon>
+                        </a>
+                    </mat-label>
+                    <mat-checkbox
+                        *ngIf="policyList.length > 7"
+                        type="checkbox"
+                        [checked]="isAllPolicySelected"
+                        class="beneficiary-checkbox"
+                        (change)="selectAll($event.checked)"
+                        [indeterminate]="isIndeterminate"
+                    >
+                        <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.selectAll']}} </span>
+                    </mat-checkbox>
+                    <div>
+                        <div
+                            formArrayName="policyNumbers"
+                            *ngFor="let item of formControl['policyNumbers'].controls; let i = index"
+                        >
+                            <mat-checkbox
+                                [ngClass]="{'pcrcheckbox': counter === 0 && isSubmitted}"
+                                (change)="selectSingle($event.checked)"
+                                [formControlName]="i"
+                                class="beneficiary-checkbox"
+                            >
+                                {{policyList[i]?.policyName}}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                    <mat-error *ngIf="counter === 0 && isSubmitted">
+                        <span>
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.selectionRequired']}}
+                        </span>
+                    </mat-error>
+                </div>
+            </div>
+            <br />
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span>
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.effectiveDate']}}
+                        </span>
+                    </mat-label>
+                    <mat-form-field class="mon-date-field w-200">
+                        <input
+                            [matDatepicker]="picker"
+                            matInput
+                            formControlName="effectiveDate"
+                            [min]="minDate"
+                            (keyup)="transform($event)"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.effectiveDate']"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-error *ngIf="formControl['effectiveDate'].errors?.required">
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                            </span>
+                        </mat-error>
+                        <mat-error *ngIf="formControl['effectiveDate'].hasError('matDatepickerMin')">
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.validationError.noPastTransferEffectiveDate']}}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="divider mon-mb-20"></div>
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <div
+                        [innerHtml]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.note']"
+                    ></div>
+                </div>
+            </div>
+            <div>
+                <div class="mon-px-0">
+                    <h3 class="mon-mb-15">
+                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.primaryBeneficiary']}}
+                    </h3>
+                    <div>
+                        <p *ngIf="primaryBeneficiaryList?.length ;else noBeneficiary">
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addPrimaryBeneficiaryMessage']}}
+                        </p>
+                        <ng-template #noBeneficiary>
+                            <p>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.noPrimaryBeneficiaryAvailable']}}
+                            </p>
+                        </ng-template>
+                        <div *ngIf="expandBeneficiaryToggle" class="add-edit-beneficiary">
+                            <empowered-add-edit-beneficiary
+                                *ngIf="!editBeneficiary"
+                                (beneficiaryEvent)="getBeneficiary($event)"
+                                [isPrimaryBeneficiary]="isPrimaryBeneficiary"
+                            ></empowered-add-edit-beneficiary>
+                        </div>
+                    </div>
+                    <div>
+                        <mon-alert
+                            *ngIf="this.formControl['primaryBeneficiaries']?.errors?.totalAllocationMustBeHundread"
+                            alertType="danger"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.totalAllocationMustBeHundread']}}
+                            </span>
+                        </mon-alert>
+
+                        <mon-alert
+                            *ngIf="this.formControl['primaryBeneficiaries']?.errors?.allocationMustNotBeZero"
+                            alertType="danger"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBeZero']}}
+                            </span>
+                        </mon-alert>
+
+                        <mon-alert
+                            *ngIf="this.formControl['primaryBeneficiaries']?.errors?.allocationMustNotBe97"
+                            alertType="danger"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe97']}}
+                            </span>
+                        </mon-alert>
+
+                        <mon-alert
+                            *ngIf="this.formControl['primaryBeneficiaries']?.errors?.allocationMustNotBe98"
+                            alertType="danger"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe98']}}
+                            </span>
+                        </mon-alert>
+
+                        <mon-alert
+                            *ngIf="this.formControl['primaryBeneficiaries']?.errors?.allocationMustNotBe99"
+                            alertType="danger"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe99']}}
+                            </span>
+                        </mon-alert>
+                        <mon-alert *ngIf="primaryPatternError" alertType="danger">
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationValidation']}}
+                            </span>
+                        </mon-alert>
+                        <div
+                            formArrayName="primaryBeneficiaries"
+                            *ngFor="let beneficiary of formControl['primaryBeneficiaries'].controls; let i = index"
+                        >
+                            <div
+                                class="beneficiray-info"
+                                [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle"
+                            >
+                                <div class="beneficiray-info-name">
+                                    <span>{{primaryBeneficiaryList[i]?.firstName}} </span>
+
+                                    <span>{{primaryBeneficiaryList[i]?.lastName}}</span>
+                                </div>
+
+                                <div class="beneficiray-info-member">
+                                    <span>{{primaryBeneficiaryList[i]?.relationship}}</span>
+                                </div>
+                                <div class="beneficiray-info-allocation">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocation']}}
+                                    </span>
+                                    <mat-form-field class="beneficiary-input">
+                                        <input
+                                            [formControlName]="i"
+                                            class="mon-input"
+                                            matInput
+                                            (blur)="checkForPrimaryAllocation()"
+                                            [maxlength]="primaryAllocationMaxLength"
+                                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocation']"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="beneficiray-info-buttons">
+                                    <span>
+                                        <a
+                                            (click)="removeBeneficiaryConfirmationPopup(beneficiary, true, i)"
+                                            class="remove"
+                                            [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                        >
+                                            <span>
+                                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.remove']}}
+                                            </span>
+                                        </a>
+                                    </span>
+                                    <span>
+                                        <a
+                                            (click)="edit(i, true)"
+                                            [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                        >
+                                            <span>
+                                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiaryl.Edit']}}
+                                            </span>
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                            <empowered-add-edit-beneficiary
+                                *ngIf="(selectedBeneficiary === i) && expandBeneficiaryToggle && editBeneficiary"
+                                (beneficiaryEvent)="getBeneficiary($event)"
+                                [beneficiary]="primaryBeneficiaryList[i]"
+                                [beneficiaryId]="i"
+                                [isPrimaryBeneficiary]="true"
+                            ></empowered-add-edit-beneficiary>
+                        </div>
+                        <mat-error *ngIf="isPrimaryAllocationRequired">
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationRequired']}}
+                        </mat-error>
+                        <mat-error *ngIf="primaryBeneficiaryMissingDetails?.length">
+                            <div *ngFor="let message of primaryBeneficiaryMissingDetails">{{message}}</div>
+                        </mat-error>
+                        <a
+                            (click)="toggleBeneficiaryForm(true, true)"
+                            *ngIf="primaryBeneficiaryList?.length < 4"
+                            [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                            ><span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addPrimaryBeneficiary']}}
+                            </span></a
+                        >
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mon-px-0">
+                    <ng-container>
+                        <h3 class="mon-mb-15">
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.contingentBeneficiary']}}
+                        </h3>
+                        <div *ngIf="contingentBeneficiaryList.length === 0; else addUpToFourContingnent">
+                            <div *ngIf="primaryBeneficiaryList.length ; else noBeneficiaryMessage">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.noContingentBeneficiaryMessage']}}
+                                </span>
+                            </div>
+                            <ng-template #noBeneficiaryMessage>
+                                <p>
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.contingentBeneficiaryValidationMessage']}}
+                                    </span>
+                                </p>
+                            </ng-template>
+                        </div>
+                        <ng-template #addUpToFourContingnent>
+                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addContingentBeneficiaryMessage']}}
+                        </ng-template>
+                        <div>
+                            <div *ngIf="expandContingentBeneficiaryToggle" class="add-edit-beneficiary">
+                                <empowered-add-edit-beneficiary
+                                    *ngIf="!editBeneficiary"
+                                    (beneficiaryEvent)="getBeneficiary($event)"
+                                    [isPrimaryBeneficiary]="false"
+                                ></empowered-add-edit-beneficiary>
+                            </div>
+                            <div>
+                                <mon-alert
+                                    *ngIf="this.formControl['contingentBeneficiaries']?.errors?.totalAllocationMustBeHundread"
+                                    alertType="danger"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.totalAllocationMustBeHundread']}}
+                                    </span>
+                                </mon-alert>
+
+                                <mon-alert
+                                    *ngIf="this.formControl['contingentBeneficiaries']?.errors?.allocationMustNotBeZero"
+                                    alertType="danger"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBeZero']}}
+                                    </span>
+                                </mon-alert>
+
+                                <mon-alert
+                                    *ngIf="this.formControl['contingentBeneficiaries']?.errors?.allocationMustNotBe97"
+                                    alertType="danger"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe97']}}
+                                    </span>
+                                </mon-alert>
+
+                                <mon-alert
+                                    *ngIf="this.formControl['contingentBeneficiaries']?.errors?.allocationMustNotBe98"
+                                    alertType="danger"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe98']}}
+                                    </span>
+                                </mon-alert>
+
+                                <mon-alert
+                                    *ngIf="this.formControl['contingentBeneficiaries']?.errors?.allocationMustNotBe99"
+                                    alertType="danger"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationMustNotBe99']}}
+                                    </span>
+                                </mon-alert>
+                                <mon-alert *ngIf="secondaryPatternError" alertType="danger">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationValidation']}}
+                                    </span>
+                                </mon-alert>
+                            </div>
+                            <div
+                                formArrayName="contingentBeneficiaries"
+                                *ngFor="let contingentBeneficiary of formControl['contingentBeneficiaries'].controls; let i = index"
+                            >
+                                <div
+                                    class="beneficiray-info"
+                                    [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                >
+                                    <div class="beneficiray-info-name">
+                                        <span>{{contingentBeneficiaryList[i]?.firstName}} </span>
+
+                                        <span>{{contingentBeneficiaryList[i]?.lastName}}</span>
+                                    </div>
+
+                                    <div class="beneficiray-info-member">
+                                        <span>{{contingentBeneficiaryList[i]?.relationship}}</span>
+                                    </div>
+                                    <div class="beneficiray-info-allocation">
+                                        <span>
+                                            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocation']}}
+                                        </span>
+                                        <mat-form-field class="beneficiary-input">
+                                            <input
+                                                [formControlName]="i"
+                                                class="mon-input"
+                                                matInput
+                                                (blur)="checkForSecondaryAllocation()"
+                                                [maxlength]="secondaryAllocationMaxLength"
+                                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocation']"
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="beneficiray-info-buttons">
+                                        <span>
+                                            <a
+                                                (click)="removeBeneficiaryConfirmationPopup(contingentBeneficiary, false, i)"
+                                                class="remove"
+                                                [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                            >
+                                                <span>
+                                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.remove']}}
+                                                </span>
+                                            </a>
+                                        </span>
+                                        <span>
+                                            <a
+                                                (click)="edit(i)"
+                                                [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                            >
+                                                <span>
+                                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiaryl.Edit']}}
+                                                </span>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <empowered-add-edit-beneficiary
+                                    *ngIf="selectedSecondaryBeneficiary === i && expandContingentBeneficiaryToggle"
+                                    (beneficiaryEvent)="getBeneficiary($event)"
+                                    [beneficiary]="contingentBeneficiaryList[i]"
+                                    [beneficiaryId]="i"
+                                    [isPrimaryBeneficiary]="false"
+                                ></empowered-add-edit-beneficiary>
+                            </div>
+                            <p>
+                                <a
+                                    [class.disabled]="expandBeneficiaryToggle || expandContingentBeneficiaryToggle "
+                                    (click)="toggleBeneficiaryForm(true,false)"
+                                    *ngIf="primaryBeneficiaryList.length && contingentBeneficiaryList.length < 4"
+                                    ><span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addContingentBeneficiary']}}
+                                    </span></a
+                                >
+                            </p>
+                            <mat-error *ngIf="isSecondaryAllocationRequired">
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.allocationRequired']}}
+                            </mat-error>
+                            <mat-error *ngIf="secondaryBeneficiaryMissingDetails?.length">
+                                <div *ngFor="let message of secondaryBeneficiaryMissingDetails">{{message}}</div>
+                            </mat-error>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <div>
+                <mon-alert alertType="danger" *ngIf="showErrorMessage || isBeneFiciarySaved">
+                    <span>
+                        {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.isBeneficiarySaved']}}
+                    </span>
+                </mon-alert>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span>{{languageStrings['primary.portal.common.cancel']}} </span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button type="button" class="mon-btn-secondary" mat-flat-button (click)="back()">
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span> {{languageStrings['primary.portal.common.back']}} </span>
+        </button>
+        <button type="submit" class="mon-btn-primary mon-ml-20" (click)="changeBeneficiary()" mat-flat-button>
+            <span> {{languageStrings['primary.portal.common.next']}} </span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"> </mon-icon>
+        </button>
+    </div>
+</div>

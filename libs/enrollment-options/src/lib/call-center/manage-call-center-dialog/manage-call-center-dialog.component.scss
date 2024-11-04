@@ -1,0 +1,101 @@
+@import "shared";
+
+.call-center-form-wrapper,
+.call-center-form-wrapper > * {
+    height: 100%;
+    font-size: convert-unit(16px, "rem");
+}
+
+.content-wrapper {
+    width: convert-unit(650px, "rem");
+    margin-top: convert-unit(50px, "rem");
+    margin-left: convert-unit(50px, "rem");
+
+    .instructions {
+        width: 100%;
+
+        .special-instructions-input {
+            height: convert-unit(126px, "rem");
+        }
+    }
+
+    .required-fields-vcc {
+        max-width: convert-unit(468px, "rem");
+    }
+
+    .required-fields {
+        max-width: convert-unit(580px, "rem");
+    }
+
+    .date-range {
+        display: flex;
+        justify-content: space-between;
+
+        .date-picker {
+            width: 100%;
+        }
+    }
+
+    .columns {
+        display: flex;
+        flex-direction: column;
+        max-width: convert-unit(650px, "rem");
+
+        .call-center-type {
+            .mat-radio-button {
+                width: convert-unit(100px, "rem");
+                margin-right: convert-unit(10px, "rem");
+            }
+        }
+    }
+
+    .account-co-producers {
+        font-size: convert-unit(16px, "rem");
+
+        td {
+            width: convert-unit(200px, "rem");
+            height: convert-unit(40px, "rem");
+        }
+    }
+
+    .disclaimer {
+        p {
+            margin-bottom: map-get($spacers, 20);
+        }
+    }
+
+    .call-center-input {
+        width: convert-unit(300px, "rem");
+    }
+
+    .custom-recording {
+        textarea {
+            height: convert-unit(146px, "rem");
+        }
+    }
+
+    textarea {
+        resize: none;
+    }
+}
+
+.producer-option {
+    height: auto !important;
+
+    ::ng-deep {
+        .mat-option-text {
+            height: auto !important;
+            line-height: normal !important;
+            padding: map-get($spacers, 5) map-get($spacers, 0) !important;
+        }
+
+        .producer-email {
+            font-size: convert-unit(14px, "rem");
+            color: get("color.gray.700");
+            margin: map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+        }
+    }
+}
+.api-error-message {
+    margin-bottom: convert-unit(40px, "rem");
+}

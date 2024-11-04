@@ -1,0 +1,116 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="producer-info-wrapper">
+    <h3>{{languageStrings['primary.portals.subproducerInfo.producerInformation']}}</h3>
+    <div class="producer-info-content" *ngIf="adminData && producerInformation">
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.nationalNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{adminData.npn}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.writingNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <div *ngFor="let writingNumber of adminData.writingNumbers">
+                    <span>{{writingNumber.number}}</span>
+                    <span *ngFor="let sitCode of writingNumber.sitCodes">
+                        {{"primary.portal.subproducerInfo.sitCodes"| replaceTag: { "##sitecode##": sitCode.code } }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.carrierAppointments']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <div *ngFor="let carrierAppointment of uniqueCarrierAppointments">
+                    {{carrierAppointment.carrier.name}}
+                    <span>(</span>
+                    <span>{{datePipe.transform(carrierAppointment.validity.effectiveStarting, dateFormat)}}-</span>
+                    <span *ngIf="carrierAppointment.validity.expiresAfter">
+                        {{datePipe.transform(carrierAppointment.validity.expiresAfter, dateFormat)}})
+                    </span>
+                    <span *ngIf="!carrierAppointment.validity.expiresAfter">
+                        {{languageStrings['primary.portal.members.workLabel.ongoing']}}
+                    </span>
+                    <span>)</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licensedStates']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{producerInformation.licenses.length}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.state']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                <mat-form-field class="state-dropdown">
+                    <mat-select
+                        disableOptionCentering="true"
+                        [placeholder]="initState"
+                        (selectionChange)="getLicenseData($event.value)"
+                    >
+                        <div class="filter-options">
+                            <mat-option *ngFor="let state of licenses" [value]="state"
+                                >{{state.state.abbreviation}}</mat-option
+                            >
+                        </div>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseNumber']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{licenseNumber}}</div>
+        </div>
+
+        <div class="flex-cont">
+            <div class="left-label-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.producerInfo.licenseEffectiveDate']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{effectiveDate}}</div>
+        </div>
+
+        <div class="flex-cont">
+            <div class="left-label-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseExpiration']}}</mat-label
+                >
+            </div>
+            <div class="right-data">{{expiration}}</div>
+        </div>
+        <div class="flex-cont">
+            <div class="left-label-initstate">
+                <mat-label class="mat-label label-txt"
+                    >{{languageStrings['primary.portals.subproducerInfo.licenseAuthority']}}</mat-label
+                >
+            </div>
+            <div class="right-data">
+                {{linesOfAuthority}}
+            </div>
+        </div>
+    </div>
+</div>

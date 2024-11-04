@@ -1,0 +1,125 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+    <!-- Prospect name -->
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <span>{{languageStrings['primary.portal.prospects.prospectName']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'name'}">
+            <span *ngIf="!element.invited"
+                ><a href="javascript:void(0)" (click)="routeToProspectDasboard(element.id)">{{element.name}}</a></span
+            >
+            <span *ngIf="element.invited">{{element.name}}</span>
+        </td>
+    </ng-container>
+
+    <!-- Account number -->
+    <ng-container matColumnDef="groupNumber">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <span>{{languageStrings['primary.portal.prospects.accountNumber']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'groupNumber'}">
+            <span>{{element.groupNumber}}</span>
+        </td>
+    </ng-container>
+
+    <!-- Primary producer -->
+    <ng-container matColumnDef="primaryProducer">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <span>{{languageStrings['primary.portal.prospects.primaryProducer']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'primaryProducer'}">
+            <span>{{element.primaryProducer}}</span>
+        </td>
+    </ng-container>
+
+    <!-- State -->
+    <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <span>{{languageStrings['primary.portal.prospects.state']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'state'}">
+            <span>{{element.state}}</span>
+        </td>
+    </ng-container>
+
+    <!-- Date created -->
+    <ng-container matColumnDef="createDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header mat-sort-start="desc">
+            <span>{{languageStrings['primary.portal.prospects.dateCreated']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'createDate'}">
+            <span>{{ this.datepipe.transform(element.createDate ,"MM/dd/yy")}}</span>
+        </td>
+    </ng-container>
+
+    <!-- Manage -->
+    <ng-container matColumnDef="manage">
+        <th mat-header-cell *matHeaderCellDef>
+            <span>{{languageStrings['primary.portal.prospects.manage']}}</span>
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <ng-container *ngIf="element.invited">
+                <a class="invitation-link" (click)="viewProspectInvitation(element.id, currentProducerId)" href="javascript:void(0)">
+                    {{languageStrings['primary.portal.accounts.accountList.viewInvitation']}}
+                </a>
+            </ng-container>
+            <ng-container *ngIf="!element.invited">
+                <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="beforeMenu"
+                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                >
+                    <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary"></mon-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <ng-container *configEnabled="PROPOSAL_CONFIG">
+                        <button mat-menu-item (click)="routeToProposal(element.id)" *hasPermission="PROPOSAL_PERMISSION">
+                            <span>{{languageStrings['primary.portal.prospects.viewcreateProposals']}}</span>
+                        </button>
+                    </ng-container>
+                    <ng-container *ngIf="element.canDeactivateProspect">
+                        <button mat-menu-item class="text-danger" (click)="deleteProspect(element)">
+                            {{languageStrings['primary.portal.common.remove']}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </ng-container>
+        </td>
+    </ng-container>
+    <ng-container matColumnDef="noResults">
+        <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+            <span> {{languageStrings['primary.portal.accounts.prospectList.resultNotFound']}} </span>
+        </th>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row [ngClass]="{'disabled-prospect': row.invited}" *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-header-row [hidden]=" dataSource && dataSource.data.length > 0" *matHeaderRowDef="['noResults']"></tr>
+</table>
+
+<div
+    class="paginator-wrapper"
+    [hidden]="!showPaginator || (dataSource && dataSource.data.length < 15) "
+    [ngClass]="{'range-actions-hide': showPaginator && dataSource.paginator.getNumberOfPages() == 1}"
+>
+    <mat-paginator
+        [hidden]="dataSource && dataSource.data.length > 15"
+        [pageSizeOptions]="pageSizeOption"
+        showFirstLastButtons
+    ></mat-paginator>
+    <mat-form-field class="paginator-input-wrapper">
+        {{languageStrings['primary.portal.common.page']}}
+        <input
+            class="paginator-input"
+            (input)="pageInputChanged($event.target.value)"
+            [formControl]="pageNumberControl"
+            matInput
+            type="number"
+            min="1"
+            max="{{showPaginator ? dataSource.paginator.getNumberOfPages() : 0}}"
+            [attr.aria-label]="languageStrings['primary.portal.common.page']"
+        />
+        <span>{{languageStrings['primary.portal.customerList.paginator.of']}}&nbsp;</span>
+        <span>{{showPaginator ? dataSource.paginator.getNumberOfPages(): 0 }}</span>
+    </mat-form-field>
+</div>

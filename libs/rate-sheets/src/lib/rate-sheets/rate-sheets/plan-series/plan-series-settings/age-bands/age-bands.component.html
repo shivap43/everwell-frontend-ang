@@ -1,0 +1,8 @@
+<div [formGroup]="form">
+    <empowered-checkbox-list ngDefaultControl formControlName="ageBands" [options]="(ageOptions$ | async)" [showSelectAll]="true"
+        ><mat-error
+            *ngIf="form.controls.ageBands.touched && form.controls.ageBands.errors?.required"
+            language="primary.portal.common.selectionRequired"
+        ></mat-error
+    ></empowered-checkbox-list>
+</div>

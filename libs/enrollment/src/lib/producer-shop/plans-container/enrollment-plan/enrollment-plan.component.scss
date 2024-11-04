@@ -1,0 +1,80 @@
+@import "shared";
+
+:host {
+    font-size: convert-unit(16px, rem);
+}
+
+.pay-frequency {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: convert-unit(-5px, "rem");
+    margin-bottom: map-get($spacers, 20);
+}
+
+.edit-details {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.edit-plans {
+    padding: 0;
+}
+
+.plan-not-available {
+    padding-left: map-get($spacers, 30);
+    padding-top: map-get($spacers, 10);
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding-bottom: map-get($spacers, 10);
+}
+
+.enrollment-plans {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: convert-unit(30px, "rem") convert-unit(30px, "rem") convert-unit(70px, "rem") convert-unit(30px, "rem");
+
+    .flex-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .mat-label {
+            width: convert-unit(140px, "rem");
+            padding-right: map-get($spacers, 30);
+            margin-bottom: map-get($spacers, 10);
+            font-size: convert-unit(16px, "rem");
+        }
+
+        .description {
+            width: convert-unit(305px, "rem");
+            margin-bottom: map-get($spacers, 10);
+        }
+
+        .beneficiaries {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .riders {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .cost-wrapper {
+        display: flex;
+        justify-content: space-between;
+
+        .cost-label {
+            padding-right: convert-unit(85px, "rem");
+        }
+    }
+    .plan-details-link {
+        line-height: convert-unit(22px, "rem");
+    }
+
+    .border-seperator {
+        margin: map-get($spacers, 10) 0 map-get($spacers, 10) 0;
+    }
+}

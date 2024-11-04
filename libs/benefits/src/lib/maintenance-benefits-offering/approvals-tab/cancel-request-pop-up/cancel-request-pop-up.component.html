@@ -1,0 +1,18 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        <ng-container *ngIf="approvalRequest?.status === approvalRequestStatusType?.SUBMITTED_TO_HR">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.cancelRequestPopUp.adminApproval']}}
+        </ng-container>
+        <ng-container *ngIf="approvalRequest?.status === approvalRequestStatusType?.SUBMITTED_TO_HQ">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.cancelRequestPopUp.integrationAdminApproval']}}
+        </ng-container>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button type="button" class="mon-btn-secondary" mat-flat-button [mat-dialog-close]="false">
+            {{languageStrings['primary.portal.common.back']}}
+        </button>
+        <button mat-button class="mon-btn-danger" (click)="onSubmit()">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.cancelRequestPopUp.yesCancelRequest']}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

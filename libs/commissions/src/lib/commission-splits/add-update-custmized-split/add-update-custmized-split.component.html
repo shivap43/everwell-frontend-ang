@@ -1,0 +1,594 @@
+<!-- TODO HTML Team will work on UI and Styling part -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="hasError">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<div class="edit-custmized-split">
+    <form [formGroup]="addUpdateCustomizedSplitForm" (ngSubmit)="checkValidity()">
+        <div class="split-name" *ngIf="!isDefault && !isPartnerCarrierSplit && !isConversionSplit">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.commissionSplit.addUpdate.splitName']}}</mat-label>
+            <div class="split-name-wrapper">
+                <mat-form-field class="split-name-input">
+                    <input
+                        matInput
+                        formControlName="name"
+                        [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.splitName']"
+                    />
+                    <mat-error
+                        *ngIf="addUpdateCustomizedSplitForm.get('name').hasError('maxlength')"
+                        language="secondary.portal.common.maxLength200"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="addUpdateCustomizedSplitForm.get('name').hasError('pattern')"
+                        language="primary.portal.members.document.note.reqAlphaNumeric"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="addUpdateCustomizedSplitForm.get('name').hasError('required')"
+                        language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="addUpdateCustomizedSplitForm.controls.name.hasError('duplicate')"
+                        language="secondary.portal.commissionSplit.addUpdate.duplicateSplitNameError"
+                    ></mat-error>
+                </mat-form-field>
+                <div *ngIf="isDirect" class="radio-wrapper">
+                    <mat-radio-group (change)="onCompanyCodeChange($event.value)">
+                        <mat-radio-button [checked]="customCompanyCode === companyCodes.US" [value]="companyCodes.US"
+                            >{{companyCodes.US}}</mat-radio-button
+                        >
+                        <mat-radio-button [checked]="customCompanyCode === companyCodes.NY" [value]="companyCodes.NY"
+                            >{{companyCodes.NY}}</mat-radio-button
+                        >
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+        <div class="split-details">
+            <p class="split-header">{{languageStrings['primary.portal.commissionSplit.addUpdate.splitSection']}}</p>
+            <div formArrayName="assignments">
+                <div
+                    *ngFor="let assignment of addUpdateCustomizedSplitForm.controls['assignments']['controls']; let i = index"
+                    [formGroupName]="i"
+                    class="split-content"
+                >
+                    <div>
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.commissionSplit.addUpdate.column.producer']}}
+                        </mat-label>
+                        <mat-form-field class="producer-select">
+                            <mat-select
+                                class="mon-input mon-select-arrow"
+                                formControlName="producerId"
+                                (selectionChange)="loadWritingNumber(i, assignment.controls.producerId.value)"
+                                disableOptionCentering="true"
+                                attr.aria-required="true"
+                            >
+                                <mat-option value="">
+                                    {{languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']}}
+                                </mat-option>
+                                <mat-option *ngFor="let item of producersList" value="{{item.id}}"> {{item.name}} </mat-option>
+                                <span class="mat-option" *ngIf="!isEfinancialAgent"
+                                    ><a (click)="openCoProducerPopup()"
+                                        >{{languageStrings['primary.portal.commissionSplit.addUpdate.inviteCoProducer']}}</a
+                                    ></span
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="assignment.controls.producerId.hasError('required')"
+                                language="secondary.portal.commissionSplit.addUpdate.producerRequiredError"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="assignment.controls.producerId.value  && assignment.controls.producerId.hasError('required')"
+                                language="secondary.portal.commissionSplit.addUpdate.selectionRequiredError"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label mon-ml-20">
+                            {{languageStrings['primary.portal.commissionSplit.addUpdate.column.percentage']}}
+                        </mat-label>
+                        <mat-form-field class="percentage-select">
+                            <mat-select
+                                class="mon-input mon-select-arrow"
+                                formControlName="percentage"
+                                [disableControl]="!assignment.controls.producerId.value || selfEnrollmentFlag || isConversionSplit"
+                                (selectionChange)="checkTotalPercentage()"
+                                disableOptionCentering="true"
+                                attr.aria-required="true"
+                            >
+                                <mat-option value="">
+                                    {{languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']}}
+                                </mat-option>
+                                <mat-option *ngFor="let item of percentageDropdown" value="{{item}}"> {{item}}% </mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="assignment.controls.percentage.hasError('required')"
+                                language="secondary.portal.commissionSplit.addUpdate.selectionRequiredError"
+                                class="mon-pl-20"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="!assignment.controls.percentage.hasError('required') && assignment.controls.percentage.hasError('invalid')"
+                                class="mon-pl-20 percentage-error"
+                            >
+                                {{secondaryLanguageStrings["secondary.portal.commissionSplit.addUpdate.percentMustBe100"]}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label mon-ml-20">
+                            {{languageStrings['primary.portal.commissionSplit.addUpdate.column.writingNumber']}}
+                        </mat-label>
+                        <mat-form-field class="writing-select">
+                            <mat-select
+                                class="mon-input mon-select-arrow"
+                                formControlName="writingNumber"
+                                [disableControl]="!assignment.controls.producerId.value"
+                                (selectionChange)="onWritingNumbersSelectionChange(assignment.controls.producerId.value, assignment.controls.writingNumber.value, i)"
+                                disableOptionCentering="true"
+                                attr.aria-required="true"
+                                [placeholder]="languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']"
+                            >
+                                <mat-option value="">
+                                    {{languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']}}
+                                </mat-option>
+                                <mat-option *ngFor="let item of writingNumberOptions[i]" value="{{item.number}}">
+                                    {{item.number}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error
+                                class="mon-pl-20"
+                                *ngIf="assignment.controls.writingNumber.hasError('required')"
+                                language="secondary.portal.commissionSplit.addUpdate.selectionRequiredError"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-label class="mat-label mon-ml-20">
+                            {{languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']}}</mat-label
+                        >
+                        <mat-form-field class="sit-code-select">
+                            <mat-select
+                                class="mon-input mon-select-arrow"
+                                formControlName="sitCode"
+                                [disableControl]="!assignment.controls.writingNumber.value"
+                                (selectionChange)="loadSitCodeHierarchy(i,assignment.controls.sitCode.value)"
+                                disableOptionCentering="true"
+                                attr.aria-required="true"
+                                [placeholder]="languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']"
+                            >
+                                <mat-option value="">
+                                    {{languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']}}
+                                </mat-option>
+                                <mat-option *ngFor="let item of sitCodeOptions[i]" value="{{item.id}}"> {{item.code}} </mat-option>
+                            </mat-select>
+                            <mat-error
+                                class="mon-pl-20"
+                                *ngIf="assignment.controls.sitCode.hasError('required')"
+                                language="secondary.portal.commissionSplit.addUpdate.selectionRequiredError"
+                            >
+                            </mat-error>
+                            <mat-error
+                                class="mon-pl-20"
+                                *ngIf="sitCodes && (sitCodes.length===0)"
+                                language="secondary.portal.commissionSplit.addUpdate.commissionSplitFailedError"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="sit-tooltip" *configEnabled="'general.enable.sit_code.hierarchy'">
+                        <button
+                            type="button"
+                            [id]="'infoIcon_'+i"
+                            mat-icon-button
+                            [richTooltip]="assignment.controls.SITCodeHierarchyList.value"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            *ngIf="assignment.controls.writingNumber.value!=='' && assignment.controls.sitCode.value!==''"
+                            class="sit-code-tooltip"
+                            [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                        >
+                            <mon-icon iconName="Filled-info" [iconSize]="18" class="icon-primary"></mon-icon>
+                        </button>
+                    </div>
+                    <div class="remove-link" *ngIf="!assignment.controls.producerId.disabled">
+                        <a
+                            *ngIf="!(addUpdateCustomizedSplitForm.controls['assignments']['controls'].length === 1) "
+                            (click)="removeMultipleProducer(i)"
+                            >{{languageStrings['primary.portal.common.remove']}}</a
+                        >
+                    </div>
+                </div>
+                <div
+                    class="max-producer-error"
+                    *ngIf="addUpdateCustomizedSplitForm.controls['assignments']['controls'].length > MAX_PRODUCERS"
+                >
+                    {{languageStrings['primary.portal.commissionSplit.addUpdate.maxProducerInSplitError']}}
+                </div>
+                <div class="duplicate-error" *ngIf="duplicateWritingNumber">
+                    <span>{{languageStrings['primary.portal.commissionSplit.addUpdate.duplicateWritingNumber']}}</span>
+                </div>
+                <div class="duplicate-error" *ngIf="showDuplicateAssigmentError">
+                    <span>{{languageStrings['primary.portal.commissionSplit.addUpdate.duplicateError']}}</span>
+                </div>
+            </div>
+            <div class="add-new-split-link" *ngIf="!(selfEnrollmentFlag || isConversionSplit)">
+                <a
+                    (click)="addMultipleProducers()"
+                    *ngIf="(MAX_PRODUCERS > addUpdateCustomizedSplitForm.controls['assignments']['controls'].length)"
+                    >{{languageStrings['primary.portal.commissionSplit.addUpdate.addCoProducer']}}</a
+                >
+            </div>
+        </div>
+
+        <div class="mon-mt-20">
+            <p class="split-header">{{languageStrings['primary.portal.commissionSplit.addUpdate.appliedWhenSection']}}</p>
+
+            <!-- For custmized Split -->
+            <div *ngIf="!isDefault  && !isPartnerCarrierSplit">
+                <div class="applied-when-description">
+                    {{languageStrings['primary.portal.commissionSplit.addUpdate.appliedWhenDescription']}}
+                </div>
+                <div class="applied-when-content" formArrayName="rules">
+                    <div
+                        *ngFor="let rule of addUpdateCustomizedSplitForm.get('rules').controls; let i = index"
+                        [formGroupName]="i"
+                        class="applied-when-optional"
+                    >
+                        <div class="d-flex">
+                            <p *ngIf="i > 0" class="split-articles mon-pl-0">
+                                {{languageStrings['primary.portal.commissionSplit.addUpdate.andLabel']}}
+                            </p>
+                            <mat-form-field class="split-enrollment-select" [ngClass]="{'split-enrollment-optinal-select': i>0}">
+                                <mat-select
+                                    class="mon-input mon-select-arrow"
+                                    formControlName="type"
+                                    [placeholder]="languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']"
+                                    (selectionChange)="requiredFields(i, $event.value);onRuleSelectionChange(i, $event.value)"
+                                    disableOptionCentering="true"
+                                    attr.aria-required="true"
+                                >
+                                    <mat-option value="">
+                                        {{languageStrings['primary.portal.commissionSplit.addUpdate.selectOption']}}
+                                    </mat-option>
+                                    <mat-option
+                                        *ngFor="let item of addUpdateCustomizedSplitForm.controls.rules.controls[i].get('ruleList').value"
+                                        [value]="item.type"
+                                    >
+                                        {{item.name}}</mat-option
+                                    >
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div>
+                            <ng-container *ngIf="rule.controls.type.value">
+                                <ng-template [ngIf]="rule.controls.type.value === 'WRITING_PRODUCER' && !isDirect">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <mat-form-field class="producer-selected-data">
+                                            <mat-chip-list #chipListProducer>
+                                                <mat-chip
+                                                    *ngFor="let producer of producerRulesSelectedData"
+                                                    selectable="true"
+                                                    removable="true"
+                                                    (removed)="ruleDropDownOperations(i, 'WRITING_PRODUCER', producer, 'REMOVE','producerId')"
+                                                >
+                                                    {{producer.name}}
+                                                    <mon-icon [iconSize]="10" iconName="close" class="icon-close" matChipRemove></mon-icon>
+                                                </mat-chip>
+                                                <input
+                                                    matInput
+                                                    #producerInput
+                                                    id="producerId"
+                                                    [matChipInputFor]="chipListProducer"
+                                                    [matAutocomplete]="auto"
+                                                    formControlName="producerId"
+                                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                                    matChipInputAddOnBlur="true"
+                                                    (blur)="removeText('producerInput');checkErrorState();"
+                                                    [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']"
+                                                />
+                                            </mat-chip-list>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].get('producerId').hasError('required') && addUpdateCustomizedSplitForm.controls.rules.controls[i].get('producerId').touched"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+                                            <mat-autocomplete
+                                                #auto="matAutocomplete"
+                                                autoActiveFirstOption
+                                                (optionSelected)="ruleDropDownOperations(i, 'WRITING_PRODUCER', $event, 'SELECT','producerId')"
+                                            >
+                                                <mat-option *ngFor="let producer of producerRulesDDData" [value]="producer">
+                                                    {{producer.name}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="producerRulesSelectedData.length"
+                                            (click)="clearAll('producerId',i)"
+                                            class="icon-clear"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                            ><mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon
+                                        ></a>
+                                    </div>
+                                </ng-template>
+                                <ng-template [ngIf]="rule.controls.type.value === 'PRODUCT'">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <mat-form-field class="producer-selected-data">
+                                            <mat-chip-list #chipListProduct>
+                                                <mat-chip
+                                                    *ngFor="let product of productRulesSelectedData"
+                                                    selectable="true"
+                                                    removable="true"
+                                                    (removed)="ruleDropDownOperations(i, 'PRODUCT', product, 'REMOVE','productId')"
+                                                >
+                                                    {{product.name}}
+                                                    <mon-icon [iconSize]="10" iconName="close" class="icon-close" matChipRemove></mon-icon>
+                                                </mat-chip>
+                                                <input
+                                                    matInput
+                                                    #productInput
+                                                    id="productId"
+                                                    [matChipInputFor]="chipListProduct"
+                                                    [matAutocomplete]="auto"
+                                                    formControlName="productId"
+                                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                                    matChipInputAddOnBlur="true"
+                                                    (blur)="removeText('productInput');checkErrorState();"
+                                                    [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']"
+                                                />
+                                            </mat-chip-list>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].get('productId').hasError('required') && addUpdateCustomizedSplitForm.controls.rules.controls[i].get('productId').touched"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+
+                                            <mat-autocomplete
+                                                autoActiveFirstOption
+                                                #auto="matAutocomplete"
+                                                (optionSelected)="ruleDropDownOperations(i, 'PRODUCT', $event, 'SELECT','productId')"
+                                            >
+                                                <mat-option *ngFor="let product of productRulesDDData" [value]="product">
+                                                    {{product.name}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="productRulesSelectedData.length"
+                                            (click)="clearAll('productId',i);"
+                                            class="icon-clear"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                            ><mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon
+                                        ></a>
+                                    </div>
+                                </ng-template>
+                                <ng-template [ngIf]="rule.controls.type.value === 'STATES'">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <div class="mon-mb-20">
+                                            <empowered-chip-select
+                                                [chipOptions$]="allStates$"
+                                                [hasSelectAll]="true"
+                                                [valuesChipControl]="addUpdateCustomizedSplitForm.controls.rules.controls[i].controls.states"
+                                                [changeStrategy]="'change'"
+                                                [initSelectedChips]="initialStateValues"
+                                                (chipChange)="changeStateControlValue($event, i)"
+                                            >
+                                            </empowered-chip-select>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].controls.states.errors?.required && addUpdateCustomizedSplitForm.controls.rules.controls[i].controls.states.touched"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template [ngIf]="rule.controls.type.value === 'DATE_WRITTEN'">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                matInput
+                                                formControlName="dateWritten"
+                                                [matDatepicker]="picker"
+                                                placeholder="Select"
+                                                (keyup)="transform($event)"
+                                                (dateInput)="checkDate($event)"
+                                                (dateChange)="checkDate($event)"
+                                                [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="picker">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].get('dateWritten').hasError('required')"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </ng-template>
+                                <ng-template [ngIf]="rule.controls.type.value === 'CARRIER'">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <mat-form-field class="producer-selected-data">
+                                            <mat-chip-list #chipListCarrier>
+                                                <mat-chip
+                                                    *ngFor="let carrier of carrierRulesSelectedData"
+                                                    selectable="true"
+                                                    removable="true"
+                                                    (removed)="ruleDropDownOperations(i, 'CARRIER', carrier, 'REMOVE','carrierId')"
+                                                >
+                                                    {{carrier.name}}
+                                                    <mon-icon [iconSize]="10" iconName="close" class="icon-close" matChipRemove></mon-icon>
+                                                </mat-chip>
+                                                <input
+                                                    matInput
+                                                    #carrierInput
+                                                    [matChipInputFor]="chipListCarrier"
+                                                    [matAutocomplete]="auto"
+                                                    formControlName="carrierId"
+                                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                                    matChipInputAddOnBlur="true"
+                                                    (blur)="removeText('carrierInput');checkErrorState();"
+                                                    id="carrierId"
+                                                    [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']"
+                                                />
+                                            </mat-chip-list>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].get('carrierId').hasError('required') && addUpdateCustomizedSplitForm.controls.rules.controls[i].get('carrierId').touched"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+                                            <mat-autocomplete
+                                                #auto="matAutocomplete"
+                                                autoActiveFirstOption
+                                                (optionSelected)="ruleDropDownOperations(i, 'CARRIER', $event, 'SELECT','carrierId')"
+                                            >
+                                                <mat-option *ngFor="let carrier of carrierRulesDDData" [value]="carrier">
+                                                    {{carrier.name}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="carrierRulesSelectedData.length"
+                                            (click)="clearAll('carrierId',i)"
+                                            class="icon-clear"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                            ><mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon
+                                        ></a>
+                                    </div>
+                                </ng-template>
+                                <ng-template [ngIf]="rule.controls.type.value === 'ENROLLMENT_METHOD'">
+                                    <div class="d-flex mon-pr-20">
+                                        <p class="split-articles">
+                                            {{languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']}}
+                                        </p>
+                                        <mat-form-field class="producer-selected-data">
+                                            <mat-chip-list #chipListEnrollmentMethod>
+                                                <mat-chip
+                                                    *ngFor="let method of enrollMethodRulesSelectedData"
+                                                    selectable="true"
+                                                    removable="true"
+                                                    (removed)="ruleDropDownOperations(i, 'ENROLLMENT_METHOD', method, 'REMOVE','enrollmentMethod')"
+                                                >
+                                                    {{enrollmentMethodList[method]}}
+                                                    <mon-icon [iconSize]="10" iconName="close" class="icon-close" matChipRemove></mon-icon>
+                                                </mat-chip>
+                                                <input
+                                                    matInput
+                                                    #enrollmentMethodInput
+                                                    [matChipInputFor]="chipListEnrollmentMethod"
+                                                    [matAutocomplete]="auto"
+                                                    formControlName="enrollmentMethod"
+                                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                                    matChipInputAddOnBlur="true"
+                                                    (blur)="removeText('enrollmentMethodInput');checkErrorState();"
+                                                    id="enrollmentMethod"
+                                                    [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.isLabel']"
+                                                />
+                                            </mat-chip-list>
+                                            <mat-error
+                                                *ngIf="addUpdateCustomizedSplitForm.controls.rules.controls[i].get('enrollmentMethod').hasError('required') && addUpdateCustomizedSplitForm.controls.rules.controls[i].get('enrollmentMethod').touched"
+                                                language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                                            >
+                                            </mat-error>
+                                            <mat-autocomplete
+                                                #auto="matAutocomplete"
+                                                autoActiveFirstOption
+                                                (optionSelected)="ruleDropDownOperations(i, 'ENROLLMENT_METHOD', $event, 'SELECT','enrollmentMethod')"
+                                            >
+                                                <mat-option *ngFor="let method of enrollMethodRulesDDData" [value]="method">
+                                                    {{enrollmentMethodList[method]}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="enrollMethodRulesSelectedData.length"
+                                            (click)="clearAll('enrollmentMethod',i)"
+                                            class="icon-clear"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                            ><mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon
+                                        ></a>
+                                    </div>
+                                </ng-template>
+                            </ng-container>
+                        </div>
+                        <div>
+                            <ng-container *ngIf="rule.controls.type.value">
+                                <a (click)="removeRules(i, rule.controls.type.value)" class="remove-link mon-mt-10"
+                                    >{{languageStrings['primary.portal.common.remove']}}</a
+                                >
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-new-rule">
+                    <a (click)="addRules()" *ngIf="!(addUpdateCustomizedSplitForm.controls.rules.controls.length === MAX_RULES)"
+                        >{{languageStrings['primary.portal.commissionSplit.addUpdate.addRule']}}</a
+                    >
+                </div>
+            </div>
+            <!-- For Default Split -->
+            <div class="applied-when-for-defaults" *ngIf="isDefault && !isPartnerCarrierSplit">
+                <div *ngFor="let rule of commissionSplit.rules;let i = index;">
+                    <span *ngIf="rule.type === 'WRITING_PRODUCER'">
+                        <strong> {{getRuleDisplayText(rule.type)}} = {{rule.name}}</strong>
+                    </span>
+                    <p *ngIf="isDirect">
+                        <strong>{{languageStrings['primary.portal.common.and']}}</strong>
+                        {{getRuleDisplayText('STATES')}} =
+                        <strong *ngIf="commissionSplit.splitCompanyCode === companyCodes.US"
+                            >{{languageStrings['primary.portal.commissionSplit.commission.anyExcept']}}
+                            {{getDisplayTextOfStates(companyCodes.NY)}}</strong
+                        >
+                        <strong *ngIf="commissionSplit.splitCompanyCode === companyCodes.NY"
+                            >{{getDisplayTextOfStates(companyCodes.NY)}}</strong
+                        >
+                    </p>
+                </div>
+                <div *ngIf="isDefault && !isConversionSplit">
+                    {{languageStrings['primary.portal.commissionSplit.addUpdate.defaultSplitRuleMessage']}}
+                </div>
+            </div>
+            <!-- For Partner carrier Split -->
+            <div class="applied-when-for-defaults" *ngIf="!isDefault && isPartnerCarrierSplit">
+                <div *ngFor="let rule of commissionSplit.rules;">
+                    <span *ngIf="rule.type === 'CARRIER'">
+                        <strong> {{getRuleDisplayText(rule.type)}} = {{rule.name}}</strong>
+                    </span>
+                    <p *ngIf="rule.type === 'CARRIER'">{{ getPartnerCarrierSplitDefaultMessage(rule.name)}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button mat-flat-button type="button" class="w-120 mon-btn-secondary" (click)="onCancel()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <button mat-flat-button type="submit" class="w-120 mon-btn-primary mon-ml-20">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+    </form>
+</div>

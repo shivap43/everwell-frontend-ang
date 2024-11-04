@@ -1,0 +1,103 @@
+<form [formGroup]="form" (submit)="onInvalidTraversal()" class="flex-form-wrapper">
+    <div class="proposal-details">
+        <h2 class="header-text">{{languageString['primary.portal.proposals.create.proposalDetails']}}</h2>
+        <div class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    <span language="primary.portal.proposals.create.proposalDetails.name" class="create-proposal-form-label"></span>
+                </mat-label>
+                <mat-form-field class="create-proposal-form-input">
+                    <input
+                        matNativeControl
+                        formControlName="name"
+                        [attr.aria-label]="languageString['primary.portal.proposals.create.proposalDetails.name']"
+                    />
+                    <mat-error *ngIf="form.controls['name'].errors?.requirement">
+                        <span language="primary.portal.common.requiredField"></span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    <span
+                        language="primary.portal.proposals.create.proposalDetails.coverageStartDate"
+                        class="create-proposal-form-label"
+                    ></span>
+                </mat-label>
+                <mat-form-field>
+                    <mat-select formControlName="coverageStartDate">
+                        <mat-option *ngFor="let date of dateArray" [value]="date"> {{date}} </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="form.controls['coverageStartDate'].errors?.requirement">
+                        <span language="primary.portal.common.requiredField"></span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-md-flex">
+            <div class="flex-item">
+                <empowered-deduction-frequency formControlName="payrollFrequencyId"></empowered-deduction-frequency>
+            </div>
+        </div>
+        <div class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    <span
+                        language="primary.portal.proposals.create.proposalDetails.censusEstimate"
+                        class="create-proposal-form-label"
+                    ></span>
+                </mat-label>
+                <mat-form-field class="create-proposal-form-input">
+                    <input
+                        matNativeControl
+                        formControlName="censusEstimate"
+                        empoweredNumberValidation
+                        [attr.aria-label]="languageString['primary.portal.proposals.create.proposalDetails.censusEstimate']"
+                    />
+                    <mat-error *ngIf="form.controls['censusEstimate'].errors?.requirement">
+                        <span language="primary.portal.common.requiredField"></span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <p>
+            <span *ngIf="!proposal" language="primary.portal.proposals.create.proposalDetails.employeePage.message1"></span>
+            <span *ngIf="proposal" language="primary.portal.proposals.edit.proposalDetails.employeePage.message1"></span>
+            <ng-container *ngIf="account$ | async as account">
+                <a
+                    [routerLink]="account.type === 'PROSPECT' ? ['producer/payroll/prospect', account.id, 'employees'] : ['producer/payroll', account.id, 'dashboard','employees']"
+                    (click)="dismissSheet()"
+                    >{{languageString['primary.portal.proposals.create.proposalDetails.employeePage.message2']}}</a
+                >
+            </ng-container>
+            <span language="primary.portal.proposals.create.proposalDetails.employeePage.message3"></span>
+        </p>
+        <div class="d-md-flex mon-mt-20">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    <span
+                        language="primary.portal.benefitsOffering.estimated.eligible.employee.for.aflac.DentalVision"
+                        class="create-proposal-form-label"
+                    ></span>
+                    <a class="edit-button" *ngIf="!isProspect" (click)="openArgusDialogOnEdit()"
+                        ><span language="primary.portal.common.edit"></span
+                    ></a>
+                </mat-label>
+                <mat-form-field class="create-proposal-form-input">
+                    <input
+                        matInput
+                        type="text"
+                        (input)="employeeADVCountChanged($event.target.value)"
+                        formControlName="eligibleADVEmp"
+                        [attr.aria-label]="languageString['primary.portal.proposals.create.proposalDetails.eligibleAdvEmployee']"
+                        maxlength="MAX_ELIGIBLE_EMPLOYEE_COUNT"
+                        [disabled]="true"
+                    />
+                </mat-form-field>
+                <div class="self-service-enrollment" *ngIf="argusEmployeesInRange">{{ minEligibleADVEmpMsg}}</div>
+            </div>
+        </div>
+    </div>
+</form>

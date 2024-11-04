@@ -1,0 +1,95 @@
+<div class="row content-common-header">
+    <button mat-icon-button class="openSideNavBtn" *ngIf="mobileQuery.matches" (click)="sideNav.toggle()">
+        <mat-icon class="hamburgerMenu" svgIcon="hamburgerMenu" aria-hidden="true"></mat-icon>
+        <span class="cdk-visually-hidden">Open Navigation</span>
+    </button>
+    <h1 class="footer-text" language="primary.portal.footer.title"></h1>
+</div>
+<mat-sidenav-container [hasBackdrop]="mobileQuery.matches">
+    <mat-sidenav-content class="footer-content">
+        <div [ngClass]="{'col-md-12': mobileQuery.matches,'col-md-10':!mobileQuery.matches}">
+            <div class="row header">
+                <h3
+                    class="content-header"
+                    [ngClass]="{'footer-header-privacy': (currentRoute === 'privacy-policy')}"
+                    language="primary.portal.{{navLang}}.title"
+                ></h3>
+            </div>
+            <div>
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </mat-sidenav-content>
+    <mat-sidenav
+        #sideNav
+        position="start"
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [fixedInViewport]="mobileQuery.matches"
+        [disableClose]="!mobileQuery.matches"
+        class="sideNav"
+    >
+        <empowered-branding
+            class="branding"
+            [logo]="logoMember"
+            [color]="colorMember"
+            *ngIf="mobileQuery.matches"
+            [sideNavOpen]="this.sideNav.opened"
+        ></empowered-branding>
+        <button mat-icon-button class="sideNav-closeBtn" *ngIf="mobileQuery.matches" (click)="sideNav.close()">
+            <mat-icon svgIcon="close" aria-hidden="true"></mat-icon>
+            <span class="cdk-visually-hidden">Close Navigation</span>
+        </button>
+        <div class="side-nav-link">
+            <a href="javascript:void(0)" (click)="backClick()" class="mon-btn-link" tabindex="0"
+                ><mon-icon iconSize="10" iconName="left" class="icon-primary"></mon-icon
+                ><span language="primary.portal.common.back"></span
+            ></a>
+            <p>
+                <a
+                    *ngIf="isAuthenticated"
+                    class="secondaryFooter-link"
+                    [routerLink]="['terms-conditions']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    language="primary.portal.termsConditions.title"
+                    (click)="menuItemClicked()"
+                    skipLocationChange
+                    tabindex="0"
+                ></a>
+            </p>
+            <p>
+                <a
+                    class="secondaryFooter-link"
+                    [routerLink]="['privacy-policy']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    language="primary.portal.privacyPolicy.title"
+                    (click)="menuItemClicked()"
+                    skipLocationChange
+                    tabindex="0"
+                ></a>
+            </p>
+            <!-- TODO: Once we get Site map content uncomment below code and add content to Site map page. -->
+            <!-- <p>
+                <a
+                    *ngIf="isAuthenticated"
+                    class="secondaryFooter-link"
+                    [routerLink]="['site-map']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    language="primary.portal.siteMap.title"
+                    (click)="menuItemClicked()"
+                    skipLocationChange
+                ></a>
+            </p> -->
+            <p>
+                <a
+                    class="secondaryFooter-link"
+                    [routerLink]="['consent-statement']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    (click)="menuItemClicked()"
+                    skipLocationChange
+                    tabindex="0"
+                    language="primary.portal.consentStatement.title"
+                ></a>
+            </p>
+        </div>
+    </mat-sidenav>
+</mat-sidenav-container>

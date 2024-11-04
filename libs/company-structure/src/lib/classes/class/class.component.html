@@ -1,0 +1,116 @@
+<mat-accordion>
+    <mat-expansion-panel
+        [ngClass]="{'panel-active': panelOpenState }"
+        hideToggle
+        (closed)="triggerPanelToggle(false)"
+        (opened)="triggerPanelToggle(true)"
+        class="group-title-expand"
+        [disabled]="true"
+    >
+        <mat-expansion-panel-header
+            collapsedHeight="50px"
+            expandedHeight="50px"
+            class="prevent-click"
+            [ngClass]="{'add-class-title': addClass, 'class-title': !addClass}"
+        >
+            <mat-panel-title class="panel-class-title">
+                <ng-container [ngTemplateOutlet]="addClass?addClassTitle:classTitle"></ng-container>
+            </mat-panel-title>
+
+            <mat-panel-description class="panel-class-desc">
+                <div class="panel-desc">
+                    <ng-container [ngTemplateOutlet]="addClass ? empty : classDesc"></ng-container>
+                </div>
+            </mat-panel-description>
+            <ng-container
+                [ngTemplateOutlet]="addClass || !classType?.visible || isPEOClassType && className.default ? empty : classLinks"
+            ></ng-container>
+        </mat-expansion-panel-header>
+        <ng-container [ngTemplateOutlet]="addClass?addClassContent:classContent"></ng-container>
+    </mat-expansion-panel>
+</mat-accordion>
+<ng-template #classTitle>
+    <div class="authorize-click">
+        <mat-progress-bar
+            *ngIf="className?.numberOfMembers/classType?.totalNumberOfMembers*100 | number:'1.0-0' as popVal"
+            richTooltip="{{popVal}}% - {{className?.numberOfMembers}} {{className?.numberOfMembers === 1? 'employee': 'employees'}}"
+            matTooltipPosition="above"
+            matTooltipClass="pos-above"
+            mode="determinate"
+            [value]="popVal"
+        ></mat-progress-bar>
+    </div>
+    <h4 class="space">{{className?.name}} <span *ngIf="className?.default" language="primary.portal.classes.default"> </span></h4>
+</ng-template>
+
+<ng-template #classDesc
+    >{{className?.description}}
+    <span *ngIf="isPEOClassType"
+        >{{languageStrings["primary.portal.classtypePopup.industryCode"]}}: {{className.riskClass}}</span
+    ></ng-template
+>
+
+<ng-template #classLinks>
+    <div class="action-buttons authorize-click">
+        <div
+            class="space"
+            *ngIf="!panelOpenState && ((isPEOClassType && isPeoRemoveAllowed$ | async) || !isPEOClassType) && !isPrivacyOnForEnroller"
+        >
+            <div [richTooltip]="getRemoveClassError()" matTooltipPosition="above" matTooltipClass="pos-above">
+                <button
+                    mat-flat-button
+                    *isRestricted="permissionEnum.ACCOUNT_RESTRICT_DELETE_CLASS"
+                    class="mon-btn-link link-danger"
+                    href="javascript:void(0)"
+                    (click)="$event.stopPropagation(); onRemoveClassClicked()"
+                    [ngClass]="{'disabledLink': getRemoveClassError()}"
+                    [disabled]="getRemoveClassError()"
+                    [tabIndex]="-1"
+                >
+                    {{languageStrings["primary.portal.common.remove"]}}
+                </button>
+            </div>
+        </div>
+        <div *ngIf="!panelOpenState && ((isPEOClassType && isPeoEditAllowed$ | async) || !isPEOClassType) && !isPrivacyOnForEnroller">
+            <button
+                *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_CLASS"
+                mat-flat-button
+                class="mon-btn-link"
+                (click)="editClass()"
+                [tabIndex]="-1"
+            >
+                {{languageStrings["primary.portal.common.edit"]}}
+            </button>
+        </div>
+    </div>
+</ng-template>
+<ng-template #classContent>
+    <div *ngIf="portalsService.selectedClass?.id===className?.id">
+        <ng-template [cdkPortalOutlet]="portalsService.selectedPortal"></ng-template>
+    </div>
+</ng-template>
+
+<ng-template #addClassTitle>
+    <div class="authorize-click" *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_CLASS">
+        <a
+            href="javascript:void(0)"
+            (click)="addClasses()"
+            *ngIf="!panelOpenState && ((isPEOClassType && isPeoEditAllowed$ | async) || !isPEOClassType) && !isPrivacyOnForEnroller"
+            [tabIndex]="-1"
+        >
+            <ng-container *ngIf="isPEOClassType;else addClass">
+                <span *ngIf="isPEO$|async">{{languageStrings["primary.portal.members.workLabel.addClassLabel.PEO"]}}</span>
+            </ng-container>
+            <ng-template #addClass>
+                <span>{{languageStrings["primary.portal.members.workLabel.addClassLabel"]}}</span>
+            </ng-template>
+        </a>
+    </div>
+    <h4 *ngIf="panelOpenState" class="class-newclass-title">
+        {{languageStrings[isPEOClassType ? "primary.portal.classes.newClass.PEO" : "primary.portal.classes.newClass"]}}
+    </h4>
+</ng-template>
+<ng-template #addClassContent>
+    <div *ngIf="!portalsService.selectedClass" [id]="portalHostId"></div>
+</ng-template>
+<ng-template #empty></ng-template>

@@ -1,0 +1,33 @@
+<mat-sidenav-container class="mat-side-nav">
+    <mat-sidenav
+        #dashboardSideNavInput
+        class="generic-dashboard-sidenav"
+        position="start"
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [fixedInViewport]="mobileQuery.matches"
+        [disableClose]="!mobileQuery.matches"
+    >
+        <a class="generic-sidenav-branding" [ngStyle]="{ 'background-color': dashBoardSideNavColor }" *ngIf="mobileQuery.matches">
+            <img [src]="dashBoardSideNavLogo" alt="Logo" class="generic-sidenav-branding-logo" />
+        </a>
+        <button mat-icon-button class="mat-side-nav-closeBtn" *ngIf="mobileQuery.matches" (click)="dashboardSideNavInput.close()">
+            <mat-icon svgIcon="close" aria-hidden="true"></mat-icon>
+            <span class="cdk-visually-hidden">Close Navigation</span>
+        </button>
+        <!-- FIX ME :: This condition to show/hide employee sidenav is temporary replace with valid condition. -->
+        <empowered-mon-navlist
+            [navigationOptions]="navigationOptions"
+            [backToList]="enableBackToPreviousListing"
+            [backToListName]="previousListName"
+            [dashboardSideNav]="dashboardSideNavInput"
+            [employeeData]="employeeData"
+            (optionSelected)="navitageToSelectedOption($event)"
+            [brandingColor$]="brandingColor$"
+        ></empowered-mon-navlist>
+    </mat-sidenav>
+    <mat-sidenav-content class="dashboard-sidenav">
+        <div class="dashboard-wrapper">
+            <ng-content></ng-content>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

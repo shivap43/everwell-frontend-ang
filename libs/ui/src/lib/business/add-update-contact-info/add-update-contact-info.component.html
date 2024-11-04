@@ -1,0 +1,310 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closePopup()" [attr.aria-label]="langStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+
+    <form [formGroup]="addUpdateContactForm" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content class="flex-form-wrapper mon-p-0">
+            <div class="contact-account-header">
+                <h2 mat-dialog-title>{{title}}</h2>
+            </div>
+            <div class="contact-account-container">
+                <mon-alert class="message-block" alertType="danger" *ngIf="showErrorMessage">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+                <ng-container *ngIf="showType">
+                    <div>
+                        <mat-label class="mat-label" for="type">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.type"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select formControlName="type" placeholder="Select" id="type">
+                                <mat-option *ngFor="let type of accountContactTypes" value="{{ type.id }}" title="{{ type.name }}">
+                                    {{ type.name }}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('type').hasError('required')"
+                                language="secondary.portal.accounts.contacts.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-label class="mat-label" for="name">
+                            <span>{{contactNameText}}</span>
+                        </mat-label>
+                        <mat-form-field class="mon-mb-0 mon-mt-5">
+                            <input formControlName="name" matInput id="name" [attr.aria-label]="contactNameText" />
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('name').hasError('required')"
+                                language="secondary.portal.profile.editAccountInfo.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('name').hasError('pattern')  && !nameWithHypenApostrophesValidation.test(addUpdateContactForm.get('name').value) && !addUpdateContactForm.get('name').hasError('maxlength')"
+                                language="secondary.portal.profile.editAccountInfo.useOnlyletterNoHYpenError"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('name').hasError('pattern')  && nameWithHypenApostrophesValidation.test(addUpdateContactForm.get('name').value) && !addUpdateContactForm.get('name').hasError('maxlength')"
+                                language="secondary.portal.profile.editAccountInfo.hypenApostropeCannotFirstError"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('name').hasError('maxlength')"
+                                language="secondary.portal.profile.editAccountInfo.cannotExceed200CharError"
+                            ></mat-error>
+                        </mat-form-field>
+                        <mat-checkbox
+                            *ngIf="parentMode !== 'ACCOUNT'"
+                            [checked]="isPrimary"
+                            [disabled]="isPrimaryDisable"
+                            (change)="onChangePrimary($event)"
+                        >
+                            <span *ngIf="!replacePrimary"
+                                >{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.makePrimary"]}}</span
+                            >
+                            <span *ngIf="replacePrimary">{{replacePrimary}}</span>
+                        </mat-checkbox>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="existingAddresses?.length && allowEditingAddress">
+                    <div class="mon-mt-20">
+                        <mat-label class="mat-label" for="existing">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.selectExisting"]}}</span>
+                            <span class="optional-text">{{langStrings["primary.portal.common.optional"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="existing"
+                                placeholder="Select"
+                                (selectionChange)="existingAddressChange($event)"
+                                disableOptionCentering="true"
+                            >
+                                <mat-option *ngFor="let item of existingAddresses" [value]="item"
+                                    >{{item.address1}} {{item.address2}} {{item.city}} {{item.state}} {{item.zip}}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('existing').hasError('required')"
+                                language="secondary.portal.accounts.contacts.required"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-label class="mat-label" for="street-address-1">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.address1"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="address1"
+                                matInput
+                                id="street-address-1"
+                                (keyup)="removeDefaultExisting()"
+                                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.address1']"
+                            />
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address1').hasError('required')"
+                                language="secondary.portal.accounts.contacts.required"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address1').hasError('pattern') && !addUpdateContactForm.get('address1').hasError('maxlength')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.address1Validation"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address1').hasError('maxlength')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-label class="mat-label" for="street-address-2">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.address2"]}}</span>
+                            <span class="optional-text">{{langStrings["primary.portal.common.optional"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="address2"
+                                matInput
+                                id="street-address-2"
+                                (keyup)="removeDefaultExisting()"
+                                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.address2']"
+                            />
+                            <mat-hint>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.address2.hint"]}}</mat-hint>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address2').hasError('required')"
+                                language="secondary.portal.accounts.contacts.required"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address2').hasError('pattern') && !addUpdateContactForm.get('address2').hasError('maxlength')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.address2Validation"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('address2').hasError('maxlength')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <div class="d-flex justify-content-between">
+                    <ng-container>
+                        <div class="w-260 mon-mr-20">
+                            <mat-label class="mat-label" for="city">
+                                <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.city"]}}</span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    formControlName="city"
+                                    matInput
+                                    id="city"
+                                    (keyup)="removeDefaultExisting()"
+                                    [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.city']"
+                                />
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('city').hasError('required')"
+                                    language="secondary.portal.accounts.contacts.required"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('city').hasError('pattern') && !addUpdateContactForm.get('city').hasError('maxlength')"
+                                    language="secondary.portal.profile.accountContacts.addUpdateContact.cityValidation"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('city').hasError('maxlength')"
+                                    language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container>
+                        <div class="w-80 mon-mr-20">
+                            <mat-label class="mat-label" for="state">
+                                <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.state"]}}</span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="state"
+                                    placeholder="Select"
+                                    id="state"
+                                    (selectionChange)="removeDefaultExisting()"
+                                    disableOptionCentering="true"
+                                >
+                                    <mat-option
+                                        *ngFor="let state of states"
+                                        value="{{ state.abbreviation }}"
+                                        title="{{ state.abbreviation }}"
+                                    >
+                                        {{ state.abbreviation }}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('state').hasError('required')"
+                                    language="secondary.portal.accounts.contacts.selectionRequired"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container>
+                        <div class="w-120">
+                            <mat-label class="mat-label" for="zip">
+                                <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.zip"]}}</span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    formControlName="zip"
+                                    matInput
+                                    id="zip"
+                                    (keyup)="removeDefaultExisting()"
+                                    empoweredZipCodeFormat
+                                    [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.zip']"
+                                />
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('zip').hasError('required')"
+                                    language="secondary.portal.accounts.contacts.required"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('zip').hasError('pattern')"
+                                    language="secondary.portal.profile.accountContacts.addUpdateContact.zipPattern"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="addUpdateContactForm.get('zip').hasError('mismatch')"
+                                    language="secondary.portal.accounts.zipMismatch"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <ng-container>
+                    <div>
+                        <mat-label class="mat-label" for="phone">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.phone"]}}</span>
+                        </mat-label>
+                        <mat-form-field class="w-260" (click)="changeFormat()">
+                            <input
+                                [maxlength]="maxLength"
+                                formControlName="phone"
+                                matInput
+                                id="phone"
+                                (focusout)="revertToFormat()"
+                                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.phone']"
+                                empoweredNumberValidation
+                                [allowDashes]="true"
+                                empoweredPhoneNumberFormat
+                            />
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('phone').hasError('required')"
+                                language="secondary.portal.accounts.contacts.required"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('phone').hasError('pattern')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.phonePattern"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-label class="mat-label" for="email">
+                            <span>{{langStrings["primary.portal.profile.accountContacts.addUpdateContact.email"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="email"
+                                matInput
+                                id="email"
+                                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.email']"
+                            />
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('email').hasError('required')"
+                                language="secondary.portal.accounts.contacts.required"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="addUpdateContactForm.get('email').hasError('pattern')"
+                                language="secondary.portal.profile.accountContacts.addUpdateContact.emailInvalid"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="closePopup()"
+                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.addUpdateContact.cancelEditingContact']"
+                language="primary.portal.common.cancel"
+            ></a>
+            <button mat-flat-button class="mon-btn-primary" type="submit">
+                <span *ngIf="!isAdd">{{langStrings['primary.portal.common.save']}}</span
+                ><span *ngIf="isAdd">{{langStrings['primary.portal.common.add']}}</span>
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

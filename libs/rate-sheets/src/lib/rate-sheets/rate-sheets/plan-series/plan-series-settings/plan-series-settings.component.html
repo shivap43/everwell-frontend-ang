@@ -1,0 +1,27 @@
+<div
+    class="plan-series-settings-wrapper"
+    [ngClass]="{'border' : selectedRateSheetPlanSeriesOptions[0]?.genders?.length || selectedRateSheetPlanSeriesOptions[0]?.tobaccoStatuses?.length || selectedRateSheetPlanSeriesOptions[0]?.ageBands?.length}"
+    *ngIf="selectedRateSheetPlanSeriesOptions"
+>
+    <ng-container *ngIf="selectedRateSheetPlanSeriesOptions[0]?.genders?.length">
+        <empowered-settings-dropdown [meta]="genderPortalMeta" [settingsDropdownContent]="genderComponent" #genderDropdown>
+            <empowered-gender class="content" [portalRef]="genderDropdown.portal" #genderComponent> </empowered-gender>
+        </empowered-settings-dropdown>
+    </ng-container>
+    <ng-container *ngIf="selectedRateSheetPlanSeriesOptions[0]?.tobaccoStatuses?.length">
+        <empowered-settings-dropdown [meta]="tobaccoPortalMeta" [settingsDropdownContent]="tobaccoComponent" #tobaccoDropdown>
+            <empowered-tobacco-status class="content" [portalRef]="tobaccoDropdown.portal" #tobaccoComponent> </empowered-tobacco-status>
+        </empowered-settings-dropdown>
+    </ng-container>
+    <ng-container *ngIf="selectedRateSheetPlanSeriesOptions[0]?.ageBands?.length === 1">
+        <empowered-settings-dropdown [meta]="agePortalMeta" [settingsDropdownContent]="ageComponent" #ageDropdown>
+            <empowered-ages class="content" [portalRef]="ageDropdown.portal" #ageComponent> </empowered-ages>
+        </empowered-settings-dropdown>
+    </ng-container>
+
+    <ng-container *ngIf="selectedRateSheetPlanSeriesOptions[0]?.ageBands?.length > 1">
+        <empowered-settings-dropdown [meta]="ageBandsPortalMeta" [settingsDropdownContent]="ageBandsComponent" #ageBandsDropdown>
+            <empowered-age-bands class="content" [portalRef]="ageBandsDropdown.portal" #ageBandsComponent> </empowered-age-bands>
+        </empowered-settings-dropdown>
+    </ng-container>
+</div>

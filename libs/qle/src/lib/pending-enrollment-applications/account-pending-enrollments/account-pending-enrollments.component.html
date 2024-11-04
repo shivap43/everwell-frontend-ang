@@ -1,0 +1,494 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<section class="member-list-wrapper">
+    <div *ngIf="!isLoading" class="enrollment-main-section">
+        <div>
+            <div class="mon-mb-20" *ngIf="errorResponse && this.pendingEnrollments.length===0">
+                <!-- Static values will be removed once language is implemented -->
+                <h1 class="member-list-header">
+                    {{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollments']}}
+                </h1>
+                <mon-alert *ngIf="errorResponse" alertType="danger">
+                    <span>{{errorMessage}}</span>
+                </mon-alert>
+            </div>
+            <div class="" *ngIf="this.pendingEnrollments.length>0">
+                <!-- Static values will be removed once language is implemented -->
+                <h1 class="member-list-header">
+                    {{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollments']}}
+                </h1>
+            </div>
+            <div *ngIf="this.pendingEnrollments.length===0 && !errorResponse">
+                <!-- Static values will be removed once language is implemented -->
+                <h1 class="member-list-header">
+                    {{languageStrings['primary.portal.accountPendingEnrollments.pendingEnrollments']}}
+                </h1>
+                <p>
+                    {{languageStrings['primary.portal.accountPendingEnrollments.noPending']}}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="this.pendingEnrollments.length>0 && !errorResponse">
+        <div class="search-filter-wraper">
+            <div class="search-filter-group">
+                <div class="search-wrapper">
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.accountPendingEnrollments.search']}}
+                    </mat-label>
+                    <div>
+                        <mat-form-field>
+                            <input
+                                type="text"
+                                class="mon-pt-5"
+                                matInput
+                                #searchValue
+                                (keyup)="searchEmployee(searchValue.value) "
+                                [attr.aria-label]="languageStrings['primary.portal.accountPendingEnrollments.search']"
+                            />
+                        </mat-form-field>
+                        <div class="search-box-wrapper">
+                            <div class="search-box-sub-wrapper">
+                                <mat-action-list *ngIf="this.searchFlag">
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label w-80">
+                                            {{languageStrings['primary.portal.accountPendingEnrollment.name']}}
+                                        </mat-label>
+                                        <span class="field-value">{{searchValue.value}} </span>
+                                    </div>
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label w-80">
+                                            {{languageStrings['primary.portal.accountPendingEnrollment.ssn']}}
+                                        </mat-label>
+                                        <span class="field-value">{{searchValue.value}} </span>
+                                    </div>
+                                </mat-action-list>
+                            </div>
+                        </div>
+                        <mat-hint class="mon-hint-msg">
+                            {{languageStrings['primary.portal.accountPendingEnrollments.hint']}}
+                        </mat-hint>
+                    </div>
+                </div>
+
+                <div class="filter-wrapper">
+                    <mat-label class="mat-label">Filters</mat-label>
+                    <div class="filter-sub-wrapper">
+                        <!-- Status Filter  -->
+                        <mat-form-field>
+                            <label class="filter-label">
+                                {{languageStrings['primary.portal.accountPendingEnrollments.filterStatus']}}
+                            </label>
+                            <mat-select
+                                #statusFilterDropdown
+                                multiple
+                                disableOptionCentering="true"
+                                panelClass="list-grid-filter filter-status"
+                                [formControl]="statusFilter"
+                                (closed)="clickOutside('statusFilter')"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="filter-options">
+                                    <mat-option *ngFor="let status of statusFilterDropdowndata" [value]="status">
+                                        <span>{{status}}</span>
+                                    </mat-option>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="resetVal('statusFilter')"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                class="mon-apply"
+                                                (click)="filterApply('statusFilter')"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label"></label>
+                        </mat-form-field>
+                        <!-- Status Filter  -->
+
+                        <!-- Created Date Filter  -->
+                        <mat-form-field>
+                            <label class="filter-label">
+                                {{languageStrings['primary.portal.accountPendingEnrollments.filterCreatedDate']}}
+                            </label>
+                            <mat-select
+                                #createdFilterDropdown
+                                [formControl]="createDateFilterDropDown"
+                                disableOptionCentering="true"
+                                panelClass="list-grid-filter filter-status"
+                                (closed)="clickOutside('createDateFilter')"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="mon-mx-20">
+                                    <mat-form-field>
+                                        <mat-select class="mon-select-arrow">
+                                            <mat-option disabled>Select</mat-option>
+                                            <mat-option
+                                                *ngFor="let option of options"
+                                                [value]="option"
+                                                placeholder="Select"
+                                                (click)="createdFilterDropdown.open()"
+                                            >
+                                                {{option}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [matDatepicker]="dateCreatedPicker"
+                                            matInput
+                                            empoweredDateTransform
+                                            (keyup)="dateValidation(createDateFilter)"
+                                            [formControl]="createDateFilter"
+                                            [attr.aria-label]="languageStrings['primary.portal.accountPendingEnrollments.filterCreatedDate']"
+                                        />
+                                        <mat-datepicker #dateCreatedPicker></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix (click)="dateCreatedPicker.open()">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                    </mat-form-field>
+                                    <mat-error *ngIf="createDateFilter.hasError('invalid')">
+                                        {{invalidDate}}
+                                    </mat-error>
+
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="resetVal('createDateFilter')"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                class="mon-apply"
+                                                (click)="filterApply('createDateFilter')"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label"></label>
+                        </mat-form-field>
+                        <!-- Created Date Filter  -->
+
+                        <!-- Coverage Filter  -->
+                        <mat-form-field>
+                            <label class="filter-label">
+                                {{languageStrings['primary.portal.accountPendingEnrollments.coverage']}}
+                            </label>
+                            <mat-select
+                                #coverageFilterDropdown
+                                disableOptionCentering="true"
+                                panelClass="list-grid-filter filter-status"
+                                (closed)="clickOutside('coverageDatesFilter')"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="mon-mx-20">
+                                    <mat-form-field>
+                                        <mat-select
+                                            class="mon-select-arrow"
+                                            [formControl]="coverageDatesFilterDropDown"
+                                        >
+                                            <mat-option disabled>Select</mat-option>
+                                            <mat-option
+                                                *ngFor="let option of options"
+                                                [value]="option"
+                                                placeholder="Select"
+                                                (click)="coverageFilterDropdown.open()"
+                                            >
+                                                {{option}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [matDatepicker]="coverageDatePicker"
+                                            matInput
+                                            empoweredDateTransform
+                                            (keyup)="dateValidation(coverageDateFilter)"
+                                            [formControl]="coverageDateFilter"
+                                            [attr.aria-label]="languageStrings['primary.portal.accountPendingEnrollments.coverage']"
+                                        />
+                                        <mat-datepicker #coverageDatePicker></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix (click)="coverageDatePicker.open()">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                    </mat-form-field>
+                                    <mat-error *ngIf="coverageDateFilter.hasError('invalid')">
+                                        {{invalidDate}}
+                                    </mat-error>
+
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="resetVal('coverageDatesFilter')"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                class="mon-apply"
+                                                (click)="filterApply('coverageDatesFilter')"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label"></label>
+                        </mat-form-field>
+                        <!-- Coverage Filter  -->
+
+                        <!-- Reason Filter  -->
+                        <ng-container *ngIf="!forMediumDevices">
+                            <mat-form-field>
+                                <label class="filter-label">
+                                    {{languageStrings['primary.portal.accountPendingEnrollments.reason']}}
+                                </label>
+                                <mat-select
+                                    #reasonFilterDropdown
+                                    multiple
+                                    disableOptionCentering="true"
+                                    [formControl]="reasonFilter"
+                                    panelClass="list-grid-filter filter-status"
+                                    (closed)="clickOutside('reasonFilter')"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-option *ngFor="let reason of reasons" [value]="reason">
+                                            {{reason}}
+                                        </mat-option>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a href="javascript:void(0)" (click)="resetVal('reasonFilter')"
+                                                    >{{languageStrings['primary.portal.common.clear']}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    class="mon-apply"
+                                                    (click)="filterApply('reasonFilter')"
+                                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label"></label>
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Reason Filter  -->
+                        <!-- Products Filter  -->
+
+                        <ng-container *ngIf="!forMediumDevices">
+                            <mat-form-field>
+                                <label class="filter-label">
+                                    {{languageStrings['primary.portal.accountPendingEnrollments.products']}}
+                                </label>
+                                <mat-select
+                                    #productFilterDropdown
+                                    multiple
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-status"
+                                    [formControl]="productFilter"
+                                    (closed)="clickOutside('productFilter')"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-option *ngFor="let product of productFilterDropdowndata" [value]="product">
+                                            {{product}}
+                                        </mat-option>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a href="javascript:void(0)" (click)="resetVal('productFilter')"
+                                                    >{{languageStrings['primary.portal.common.clear']}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    class="mon-apply"
+                                                    (click)="filterApply('productFilter')"
+                                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label"></label>
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Products Filter  -->
+
+                        <!-- MORE Filter -->
+                        <ng-container>
+                            <button
+                                #moreFilterOrigin
+                                class="more-button"
+                                (click)="moreFilterView()"
+                                *ngIf="forMediumDevices"
+                            >
+                                {{languageStrings['primary.portal.common.moreFilter']}}
+                            </button>
+                        </ng-container>
+
+                        <!-- More Filter -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-grid table-mask-wrapper">
+            <!-- Static values will be removed once language is implemented -->
+            <table mat-table [dataSource]="dataSource">
+                <!-- Employee name Column -->
+                <ng-container matColumnDef="employee">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.employee']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a class="mon-mb-30" href="javascript:void(0)" (click)="navigateToEmployee(element.employee.id)"
+                            >{{element.employee.name}}</a
+                        >
+                    </td>
+                </ng-container>
+                <!-- Products Column -->
+                <ng-container matColumnDef="products">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.products']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.data.length>1">
+                            <p mat-cell *ngFor="let el of element.data" class="mon-mb-5">
+                                {{el.productCount}}
+                                <span class="info-icon" [richTooltip]="el.productTooltip" matTooltipClass="pos-below">
+                                    <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary">
+                                    </mon-icon>
+                                </span>
+                            </p>
+                        </span>
+                        <span *ngIf="element.data.length===undefined">
+                            {{element.data.productCount}}
+                            <span
+                                class="info-icon"
+                                [richTooltip]="element.data.productTooltip"
+                                matTooltipClass="pos-below"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary">
+                                </mon-icon>
+                            </span>
+                        </span>
+                    </td>
+                </ng-container>
+                <!-- Reason Column -->
+                <ng-container matColumnDef="reason">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.reason']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.data.length>1">
+                            <p mat-cell *ngFor="let el of element.data" class="mon-mb-5">
+                                {{el.reason}}
+                            </p>
+                        </span>
+                        <span *ngIf="element.data.length===undefined">
+                            {{element.data.reason}}
+                        </span>
+                    </td>
+                </ng-container>
+                <!-- Created date Column -->
+                <ng-container matColumnDef="createdDate">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.filterCreatedDate']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.data.length>1">
+                            <p mat-cell *ngFor="let el of element.data" class="mon-mb-5">
+                                {{el.createdDate}}
+                            </p>
+                        </span>
+                        <span *ngIf="element.data.length===undefined">
+                            {{element.data.createdDate}}
+                        </span>
+                    </td>
+                </ng-container>
+                <!-- Coverage Starts Column -->
+                <ng-container matColumnDef="coverageStarts">
+                    <th mat-header-cell *matHeaderCellDef>Coverage starts</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.data.length>1">
+                            <p mat-cell *ngFor="let el of element.data" class="mon-mb-5">
+                                {{el.coverageStarts}}
+                            </p>
+                        </span>
+                        <span *ngIf="element.data.length===undefined">
+                            {{element.data.coverageStarts}}
+                        </span>
+                    </td>
+                </ng-container>
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.accountPendingEnrollments.filterStatus']}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.data.length>1">
+                            <p mat-cell *ngFor="let el of element.data" class="mon-mb-5">
+                                <span *ngIf="el.statusCount==='one'">
+                                    <span *ngIf="el.status!=='Unspecified'">{{el.status}}</span>
+                                    <span *ngIf="el.status==='Unspecified'">&nbsp;</span>
+                                </span>
+                                <span *ngIf="el.statusCount==='Multiple'">
+                                    <span *ngIf="el.status!=='Unspecified'">
+                                        {{languageStrings['primary.portal.accountPendingEnrollment.multiple']}}
+                                    </span>
+                                    <span *ngIf="el.status==='Unspecified'">&nbsp;</span>
+                                    <span class="info-icon" [richTooltip]="el.status" matTooltipClass="pos-below">
+                                        <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary">
+                                        </mon-icon>
+                                    </span>
+                                </span>
+                            </p>
+                        </span>
+                        <span *ngIf="element.data.length===undefined">
+                            <span *ngIf="element.data.statusCount==='one'">
+                                <span *ngIf="element.data.status!=='Unspecified'">{{element.data.status}}</span>
+                                <span *ngIf="element.data.status==='Unspecified'">&nbsp;</span>
+                            </span>
+                            <span *ngIf="element.data.statusCount==='Multiple'">
+                                <span *ngIf="element.data.status!=='Unspecified'">
+                                    {{languageStrings['primary.portal.accountPendingEnrollment.multiple']}}
+                                </span>
+                                <span *ngIf="element.data.status==='Unspecified'">&nbsp;</span>
+                                <span class="info-icon" [richTooltip]="element.data.status" matTooltipClass="pos-below">
+                                    <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary">
+                                    </mon-icon>
+                                </span>
+                            </span>
+                        </span>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            <span *ngIf="dataSource.length===0">
+                {{languageStrings['primary.portal.accountPendingEnrollment.noPendingEnrollments']}}
+            </span>
+        </div>
+    </div>
+</section>

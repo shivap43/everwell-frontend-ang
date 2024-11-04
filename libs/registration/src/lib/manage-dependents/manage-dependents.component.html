@@ -1,0 +1,132 @@
+<div *ngIf="!remove" class="mon-card-wrapper mon-my-50 w-600">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+    <mat-card>
+        <mat-card-content>
+            <div>
+                <mat-card-title language="primary.portal.register.dependentsTitle"></mat-card-title>
+                <mon-alert *ngIf="error" alertType="danger">
+                    <span [language]="errorMsg"></span>
+                </mon-alert>
+                <p class="mon-mt-0 mon-mb-30" language="primary.portal.register.dependentsMessage"></p>
+            </div>
+            <div *ngIf="dependents">
+                <div>
+                    <table [dataSource]="dataSource" mat-table>
+                        <ng-container matColumnDef="name">
+                            <th
+                                *matHeaderCellDef
+                                language="primary.portal.register.dependents.nameColumn"
+                                mat-header-cell
+                            ></th>
+                            <td *matCellDef="let element" mat-cell>
+                                {{ element.name.firstName}} {{element.name.lastName }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="relation">
+                            <th
+                                *matHeaderCellDef
+                                class="w-100"
+                                language="primary.portal.register.dependents.relationshipColumn"
+                                mat-header-cell
+                            ></th>
+                            <td *matCellDef="let element" mat-cell>{{ element.relation | titlecase }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="age">
+                            <th
+                                *matHeaderCellDef
+                                class="w-50"
+                                language="primary.portal.register.dependents.ageColumn"
+                                mat-header-cell
+                            ></th>
+                            <td *matCellDef="let element" mat-cell>{{ element.age }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="gender">
+                            <th
+                                *matHeaderCellDef
+                                class="w-80"
+                                language="primary.portal.register.dependents.genderCoulmn"
+                                mat-header-cell
+                            ></th>
+                            <td *matCellDef="let element" mat-cell>{{ element.gender | titlecase }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="config">
+                            <th
+                                *matHeaderCellDef
+                                class="w-50 text-center"
+                                mat-header-cell
+                                language="primary.portal.register.dependents.manageCoulmn"
+                            ></th>
+                            <td *matCellDef="let element" mat-cell class="text-center">
+                                <button
+                                    *ngIf="!isAflacReadOnly"
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="beforeMenu"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                                >
+                                    <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary">
+                                    </mon-icon>
+                                </button>
+                                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                    <button
+                                        mat-menu-item
+                                        (click)="onEditClick(element.id)"
+                                        attr.aria-label="Edit {{element.name.firstName}} {{element.name.lastName}}"
+                                    >
+                                        {{languageStrings['primary.portal.register.dependents.edit']}}
+                                    </button>
+                                    <button
+                                        mat-menu-item
+                                        (click)="onDeleteClick(element)"
+                                        attr.aria-label="Remove {{element.name.firstName}} {{element.name.lastName}}"
+                                        class="text-danger"
+                                    >
+                                        {{languageStrings['primary.portal.register.dependents.remove']}}
+                                    </button>
+                                </mat-menu>
+                            </td>
+                        </ng-container>
+                        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                        <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="mon-mt-35 mon-pb-20">
+                <a
+                    *ngIf="!isAflacReadOnly"
+                    class="btn-link"
+                    (click)="onAddDependentsClick()"
+                    routerLink="../dependents/add"
+                    routerLinkActive="router-link-active"
+                    >{{languageStrings['primary.portal.register.dependentsAddDependentsLink']}}</a
+                >
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a class="mon-btn-link mon-pt-10" (click)="clickOnBack()"
+                >{{languageStrings['primary.portal.common.back']}}</a
+            >
+            <button class="mon-btn-primary" mat-flat-button routerLink="../../login">
+                {{languageStrings['primary.portal.common.finishRegistration']}}
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</div>
+<div *ngIf="remove" class="mon-card-wrapper mon-my-50 w-600">
+    <mat-card role="Account Message">
+        <mat-card-content class="mon-m-50 mon-pb-50">
+            <h1>
+                {{ "primary.portal.register.dependnets.confirmRemove" | replaceTag: { "#name":
+                this.dependentToRemove.name.firstName + " " + this.dependentToRemove.name.lastName } }}
+            </h1>
+        </mat-card-content>
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a href="javascript:void(0)" class="mon-btn-link mon-pt-10" (click)="onCancelClick()"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button class="mon-btn-danger" mat-flat-button (click)="deleteDependent()">
+                {{languageStrings['primary.portal.common.remove']}}
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</div>

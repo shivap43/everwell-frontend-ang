@@ -1,0 +1,95 @@
+<form
+    *ngIf="dropdownRiderStates$ | async as riderStates; else loader"
+    [formGroup]="form"
+    (submit)="onApply()"
+    data-test="eb-enrollment__rider-form"
+    class="rider-form"
+>
+    <div *ngFor="let formGroup of riderFormArray.controls; let i = index" [formGroup]="formGroup">
+        <mat-checkbox class="rider-form__checkbox" formControlName="riderPlanName" data-test="eb-enrollment__rider-form__checkbox">
+            {{ riderStates[i].riderPlanName }}
+        </mat-checkbox>
+
+        <div
+            *ngIf="riderStates[i].returnOfPremiumRider"
+            class="checkbox-bottom-label"
+            language="primary.portal.shoppingExperience.ropRiderInfo"
+        ></div>
+
+        <div *ngIf="riderStates[i].disableText" class="checkbox-bottom-label">{{ riderStates[i].disableText }}</div>
+        <div
+            *ngIf="riderStates[i].missingInformation === missingInfoType.SALARY"
+            class="checkbox-bottom-label"
+            language="primary.portal.shoppingExperience.salaryMissingRider"
+        ></div>
+
+        <ng-container *ngIf="!formGroup.controls.riderPlanName.disabled || riderStates[i]?.checked">
+            <ng-container>
+                <ng-container
+                    *ngTemplateOutlet="select; 
+                context: {
+                    labelLanguage: 'primary.portal.quoteShop.coverageLevel', 
+                    options: riderStates[i].coverageLevelNames, 
+                    formControl: formGroup.controls.coverageLevelName, 
+                    isCurrencyOptions: false
+                }"
+                >
+                </ng-container>
+            </ng-container>
+            <ng-container *ngIf="(isSupplementaryPlan$ | async) === false">
+                <ng-container
+                    *ngTemplateOutlet="select; 
+                context: {
+                    labelLanguage: 'primary.portal.coverage.eliminationperiod', 
+                    options: riderStates[i].eliminationPeriodNames, 
+                    formControl: formGroup.controls.eliminationPeriodName, 
+                    isCurrencyOptions: false
+                }"
+                >
+                </ng-container>
+            </ng-container>
+
+            <ng-container
+                *ngTemplateOutlet="select; 
+                context: {
+                    labelLanguage: 'primary.portal.coverage.benefitamount', 
+                    options: riderStates[i].benefitAmounts, 
+                    formControl: formGroup.controls.benefitAmount, 
+                    isCurrencyOptions: true
+                }"
+            >
+            </ng-container>
+        </ng-container>
+    </div>
+</form>
+
+<ng-template
+    #select
+    let-labelLanguage="labelLanguage"
+    let-options="options"
+    let-formControl="formControl"
+    let-isCurrencyOptions="isCurrencyOptions"
+>
+    <ng-container *ngIf="options.length">
+        <div class="selector-label" [language]="labelLanguage"></div>
+        <mat-form-field class="rider-form__form-field">
+            <mat-select data-test="eb-enrollment__rider-form__select" [formControl]="formControl" ariaLabel="#">
+                <mat-option
+                    data-test="eb-enrollment__rider-form__select__option"
+                    class="selector-option"
+                    *ngFor="let option of options; trackBy: trackByRiderOption"
+                    [value]="option"
+                >
+                    <span *ngIf="!isCurrencyOptions">{{ option }}</span>
+                    <span *ngIf="isCurrencyOptions">{{ option | currency : 'USD' : 'symbol' : '1.0' }}</span>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </ng-container>
+</ng-template>
+
+<ng-template #loader>
+    <div class="loader-wrapper">
+        <mat-spinner strokeWidth="3" diameter="50" color="primary"></mat-spinner>
+    </div>
+</ng-template>

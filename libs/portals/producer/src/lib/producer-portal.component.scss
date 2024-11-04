@@ -1,0 +1,21 @@
+////
+/// Producer Portal Styles
+///
+/// Since `ProducerPortalComponent` has ViewEncapsulation.None, this stylesheet can be used to style any child component in Producer portal.
+///
+
+.producer-portal {
+    /// Ensure all child components fill the available space by default.
+    empowered-producer-portal {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+
+        & > *:not(.router-outlet) {
+            flex: 1 0 auto;
+
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

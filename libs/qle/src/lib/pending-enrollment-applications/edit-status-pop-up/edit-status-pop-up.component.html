@@ -1,0 +1,63 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="info-modal w-500">
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            {{languageStrings['primary.portal.accountPendingEnrollments.editStatus']}}
+        </h2>
+        <mon-alert *ngIf="errorFlag" alertType="danger">
+            <span>{{errMsg}}</span>
+        </mon-alert>
+        <div>
+            <mat-radio-group [(ngModel)]="this.defaultStatus" class="d-flex flex-column">
+                <div *ngFor="let status of this.pendingStatus">
+                    <mat-radio-button class="mon-py-10" [value]="status.name" (change)="onChange($event)">
+                        {{status.name}}
+                    </mat-radio-button>
+                    <a
+                        *ngIf="status.name!=='Unspecified'"
+                        href="javascript:void(0)"
+                        class="remove-status"
+                        (click)="removeStatus($event,status.name)"
+                    >
+                        {{languageStrings['primary.portal.accountPendingEnrollments.remove']}}
+                    </a>
+                </div>
+            </mat-radio-group>
+        </div>
+        <div class="mon-mt-20 d-flex">
+            <div class="w-200" *ngIf="!this.enableAdd">
+                <a href="javascript:void(0)" (click)="enableAddStatus()">
+                    {{languageStrings['primary.portal.accountPendingEnrollments.customStatus']}}
+                </a>
+            </div>
+            <div *ngIf="this.enableAdd" class="d-flex">
+                <div class="w-200">
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.accountPendingEnrollments.customStatus']}}
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            [formControl]="statusForm"
+                            [attr.aria-label]="languageStrings['primary.portal.accountPendingEnrollments.customStatus']"
+                        />
+                        <mat-error *ngIf="!statusForm.valid">
+                            {{languageStrings['primary.portal.accountPendingEnrollment.statusNameAlready']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <a href="javascript:void(0)" class="add-status" (click)="checkExistingStatus()" language="">
+                    {{languageStrings['primary.portal.accountPendingEnrollments.add']}}
+                </a>
+            </div>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <button class="mon-btn-primary" mat-flat-button (click)="closeForm()">
+            {{languageStrings['primary.portal.accountPendingEnrollments.cancel']}}
+        </button>
+        <button class="mon-btn-primary" mat-flat-button (click)="updateStatus($event)">
+            {{languageStrings['primary.portal.accountPendingEnrollments.update']}}
+        </button>
+    </mat-dialog-actions>
+</div>

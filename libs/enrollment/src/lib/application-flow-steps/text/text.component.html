@@ -1,0 +1,103 @@
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<ng-container>
+    <section class="section-container">
+        <ng-container *ngIf="body">
+            <div class="question-container">
+                <div class="question-block">
+                    <p [innerHTML]="body"></p>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="directionsLast">
+            <div class="question-container">
+                <div class="question-block">
+                    <p [innerHTML]="directionsLast"></p>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="headlineLast">
+            <div class="question-container">
+                <div class="question-block">
+                    <p [innerHTML]="headlineLast"></p>
+                </div>
+            </div>
+        </ng-container>
+    </section>
+    <div class="plan-details" *ngIf="isAgPlan && (isFraudProtectionMsgEnabled$ | async) === false  && (isHQMsgEnabled$ | async) === false">
+        <div>
+            <mat-label class="mat-label">{{languageStrings['primary.portal.applicationFlow.fraudProtection.policy']}}</mat-label>
+            <div>{{planObject.application.planName}}</div>
+        </div>
+        <div>
+            <mat-label class="mat-label"> {{languageStrings['primary.portal.applicationFlow.tier']}} </mat-label>
+            <div>{{tierName$ | async}}</div>
+        </div>
+        <div>
+            <mat-label class="mat-label"> {{languageStrings['primary.portal.applicationFlow.cost']}} </mat-label>
+            <div>{{totalCost$ | async | currency}}</div>
+        </div>
+    </div>
+    <div *ngIf="isFraudProtectionMsgEnabled$ | async">
+        <p>{{languageStrings['primary.portal.applicationFlow.fraudProtection.message']}}</p>
+        <mat-list role="list">
+            <mat-list-item role="listitem"
+                >{{languageStrings['primary.portal.applicationFlow.fraudProtection.policy']}}{{planObject.application.planName}}</mat-list-item
+            >
+            <mat-list-item role="listitem">{{languageStrings['primary.portal.applicationFlow.fraudProtection.tier']}}</mat-list-item>
+            <mat-list-item role="listitem">{{languageStrings['primary.portal.applicationFlow.fraudProtection.cost']}}</mat-list-item>
+        </mat-list>
+    </div>
+
+    <div *ngIf="isHQMsgEnabled$ | async">
+        <p>{{languageStrings['primary.portal.applicationFlow.fraudProtection.message']}}</p>
+        <p>{{languageStrings['primary.portal.applicationFlow.fraudProtection.decline']}}</p>
+        <mat-list role="list">
+            <mat-list-item role="listitem"
+                >{{languageStrings['primary.portal.applicationFlow.fraudProtection.policy']}}{{planObject.application.planName}}</mat-list-item
+            >
+            <mat-list-item role="listitem"
+                >{{languageStrings['primary.portal.applicationFlow.fraudProtection.HQCost']}} ({{payFrequency.name}}):
+                {{planObject.application.cartData.cost | currency}}</mat-list-item
+            >
+        </mat-list>
+    </div>
+    <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+        <button
+            id="submitAppFlowForm"
+            *ngIf="planObject.lastStep"
+            (click)="goToNextProduct()"
+            class="mon-btn-primary submit-app-flow-form"
+            mat-flat-button
+        >
+            <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                >{{isConfirmation? languageStrings['primary.portal.applicationFlow.planOption.confirm']:
+                languageStrings['primary.portal.applicationFlow.planOption.continue']}}{{this.planObject.nextProduct}}
+            </span>
+            <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                >{{isConfirmation?
+                languageStrings['primary.portal.applicationFlow.planOption.confirmAflacAlways']:languageStrings['primary.portal.applicationFlow.planOption.continueaflacAlways']}}
+            </span>
+            <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSPayment)"
+                >{{ isConfirmation?
+                languageStrings['primary.portal.applicationFlow.planOption.confirmBilling']:languageStrings['primary.portal.applicationFlow.planOption.continueBilling']}}
+            </span>
+            <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                >{{isConfirmation?languageStrings['primary.portal.applicationFlow.planOption.confirmApplications']
+                :languageStrings['primary.portal.applicationFlow.planOption.continueApplications']}}
+            </span>
+        </button>
+        <button class="mon-btn-primary" *ngIf="!this.planObject.lastStep" (click)="goToNextProduct()" mat-flat-button>
+            <span *ngIf="!this.planObject.lastStep">
+                {{isConfirmation ? languageStrings['primary.portal.common.confirm'] : languageStrings['primary.portal.common.continue']}}
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</ng-container>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

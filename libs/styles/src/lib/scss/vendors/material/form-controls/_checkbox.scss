@@ -1,0 +1,152 @@
+@import "shared";
+
+.mat-checkbox {
+    // Default display is inline-block, but the inherited line-height messes up the 20px expected line-height of inner content
+    display: flex;
+    line-height: convert-unit(20px, "rem");
+
+    &-inner-container {
+        // Border doesn't take away from the dimension of the checkbox
+        // Expected width and height should be 20px and border should be 1px thick
+        height: convert-unit(20px, "rem");
+        width: convert-unit(20px, "rem");
+
+        &-frame {
+            border: convert-unit(1px, "rem") solid get("color.gray.600");
+        }
+    }
+
+    // TODO: The svg used for checkmark doesn't match spec
+    .mat-checkbox-checkmark {
+        width: 75%;
+        margin: auto;
+    }
+
+    .mat-checkbox-inner-container {
+        // Prevent default behavior to center checkbox vertically
+        margin-top: 0;
+    }
+
+    .mat-checkbox-label {
+        line-height: convert-unit(20px, "rem");
+    }
+
+    &.mat-checkbox-checked.mat-accent {
+        .mat-checkbox-background {
+            background-color: get("color.gray.800");
+        }
+
+        &.mat-checkbox-disabled .mat-checkbox-background {
+            background-color: get("color.gray.500");
+        }
+    }
+
+    &.mat-checkbox-disabled.mat-accent {
+        .mat-checkbox-background {
+            background-color: get("color.gray.300");
+        }
+
+        .mat-checkbox-inner-container {
+            border: convert-unit(1px, "rem") solid get("color.gray.400");
+            cursor: not-allowed;
+        }
+    }
+
+    &.mat-checkbox-indeterminate {
+        .mat-checkbox-background {
+            background-color: get("color.black");
+        }
+
+        .mat-checkbox-inner-container {
+            border: convert-unit(1px, "rem") solid get("color.gray.400");
+        }
+    }
+
+    &.ng-invalid {
+        color: get("color.info.danger.500");
+
+        .mat-checkbox-frame {
+            border-color: get("color.info.danger.500");
+            background-color: get("color.info.danger.100");
+        }
+    }
+
+    > label:focus-within {
+        box-shadow: convert-unit(0px, "rem") convert-unit(0px, "rem") convert-unit(1px, "rem") convert-unit(1px, "rem")
+                get("color.primary.300"),
+            convert-unit(0px, "rem") convert-unit(0px, "rem") convert-unit(3px, "rem") convert-unit(4px, "rem") get("color.primary.100");
+    }
+
+    &.highlight-required {
+        .mat-checkbox-frame {
+            background-color: get("color.paleYellow");
+        }
+    }
+}
+
+&.is-touch {
+    .mat-checkbox {
+        display: inline-block;
+        overflow: unset;
+
+        .mat-checkbox-layout {
+            display: flex;
+            align-items: center;
+            padding-bottom: convert-unit(10px, "rem");
+
+            .mat-checkbox-inner-container {
+                margin: 0 convert-unit(10px, "rem") 0 0;
+            }
+        }
+    }
+}
+
+.mat-checkbox.error-group {
+    &.mat-checkbox-checked.mat-accent {
+        .mat-checkbox-background {
+            background: get("color.info.danger.500");
+            opacity: 0.9;
+        }
+    }
+}
+
+.mat-checkbox-layout {
+    white-space: normal;
+}
+
+.mat-selection-list {
+    padding-top: 0;
+    .mat-list-item {
+        height: convert-unit(22px, "rem");
+        margin-bottom: convert-unit(10px, "rem");
+        .mat-list-item-content {
+            padding: 0;
+            .mat-list-text {
+                padding-left: convert-unit(10px, "rem") !important;
+            }
+        }
+        &:last-of-type {
+            margin-bottom: convert-unit(5px, "rem");
+        }
+        .mat-pseudo-checkbox {
+            width: convert-unit(20px, "rem");
+            height: convert-unit(20px, "rem");
+            &.mat-pseudo-checkbox-checked {
+                background-color: get("color.gray.800");
+                &::after {
+                    top: 25%;
+                    left: 25%;
+                }
+            }
+        }
+    }
+    &.ng-invalid.ng-touched {
+        .mat-pseudo-checkbox {
+            color: get("color.info.danger.500");
+            background-color: get("color.info.danger.100");
+        }
+        .mat-list-text {
+            color: get("color.info.danger.500");
+        }
+    }
+}

@@ -1,0 +1,238 @@
+<div *ngIf="form" [formGroup]="form">
+    <div
+        [ngSwitch]="true"
+        [hidden]="hidden || question.questionsDisplay.style === QuestionDisplayStyle.HIDDEN"
+        [class]="'carrier-'+question.questionsDisplay.style.toLowerCase()"
+        class="flex-form-wrapper"
+    >
+        <div class="d-md-flex" *ngSwitchCase="question.type === QuestionType.INPUT || question.type === QuestionType.TEXTAREA">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-form-field class="client-info">
+                    <input
+                        *ngIf="question.validation?.format === QuestionFormat.PHONE; else taxId"
+                        matInput
+                        [formControlName]="question.id"
+                        autocomplete="off"
+                        [readonly]="question.readOnly"
+                        empoweredNumberValidation
+                        [allowDashes]="true"
+                        empoweredPhoneNumberFormat
+                        (keyup)="form.get(question.id.toString()).setValue($event.target.value)"
+                    />
+                    <ng-template #taxId
+                        ><input
+                            *ngIf="question.id === groupTaxQuestionId && question.type === QuestionType.INPUT; else inputQuestionWithZip"
+                            matInput
+                            [formControlName]="question.id"
+                            autocomplete="off"
+                            [readonly]="question.readOnly"
+                            [maxlength]="MAX_LENGTH_TAX_ID"
+                            (input)="removeError($event)"
+                        />
+                    </ng-template>
+                    <ng-template #inputQuestionWithZip
+                        ><input
+                            *ngIf="question.type === QuestionType.INPUT && question?.validation?.format === QuestionFormat.ZIP_CODE; else inputQuestion"
+                            matInput
+                            [formControlName]="question.id"
+                            autocomplete="off"
+                            [readonly]="question.readOnly"
+                            [minlength]="question?.validation?.minLength"
+                            [maxlength]="question?.validation?.maxLength"
+                            empoweredZipCodeFormat
+                            (blur)="validateZipCodeByState(question)"
+                            (input)="removeError($event)"
+                            (keyup)="disableSave($event)"
+                        />
+                    </ng-template>
+                    <ng-template #inputQuestion
+                        ><input
+                            *ngIf="question.type === QuestionType.INPUT; else textArea"
+                            matInput
+                            [formControlName]="question.id"
+                            autocomplete="off"
+                            [readonly]="question.readOnly"
+                            (input)="removeError($event)"
+                        />
+                    </ng-template>
+                    <ng-template #textArea>
+                        <textarea matInput [formControlName]="question.id"></textarea>
+                    </ng-template>
+                    <mat-error>{{getError()}}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-md-flex" *ngSwitchCase="question.type === QuestionType.TEXT">
+            <div class="flex-item">
+                <mat-label class="mat-label"><span [innerHTML]="question.text"></span></mat-label>
+            </div>
+        </div>
+        <div class="d-md-flex" *ngSwitchCase="question.type === QuestionType.CURRENCY">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-form-field class="client-info">
+                    <input
+                        matInput
+                        [formControlName]="question.id"
+                        autocomplete="off"
+                        [readonly]="question.readOnly"
+                        (blur)="formatMoney($event, true)"
+                        (focus)="formatMoney($event, false)"
+                    />
+                    <mat-error>{{getError()}}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-md-flex" *ngSwitchCase="question.type === QuestionType.SELECT">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-form-field>
+                    <mat-select
+                        [formControlName]="question.id"
+                        disableOptionCentering="true"
+                        panelClass="carrier-select"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        (selectionChange)="validateZipCodeByState(question,$event.value)"
+                    >
+                        <mat-option
+                            *ngFor="let opt of question.options"
+                            [value]="opt.questionResponseId ? opt.questionResponseId.toString() : opt.text"
+                            >{{opt.text}}</mat-option
+                        >
+                    </mat-select>
+                    <mat-error *ngIf="form.controls[question.id].errors?.required"
+                        >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+        <div *ngSwitchCase="question.type === QuestionType.RADIO" class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-radio-group [formControlName]="question.id" class="carrier-forms-radio" [disabled]="question.readOnly">
+                    <mat-radio-button *ngFor="let opt of question.options" [value]="opt.questionResponseId.toString()"
+                        >{{opt.text}}
+                    </mat-radio-button>
+                    <mat-error *ngIf="form.controls[question.id].touched && form.controls[question.id].errors?.required">
+                        {{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                    >
+                    <mat-error
+                        *ngIf="form.controls[question.id].touched && form.controls[question.id].errors?.replacementAnswerMismatch"
+                        language="secondary.portal.formPageQuestion.replacementMismatchValidation"
+                    ></mat-error>
+                </mat-radio-group>
+            </div>
+        </div>
+        <div *ngSwitchCase="question.type === QuestionType.CHECKBOX" class="d-md-flex">
+            <div class="flex-item carrierforms-checkbox">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-selection-list [formControlName]="question.id" disableOptionCentering="true" class="carrier-checkbox">
+                    <mat-list-option
+                        checkboxPosition="before"
+                        *ngFor="let opt of question.options; let i = index"
+                        [selected]="selectedBoxes[i]"
+                        [disabled]="(opt.questionResponseId === adpccrResponseId && disableADPCCR) || (opt.questionResponseId === eccprResponseId && disableECCPR)
+                        || (opt.questionResponseId === rpdprResponseId && disableRPDPR) || (opt.questionResponseId === adpccrTLResponseId && disableADPCCRTL) || question.readOnly"
+                        (click)="checkRiderCondition()"
+                        [value]="opt.questionResponseId.toString()"
+                    >
+                        {{ opt.text }}
+                    </mat-list-option>
+                </mat-selection-list>
+                <mat-error *ngIf="form.controls[question.id].errors?.required"
+                    >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                >
+            </div>
+        </div>
+        <div *ngSwitchCase="question.type === QuestionType.DATEPICKER" class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <mat-form-field class="mon-date-field">
+                    <input
+                        [matDatepicker]="datePicker"
+                        [formControlName]="question.id"
+                        matInput
+                        (keyup)="transform($event)"
+                        autocomplete="off"
+                        [readonly]="question.readOnly"
+                    />
+                    <mat-datepicker #datePicker [disabled]="question.readOnly"></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix (click)="datePicker.open()" *ngIf="!question.readOnly">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                    <mat-error *ngIf="form.controls[question.id].errors?.matDatepickerParse"
+                        >{{languageStrings["primary.portal.census.errorMessage.general.error.date_format"]}}</mat-error
+                    >
+                    <mat-error *ngIf="form.controls[question.id].errors?.invalidDate">Invalid date</mat-error>
+                    <mat-error *ngIf="form.controls[question.id].errors?.required"
+                        >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+        <div *ngSwitchCase="question.type === QuestionType.HYPERLINK" class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <a target="_blank" [href]="question.link">{{question.text}}</a>
+            </div>
+        </div>
+        <div *ngSwitchCase="question.type === QuestionType.FILE" class="d-md-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    ><span [innerHTML]="question.text"></span
+                    ><span *ngIf="!question.required && !requiredBydependentQuestion && !isQ60Form" class="optional-text"
+                        >{{languageStrings["primary.portal.common.optional"]}}</span
+                    ></mat-label
+                >
+                <input matInput [formControlName]="question.id" [hidden]="true" />
+                <empowered-carrier-file-upload
+                    [uploadApi]="uploadApi"
+                    [isMultipartFileUploadEnabled]="multipartFileUploadConfig"
+                    [maxFileSize]="maxFileSizeAllowed"
+                    (fileUploaded)="onfileUploaded($event)"
+                    (documentIdReceived)="form.controls[question.id].setValue($event)"
+                ></empowered-carrier-file-upload>
+            </div>
+        </div>
+        <mat-form-field *ngSwitchDefault
+            ><input matInput [formControlName]="question.id" autocomplete="off" [readonly]="question.readOnly"
+        /></mat-form-field>
+    </div>
+</div>

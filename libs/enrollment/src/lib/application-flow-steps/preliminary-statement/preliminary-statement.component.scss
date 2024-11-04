@@ -1,0 +1,60 @@
+@import "shared";
+
+.preliminary-section-container {
+    padding: map-get($spacers, 30) map-get($spacers, 30) map-get($spacers, 25) map-get($spacers, 30);
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        margin: map-get($spacers, 0);
+        color: get("color.black");
+    }
+
+    .preliminary-content {
+        padding-bottom: map-get($spacers, 20);
+        padding-top: map-get($spacers, 20);
+
+        .preliminary-question {
+            padding-bottom: map-get($spacers, 15);
+        }
+
+        .email-notification {
+            padding-top: map-get($spacers, 10);
+        }
+
+        .horizontal-border {
+            border-bottom: 1px solid get("color.gray.600");
+        }
+
+        .form-name {
+            font-weight: bold;
+        }
+
+        .radio-question {
+            padding-top: map-get($spacers, 15);
+
+            .radio-options {
+                padding-left: map-get($spacers, 30);
+                padding-top: map-get($spacers, 20);
+            }
+
+            .radio-question-notification {
+                font-size: small;
+                color: get("color.gray.600");
+            }
+        }
+    }
+}
+
+:host ::ng-deep .mat-radio-button {
+    display: block;
+    margin-bottom: map-get($spacers, 10);
+}
+
+:host ::ng-deep .mon-icon {
+    margin-left: map-get($spacers, 0);
+}
+
+:host ::ng-deep .mat-form-field {
+    margin-bottom: map-get($spacers, 10);
+}

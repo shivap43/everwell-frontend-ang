@@ -1,0 +1,40 @@
+<div class="info-modal size-large">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings[languageKeys.close]">
+            <mon-icon
+                class="mon-icon-close"
+                iconSize="25"
+                iconName="close"
+                [attr.aria-label]="languageStrings[languageKeys.close]"
+            ></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h2 mat-dialog-title [attr.aria-label]="languageStrings[languageKeys.addNewAccount]">
+            {{ languageStrings[languageKeys.addNewAccount] }}
+        </h2>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a (click)="onCancel()" [attr.aria-label]="languageStrings[languageKeys.cancel]">{{ languageStrings[languageKeys.cancel] }}</a>
+        <div class="flex flex-grow-one justify-content-end">
+            <button
+                class="mon-btn-secondary mon-mr-4"
+                type="button"
+                mat-flat-button
+                (click)="onClear()"
+                [attr.aria-label]="languageStrings[languageKeys.clear]"
+            >
+                {{ languageStrings[languageKeys.clear] }}
+            </button>
+            <button
+                class="mon-btn-primary mon-mr-4"
+                type="button"
+                mat-flat-button
+                (click)="onSave()"
+                [attr.aria-label]="languageStrings[languageKeys.save]"
+            >
+                {{ languageStrings[languageKeys.save] }}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

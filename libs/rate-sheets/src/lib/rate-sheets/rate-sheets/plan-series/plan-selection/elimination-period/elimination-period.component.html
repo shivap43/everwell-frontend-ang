@@ -1,0 +1,17 @@
+<div class="elimination-period-checkbox">
+    <mat-selection-list [formControl]="formControl" ngDefaultControl>
+        <mat-list-option
+            checkboxPosition="before"
+            *ngFor="let eliminationData of eliminationPeriodOptions; let i=index"
+            [value]="eliminationData"
+            [richTooltip]="disableEliminationOptions && disableEliminationOptions[i] ? toolTipMessage : '' "
+            matTooltipPosition="above"
+            matTooltipClass="pos-above"
+            [disabled]="disableEliminationOptions ? disableEliminationOptions[i] : false"
+            [ngClass]="{'error': requiredEliminationOptions[i]}"
+        >
+            {{ eliminationData.name }}
+        </mat-list-option>
+    </mat-selection-list>
+</div>
+<mat-error><ng-content></ng-content></mat-error>

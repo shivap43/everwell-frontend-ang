@@ -1,0 +1,45 @@
+<div class="unplugged-wrapper">
+    <h1 class="content-header" language="primary.portal.requestSupport.pageHeader"></h1>
+    <div class="flex-grid">
+        <div class="unplugged-leftnav">
+            <a href="javascript:void(0)" (click)="backClick()" class="mon-btn-link"
+                ><mon-icon iconSize="10" iconName="left" class="icon-primary accordion-indicator"></mon-icon
+                ><span language="primary.portal.common.back"></span
+            ></a>
+            <mat-list class="leftMenu-txt" *ngIf="(portalType$|async) as portalType">
+                <!-- Training Resource item enable only when user has permission, the feature is enable as well as portal is producer portal -->
+                <ng-container *configEnabled="'general.feature.enabled.user_process_guide'">
+                    <ng-container *hasPermission="'core.user.processGuide.read'">
+                        <mat-list-item
+                            *ngIf="portalType === portals.PRODUCER"
+                            [routerLink]="['trainingResources']"
+                            routerLinkActive="router-link-active"
+                        >
+                            <a href="javascript:void(0)" [routerLink]="'trainingResources'" class="sid-nav-menu">
+                                <span language="primary.portal.support.userProcessGuide.leftNavLink"></span></a
+                        ></mat-list-item>
+                    </ng-container>
+                </ng-container>
+                <ng-container *isRestricted="permissionEnum.SUPPORT_RESTRICT_SOFTWARE_AND_DOCUMENTATION_READ">
+                    <mat-list-item
+                        *ngIf="portalType === portals.PRODUCER"
+                        [routerLink]="['downloadUnplugged']"
+                        routerLinkActive="router-link-active"
+                    >
+                        <a href="javascript:void(0)" [routerLink]="'downloadUnplugged'" class="sid-nav-menu">
+                            <span language="primary.portal.downloadUnplugged.softwareDocumentation"></span
+                        ></a>
+                    </mat-list-item>
+                </ng-container>
+                <mat-list-item routerLinkActive="router-link-active" *ngIf="portalType === portals.MEMBER">
+                    <a href="javascript:void(0)" [routerLink]="'faq'" class="sid-nav-menu">
+                        <span language="primary.portal.requestSupport.faqTitle"></span
+                    ></a>
+                </mat-list-item>
+            </mat-list>
+        </div>
+        <div class="right-content">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

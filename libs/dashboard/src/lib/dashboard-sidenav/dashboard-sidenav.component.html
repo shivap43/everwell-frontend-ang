@@ -1,0 +1,312 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<mat-nav-list>
+    <ng-container *ngIf="credential">
+        <div class="back-btn">
+            <a href="javascript:void(0)" *ngIf="credential.producerId" class="mon-btn-link" [routerLink]="['../../../payroll']">
+                <mon-icon iconSize="12" iconName="left" class="icon-left"> </mon-icon>
+                <span>{{languageStrings['primary.portal.dashboard.accounts']}}</span>
+            </a>
+            <ng-container *configEnabled="'portal.admin.account_list.enabled'">
+                <a href="javascript:void(0)" *ngIf="credential.adminId" class="mon-btn-link" [routerLink]="['/admin/accountList']">
+                    <mon-icon iconSize="12" iconName="left" class="icon-left"> </mon-icon>
+                    <span>{{languageStrings['primary.portal.dashboard.accountList']}}</span></a
+                >
+            </ng-container>
+        </div>
+        <mat-divider class="dotted-divider" [inset]="false"></mat-divider>
+        <mat-accordion>
+            <!-- Dashboard -->
+            <mat-expansion-panel
+                MatExpansionPanelState="collapsed"
+                [hideToggle]="true"
+                [expanded]="dashboardExpand"
+                #dashboard="matExpansionPanel"
+                (click)="goToDashboard();"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                        <a>
+                            <span class="title"> {{languageStrings['primary.portal.dashboard.dashboard']}} </span>
+                        </a>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <!-- Profile -->
+            <mat-expansion-panel
+                [hideToggle]="false"
+                [expanded]="profileExpand"
+                *ngIf="((credential.producerId && !credential.callCenterId) || (credential.producerId && hybridUserPermission)
+                || (credential.adminId && !credential.callCenterId) || (credential.adminId && hybridUserPermission))"
+                #profile="matExpansionPanel"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                        <span class="title"> {{languageStrings['primary.portal.dashboard.profile']}}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="!credential.memberId || !inMemberPortal"
+                    [routerLink]="['profile/account-info']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.accountInfo']}}
+                </a>
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="!credential.memberId || !inMemberPortal"
+                    [routerLink]="['profile/contacts']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.contacts']}}</a
+                >
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="!credential.memberId || !inMemberPortal"
+                    [routerLink]="['assign-admin/display-admin-list']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.administrators']}}</a
+                >
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="(!credential.memberId || !inMemberPortal)"
+                    [routerLink]="['enrollment-options']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.enrollmentOptions']}}</a
+                >
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="(!credential.memberId || !inMemberPortal)"
+                    [routerLink]="['case-builder']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.caseBuilderAdmins']}}</a
+                >
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="(!credential.memberId || !inMemberPortal)&& classRegionPermission"
+                    [routerLink]="['profile/structure']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.structure']}}</a
+                >
+                <a
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    *ngIf="!credential.memberId || !inMemberPortal"
+                    [routerLink]="['profile/carriers']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.carriers']}}</a
+                >
+                <ng-container *hasPermission="'core.account.create.branding'">
+                    <ng-container *configEnabled="'general.branding.enabled'">
+                        <a
+                            href="javascript:void(0);$event.stopPropagation()"
+                            class="sub-menu"
+                            mat-list-item
+                            *ngIf="!credential.memberId || !inMemberPortal"
+                            [routerLink]="['profile/branding']"
+                            routerLinkActive="router-link-active"
+                            (click)="menuItemClicked()"
+                        >
+                            <span language="primary.portal.branding.side_nav"></span>
+                        </a>
+                    </ng-container>
+                </ng-container>
+
+                <ng-container *configEnabled="'portal.resources_config.enabled'">
+                    <ng-container *hasPermission="'core.account.read.resource'">
+                        <span *ngIf="!isAdminPortal">
+                            <a
+                                href="javascript:void(0);$event.stopPropagation()"
+                                class="sub-menu"
+                                mat-list-item
+                                *ngIf="!credential.memberId || !inMemberPortal"
+                                [routerLink]="['resources']"
+                                routerLinkActive="router-link-active"
+                                (click)="menuItemClicked()"
+                                >{{languageStrings['primary.portal.dashboard.resources']}}</a
+                            >
+                        </span>
+                    </ng-container>
+                </ng-container>
+                <!--Rules-->
+                <a
+                    routerLinkActive="router-link-active"
+                    href="javascript:void(0);$event.stopPropagation()"
+                    class="sub-menu"
+                    mat-list-item
+                    [routerLink]="['profile/rules']"
+                    *ngIf="portal === appSettings.PORTAL_PRODUCER"
+                    (click)="menuItemClicked()"
+                    >{{languageStrings['primary.portal.dashboard.rules']}}</a
+                >
+            </mat-expansion-panel>
+            <!-- Benefits -->
+            <!-- TODO: previous logic: *ngIf="credential.producerId" -->
+            <mat-expansion-panel
+                [hideToggle]="false"
+                *ngIf="(credential.adminId || (credential.producerId && !credential.callCenterId) || (credential.producerId && hybridUserPermission$ | async))"
+                [expanded]="benefitsExpand"
+                #benefits="matExpansionPanel"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                        <span class="title"> {{languageStrings['primary.portal.dashboard.benefits']}} </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <a
+                    href="javascript:void(0)"
+                    class="sub-menu"
+                    mat-list-item
+                    (click)="navigateToBenefitsOffering(); menuItemClicked()"
+                    [ngClass]="{'router-link-active' : isRouteActive('benefits')}"
+                    ><span> {{languageStrings['primary.portal.dashboard.offering']}}</span></a
+                >
+                <a
+                    *ngIf="(createPermission && exceptions)||(!createPermission && exceptions && exceptions.length>0)"
+                    href="javascript:void(0)"
+                    class="sub-menu"
+                    mat-list-item
+                    [ngClass]="{'router-link-active' : isRouteActive('exceptions')}"
+                    (click)="navigateToExceptions()"
+                    ><span> {{languageStrings['primary.portal.dashboard.exceptions']}}</span></a
+                >
+                <ng-container *configEnabled="'portal.producer.payroll_tab.prospects.proposals.enabled'">
+                    <ng-container *hasPermission="'core.proposal.read'">
+                        <ng-container *ngIf="mpGroupAccount$ | async as mpGroupAccount">
+                            <a
+                                href="javascript:void(0)"
+                                class="sub-menu"
+                                mat-list-item
+                                (click)="navigateToProposals();"
+                                [ngClass]="{'router-link-active' : isRouteActive('proposals')}"
+                                *ngIf="credential.producerId && mpGroupAccount.type !== 'PROSPECT'"
+                                ><span> {{languageStrings['primary.portal.dashboard.proposals']}}</span></a
+                            >
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *hasPermission="'core.policyChangeRequest.read'">
+                    <a
+                        href="javascript:void(0)"
+                        class="sub-menu"
+                        mat-list-item
+                        (click)="navigateToPCR()"
+                        [ngClass]="{'router-link-active' : isRouteActive('change-requests')}"
+                        ><span>{{languageStrings['primary.portal.dashboard.policyChangeRequests']}}</span></a
+                    >
+                </ng-container>
+            </mat-expansion-panel>
+            <!-- Employees -->
+            <mat-expansion-panel
+                MatExpansionPanelState="collapsed"
+                [hideToggle]="true"
+                [expanded]="employeesExpand"
+                (keyup.Space)="goToEmployees()"
+                (keyup.enter)="goToEmployees()"
+                (click)="goToEmployees()"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+
+                        <span class="title"> {{languageStrings['primary.portal.dashboard.employees']}} </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <!-- Business -->
+            <mat-expansion-panel
+                *ngIf="((credential.producerId && !credential.callCenterId) || (credential.producerId && hybridUserPermission))"
+                [hideToggle]="false"
+                [expanded]="businessExpand"
+                #business="matExpansionPanel"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                        <span class="title"> {{languageStrings['primary.portal.dashboard.business']}}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <a
+                    href="javascript:void(0)"
+                    class="sub-menu"
+                    *ngIf="credential.producerId"
+                    mat-list-item
+                    [routerLink]="['business/schedule-send']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    ><span>{{languageStrings['primary.portal.dashboard.scheduleAndSend']}}</span>
+                </a>
+                <a
+                    href="javascript:void(0)"
+                    class="sub-menu"
+                    *ngIf="credential.producerId"
+                    mat-list-item
+                    [routerLink]="['business/pending-enrollments']"
+                    routerLinkActive="router-link-active"
+                    (click)="menuItemClicked()"
+                    ><span>{{languageStrings['primary.portal.dashboard.pendingEnrollments']}}</span>
+                </a>
+            </mat-expansion-panel>
+            <!-- Commissions -->
+            <mat-expansion-panel
+                *ngIf="!credential.memberId && !credential.adminId"
+                MatExpansionPanelState="collapsed"
+                [hideToggle]="true"
+                [expanded]="commissionsExpand"
+                (click)="goToCommissions()"
+                (keyup.Space)="goToCommissions()"
+                (keyup.enter)="goToCommissions()"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                        <span class="title">{{languageStrings['primary.portal.dashboard.commissions']}}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <!-- Reports -->
+            <!-- TODO: previous logic: *ngIf="!credential.memberId && !credential.adminId" -->
+            <ng-container *configEnabled="'portal.account.reports.enabled'">
+                <ng-container *hasPermission="'core.document.read'">
+                    <mat-expansion-panel
+                        *ngIf="credential.adminId || (credential.producerId && !credential.callCenterId) || (credential.producerId && hybridUserPermission)"
+                        MatExpansionPanelState="collapsed"
+                        [hideToggle]="true"
+                        [expanded]="reportsExpand"
+                        (click)="navigateToReports()"
+                        (keyup.Space)="navigateToReports()"
+                        (keyup.enter)="navigateToReports()"
+                    >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <mon-icon iconName="diamond-2" class="icon icon-diamond"></mon-icon>
+                                <span class="title"> {{languageStrings['primary.portal.dashboard.reports']}} </span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                    </mat-expansion-panel>
+                </ng-container>
+            </ng-container>
+        </mat-accordion>
+    </ng-container>
+</mat-nav-list>

@@ -1,0 +1,1171 @@
+<div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+    <form [formGroup]="personalInfoForm" (ngSubmit)="onSubmit()" role="form">
+        <div class="flex-form-wrapper" [ngClass]="{'personal-info' : !isTpi}">
+            <div class="mon-mt-20">
+                <mon-alert *ngIf="showErrorMessage" alertType="danger" role="alert">
+                    <span>{{errorMessage}}</span>
+                </mon-alert>
+            </div>
+            <h2>{{ langStrings["primary.portal.members.dependent.personalInfo.title"]}}</h2>
+            <div formGroupName="name" class="flex-form-item">
+                <div class="d-md-flex flex-wrap">
+                    <ng-container *ngIf="hideFieldElementSetting.firstName">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.firstName"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('firstName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="firstName"
+                                    [readonly]="readOnlyFieldElementSetting.firstName"
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.firstName']"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('firstName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('firstName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('firstName').value)"
+                                    language="secondary.portal.members.personalValidationMsg.firstNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('firstName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('firstName').value)"
+                                    language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.middleName">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.middleName"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('middleName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="middleName"
+                                    [readonly]="readOnlyFieldElementSetting.middleName"
+                                    [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.middleName"] + " " + langStrings["primary.portal.common.optional"]'
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('middleName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('middleName').hasError('pattern')"
+                                    language="secondary.portal.members.personalValidationMsg.middleName"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.lastName">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.lastName"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('lastName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="lastName"
+                                    [readonly]="readOnlyFieldElementSetting.lastName"
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.lastName']"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('lastName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('lastName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('lastName').value)"
+                                    language="secondary.portal.members.personalValidationMsg.lastNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('lastName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('lastName').value)"
+                                    language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.suffix">
+                        <div class="flex-item w-100">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.suffix"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('suffix')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="suffix"
+                                    [disabled]="readOnlyFieldElementSetting.suffix"
+                                    [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                    disableOptionCentering="true"
+                                >
+                                    <mat-option value="" selected> {{langStrings['primary.portal.common.select']}} </mat-option>
+                                    <mat-option *ngFor="let suffix of suffixes" [value]="suffix"> {{suffix}} </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('suffix').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="d-md-flex flex-wrap">
+                    <ng-container *ngIf="hideFieldElementSetting.maidenName">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.maidenName"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('maidenName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="maidenName"
+                                    [readonly]="readOnlyFieldElementSetting.maidenName"
+                                    [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.maidenName"] + " " + langStrings["primary.portal.common.optional"]'
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('maidenName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('maidenName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('maidenName').value)"
+                                    language="secondary.portal.members.personalValidationMsg.nickNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('maidenName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('maidenName').value)"
+                                    language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.nickname">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.nickName"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('nickName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="nickname"
+                                    [readonly]="readOnlyFieldElementSetting.nickname"
+                                    [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.nickName"] + " " + langStrings["primary.portal.common.optional"]'
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('nickname').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('nickname').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('nickname').value)"
+                                    language="secondary.portal.members.personalValidationMsg.nickNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('name').get('nickname').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(personalInfoForm.get('name').get('nickname').value)"
+                                    language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="flex-form-item">
+                <div class="d-md-flex mon-mb-20">
+                    <ng-container *ngIf="hideFieldElementSetting.homeAddressSameAsEmployee">
+                        <mat-checkbox
+                            [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                            formControlName="homeAddressSameAsEmployee"
+                            (change)="isFormValueChange = true"
+                            [disabled]="readOnlyFieldElementSetting.homeAddressSameAsEmployee"
+                        >
+                            <span language="primary.portal.members.dependent.personalInfo.homeAddressSameAsEmployee"></span>
+                        </mat-checkbox>
+                        <mat-error
+                            *ngIf="personalInfoForm.get('homeAddressSameAsEmployee').hasError('required')"
+                            language="secondary.portal.members.requiredField"
+                        >
+                        </mat-error>
+                    </ng-container>
+                </div>
+
+                <div formGroupName="address">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.address1">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.streetAddress1"></span>
+                                    <span
+                                        *ngIf="!isAddress1Mandatory"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="address1"
+                                        [readonly]="readOnlyFieldElementSetting.address1"
+                                        [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.streetAddress1"] + " " + langStrings["primary.portal.common.optional"]'
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address1').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address1').hasError('pattern')"
+                                        language="primary.portal.members.dependentValidationMsg.streetAddress1Msg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address1').hasError('maxlength')"
+                                        language="secondary.portal.members.dependentValidationMsg.streetAddress1MaxLengthMsg"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.address2">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.streetAddress2"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('address2')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="address2"
+                                        [readonly]="readOnlyFieldElementSetting.address2"
+                                        [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.streetAddress2"] + " " + langStrings["primary.portal.common.optional"]'
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-hint language="primary.portal.register.contactInfo.streetAddress2Hint"> </mat-hint>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address2').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address2').hasError('pattern')"
+                                        language="primary.portal.members.dependentValidationMsg.streetAddress1Msg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('address2').hasError('maxlength')"
+                                        language="secondary.portal.members.dependentValidationMsg.streetAddress2MaxLengthMsg"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.city">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.city"></span>
+                                    <span *ngIf="!isCityMandatory" class="optional-text" language="primary.portal.common.optional"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="city"
+                                        [readonly]="readOnlyFieldElementSetting.city"
+                                        [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.city"] + " " + langStrings["primary.portal.common.optional"]'
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('city').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('city').hasError('maxlength')"
+                                        language="secondary.portal.members.dependentValidationMsg.cityMaxLengthMsg"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('city').hasError('pattern')"
+                                        language="primary.portal.members.dependentValidationMsg.cityMsg"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.state">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.state"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('state')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="state"
+                                        [disabled]="readOnlyFieldElementSetting.state"
+                                        (selectionChange)="getCounties($event.value); checkZipCode()"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let state of states" [value]="state.abbreviation">
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('state').hasError('required')"
+                                        language="secondary.portal.members.selectionRequired"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.zip">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.zip"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('zip')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="zip"
+                                        [readonly]="readOnlyFieldElementSetting.zip"
+                                        [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.zip']"
+                                        (paste)="numberValidation($event);"
+                                        (keypress)="numberValidation($event);"
+                                        maxlength="{{zipMaximumLength}}"
+                                        minlength="{{zipMinLength}}"
+                                        (input)="isFormValueChange = true"
+                                        (keyup)="checkZipCode()"
+                                        #zipInput
+                                        empoweredZipCodeFormat
+                                    />
+                                    <mat-error *ngIf="personalInfoForm.get('address').get('zip').hasError('mismatch')">
+                                        {{langStrings['primary.portal.census.manualEntry.zipErrorMsg']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('zip').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('zip').hasError('pattern')"
+                                        language="primary.portal.members.dependentValidationMsg.zipMsg"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('zip').hasError('zipMismatch')"
+                                        language="secondary.portal.members.situsMistmatchError"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.countyId">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.county"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('countyId')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="countyId"
+                                        [disabled]="readOnlyFieldElementSetting.countyId"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let county of counties" [value]="county.id"> {{county.name}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('countyId').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.country">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.country"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('country')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="country"
+                                        [disabled]="readOnlyFieldElementSetting.country"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let country of countries" [value]="country"> {{country}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('address').get('country').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-form-item">
+                <div class="d-md-flex flex-wrap">
+                    <ng-container *ngIf="hideFieldElementSetting.birthDate">
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.birthDate"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('birthDate')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    matInput
+                                    formControlName="birthDate"
+                                    [readonly]="readOnlyFieldElementSetting.birthDate"
+                                    [max]="maxDate"
+                                    [min]="minDate"
+                                    [matDatepicker]="picker"
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.birthDate']"
+                                    #datePickerInput
+                                    (keyup)="transform($event)"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                <mat-error *ngIf="isDateInvalid"
+                                    >{{validateDate('birthDate', 'personalInfoForm', datePickerInput.value)}}</mat-error
+                                >
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('birthDate').hasError('matDatepickerMax') && personalInfoForm.get('dependentRelationId').value=='1'"
+                                    language="primary.portal.members.dependentValidationMsg.birthDateMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('birthDate').hasError('matDatepickerMin') && personalInfoForm.get('dependentRelationId').value=='2'"
+                                    language="primary.portal.members.dependentValidationMsg.birthDateMsg2"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container formGroupName="profile">
+                        <ng-container *ngIf="hideFieldElementSetting.birthState">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.birthState"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('birthState')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field class="w-100">
+                                    <mat-select
+                                        formControlName="birthState"
+                                        [disabled]="readOnlyFieldElementSetting.birthState"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let state of states" [value]="state.abbreviation">
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('birthState').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container formGroupName="customID">
+                        <ng-container *ngFor="let memberIdentifierType of memberIdentifierTypes let i=index">
+                            <div class="flex-item" *ngIf="memberIdentifierType.type === SSN.toUpperCase()">
+                                <mat-label class="mat-label">
+                                    <span> {{memberIdentifierType.name}}</span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField(memberIdentifierType.type)"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        *ngIf="memberIdentifierType.type === SSN.toUpperCase()"
+                                        matInput
+                                        [formControlName]="memberIdentifierType.type"
+                                        [attr.aria-label]='memberIdentifierType.name + " " + langStrings["primary.portal.common.optional"]'
+                                        (click)="ssnMaskingToggler(true)"
+                                        (focusout)="ssnMaskingToggler(false)"
+                                        (change)="maskSSN()"
+                                        [readonly]="readOnlyFieldElementSetting.ssn || isMaskedTrue"
+                                        [maxLength]="ssnMaxLength"
+                                        empoweredSsnFormat
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <span
+                                        matSuffix
+                                        *ngIf="!isFullyVisible && customIDAliases.get(memberIdentifierType.type).value && customIDAliases.get(memberIdentifierType.type).valid"
+                                    >
+                                        <a href="javascript:void(0)" *ngIf="isMaskedTrue" (click)="ssnMaskingToggler(isMaskedTrue)"
+                                            >{{ langStrings["primary.portal.common.show"]}}</a
+                                        >
+                                        <a href="javascript:void(0)" *ngIf="!isMaskedTrue" (click)="ssnMaskingToggler(isMaskedTrue)"
+                                            >{{ langStrings["primary.portal.common.hide"]}}</a
+                                        >
+                                    </span>
+                                    <mat-error
+                                        *ngIf="customIDAliases.get(memberIdentifierType.type).hasError('pattern') && personalInfoForm.get('customID').get('SSN').value.length === 11"
+                                        language="primary.portal.members.dependentValidationMsg.ssnMsg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('customID').get('SSN').value && personalInfoForm.get('customID').get('SSN').value.length !== 11"
+                                        language="primary.portal.members.dependentValidationMsg.ssnMsg1"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+                <div class="d-md-flex flex-wrap">
+                    <ng-container formGroupName="profile">
+                        <ng-container *ngIf="hideFieldElementSetting.heightFeet">
+                            <div class="flex-item w-120">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.height"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('heightFeet')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="heightFeet"
+                                        [disabled]="readOnlyFieldElementSetting.heightFeet"
+                                        placeholder="Select (ft)"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let height of heightFeets" [value]="height"> {{height}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('heightFeet').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.heightInch">
+                            <div class="flex-item w-120 mon-mt-20">
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="heightInch"
+                                        [disabled]="readOnlyFieldElementSetting.heightInch"
+                                        placeholder="Select (in)"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let height of heightInches" [value]="height"> {{height}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('heightInch').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.weight">
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.weight"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('weight')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="weight"
+                                        [readonly]="readOnlyFieldElementSetting.weight"
+                                        [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.maidenName"] + " " + langStrings["primary.portal.common.optional"]'
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('weight').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('weight').hasError('pattern')"
+                                        language="secondary.portal.members.dependent.personalInfo.invalidWeight"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.ethnicity">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.ethnicity"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('ethnicity')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="ethnicity"
+                                        [disabled]="readOnlyFieldElementSetting.ethnicity"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let ethnicity of ethnicities" [value]="ethnicity">
+                                            {{ethnicity | titlecase}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('ethnicity').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.gender">
+                        <div class="flex-item w-120">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.gender"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('gender')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="gender"
+                                    [disabled]="readOnlyFieldElementSetting.gender"
+                                    [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                    disableOptionCentering="true"
+                                >
+                                    <mat-option
+                                        *ngIf="requiredFields && !isRequiredField('gender')"
+                                        value="{{UNKNOWN}}"
+                                        title="{{langStrings['primary.portal.common.placeholderSelect']}}"
+                                    >
+                                        {{langStrings['primary.portal.common.placeholderSelect']}}
+                                    </mat-option>
+                                    <mat-option *ngFor="let item of genders" value="{{item.value}}" title="{{item.for}}">
+                                        {{item.for}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('gender').hasError('required')"
+                                    language="secondary.portal.members.selectionRequired"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="flex-form-item">
+                <div class="d-md-flex flex-wrap">
+                    <ng-container *ngIf="hideFieldElementSetting.dependentRelationId">
+                        <div class="flex-item w-200">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.personalInfo.relationshipToEmployee"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('dependentRelationId')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="dependentRelationId"
+                                    [disabled]="readOnlyFieldElementSetting.dependentRelationId"
+                                    (selectionChange)="checkDependentBirthDate()"
+                                    [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                    disableOptionCentering="true"
+                                >
+                                    <mat-option *ngFor="let relation of relations" [value]="relation.id"> {{relation.name}} </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('dependentRelationId').hasError('required')"
+                                    language="secondary.portal.members.selectionRequired"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+
+                    <ng-container formGroupName="profile">
+                        <ng-container *ngIf="hideFieldElementSetting.verified">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.verificationStatus"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="verified"
+                                        [disabled]="readOnlyFieldElementSetting.verified || isMember"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let verificationStatus of verificationStatusList" [value]="verificationStatus">
+                                            {{verificationStatus | titlecase}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('verified').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.maritalStatus">
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.maritalStatus"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('maritalStatus')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="maritalStatus"
+                                        [disabled]="readOnlyFieldElementSetting.maritalStatus"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let maritalStatus of maritalStatuses" [value]="maritalStatus">
+                                            {{maritalStatus | titlecase}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('maritalStatus').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.citizenship">
+                            <div class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.citizenship"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('citizenship')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="citizenship"
+                                        [disabled]="readOnlyFieldElementSetting.citizenship"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let citizenship of citizenships" [value]="citizenship">
+                                            {{citizenship}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('citizenship').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+
+                <div class="d-md-flex flex-wrap">
+                    <ng-container formGroupName="profile">
+                        <ng-container *ngIf="hideFieldElementSetting.languagePreference">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.languagePreferences"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('languagePreference')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="languagePreference"
+                                        [disabled]="readOnlyFieldElementSetting.languagePreference"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let languagePreference of languagePreferences" [value]="languagePreference">
+                                            {{languagePreference | titlecase}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('languagePreference').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.tobaccoStatus">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.tabaccoUser"></span>
+                                    <span
+                                        *ngIf="requiredFields && !isRequiredField('tobaccoStatus')"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="tobaccoStatus"
+                                        [disabled]="readOnlyFieldElementSetting.tobaccoStatus"
+                                        [placeholder]="langStrings['primary.portal.common.placeholderSelect']"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let tobaccoUser of tobaccoUsers" [value]="tobaccoUser.name">
+                                            {{tobaccoUser.value}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('tobaccoStatus').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="flex-form-item">
+                <ng-container formGroupName="profile">
+                    <div class="d-md-flex flex-wrap mon-mb-20">
+                        <ng-container *ngIf="hideFieldElementSetting.medicareEligibility">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.dependent.personalInfo.medicareEligible"></span>
+                                </mat-label>
+                                <mat-checkbox
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                    formControlName="medicareEligibility"
+                                    (change)="isFormValueChange = true"
+                                    [disabled]="readOnlyFieldElementSetting.medicareEligibility"
+                                >
+                                    <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                </mat-checkbox>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('profile').get('medicareEligibility').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.disabled">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" language="primary.portal.members.dependent.personalInfo.disabledDescriptive">
+                                </mat-label>
+                                <mat-checkbox
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                    formControlName="disabled"
+                                    (change)="isFormValueChange = true"
+                                    [disabled]="readOnlyFieldElementSetting.disabled"
+                                >
+                                    <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                </mat-checkbox>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('profile').get('disabled').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.handicapped">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" language="primary.portal.members.dependent.personalInfo.handicapped">
+                                </mat-label>
+                                <mat-checkbox
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                    formControlName="handicapped"
+                                    (change)="isFormValueChange = true"
+                                    [disabled]="readOnlyFieldElementSetting.handicapped"
+                                >
+                                    <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                </mat-checkbox>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('profile').get('handicapped').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.hiddenFromEmployee && !isTpi">
+                            <ng-container *ngIf="!isMember">
+                                <div class="flex-item">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.members.dependent.personalInfo.hiddenFromEmployee"
+                                    >
+                                    </mat-label>
+                                    <mat-checkbox
+                                        [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                        formControlName="hiddenFromEmployee"
+                                        (change)="isFormValueChange = true"
+                                        [disabled]="readOnlyFieldElementSetting.hiddenFromEmployee"
+                                    >
+                                        <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                    </mat-checkbox>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('hiddenFromEmployee').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.ineligibleForCoverage && !isTpi">
+                            <ng-container *ngIf="!isMember">
+                                <div class="flex-item">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="primary.portal.members.dependent.personalInfo.ineligibleForCoverage"
+                                    >
+                                    </mat-label>
+                                    <mat-checkbox
+                                        [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                        formControlName="ineligibleForCoverage"
+                                        (change)="isFormValueChange = true"
+                                        [disabled]="readOnlyFieldElementSetting.ineligibleForCoverage"
+                                    >
+                                        <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                    </mat-checkbox>
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('ineligibleForCoverage').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.courtOrdered">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" language="primary.portal.members.dependent.personalInfo.courtOrdered">
+                                </mat-label>
+                                <mat-checkbox
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                    formControlName="courtOrdered"
+                                    (change)="isFormValueChange = true"
+                                    [disabled]="readOnlyFieldElementSetting.courtOrdered"
+                                >
+                                    <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                </mat-checkbox>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('profile').get('courtOrdered').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.student">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" language="primary.portal.members.dependent.personalInfo.student"></mat-label>
+                                <mat-checkbox
+                                    [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                    formControlName="student"
+                                    (change)="isFormValueChange = true"
+                                    [disabled]="readOnlyFieldElementSetting.student"
+                                >
+                                    <span language="primary.portal.members.dependent.personalInfo.optionYes"></span>
+                                </mat-checkbox>
+                                <mat-error
+                                    *ngIf="personalInfoForm.get('profile').get('student').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.student">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" *ngIf="isStudent">
+                                    <span language="primary.portal.members.dependent.personalInfo.school"></span>
+                                    <span class="optional-text" language="primary.portal.common.optional"></span>
+                                </mat-label>
+                                <mat-form-field *ngIf="isStudent">
+                                    <input
+                                        matInput
+                                        formControlName="school"
+                                        [readonly]="readOnlyFieldElementSetting.student"
+                                        [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.maidenName"] + " " + langStrings["primary.portal.common.optional"]'
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="personalInfoForm.get('profile').get('school').hasError('required')"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+            <ng-container formGroupName="profile" class="flex-form-item" *ngIf="hideFieldElementSetting.dependentOrder">
+                <div class="d-md-flex flex-wrap mon-my-30">
+                    <div class="flex-item w-200">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.dependent.personalInfo.dependentOrder"></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="dependentOrder"
+                                [readonly]="readOnlyFieldElementSetting.dependentOrder"
+                                [attr.aria-label]='langStrings["primary.portal.members.dependent.personalInfo.maidenName"] + " " + langStrings["primary.portal.common.optional"]'
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="personalInfoForm.get('profile').get('dependentOrder').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <footer class="flex-form-footer fixed-position" *ngIf="!isTpi">
+            <button
+                type="button"
+                *ngIf="personalInfoForm.dirty || isFormValueChange"
+                mat-flat-button
+                (click)="revertForm()"
+                class="mon-btn-secondary mon-mr-20"
+                language="primary.portal.common.undoChanges"
+                [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.ariaUndoChanges']"
+            ></button>
+            <button
+                type="submit"
+                *ngIf="personalInfoForm.dirty || !isSaved || isFormValueChange"
+                [disabled]="!(personalInfoForm.dirty || isFormValueChange)"
+                mat-flat-button
+                language="primary.portal.common.save"
+                class="mon-btn-primary mon-px-30"
+                [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.ariaSave']"
+            ></button>
+            <button
+                type="button"
+                *ngIf="isSaved && !personalInfoForm.dirty && !isFormValueChange"
+                mat-flat-button
+                class="mon-btn-success mon-px-30"
+                [attr.aria-label]="langStrings['primary.portal.members.dependent.personalInfo.ariaSaved']"
+            >
+                <span>
+                    <mon-icon class="check-icon" iconName="check" [iconSize]="19"></mon-icon>
+                </span>
+                <span language="primary.portal.common.saved"></span>
+            </button>
+        </footer>
+    </form>
+</div>

@@ -1,0 +1,24 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="heading">
+        <h2 mat-dialog-title>{{ languageStrings["primary.portal.dashboard.accountInstructions"] }}</h2>
+    </div>
+    <div mat-dialog-content>
+        <p>{{specialInstructions}}</p>
+        <br />
+        <span class="owner-detail"
+            >{{languageStrings['primary.portal.dashboard.byOwner']}} {{specialInstructionsByName}}
+            {{languageStrings['primary.portal.dashboard.hyphen']}} {{specialInstructionsModifiedDate |
+            date:'MM/dd/yy'}}</span
+        >
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <button mat-flat-button class="mon-btn-primary mon-dialog-button mon-px-30" (click)="onCancel()">
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </mat-dialog-actions>
+</div>

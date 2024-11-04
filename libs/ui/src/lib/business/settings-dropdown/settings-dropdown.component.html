@@ -1,0 +1,29 @@
+<div [ngClass]="['settings-control', meta.class]" [empoweredPortalTrigger]="portal" tabindex="0">
+    <div class="settings-trigger" [ngClass]="{'settings-cursor-default': portal.disableClick}">
+        <div *ngIf="meta.trigger.label">{{ meta.trigger.label }}</div>
+        <div class="settings-trigger-value">{{ meta.trigger.value | async }}</div>
+        <span class="dropdown-arrow" [ngClass]="{'settings-cursor-disable': portal.disableClick}"></span>
+    </div>
+
+    <empowered-drop-down-portal
+        #portal
+        [backdropAnchor]="meta.backdrop.anchor"
+        [backdropStyle]="meta.backdrop.style"
+        [portalClass]="meta.portal.class"
+        [ariaTitle]="meta.portal.title"
+    >
+        <ng-content></ng-content>
+
+        <div class="footer" *ngIf="meta.footer">
+            <div class="reset-wrapper">
+                <button class="mon-btn-link reset" *ngIf="settingsDropdownContent.showResetButton$ | async" (click)="reset()">
+                    {{ meta.footer.reset }}
+                </button>
+            </div>
+
+            <button class="mon-btn-link apply" [disabled]="settingsDropdownContent.disableApplyButton$ | async" (click)="apply()">
+                {{ meta.footer.apply }}
+            </button>
+        </div>
+    </empowered-drop-down-portal>
+</div>

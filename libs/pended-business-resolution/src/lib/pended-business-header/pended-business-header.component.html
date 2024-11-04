@@ -1,0 +1,20 @@
+<div class="header-wrapper">
+    <h1>
+        <span *ngIf="(producer$ | async)?.name as name">{{ (name.firstName + " " + name.lastName) | titlecase}}: </span>
+        {{languageStrings["primary.portal.pbr.overview.pendedBusiness"]}}
+    </h1>
+    <div class="action-buttons">
+        <button mat-flat-button class="mon-btn-secondary btn-sm pull-down-sm" [matMenuTriggerFor]="manageBusiness">
+            <span>{{languageStrings["primary.portal.pendedBusiness.managePendedBusiness"]}}</span>
+            <mon-icon [iconSize]="8" iconName="down" class="icon-right"></mon-icon>
+        </button>
+        <mat-menu #manageBusiness="matMenu" xPosition="before">
+            <a mat-menu-item [href]="nbsFaxCoverSheetLink" download="nbsFaxCoverSheetLink" target="_blank">
+                {{languageStrings["primary.portal.pendedBusiness.downloadMbsSheet"]}}
+            </a>
+            <button (click)="openUploadModal()" mat-menu-item>
+                {{languageStrings["primary.portal.pendedBusiness.uploadApplication"]}}
+            </button>
+        </mat-menu>
+    </div>
+</div>

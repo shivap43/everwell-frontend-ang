@@ -1,0 +1,111 @@
+import { Action } from "@ngrx/store";
+
+import * as <%= classify(name) %>Actions from "./<%= dasherize(name) %>.actions";
+import { <%= classify(name) %>Entity } from "./<%= dasherize(name) %>.model";
+import { reducer } from "./<%= dasherize(name) %>.reducer";
+import { State, initialState } from "./<%= dasherize(name) %>.state";
+
+describe("<%= classify(name) %> Reducer", () => {
+    const create<%= classify(name) %>Entity = (id: string, name = ""): <%= classify(name) %>Entity => ({
+        id,
+        name: name || `name-${id}`,
+    });
+
+    describe("valid <%= classify(name) %> actions", () => {
+        describe("init action", () => {
+            it("should update the state in an immutable way", () => {
+                // Expectation of new state
+                const expectedState: State = {
+                    ids: [],
+                    entities: {},
+                    loaded: false,
+                    error: null,
+                };
+
+                const action = <%= classify(name) %>Actions.init();
+
+                // Verify initial state before reducer handles action
+                expect(initialState).toStrictEqual({
+                    ids: [],
+                    entities: {},
+                    loaded: false,
+                });
+
+                const state = reducer(initialState, action);
+
+                // Compare new state to expected state
+                expect(state).toStrictEqual(expectedState);
+
+                // Check for immutability
+                expect(state).not.toBe(expectedState);
+            });
+        });
+        
+        describe("setSelected<%= classify(name) %> action", () => {
+            it("should set selectedId", () => {
+                const selectedId = "AAA";
+                const action = <%= classify(name) %>Actions.setSelected<%= classify(name) %>({ selectedId });
+
+                const result: State = reducer(initialState, action);
+
+                expect(result.selectedId).toBe("AAA");
+            });
+        });
+
+        describe("load<%= classify(name) %>Success action", () => {
+            it("should add <%= classify(name) %> array to store and set loaded to true", () => {
+                const <%= camelize(name) %> = [create<%= classify(name) %>Entity("PRODUCT-AAA"), create<%= classify(name) %>Entity("PRODUCT-zzz")];
+                const action = <%= classify(name) %>Actions.load<%= classify(name) %>Success({ <%= camelize(name) %> });
+
+                const result: State = reducer(initialState, action);
+
+                expect(result.loaded).toBe(true);
+                expect(result.ids.length).toBe(2);
+            });
+        });
+
+        describe("load<%= classify(name) %>Failure action", () => {
+            it("should update the state in an immutable way", () => {
+                // Expectation of new state
+                const expectedState: State = {
+                    ids: [],
+                    entities: {},
+                    loaded: false,
+                    error: {
+                        message: "some error",
+                    },
+                };
+
+                const action = <%= classify(name) %>Actions.load<%= classify(name) %>Failure({ error: expectedState.error });
+
+                // Verify initial state before reducer handles action
+                expect(initialState).toStrictEqual({
+                    ids: [],
+                    entities: {},
+                    loaded: false,
+                });
+
+                const state = reducer(initialState, action);
+
+                // Compare new state to expected state
+                expect(state).toStrictEqual(expectedState);
+
+                // Check for immutability
+                expect(state).not.toBe(expectedState);
+            });
+        });
+    });
+
+    describe("unknown action", () => {
+        it("should return the previous state", () => {
+            const action = {
+                type: "Unknown",
+            } as Action;
+
+            const result = reducer(initialState, action);
+
+            // Expected for state to not change when using an unknown action
+            expect(result).toBe(initialState);
+        });
+    });
+});

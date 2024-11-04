@@ -1,0 +1,63 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header class="modal-title">
+        <h2>
+            {{languageStrings['primary.portal.benefitOffering.enrollmentOptions.thirdPartyPreview.updatesOffering']}}
+        </h2>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="onBack()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" iconSize="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+
+        <button
+            mat-button
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.save']"
+            (click)="onSave()"
+        >
+            {{languageStrings['primary.portal.common.save']}}
+        </button>
+    </empowered-modal-footer>
+    <div class="content">
+        <div class="third-party-preview-container" *ngIf="thirdPartyPreview?.plansToRemove?.length">
+            <p>
+                {{languageStrings['primary.portal.benefitOffering.enrollmentOptions.thirdPartyPreview.removed']}}
+            </p>
+            <ul *ngFor="let eachPlanToRemove of thirdPartyPreview.plansToRemove">
+                <li>{{eachPlanToRemove}}</li>
+            </ul>
+        </div>
+        <ng-container *ngIf="thirdPartyPreview?.productsRequiringSelfService?.length">
+            <mat-divider class="divider"></mat-divider>
+            <div class="third-party-preview-container">
+                <p>
+                    {{languageStrings['primary.portal.benefitOffering.enrollmentOptions.thirdPartyPreview.selfService']}}
+                </p>
+                <ul *ngFor="let eachProductRequiringSelfService of thirdPartyPreview.productsRequiringSelfService">
+                    <li>{{eachProductRequiringSelfService}}</li>
+                </ul>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="thirdPartyPreview.multipleEnrollmentStartDates">
+            <mat-divider class="divider"></mat-divider>
+            <div class="third-party-preview-container">
+                <p>
+                    {{languageStrings['primary.portal.benefitOffering.enrollmentOptions.thirdPartyPreview.multipleEnrollment']}}
+                </p>
+                <ul>
+                    <li>
+                        {{languageStrings['primary.portal.benefitOffering.enrollmentOptions.thirdPartyPreview.enrollmentStartDate']}}
+                        {{thirdPartyPreview.earliestEnrollmentStartDate | date: DATE_FORMAT_MM_DD_YYYY }}
+                    </li>
+                </ul>
+            </div>
+        </ng-container>
+    </div>
+</empowered-modal>

@@ -1,0 +1,129 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form
+    [formGroup]="addThirdPartyPlatformForm"
+    class="info-modal addthirdpartyplatform"
+    [ngClass]="{'hide-third-party-preview-modal': isThirdPartyPreviewOpened}"
+>
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeAddPopup()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2 *ngIf="data.type === 'add'" mat-dialog-title>
+            {{languageStrings['primary.portal.thirdParty.addparty_platform']}}
+        </h2>
+        <h2 *ngIf="data.type === 'edit'" mat-dialog-title>
+            {{languageStrings['primary.portal.thirdParty.editparty_platform']}}
+        </h2>
+
+        <mat-form-field class="add-editform">
+            <mat-select
+                formControlName="thirdPartyPlatform"
+                placeholder="Select"
+                [disableControl]="isDisableThirdPartyPlatform"
+            >
+                <mat-option *ngFor="let TPP of allowedThirdPartyPlatformEnrollments" [value]="TPP.id">
+                    {{TPP.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="addThirdPartyPlatformForm.get('thirdPartyPlatform').hasError('required')">
+                {{languageStrings['primary.portal.common.requiredField']}}
+            </mat-error>
+        </mat-form-field>
+
+        <div class="d-flex">
+            <div>
+                <mat-label class="mat-label" language="primary.portal.thirdParty.startdate"></mat-label>
+                <mat-form-field class="mon-mr-20 mon-date-field">
+                    <input
+                        matInput
+                        [matDatepicker]="startDatepicker"
+                        [min]="todayDate"
+                        formControlName="{{START_DATE}}"
+                        name="startDatePicker"
+                        (blur)="onBlurEvt()"
+                        (dateChange)="addEvent(START_DATE)"
+                        [disableControl]="isDisableStartDate"
+                        [attr.aria-label]="languageStrings['primary.portal.thirdParty.startdate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker #startDatepicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="startDatepicker">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-hint language="primary.portal.thirdParty.dateformat"></mat-hint>
+                    <mat-error
+                        *ngIf="pastError.field === START_DATE && !addThirdPartyPlatformForm.controls?.startDate?.errors?.required"
+                    >
+                        {{pastError.message}}
+                    </mat-error>
+                    <mat-error *ngIf="addThirdPartyPlatformForm.controls?.startDate?.errors?.required">
+                        {{languageStrings['primary.portal.common.requiredField']}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="mon-ml-15">
+                <mat-label class="mat-label"
+                    ><span>{{languageStrings['primary.portal.thirdParty.enddate']}}</span>
+                    <span class="optional-text" language="primary.portal.common.optional"></span
+                ></mat-label>
+                <mat-form-field class="mon-mr-20 mon-date-field">
+                    <input
+                        matInput
+                        [matDatepicker]="endDatepicker"
+                        [min]="todayDate"
+                        formControlName="{{END_DATE}}"
+                        name="endDatePicker"
+                        (dateChange)="addEvent(END_DATE)"
+                        [disableControl]="isDisableEndDate"
+                        [attr.aria-label]="languageStrings['primary.portal.thirdParty.enddate']"
+                        empoweredDateTransform
+                    />
+                    <mat-datepicker #endDatepicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="endDatepicker">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-hint language="primary.portal.thirdParty.dateformat"></mat-hint>
+                    <mat-error *ngIf="pastError.field === END_DATE"> {{pastError.message}} </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <mat-error>{{warningMessage}}</mat-error>
+        <mon-alert *ngIf="isOverlap" alertType="warning">
+            <span>{{overlapWarning}}</span>
+        </mon-alert>
+    </div>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+        <a href="javascript:void(0)" class="mon-btn-link mon-px-0" mat-button mat-dialog-close (click)="closeAddPopup()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button
+            mat-flat-button
+            color="primary"
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            (click)="createAccountThirdPartyPlatform()"
+            *ngIf="data.type === 'add'"
+            type="submit"
+            [disabled]="isDisableAddButton"
+        >
+            {{languageStrings['primary.portal.thirdParty.add']}}
+        </button>
+        <button
+            mat-flat-button
+            color="primary"
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            *ngIf="data.type === 'edit' "
+            type="submit"
+            (click)="updateExistingTPP(this.data.accountWiseThirdPartyPlatforms)"
+            [disabled]="isDisableEditButton"
+        >
+            {{languageStrings['primary.portal.thirdParty.save']}}
+        </button>
+    </mat-dialog-actions>
+</form>

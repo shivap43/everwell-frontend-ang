@@ -1,0 +1,83 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<div class="info-modal" *ngIf="data.type === edit">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content class="flex-form-wrapper">
+        <h1 mat-dialog-title><span>{{languageStrings['primary.portal.quickQuote.editOrder']}}</span></h1>
+        <p class="dialog-subtitle">{{languageStrings['primary.portal.createQuote.dragDropPlans']}}</p>
+        <div cdkDropList class="plan-list" (cdkDropListDropped)="onDrop($event)">
+            <div class="plan-box" *ngFor="let plan of plans.planSelection" cdkDrag>
+                <div class="plan-custom-placeholder" *cdkDragPlaceholder></div>
+                <mon-icon class="icon-black" iconName="arrow-cross" [iconSize]="15"></mon-icon>
+                <div class="plan-text">{{plan.planName}}</div>
+            </div>
+        </div>
+    </div>
+
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="closeDialog()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button mat-flat-button class="mon-btn-primary" type="button" (click)="updatePlanOrder()">
+            {{languageStrings['primary.portal.common.save']}}
+        </button>
+    </mat-dialog-actions>
+</div>
+
+<div class="info-modal" *ngIf="data.type === emailType">
+    <form [formGroup]="emailForm" (ngSubmit)="emailQuote()">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <div mat-dialog-content class="flex-form-wrapper">
+            <h2 mat-dialog-title>
+                <span>{{languageStrings['primary.portal.quickQuote.sendQuote']}} "{{data.quoteTitle}}"</span>
+            </h2>
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.email']}}</mat-label>
+                <mat-form-field class="w-200">
+                    <input
+                        formControlName="emailName"
+                        type="text"
+                        matInput
+                        (blur)="updateEmail()"
+                        [attr.aria-label]="languageStrings['primary.portal.quickQuote.email']"
+                    />
+                    <mat-error>
+                        <span>{{languageStrings['primary.portal.common.requiredField']}}</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label" id="notesOptional"
+                    ><span>{{languageStrings['primary.portal.createQuote.notes']}}</span>
+                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span></mat-label
+                >
+                <mat-form-field>
+                    <textarea
+                        formControlName="note"
+                        matInput
+                        (blur)="sendNote()"
+                        aria-labelledby="notesOptional"
+                    ></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" class="mon-btn-link" (click)="closeDialog()"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button mat-flat-button class="mon-btn-primary" type="submit">
+                {{languageStrings['primary.portal.createQuote.send']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

@@ -1,0 +1,42 @@
+@import "shared";
+// disabled mode
+.mon-btn-disabled {
+    color: get("color.gray.500");
+    cursor: default;
+    .mon-icon {
+        color: $disabled-arrow;
+    }
+}
+.link-danger {
+    color: get("color.info.danger.500");
+    position: relative;
+    top: convert-unit(-10px, "rem");
+    &:hover {
+        color: get("color.info.danger.500");
+    }
+}
+.normal-txt {
+    @include fontFace("primary.regular", sans-serif, true);
+}
+::ng-deep {
+    .mat-select-panel {
+        .manage-dependent-disabled {
+            &.mat-option {
+                .mat-option-text {
+                    color: get("color.gray.500");
+                    cursor: default;
+                }
+                &:hover {
+                    background-color: get("color.white");
+                }
+            }
+        }
+    }
+    @include media-max("l") {
+        .coverage-table {
+            .mat-form-field-flex {
+                width: convert-unit(170px, "rem");
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+<form [formGroup]="moreFilterForm">
+    <div class="product-filter-wrapper" *ngIf="forMobileDevices || forMediumDevices">
+        <div class="filter-options">
+            <div class="d-flex justify-content-between">
+                <h3 class="mon-mt-0">{{languageStrings['primary.portal.common.filters']}}</h3>
+            </div>
+            <div>
+                <h4>{{languageStrings['primary.portal.accountPending.reason']}}</h4>
+                <div class="status" formArrayName="reasonFilter">
+                    <mat-checkbox
+                        *ngFor="let reason of reasonFilterData; let i = index"
+                        [formControlName]="i"
+                        [value]="reason"
+                    >
+                        {{reason}}
+                    </mat-checkbox>
+                </div>
+            </div>
+
+            <mat-divider class="mon-my-10"></mat-divider>
+
+            <div>
+                <h4>{{languageStrings['primary.portal.accountPending.product']}}</h4>
+                <div class="status" formArrayName="productFilter">
+                    <mat-checkbox
+                        *ngFor="let product of productFilterData; let i = index"
+                        [formControlName]="i"
+                        [value]="product"
+                    >
+                        {{product}}
+                    </mat-checkbox>
+                </div>
+            </div>
+        </div>
+        <div class="mon-clear">
+            <div>
+                <a href="javascript:void(0)" language="primary.portal.common.clear" (click)="resetMoreFilter()"></a>
+            </div>
+            <div>
+                <a
+                    href="javascript:void(0)"
+                    class="mon-apply"
+                    language="primary.portal.common.apply"
+                    (click)="moreFilterApply()"
+                ></a>
+            </div>
+        </div>
+    </div>
+</form>

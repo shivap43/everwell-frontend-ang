@@ -1,0 +1,36 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title class="mon-mb-0">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.actionRequired.title']}}
+        </h1>
+        <p class="mon-mb-30">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.actionRequired.subtitle1']}}
+            <a href="javascript:void(0)" class="nodec-link font-medium"
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.actionRequired.approvalLink']}}</a
+            >
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.actionRequired.subtitle2']}}
+        </p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-dialog-close
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+            >{{languageStrings['primary.portal.common.back']}}</a
+        >
+        <button
+            type="submit"
+            mat-flat-button
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.gotIt']"
+        >
+            {{languageStrings['primary.portal.common.gotIt']}}
+        </button>
+    </mat-dialog-actions>
+</div>

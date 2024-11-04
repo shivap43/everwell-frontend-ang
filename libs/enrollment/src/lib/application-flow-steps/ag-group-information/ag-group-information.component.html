@@ -1,0 +1,74 @@
+<section class="section-container">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="section-subheader">
+            <p>{{sectionSteps[0].directions}}</p>
+        </div>
+        <mon-alert *ngIf="writingNumberError" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+        <div class="flex-form-wrapper">
+            <div *ngIf="displayWritingNumber" class="d-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.tpiEnrollment.writingNumber']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            [formControlName]="SelectionTypes.WRITING_NUMBER"
+                            (selectionChange)="validateWritingNumber()"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            disableOptionCentering="true"
+                        >
+                            <mat-option *ngFor="let option of displayWritingNumberOptions" [value]="option.value"
+                                >{{option.viewValue}}</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div *ngIf="displayGroupLocations" class="d-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.agInformation.agLocation']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            [formControlName]="SelectionTypes.GROUP_LOCATION"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            disableOptionCentering="true"
+                        >
+                            <mat-option *ngFor="let option of displayGroupLocationsOptions" [value]="option.value"
+                                >{{option.viewValue}}</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div *ngIf="displayDeductionFrequency" class="d-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.agInformation.deductionFrequency']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            [formControlName]="SelectionTypes.DEDUCTION_FREQUENCY"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            disableOptionCentering="true"
+                        >
+                            <mat-option *ngFor="let option of displayDeductionFrequencyOptions" [value]="option.value"
+                                >{{option.viewValue}}</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="action-btns">
+            <button type="submit" class="mon-btn-primary" mat-flat-button>
+                <span>{{languageStrings['primary.portal.common.next']}}</span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </form>
+</section>

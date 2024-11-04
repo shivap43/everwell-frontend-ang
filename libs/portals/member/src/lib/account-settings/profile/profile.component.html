@@ -1,0 +1,166 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<form [formGroup]="profileForm">
+    <h3 class="title">{{languageStrings['primary.portal.dashboard.profile']}}</h3>
+    <div class="message-block">
+        <mon-alert alertType="info">
+            <span>
+                {{languageStrings['primary.portal.producerInfo.info']}}
+            </span>
+        </mon-alert>
+    </div>
+    <div class="flex-form-wrapper">
+        <h3 class="sub-title">{{languageStrings['primary.portal.members.personalLabel.personInfo']}}</h3>
+        <div class="d-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.register.personalInfo.firstName']}}
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        formControlName="firstName"
+                        matInput
+                        [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.firstName']"
+                    />
+                </mat-form-field>
+            </div>
+
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.register.personalInfo.middleName']}}
+                    {{languageStrings['primary.portal.common.optional']}}</mat-label
+                >
+                <mat-form-field>
+                    <input
+                        formControlName="middleName"
+                        [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.middleName']"
+                        matInput
+                    />
+                </mat-form-field>
+            </div>
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.register.personalInfo.lastName']}}</mat-label
+                >
+                <mat-form-field>
+                    <input
+                        formControlName="lastName"
+                        [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.lastName']"
+                        matInput
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="d-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.register.personalInfo.emailAddress']}}</mat-label
+                >
+                <mat-form-field>
+                    <input
+                        formControlName="emailAddress"
+                        [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.emailAddress']"
+                        matInput
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="d-flex">
+            <div class="flex-item">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.members.contactLabel.phoneNumber']}}
+                    {{languageStrings['primary.portal.common.optional']}}</mat-label
+                >
+                <mat-form-field>
+                    <input
+                        formControlName="phoneNumber"
+                        [attr.aria-label]="languageStrings['primary.portal.members.contactLabel.phoneNumber']"
+                        matInput
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <h3 class="sub-title">
+            {{languageStrings['primary.portal.members.workLabel.workInfo']}}
+        </h3>
+
+        <div class="d-flex">
+            <div class="flex-item">
+                <div>
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.members.personalLabel.streetAddress1']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <input
+                            formControlName="streetAddress1"
+                            [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.streetAddress1']"
+                            matInput
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex-item">
+                <div>
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.members.personalLabel.streetAddress2']}}
+                        <span class="optional-text" language="primary.portal.common.optional"></span
+                    ></mat-label>
+                    <mat-form-field>
+                        <input
+                            formControlName="streetAddress2"
+                            [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.streetAddress2']"
+                            matInput
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex">
+            <div class="flex-item">
+                <div>
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.members.personalLabel.city']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <input
+                            formControlName="city"
+                            [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.city']"
+                            matInput
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex-item">
+                <div>
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.members.personalLabel.state']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <input
+                            formControlName="state"
+                            [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.state']"
+                            matInput
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex-item">
+                <div>
+                    <mat-label class="mat-label">
+                        {{languageStrings['primary.portal.members.personalLabel.zip']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <input
+                            formControlName="zip"
+                            [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.zip']"
+                            matInput
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

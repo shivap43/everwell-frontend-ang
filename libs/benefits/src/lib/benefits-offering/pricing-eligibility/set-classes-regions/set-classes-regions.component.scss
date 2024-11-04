@@ -1,0 +1,213 @@
+@import "shared";
+
+.chooseregions-filterbtn {
+    margin: convert-unit(15px, "rem") 0px;
+}
+
+.set-regions-wrapper {
+    margin: 0 convert-unit(30px, "rem");
+
+    .choose-Eligibles {
+        padding-bottom: 30px;
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    }
+
+    .set-regions {
+        .region-instructions {
+            padding-bottom: convert-unit(30px, "rem");
+            @include fontFace("primary.regular");
+            line-height: convert-unit(22px, "rem");
+        }
+    }
+
+    .search-eligible-class {
+        margin-bottom: convert-unit(30px, "rem");
+
+        .region-count {
+            display: inline-flex;
+        }
+
+        @include media-min("l") {
+            .state-wrapper,
+            .search-eligible-class {
+                .mat-form-field {
+                    width: convert-unit(600px, "rem");
+                }
+            }
+        }
+
+        .mat-checkbox {
+            margin-bottom: convert-unit(15px, "rem");
+            display: inline-flex;
+            color: get("color.gray.900");
+            @include fontFace("primary.regular");
+
+            ::ng-deep .mat-checkbox-inner-container {
+                width: convert-unit(20px, "rem");
+                height: convert-unit(20px, "rem");
+                outline: none;
+                border-radius: convert-unit(1px, "rem");
+                margin-right: convert-unit(10px, "rem");
+
+                .mat-checkbox-frame {
+                    border: none;
+                }
+
+                .mat-checkbox-background {
+                    border: 1px solid get("color.gray.600");
+                }
+            }
+        }
+
+        .region-helpertext {
+            font-size: convert-unit(12px, "rem");
+            @include fontFace("primary.regular");
+            color: get("color.gray.600");
+        }
+
+        .mat-form-field {
+            margin-bottom: convert-unit(4px, "rem");
+        }
+
+        .state-wrapper,
+        .region-helpertext {
+            margin-left: convert-unit(32px, "rem");
+        }
+    }
+
+    .select-region-btn {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: convert-unit(36px, "rem");
+        margin-top: convert-unit(60px, "rem");
+    }
+
+    .risk-classes {
+        border-top: convert-unit(1px, "rem") dotted get("color.gray.500");
+        border-bottom: convert-unit(1px, "rem") dotted get("color.gray.500");
+        padding-top: convert-unit(30px, "rem");
+        padding-bottom: convert-unit(45px, "rem");
+        margin-left: convert-unit(32px, "rem");
+        @include fontFace("primary.regular");
+        color: get("color.black");
+
+        .risk-name {
+            font-size: convert-unit(16px, "rem");
+            line-height: convert-unit(24px, "rem");
+            margin-bottom: convert-unit(12px, "rem");
+
+            .risk-heading {
+                @include fontFace("primary.bold");
+                margin-right: convert-unit(5px, "rem");
+            }
+
+            .skip-classes {
+                margin-right: 32px;
+            }
+        }
+    }
+
+    .risk-instructions {
+        font-size: convert-unit(14px, "rem");
+        width: max-content;
+    }
+
+    .your-selection.risk-classes {
+        display: flex;
+        padding-top: 0px !important;
+        padding-bottom: convert-unit(30px, "rem");
+        justify-content: space-between;
+
+        .selection-content {
+            h3 {
+                margin-top: 30px;
+            }
+
+            .risk-name {
+                display: flex;
+
+                .risk-heading {
+                    width: 150px;
+                }
+            }
+        }
+
+        .select-region-btn {
+            margin-right: 0px !important;
+            margin-top: convert-unit(20px, "rem");
+
+            a {
+                text-decoration: none;
+            }
+        }
+    }
+
+    ::ng-deep .icon-close {
+        margin-top: 10px;
+    }
+}
+
+:host ::ng-deep .mat-form-field-label {
+    top: convert-unit(27px, "rem");
+
+    mat-label,
+    .mat-label {
+        font-size: convert-unit(16px, "rem");
+        @include fontFace("primary.regular");
+        color: get("color.gray.600");
+    }
+}
+
+:host ::ng-deep .state-input {
+    width: convert-unit(270px, "rem");
+
+    .mat-form-field-infix,
+    .mat-form-field-flex {
+        margin-top: 0;
+        padding: 0px;
+
+        // padding: 0 convert-unit(10px, "rem");
+        .mat-form-field-outline-end,
+        .mat-form-field-outline-start {
+            border-color: get("color.gray.600");
+        }
+
+        .mat-form-field-outline-start {
+            border-radius: convert-unit(4px, "rem") 0 0 convert-unit(4px, "rem");
+            width: inherit !important;
+        }
+
+        .mat-form-field-outline-end {
+            border-radius: 0 convert-unit(4px, "rem") convert-unit(4px, "rem") 0;
+        }
+
+        .mat-form-field-outline-gap {
+            border-radius: convert-unit(4px, "rem");
+            width: inherit !important;
+        }
+    }
+
+    .mat-form-field-infix {
+        padding: 0px !important;
+    }
+
+    .mat-form-field-suffix {
+        ::ng-deep .search-icon svg {
+            color: get("color.gray.500");
+        }
+    }
+
+    .mat-chip-list-wrapper {
+        margin: 0;
+        padding: 0 0 0 convert-unit(1px, "rem");
+        cursor: text;
+
+        .mat-input-element {
+            line-height: 25px;
+        }
+
+        .mat-standard-chip {
+            margin: convert-unit(2px, "rem") convert-unit(4px, "rem");
+        }
+    }
+}

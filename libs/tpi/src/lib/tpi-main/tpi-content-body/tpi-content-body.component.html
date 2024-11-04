@@ -1,0 +1,19 @@
+<div (click)="keepAlive()" class="content-block">
+    <div *ngIf="benefitOfferingError" class="error-block">
+        <span>{{ benefitOfferingError }}</span>
+    </div>
+    <mon-alert *ngIf="invalidEnrollmentStateErrorMessage" class="message-block">
+        <span>{{ invalidEnrollmentStateErrorMessage }}</span>
+    </mon-alert>
+    <p *ngIf="invalidEnrollmentAgeErrorMessage" class="generic-message">
+        <span>{{ invalidEnrollmentAgeErrorMessage }}</span>
+    </p>
+    <mon-alert alertType="danger" *ngIf="errorMessage && !benefitOfferingError" class="message-block">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <mon-alert alertType="info" *ngIf="agInfoMessage" class="message-block">
+        <span>{{ agInfoMessage }}</span>
+    </mon-alert>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+    <router-outlet></router-outlet>
+</div>

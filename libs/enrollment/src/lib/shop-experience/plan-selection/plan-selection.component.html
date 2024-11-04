@@ -1,0 +1,235 @@
+<!-- expanded panel code -->
+<ng-template [ngIf]="isLoading" [ngIfElse]="planComponentView">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template #planComponentView>
+    <div>
+        <div *ngIf="!isLoading">
+            <ng-container>
+                <ng-template [ngIf]="planOffering.isCoverageSection">
+                    <h2>
+                        <span *ngIf="getQuestionNumber('coverage')">{{getQuestionNumber("coverage") + ". "}}</span>
+                        <span>{{getQuestion("coverage")}}</span>
+                    </h2>
+                    <div class="hsa-plan-row" *ngIf="isHSAPlan && planOffering.hsaFsaCoverage">
+                        <div class="plan-card">
+                            <div class="coverage-head hsa-fsa active">
+                                <mon-icon iconName="user" [iconSize]="40" class="plan-icon"></mon-icon>
+                                <p>{{planOffering.hsaFsaCoverage}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <empowered-coverage-level-selection
+                        *ngIf="!(isHSAPlan || isFSAPlan)"
+                        [isRiderCoverage]="false"
+                        [planOfferingObj]="planOffering"
+                        [productOfferingId]="productOfferingId"
+                        [currentCoverageLevel]="selectedCoverageLevel"
+                        (updateAmount)="updateAmount($event)"
+                    >
+                    </empowered-coverage-level-selection>
+                </ng-template>
+                <ng-template [ngIf]="planOffering.isJuvenileSection">
+                    <div class="plan-description">
+                        <div class="juvenile-plan">
+                            <h2>{{languageStrings["primary.portal.shoppingExperience.selectChildAge"]}}</h2>
+                            <div class="plan-description-texts">
+                                <mat-label class="mat-label"> {{languageStrings["primary.portal.shoppingExperience.childAge"]}} </mat-label>
+                                <mat-form-field class="dependent-age">
+                                    <mat-select
+                                        disableOptionCentering="true"
+                                        [formControl]="childAgeControl"
+                                        (selectionChange)="onChildAgeChange()"
+                                    >
+                                        <mat-option *ngFor="let age of dependentAgeOptions" [value]="age"> {{age}} </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template [ngIf]="planOffering.isEliminationPeriodSection">
+                    <div class="plan-description">
+                        <h2>
+                            <span *ngIf="getQuestionNumber('elimination')">{{getQuestionNumber("elimination") + ". "}}</span>
+                            <span>{{getQuestion("elimination")}}</span>
+                        </h2>
+                        <p
+                            language="primary.portal.shoppingExperience.eliminationPeriodPara"
+                            class="plan-description-texts"
+                            *ngIf="getQuestionNumber('elimination')"
+                        ></p>
+                    </div>
+                    <empowered-elimination-period-selection
+                        [isRiderCoverage]="false"
+                        [planOfferingObj]="planOffering"
+                        [productOfferingId]="productOfferingId"
+                        [currentCoverageLevel]="selectedCoverageLevel"
+                        (updateAmount)="updateAmount($event)"
+                    >
+                    </empowered-elimination-period-selection>
+                </ng-template>
+                <ng-template [ngIf]="planOffering.isBenefitAmountSection ">
+                    <div class="plan-description">
+                        <h2>
+                            <span *ngIf="getQuestionNumber('benefit')">{{getQuestionNumber("benefit") + ". "}}</span>
+                            <span *ngIf="checkSingleBenefit(planOffering);else singleBenefit">{{getQuestion("benefit")}}</span>
+                            <ng-template #singleBenefit><span>{{getQuestion("singleBenefit")}}</span></ng-template>
+                        </h2>
+                        <p language="primary.portal.shoppingExperience.benefitAmountDescription" class="plan-description-texts"></p>
+                    </div>
+                    <empowered-benefit-amount-selection
+                        (updateAmount)="updateAmount($event)"
+                        [planOfferingObj]="planOffering"
+                        [productOfferingId]="productOfferingId"
+                        [currentCoverageLevel]="selectedCoverageLevel"
+                        [isRiderBenefit]="false"
+                    ></empowered-benefit-amount-selection>
+                </ng-template>
+
+                <ng-template [ngIf]="planOffering.isRiderSection">
+                    <div class="plan-description">
+                        <h2 *ngIf="this.riderQuestionFlag">
+                            <span *ngIf="getQuestionNumber('rider')">{{getQuestionNumber("rider") + ". "}}</span>
+                            <span>{{getQuestion("rider")}}</span>
+                        </h2>
+                        <p
+                            *ngIf="this.riderQuestionFlag"
+                            language="primary.portal.shoppingExperience.riderDescription"
+                            class="plan-description-texts"
+                        ></p>
+                    </div>
+                    <empowered-rider-selection
+                        #planRider
+                        (updateAmount)="updateRiderAmount($event)"
+                        [planOfferingObj]="planOffering"
+                        [productOfferingId]="productOfferingId"
+                        [baseCoverageLevel]="selectedCoverageLevel"
+                        [cartItems]="cartItems"
+                        [memberAgeOnCoverageEffectiveDate]="memberAgeOnCoverageEffectiveDate"
+                    ></empowered-rider-selection>
+                </ng-template>
+            </ng-container>
+
+            <div *ngIf="planOffering.isHsaSection">
+                <h2 *ngIf="isHSAPlan">
+                    <span *ngIf="getQuestionNumber('hsa')">{{getQuestionNumber("hsa") + ". "}}</span>
+                    <span>{{getQuestion("hsa")}}</span>
+                </h2>
+                <h2 *ngIf="isFSAPlan && (!isTransitPlan && !isParkingPlan)">
+                    <span *ngIf="fsaQuestionNumber">{{fsaQuestionNumber + ". "}}</span>
+                    <span>{{fsaQuestion}}</span>
+                </h2>
+
+                <h2 *ngIf="isTransitPlan">
+                    <span>{{transitQuestion}}</span>
+                </h2>
+                <h2 *ngIf="isParkingPlan">
+                    <span>{{parkingQuestion}}</span>
+                </h2>
+                <div class="hsa-plan-row">
+                    <div *ngIf="isHSAPlan">
+                        <p language="primary.portal.shoppingExperience.hsaPlanPara"></p>
+                    </div>
+                    <div *ngIf="isFSAPlan && (!isTransitPlan && !isParkingPlan)">
+                        <p language="primary.portal.shoppingExperience.fsaPlanPara"></p>
+                    </div>
+                    <div *ngIf="isTransitPlan">
+                        <p language="primary.portal.shoppingExperience.transitPlanPara"></p>
+                    </div>
+                    <div *ngIf="isParkingPlan">
+                        <p language="primary.portal.shoppingExperience.parkingPlanPara"></p>
+                    </div>
+                    <mat-label class="mat-label" language="primary.portal.shoppingExperience.annualContribution"></mat-label>
+                    <mat-form-field class="has-currency contribution-field">
+                        <input matInput [formControl]="hsaFormControl" type="number" />
+                        <mat-hint *ngIf="!hsaFormControl.errors">
+                            {{ "primary.portal.shoppingExperience.minMaxHsa" | replaceTag: { "#minhsa": planOffering.minHSA, "#maxhsa":
+                            planOffering.maxHSA } }}
+                        </mat-hint>
+                        <mat-error *ngIf="hsaFormControl.errors">
+                            {{ "primary.portal.shoppingExperience.minMaxHsaError" | replaceTag: { "#minhsa": planOffering.minHSA, "#maxhsa":
+                            planOffering.maxHSA } }}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <ng-template [ngIf]="flexDollars?.length && !planOffering.isJuvenileSection">
+                <div class="plan-description">
+                    <h2>
+                        <span *ngIf="multiQuestion">{{getQuestionNumber("adjustments") + ". "}}</span>
+                        <span>{{getQuestion("adjustments")}}</span>
+                    </h2>
+                </div>
+                <p class="plan-description-texts mon-mb-15" *ngIf="multiQuestion">
+                    {{languageStrings["primary.portal.shoppingExperience.adjustmentDescription"].replace("##company##", accountName)}}
+                    {{languageStrings["primary.portal.benefitDollars.payment.message"]}}
+                </p>
+                <div *ngFor="let flexDollar of flexDollars">
+                    <label>{{flexDollar.name}}</label>
+                    <div>-{{ (getFlexAmount(flexDollar) | currency) }}</div>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="d-flex justify-content-between plan-end dotted-border-top">
+            <div class="plan-price">
+                <p language="primary.portal.shoppingExperience.yourCost"></p>
+                <span *ngIf="!(isHSAPlan || isFSAPlan)" language="primary.portal.shoppingExperience.planDetailsPara"> </span>
+                <span *ngIf="isHSAPlan || isFSAPlan" language="primary.portal.shoppingExperience.hsafsaPara"> </span>
+            </div>
+
+            <div class="plan-price-monthly">
+                <p *ngIf="!isJuvenilePlan && !isCompanyProvided">
+                    {{ "primary.portal.shoppingExperience.planOfferingTotalCost" | replaceTag: { "##planofferingtotalcost##":
+                    (planOffering.cost ? planOffering.cost : planOffering.enrollment ? planOffering.enrollment.memberCostPerPayPeriod : 0) |
+                    flexDollar : productOffering.flexDollars : payFrequency: enrollmentState | currency } }}
+                </p>
+                <p *ngIf="isCompanyProvided">
+                    {{ "primary.portal.shoppingExperience.planOfferingTotalCost" | replaceTag: { "##planofferingtotalcost##":
+                    (planOffering.totalCost ? planOffering.cost : 0) | currency } }}
+                </p>
+                <p *ngIf="isJuvenilePlan">
+                    {{ "primary.portal.shoppingExperience.planOfferingTotalCost" | replaceTag: { "##planofferingtotalcost##":
+                    (planOffering.totalCost ? planOffering.totalCost : 0) | currency } }}
+                </p>
+                <span>{{payFrequency?.name}}</span>
+            </div>
+        </div>
+        <div class="cart-button">
+            <div *ngIf="editMode">
+                <a *ngIf="editMode" (click)="cancelEdit()" language="primary.portal.common.cancel" class="mon-btn-link mon-mr-20"></a>
+                <button
+                    mat-button
+                    type="button"
+                    [ngClass]="planUpdated ? 'mon-btn-primary' : 'mon-btn-success'"
+                    (click)="planUpdated && updatePlan()"
+                >
+                    <mon-icon *ngIf="!planUpdated" iconName="check" class="tick-icon" [iconSize]="20"></mon-icon>
+                    <span *ngIf="planUpdated"> {{languageStrings["primary.portal.common.update"]}} </span>
+                    <span *ngIf="!planUpdated && !isTpi"> {{languageStrings["primary.portal.shoppingExperience.inCart"]}} </span>
+                    <span *ngIf="!planUpdated && isTpi"> {{languageStrings["primary.portal.tpi.selected"]}} </span>
+                </button>
+            </div>
+            <div *ngIf="!editMode">
+                <button
+                    *ngIf="!isTpi"
+                    mat-button
+                    type="button"
+                    (click)="addPlan()"
+                    class="mon-btn-primary"
+                    language="primary.portal.shoppingExperience.addToCart"
+                ></button>
+                <button
+                    *ngIf="isTpi"
+                    mat-button
+                    [disabled]="locked"
+                    type="button"
+                    (click)="addPlan()"
+                    class="mon-btn-primary"
+                    language="primary.portal.common.select"
+                ></button>
+            </div>
+        </div>
+    </div>
+</ng-template>

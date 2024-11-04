@@ -1,0 +1,54 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isloaded"></empowered-mon-spinner>
+<form [formGroup]="censusStimateForm" class="info-modal">
+    <div class=" modal-header">
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings.ariaClose">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content>
+        <h2>
+            {{langStrings['primary.portal.census.censusEstimate.mainTitle']}}
+        </h2>
+        <p language="primary.portal.census.censusEstimate.containSection"></p>
+        <mat-label class="mat-label" language="primary.portal.census.censusEstimate.label"></mat-label>
+        <mat-form-field>
+            <input
+                formControlName="eligibleEmployees"
+                type="text"
+                matInput
+                [attr.aria-label]="languageStrings.censusEstimateLabel"
+            />
+            <mat-error
+                *ngIf="isEmployeeFormSubmit && !censusStimateForm.controls['eligibleEmployees'].value"
+                [language]="getEmployeeFormErrorMessage('eligibleEmployees')"
+            ></mat-error>
+            <mat-error
+                *ngIf="this.censusStimateForm.controls['eligibleEmployees'].hasError('pattern')"
+                language="primary.portal.census.censusEstimate.errorPositiveInterger"
+            ></mat-error>
+        </mat-form-field>
+        <span *ngIf="hasError">
+            <p language="secondary.portal.census.censusEstimate.validNumber"></p>
+        </span>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-dialog-close
+            [attr.aria-label]="languageStrings.ariaCancel"
+            (click)="onNoClick()"
+            cdkFocusInitial
+            >{{languageStrings.ariaCancel}}</a
+        >
+        <button
+            mat-button
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings.ariaSave"
+            (click)="addEligibleEmployee()"
+        >
+            {{languageStrings.ariaSave}}
+        </button>
+    </mat-dialog-actions>
+</form>

@@ -1,0 +1,3 @@
+export const DEFAULT_USE_SHARED_COVERAGE_DATES_VALUE = true;
+export const DEFAULT_DATEPICKER_SHARED_COVERAGE_DATES_VALUE = null;
+export const DAYS = "days";

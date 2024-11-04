@@ -1,0 +1,527 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-horizontal-stepper class="dialog-horizontal-stepper" animationDuration="0ms">
+        <mat-step [stepControl]="stepOneForm">
+            <form [formGroup]="stepOneForm">
+                <div class="step-header">
+                    <mat-label class="step-txt">
+                        <ng-container
+                            *ngIf="stepOneForm.controls.aflacGroupNumber.value  && !stepOneForm.controls.aflacIndividual.value; else stepOneOfThree"
+                            >{{languageStrings['primary.portal.aflacgroup.importaccount.stepOneOfTwo']}}
+                        </ng-container>
+                        <ng-template #stepOneOfThree
+                            >{{languageStrings['primary.portal.aflacGroup.importAccount.stepOneOfThree']}}
+                        </ng-template>
+                    </mat-label>
+                    <h2>{{languageStrings['primary.portal.aflacgroup.importaccount.importAccount']}}</h2>
+                </div>
+                <div mat-dialog-content class="aflac-group-import">
+                    <div class="aflac-group-wrapper">
+                        <div class="select-txt">{{languageStrings['primary.portal.aflacgroup.importaccount.selectAflacProducts']}}</div>
+                        <div class="aflac-individual">
+                            <div
+                                [ngClass]="{'ag-checkbox-error': isStepOneInValid && stepOneForm.invalid && stepOneForm.errors?.checkBoxSelection}"
+                            >
+                                <mat-checkbox formControlName="aflacIndividual"
+                                    >{{languageStrings['primary.portal.aflacgroup.importaccount.aflacIndividual']}}
+                                </mat-checkbox>
+                            </div>
+                            <div
+                                class="aflac-individual-section"
+                                *ngIf="stepOneForm.get('aflacIndividual').value && stepOneForm.get('accountNumber')"
+                            >
+                                <mat-label class="search-label"
+                                    >{{languageStrings['primary.portal.aflacgroup.importaccount.searchByAccountNumber']}}
+                                </mat-label>
+                                <div class="search-number">
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="accountNumber"
+                                            autocomplete="off"
+                                            maxlength="45"
+                                            [attr.aria-label]="languageStrings['primary.portal.aflacgroup.importaccount.searchByAccountNumber']"
+                                        />
+                                    </mat-form-field>
+                                    <button
+                                        #submit
+                                        mat-flat-button
+                                        class="mon-btn-search mon-btn-primary"
+                                        color="primary"
+                                        type="button"
+                                        (click)="getAccountNumber()"
+                                        [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                    >
+                                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                                    </button>
+                                </div>
+                                <div *ngIf="stepOneForm.get('accountNumber').touched && stepOneForm.get('accountNumber').invalid">
+                                    <mat-error *ngIf="stepOneForm.get('accountNumber').hasError('pattern')">
+                                        {{languageStrings['primary.portals.accounts.importAccount.errors.invalidGroupNumber']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="stepOneForm.get('accountNumber').errors?.required">
+                                        {{languageStrings['primary.portals.accounts.importAccount.step1.errors.required.groupNumber']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="stepOneForm.get('accountNumber').errors?.matchingAIError">
+                                        {{ languageStrings['primary.portal.aflacgroup.importaccount.agMatchingAccount']}}
+                                    </mat-error>
+                                </div>
+                                <mat-error *ngIf="isAiAlreadyExist && !duplicateAI">
+                                    {{ languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.duplicate']}}
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="stepOneForm.get('accountNumber').invalid && forbiddenError && !stepOneForm.get('accountNumber').hasError('pattern') && !stepOneForm.get('accountNumber').errors?.required && !stepOneForm.get('accountNumber').errors?.matchingAIError"
+                                >
+                                    {{forbiddenError}}
+                                </mat-error>
+                                <div class="account-wrapper" *ngIf="aflacAccount">
+                                    {{aflacAccount.name | titlecase}}
+                                    <span *ngIf="aflacAccount.primaryContact.address as address">
+                                        / {{address.city | titlecase}}, {{address.state}}
+                                        <span>
+                                            / {{languageStrings['primary.portals.accounts.importAccount.accountNo']}}
+                                            {{aflacAccount.accountNumber | uppercase}}</span
+                                        >
+                                    </span>
+                                </div>
+                                <div class="account-wrapper" *ngIf="duplicateAI">
+                                    {{duplicateAI.name | titlecase}}
+                                    <span *ngIf="duplicateAI.primaryContact.address as address">
+                                        / {{address.city | titlecase}}, {{address.state}}
+                                        <span>
+                                            / {{languageStrings['primary.portals.accounts.importAccount.accountNo']}}
+                                            {{duplicateAI.accountNumber | uppercase}}</span
+                                        >
+                                    </span>
+                                </div>
+                                <div>
+                                    <a href="javascript:void(0)" (click)="matStepper.selectedIndex=6"
+                                        >{{languageStrings['primary.portal.aflacgroup.importaccount.accountNumberLink']}}
+                                    </a>
+                                </div>
+                                <div class="mon-py-30" *ngIf="matchingAIError && !duplicateAI">
+                                    <mon-alert alertType="danger">
+                                        <span>{{languageStrings['primary.portal.aflacgroup.importaccount.aflacIndividualWarning']}}</span>
+                                    </mon-alert>
+                                </div>
+                                <div class="mon-py-30" *ngIf="duplicateAI">
+                                    <mon-alert alertType="danger">
+                                        <span *ngIf="isAiAlreadyExist">
+                                            {{
+                                            languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.duplicate']}}
+                                        </span>
+                                        <span *ngIf="!isAiAlreadyExist"
+                                            >{{languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.selfDuplicate']}}</span
+                                        >
+                                        &nbsp;
+                                        <span>
+                                            <a href="javascript:void(0)" (click)="navigateTo(duplicateAI.id+'/dashboard')"
+                                                >{{languageStrings['primary.portal.aflacgroup.importaccount.viewAccount']}}
+                                            </a>
+                                        </span>
+                                    </mon-alert>
+                                </div>
+                                <div class="mon-py-30" *ngIf="stepOneForm.controls.accountNumber.errors?.invalidApplicationState">
+                                    <mon-alert alertType="danger">
+                                        <span
+                                            >{{languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.invalidState']}}</span
+                                        >
+                                    </mon-alert>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="aflac-group">
+                            <div
+                                [ngClass]="{'ag-checkbox-error': isStepOneInValid && stepOneForm.invalid && stepOneForm.errors?.checkBoxSelection}"
+                            >
+                                <mat-checkbox formControlName="aflacGroupNumber" [disabled]="isRole93">
+                                    {{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroup']}}
+                                </mat-checkbox>
+                            </div>
+                            <div
+                                class="aflac-individual-section"
+                                *ngIf="stepOneForm.get('aflacGroupNumber').value && stepOneForm.get('groupNumber')"
+                            >
+                                <mat-label class="search-label"
+                                    >{{languageStrings['primary.portal.aflacgroup.importaccount.searchByGroupNumber']}}
+                                </mat-label>
+                                <div class="search-number">
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="groupNumber"
+                                            autocomplete="off"
+                                            maxlength="45"
+                                            [attr.aria-label]="languageStrings['primary.portal.aflacgroup.importaccount.searchByAccountNumber']"
+                                        />
+                                    </mat-form-field>
+                                    <button
+                                        #submit
+                                        mat-flat-button
+                                        class="mon-btn-search mon-btn-primary"
+                                        color="primary"
+                                        type="button"
+                                        (click)="getGroupNumber()"
+                                        [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                    >
+                                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                                    </button>
+                                </div>
+                                <mat-error *ngIf="isAgAlreadyExist">
+                                    {{ languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.duplicate']}}
+                                </mat-error>
+                                <div *ngIf="stepOneForm.get('groupNumber').touched && stepOneForm.get('groupNumber').invalid">
+                                    <mat-error *ngIf="stepOneForm.get('groupNumber').hasError('pattern')">
+                                        {{ languageStrings['primary.portal.aflacgroup.importaccount.invalidGroupNumber']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="stepOneForm.get('groupNumber').errors?.required">
+                                        {{
+                                        languageStrings['primary.portals.accounts.importAccount.step1.errors.required.aflacGroupNumber']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="stepOneForm.get('groupNumber').errors?.matchingAGError">
+                                        {{ languageStrings['primary.portal.aflacgroup.importaccount.agMatchingAccount']}}
+                                    </mat-error>
+                                </div>
+                                <div class="account-wrapper" *ngIf="aflacGroupNo">
+                                    {{aflacGroupNo.name | titlecase}}
+                                    <span *ngIf="aflacGroupNo.primaryContact.address as address">
+                                        {{languageStrings['primary.portal.common.slash']}} {{address.city | titlecase}}, {{address.state}}
+                                        <span>
+                                            {{languageStrings['primary.portal.common.slash']}}
+                                            {{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroupNo']}}
+                                            {{aflacGroupNo.aflacGroupNumber}}</span
+                                        >
+                                    </span>
+                                </div>
+                                <div class="account-wrapper" *ngIf="duplicateAG">
+                                    {{duplicateAG.name | titlecase}}
+                                    <span *ngIf="duplicateAG.primaryContact.address as address">
+                                        {{languageStrings['primary.portal.common.slash']}} {{address.city | titlecase}}, {{address.state}}
+                                        <span>
+                                            {{languageStrings['primary.portal.common.slash']}}
+                                            {{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroupNo']}}
+                                            {{duplicateAG.aflacGroupNumber? duplicateAG.aflacGroupNumber :duplicateAG.accountNumber}}</span
+                                        >
+                                    </span>
+                                </div>
+                                <div class="mon-py-30" *ngIf="matchingAGError && !duplicateAG">
+                                    <mon-alert alertType="danger">
+                                        <span>{{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroupWarning']}}</span>
+                                    </mon-alert>
+                                </div>
+                                <div class="mon-py-30" *ngIf="stepOneForm.controls.groupNumber.errors?.invalidApplicationState">
+                                    <mon-alert alertType="danger">
+                                        <span
+                                            >{{languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.invalidState']}}</span
+                                        >
+                                    </mon-alert>
+                                </div>
+                                <div class="mon-py-30" *ngIf="duplicateAG">
+                                    <mon-alert alertType="danger">
+                                        <span>{{languageStrings['primary.portal.aflacgroup.importaccount.groupNumberInUse']}}</span>
+                                        &nbsp;
+                                        <span>
+                                            <a href="javascript:void(0)" (click)="navigateTo(duplicateAG.id+'/dashboard')"
+                                                >{{languageStrings['primary.portal.aflacgroup.importaccount.viewAccount']}}
+                                            </a>
+                                        </span>
+                                    </mon-alert>
+                                </div>
+                                <div class="mon-py-30" *ngIf="aflacGroupNo && (aflacGroupNo.importType ==='SHARED_CASE') && !aflacAccount">
+                                    <mon-alert alertType="danger">
+                                        <span> {{languageStrings['primary.portal.aflacgroup.getAflac.sharedAG.info']}} </span>
+                                    </mon-alert>
+                                </div>
+                            </div>
+                        </div>
+                        <mat-error *ngIf="isStepOneInValid && stepOneForm.invalid && stepOneForm.errors?.checkBoxSelection">
+                            {{languageStrings['primary.portal.members.workValidationMsg.selectionRequired']}}
+                        </mat-error>
+                        <!-- Validation section || Start -->
+
+                        <div class="mon-pb-30" *ngIf="isPartialSetup">
+                            <mon-alert alertType="danger">
+                                <span>{{languageStrings['primary.portal.aflacgroup.importaccount.dangerInfo']}} </span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-pb-30" *ngIf="agRequiredError">
+                            <mon-alert alertType="danger">
+                                <span>{{languageStrings['primary.portal.aflacGroup.importAccount.notPermitted']}} </span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-pb-30 ag-alert-warning" *ngIf="aflacAccount && aflacGroupNo && taxIdMismatch" #taxIdAlert>
+                            <mon-alert alertType="warning">
+                                <span>{{languageStrings['primary.portal.aflacgroup.importaccount.taxIdMismatch']}}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-pb-30" *ngIf="aflacAccount && aflacGroupNo && situsMismatch">
+                            <mon-alert alertType="danger">
+                                <span>{{languageStrings['primary.portal.aflacgroup.importaccount.situsMismatch']}}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-pb-30" *ngIf="missingZip">
+                            <mon-alert alertType="danger">
+                                <span>{{languageStrings['primary.portal.aflacgroup.importaccount.missingZip']}}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-mb-30" *ngIf="invalidZipError">
+                            <mon-alert alertType="danger">
+                                <span language="primary.portals.accounts.importAccount.errors.getAflacAccount.409.invalidZip"></span>
+                            </mon-alert>
+                        </div>
+                        <!-- Validation section || End -->
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" (click)="closePopup()" class="mon-btn-link">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <button
+                        class="mon-btn-primary"
+                        type="button"
+                        mat-flat-button
+                        [disabled]="invalidZipError"
+                        (click)="onNext('stepOneForm', 'isStepOneInValid', 1)"
+                    >
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                            iconSize="12"
+                            iconName="right"
+                        ></mon-icon>
+                    </button>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="linkAccounts">
+            <div>
+                <empowered-ag-individual-form
+                    [linkAccounts]="linkAccounts"
+                    [isAiOnly]="aflacAccount && !aflacGroupNo ? true: false"
+                ></empowered-ag-individual-form>
+
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" (click)="closePopup()" class="mon-btn-link">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-ml-20" type="button" mat-flat-button (click)="matStepper.selectedIndex=0">
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-primary mon-ml-20" type="button" mat-flat-button (click)="linkIndividual()">
+                            <span>{{languageStrings['primary.portal.common.next']}}</span>
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="right"
+                            ></mon-icon>
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-step>
+        <mat-step>
+            <div *ngIf="primaryProducer && primaryProducer.length">
+                <empowered-ag-individual-second
+                    [primaryProducer]="primaryProducer"
+                    [isAiOnly]="aflacAccount && !aflacGroupNo ? true: false"
+                ></empowered-ag-individual-second>
+
+                <mat-dialog-actions class="dialog-footer d-flex ag-linkAcc-buttons">
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-ml-20" mat-flat-button (click)="matStepper.selectedIndex = 0">
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-secondary mon-ml-20" type="button" mat-flat-button (click)="matStepper.selectedIndex=4">
+                            <span>{{languageStrings['primary.portal.aflacgroup.importaccount.individual.createAccount']}}</span>
+                        </button>
+                        <button class="mon-btn-primary mon-ml-20" type="button" mat-flat-button (click)="closePopup()">
+                            <span>{{languageStrings['primary.portal.common.close']}</span>
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-step>
+        <mat-step>
+            <div *ngIf="duplicateTaxAccountIds">
+                <empowered-ag-individual-multi-account
+                    [duplicateTaxAccountIds]="duplicateTaxAccountIds"
+                    [producerId]="producerId"
+                    (navigateToCarrierPage)="navigateTo($event.id+'/dashboard/profile/carriers')"
+                    [isAiOnly]="aflacAccount && !aflacGroupNo"
+                ></empowered-ag-individual-multi-account>
+
+                <mat-dialog-actions class="dialog-footer d-flex ag-linkAcc-buttons">
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-ml-20" mat-flat-button (click)="matStepper.selectedIndex = 0">
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-secondary mon-ml-20" type="button" mat-flat-button (click)="matStepper.selectedIndex=4">
+                            <span>{{languageStrings['primary.portal.aflacgroup.importaccount.individual.createAccount']}}</span>
+                        </button>
+                        <button class="mon-btn-primary mon-ml-20" type="button" mat-flat-button (click)="closePopup()">
+                            <span>Close</span>
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-step>
+        <mat-step [stepControl]="stepTwoForm">
+            <empowered-import-step-second
+                [languageStrings]="languageStrings"
+                [producerSearchList]="producerSearchList"
+                [companyCode]="companyCode"
+                [stepControl]="stepTwoForm"
+                [aflacAccount]="duplicateAI ?duplicateAI :aflacAccount"
+                [aflacGroupNo]="duplicateAG ?duplicateAG :aflacGroupNo"
+                *ngIf="producerSearchList"
+            ></empowered-import-step-second>
+            <div class="mon-py-30" *ngIf="alreadyImportedAccount">
+                <mon-alert alertType="danger">
+                    <span>{{languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.selfDuplicate']}}</span>
+                    &nbsp;
+                    <span>
+                        <a href="javascript:void(0)" (click)="navigateTo(alreadyImportedAccount.id+'/dashboard')"
+                            >{{languageStrings['primary.portal.aflacgroup.importaccount.viewAccount']}}
+                        </a>
+                    </span>
+                </mon-alert>
+            </div>
+            <div class="mon-py-30" *ngIf="errorCode && !alreadyImportedAccount">
+                <mon-alert alertType="danger">
+                    <span>{{languageStrings['primary.portals.accounts.importAccount.AgImport.'+errorCode]}}</span>
+                </mon-alert>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="closePopup()">
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <button class="mon-btn-primary" mat-flat-button (click)="onImport(stepTwoForm)" *ngIf="!(aflacAccount?.daysToEnroll)">
+                    {{languageStrings['primary.portals.accounts.importAccount.step2.import']}}
+                </button>
+                <button
+                    class="mon-btn-primary mon-ml-20"
+                    type="button"
+                    mat-flat-button
+                    *ngIf="(aflacAccount?.daysToEnroll)"
+                    (click)="onNextOfStepSecond(5)"
+                >
+                    <span>{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon
+                        class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                        iconSize="12"
+                        iconName="right"
+                    ></mon-icon>
+                </button>
+            </mat-dialog-actions>
+        </mat-step>
+        <mat-step [stepControl]="agNewHireForm">
+            <div>
+                <empowered-ag-new-hire-form [agNewHireForm]="agNewHireForm"></empowered-ag-new-hire-form>
+                <div class="mon-py-30" *ngIf="alreadyImportedAccount">
+                    <mon-alert alertType="danger">
+                        <span>{{languageStrings['primary.portals.accounts.importAccount.errors.getAflacAccount.409.selfDuplicate']}}</span>
+                        &nbsp;
+                        <span>
+                            <a href="javascript:void(0)" (click)="navigateTo(alreadyImportedAccount.id+'/dashboard')"
+                                >{{languageStrings['primary.portal.aflacgroup.importaccount.viewAccount']}}
+                            </a>
+                        </span>
+                    </mon-alert>
+                </div>
+                <div class="mon-py-30" *ngIf="errorCode && !alreadyImportedAccount">
+                    <mon-alert alertType="danger">
+                        <span>{{languageStrings['primary.portals.accounts.importAccount.AgImport.'+errorCode]}}</span>
+                    </mon-alert>
+                </div>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="closePopup()">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-ml-20" type="button" mat-flat-button (click)="matStepper.selectedIndex=4">
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-primary mon-ml-20" mat-flat-button (click)="onImport(agNewHireForm)">
+                            {{languageStrings['primary.portals.accounts.importAccount.step2.import']}}
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-step>
+        <mat-step>
+            <div mat-dialog-content>
+                <div class="content-wrapper">
+                    <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.about.title']}}</h2>
+                    <p language="primary.portals.accounts.importAccount.about.NASSA.infoPart1"></p>
+                    <p class="mon-mt-10">
+                        {{languageStrings['primary.portals.accounts.importAccount.about.NASSA.infoPart2']}}
+                        <a
+                            class="email-info"
+                            href="mailto:{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}?subject={{languageStrings['primary.portals.accounts.importAccount.NASSA.email.subject']}}"
+                            >{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}</a
+                        >.
+                    </p>
+                    <p class="mon-mt-10">
+                        <a
+                            class="content-link"
+                            target="_blank"
+                            [href]="languageStrings['primary.portals.accounts.importAccount.about.NASSA.link']"
+                            >{{languageStrings['primary.portals.accounts.importAccount.about.learnMoreNASSA']}}</a
+                        >
+                        <mon-icon iconName="open-in-new" iconSize="16"></mon-icon>
+                    </p>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="closePopup()">
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <span>
+                    <button
+                        class="mon-btn-secondary mon-mr-20"
+                        color="primary"
+                        mat-flat-button
+                        type="button"
+                        (click)="matStepper.selectedIndex=0"
+                    >
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                            iconSize="12"
+                            iconName="left"
+                        ></mon-icon
+                        ><span>{{languageStrings['primary.portal.common.back']}}</span>
+                    </button>
+                    <button type="button" class="mon-btn-primary mon-m-0" (click)="closePopup()" mat-flat-button>
+                        {{languageStrings['primary.portals.accounts.importAccount.about.startNASSA']}}
+                    </button>
+                </span>
+            </mat-dialog-actions>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

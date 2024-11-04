@@ -1,0 +1,118 @@
+<div class="eb-plan-prices" *ngIf="dataSource$ | async as dataSource ; else coverageLoading">
+    <mat-table [dataSource]="dataSource" class="products-accordion-table">
+        <ng-container *ngFor="let rowLabel of (displayName$  | async); let colIndex = index" [matColumnDef]="rowLabel">
+            <ng-container *ngIf="selectedCoverageLevelId$ | async as selectedCoverageLevelId">
+                <!-- dataSource would always have the base plan price details at 0th index -->
+                <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    [ngClass]="{
+                'checked-plan': dataSource[0]?.coverageLevelPrices?.[colIndex-1]?.id === selectedCoverageLevelId && rowLabel !== position
+              }"
+                >
+                    <span *ngIf="rowLabel !== position">{{ rowLabel }}</span>
+                </th>
+                <td
+                    mat-cell
+                    *matCellDef="let cell"
+                    [ngClass]="{
+                'checked-plan': cell.coverageLevelPrices[colIndex-1]?.id === selectedCoverageLevelId && rowLabel !== position
+              }"
+                >
+                    <span *ngIf="rowLabel === position"> {{ cell.rowLabel }}</span>
+                    <!-- Do not show the price if POSITION placeholder or has spouse knockout  -->
+                    <span *ngIf="rowLabel !== position && !cell.coverageLevelPrices[colIndex -1]?.spouseKnockoutDisable">
+                        <ng-container *ngIf="!cell.isReturnOfPremiumRider; else returnOfPremiumRider">
+                            <span *ngIf="!cell.coverageLevelPrices[colIndex-1]?.price"></span>
+                            {{cell.coverageLevelPrices[colIndex-1]?.price | currency:'':'symbol':'1.2-2'}}
+                        </ng-container>
+                        <!-- when Return Of Premium Rider is selected then show below tooltip Icon with message -->
+                        <ng-template #returnOfPremiumRider
+                            ><span>
+                                <a
+                                    [richTooltip]="languageStrings['primary.portal.shopQoute.ROPMessage']"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    href="javascript:void(0)"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="17" class="icon-primary"> </mon-icon>
+                                </a> </span
+                        ></ng-template>
+                    </span>
+                </td>
+                <td
+                    mat-footer-cell
+                    *matFooterCellDef
+                    [ngClass]="{
+                'checked-plan': dataSource[0].coverageLevelPrices[colIndex-1]?.id === selectedCoverageLevelId && rowLabel !== position
+              }"
+                >
+                    <div class="pay-frequency-container">
+                        <span *ngIf="rowLabel === position" class="total-price" language="primary.portal.common.total"></span>
+                        <span *ngIf="rowLabel === position" class="pay-frequency">
+                            <ng-container *ngIf="payFrequency$ | async as payFrequency"> {{ payFrequency | lowercase }}</ng-container>
+                        </span>
+                    </div>
+
+                    <div *ngIf="rowLabel !== position">
+                        <ng-container *ngIf="totalPrices$ | async as total">
+                            <span
+                                *ngIf="((total[colIndex -1] === 0 ||
+                                 dataSource[0].coverageLevelPrices[colIndex-1]?.spouseKnockoutDisable) && 
+                                 (isSupplementaryPlan$ | async) === false ||
+                                 dataSource[0].coverageLevelPrices[colIndex-1]?.price === '' );then coverageIneligible else coverageEligible"
+                            ></span>
+                            <!-- Coverage is disabled for no price or spouse knockout -->
+                            <ng-template #coverageIneligible>
+                                <button
+                                    mat-icon-button
+                                    [richTooltip]="languageStrings['primary.portal.quoteShop.knockout.reanswerMessageToolTip']"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    href="javascript:void(0)"
+                                    *ngIf="dataSource[0].coverageLevelPrices[colIndex -1]?.spouseKnockoutDisable; else priceNotAvailable"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="17" class="icon-primary"> </mon-icon>
+                                </button>
+                                <ng-template #priceNotAvailable>
+                                    <button
+                                        mat-icon-button
+                                        [richTooltip]="languageStrings['primary.portal.shoppingExperience.missingDependentInfo']"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        href="javascript:void(0)"
+                                    >
+                                        <mon-icon iconName="Filled-info" [iconSize]="17" class="icon-primary"> </mon-icon>
+                                    </button>
+                                </ng-template>
+                            </ng-template>
+                            <ng-template #coverageEligible>
+                                <span class="plan-prices">
+                                    {{ total[colIndex -1] | currency:'':'symbol':'1.2-2'}}
+                                    <mat-radio-group
+                                        (change)="coverageLevelIdSelected(dataSource[0].coverageLevelPrices?.[colIndex -1]?.id)"
+                                    >
+                                        <mat-radio-button
+                                            [value]="rowLabel"
+                                            [disabled]="isSupplementaryPlan$ | async"
+                                            [checked]="dataSource[0].coverageLevelPrices[colIndex -1]?.id === selectedCoverageLevelId"
+                                        ></mat-radio-button>
+                                    </mat-radio-group>
+                                </span>
+                            </ng-template>
+                        </ng-container>
+                    </div>
+                </td>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="displayName$ | async as displayName">
+            <tr mat-header-row *matHeaderRowDef="displayName"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayName;"></tr>
+            <tr mat-footer-row *matFooterRowDef="displayName"></tr>
+        </ng-container>
+    </mat-table>
+</div>
+
+<ng-template #coverageLoading>
+    <empowered-mon-spinner *ngIf="isExpandedPanel$ | async" [enableSpinner]="true" [backdrop]="true"> </empowered-mon-spinner>
+</ng-template>

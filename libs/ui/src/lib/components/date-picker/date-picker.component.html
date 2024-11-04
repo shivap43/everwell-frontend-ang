@@ -1,0 +1,41 @@
+<mat-form-field class="mon-date-field">
+    <input
+        matInput
+        [matDatepicker]="datePicker"
+        [min]="minDate"
+        [max]="maxDate"
+        empoweredInput
+        [displayOrder]="displayOrder"
+        [formName]="formName"
+        [formControl]="datePickerControl"
+        (input)="onInput($event.target.value)"
+        (dateChange)="onInput($event.target.value)"
+        attr.aria-labelledby="{{labeledById}}"
+        attr.aria-label="{{languageStrings['primary.portal.common.datePickerLabel']}}"
+    />
+
+    <mat-datepicker-toggle matSuffix [for]="datePicker">
+        <mon-icon
+            attr.aria-label="{{languageStrings['primary.portal.common.datePickerIconLabel']}}"
+            iconName="calendar-date"
+            [iconSize]="23"
+            matDatepickerToggleIcon
+        >
+        </mon-icon>
+    </mat-datepicker-toggle>
+
+    <mat-datepicker #datePicker></mat-datepicker>
+
+    <mat-hint>
+        <span
+            *ngIf="!customHint"
+            attr.aria-describedby="{{languageStrings['primary.portal.common.dateHint']}}"
+            language="primary.portal.common.dateHint"
+        ></span>
+        <span *ngIf="customHint" attr.aria-describedby="{{customHint}}">{{customHint}}</span>
+    </mat-hint>
+
+    <mat-error>
+        <ng-content></ng-content>
+    </mat-error>
+</mat-form-field>

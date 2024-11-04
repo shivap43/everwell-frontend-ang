@@ -1,0 +1,110 @@
+<div>
+    <h1><mon-icon iconName="email" iconSize="35"></mon-icon><span [language]="MessageCenterLanguage.INBOX_CONTAINER_HEADER"></span></h1>
+
+    <mat-tab-group (selectedTabChange)="onBoxTabChange($event)" [selectedIndex]="selectedBoxIndex$ | async">
+        <mat-tab [label]="tabInbox"></mat-tab>
+        <mat-tab [label]="tabSent"></mat-tab>
+        <mat-tab [label]="tabTrash"></mat-tab>
+    </mat-tab-group>
+
+    <div *ngIf="portal$ | async as portal" [ngClass]="{'hide': boxSize === 0 && !searchFilterApplied}">
+        <h2>{{ selectedBox$ | async | titlecase }}</h2>
+
+        <div class="function-bar">
+            <div class="function-bar-filters d-flex flex-grow-1">
+                <div class="function-bar-filter search-bar">
+                    <mat-label [language]="MessageCenterLanguage.INBOX_CONTAINER_LABEL_SEARCH_BAR"></mat-label>
+                    <mat-form-field>
+                        <input matInput [formControl]="searchBar" />
+                        <mat-hint [language]="MessageCenterLanguage.INBOX_CONTAINER_HINT_SEARCH_BAR"></mat-hint>
+                    </mat-form-field>
+                </div>
+
+                <div class="function-bar-filter pill-container d-flex flex-grow-1">
+                    <empowered-pill-filter-group [filterModels$]="filterModels$" (filterChange)="onChange($event)">
+                    </empowered-pill-filter-group>
+                </div>
+            </div>
+
+            <empowered-compose-message-button></empowered-compose-message-button>
+        </div>
+
+        <table mat-table matSort (matSortChange)="onSortEvent($event)" [dataSource]="dataSource">
+            <tr mat-header-row *matHeaderRowDef="BOX_COLUMNS"></tr>
+
+            <tr mat-row *matRowDef="let row; columns: BOX_COLUMNS;"></tr>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[0]" *ngIf="selectedBox$ | async as selectedBox">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="{ 'hide': selectedBox !== 'INBOX' }"></th>
+                <td mat-cell *matCellDef="let thread" [ngClass]="{ 'hide': selectedBox !== 'INBOX' }" (click)="onRowClick(thread)">
+                    <empowered-status-icon
+                        [portalType]="portal"
+                        [lastReadOn]="thread?.lastReadOn"
+                        [status]="thread?.status">
+                    </empowered-status-icon>
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[1]">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_FROM"></th>
+                <td mat-cell *matCellDef="let thread" (click)="onRowClick(thread)">
+                    {{ thread.from | dereferenceTargetUnit | async }}
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[2]">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_SUBJECT"></th>
+                <td mat-cell *matCellDef="let thread" (click)="onRowClick(thread)">
+                    {{thread.subject}}
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[3]">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_CATEGORY"></th>
+                <td mat-cell *matCellDef="let thread" (click)="onRowClick(thread)">
+                    {{thread.sentTo | dereferenceCategory | async}}
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[4]">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_ASSIGNED_TO"></th>
+                <td mat-cell *matCellDef="let thread" (click)="onRowClick(thread)">
+                    {{thread.assignedAdminId | dereferenceAssignedTo | async}}
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[5]">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_DATE_RECIEVED"></th>
+                <td mat-cell *matCellDef="let thread" (click)="onRowClick(thread)">
+                    {{thread.lastReceivedOn}}
+                </td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="BOX_COLUMNS[6]">
+                <th mat-header-cell *matHeaderCellDef [ngClass]="{ 'hide': selectedBox !== 'INBOX' }" [language]="MessageCenterLanguage.INBOX_CONTAINER_TABLE_HEADER_MANAGE"></th>
+                <td mat-cell *matCellDef="let thread" [ngClass]="{ 'hide': selectedBox !== 'INBOX' }">
+                    <ng-container *ngIf="isAdmin; else deleteOnly">
+                        <button mat-icon-button class="manage-menu" [matMenuTriggerFor]="menu"><mon-icon iconName="ellipsis" [iconSize]="20"></mon-icon></button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item (click)="onChangeStatusClick(thread)" [language]="MessageCenterLanguage.INBOX_CONTAINER_MENU_CHANGE_STATUS"></button>
+                            <button mat-menu-item (click)="onChangeCategoryClick(thread)" [language]="MessageCenterLanguage.INBOX_CONTAINER_MENU_CHANGE_CATEGORY"></button>
+                            <button mat-menu-item (click)="onChangeAdminClick(thread)" [language]="MessageCenterLanguage.INBOX_CONTAINER_MENU_MANAGE_ADMIN"></button>
+                            <button mat-menu-item (click)="onDeleteClick(thread.id)" [language]="MessageCenterLanguage.INBOX_CONTAINER_MENU_DELETE_THREAD"></button>
+                        </mat-menu>
+                    </ng-container>
+                    <ng-template #deleteOnly>
+                        <a class="manage-menu" (click)="onDeleteClick(thread.id)" [language]="MessageCenterLanguage.INBOX_CONTAINER_MENU_DELETE_THREAD"></a>
+                    </ng-template>
+                </td>
+            </ng-container>
+        </table>
+
+        <empowered-paginator [data$]="sortedResults$"></empowered-paginator>
+    </div>
+
+    <div [ngClass]="{'hide': boxSize !== 0 || searchFilterApplied }">
+        <div [language]="MessageCenterLanguage.INBOX_CONTAINER_ZERO_STATE"></div>
+
+        <empowered-compose-message-button></empowered-compose-message-button>
+    </div>
+</div>

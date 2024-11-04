@@ -1,0 +1,24 @@
+import * as <%= classify(name) %>Actions from "./<%= dasherize(name) %>.actions";
+import { <%= camelize(name) %>Adapter, initialState, State } from "./<%= dasherize(name) %>.state";
+import { createReducer, on, Action } from "@ngrx/store";
+
+export const <%= underscore(name).toUpperCase() %>_FEATURE_KEY = "<%= camelize(name) %>";
+
+export interface <%= classify(name) %>PartialState {
+    readonly [<%= underscore(name).toUpperCase() %>_FEATURE_KEY]: State;
+}
+
+const <%= camelize(name) %>Reducer = createReducer(
+    initialState,
+    on(<%= classify(name) %>Actions.init, (state): State => ({ ...state, loaded: false, error: null })),
+    on(<%= classify(name) %>Actions.setSelected<%= classify(name) %>, (state, { selectedId }): State => ({ ...state, selectedId })),
+    on(
+        <%= classify(name) %>Actions.load<%= classify(name) %>Success,
+        (state, { <%= camelize(name) %> }): State => <%= camelize(name) %>Adapter.setAll(<%= camelize(name) %>, { ...state, loaded: true })
+    ),
+    on(<%= classify(name) %>Actions.load<%= classify(name) %>Failure, (state, { error }): State => ({ ...state, error }))
+);
+
+export function reducer(state: State | undefined, action: Action): State {
+    return <%= camelize(name) %>Reducer(state, action);
+}

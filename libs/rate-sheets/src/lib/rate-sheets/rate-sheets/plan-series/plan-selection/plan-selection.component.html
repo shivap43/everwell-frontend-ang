@@ -1,0 +1,273 @@
+<div class="plan-selection">
+    <div class="mon-mt-30">
+        <mon-alert class="error-alert" alertType="danger" *ngIf="isInvalidEliminationPeriodSelection" closeButton="true">
+            <span language="primary.portal.rateSheets.selected.eliminationPeriod.invalid.message"></span>
+        </mon-alert>
+        <mon-alert alertType="danger" *ngIf="isInvalidBenefitAmountSelection" closeButton="true">
+            <span *ngIf="isStdProduct$ | async; else otherProducts">
+                {{ "primary.portal.rateSheets.selected.benefitAmount.invalid.message" | replaceTag: { "##plans##" : 'benefit periods',
+                "##ratesheetplan##" : 'benefit period(s)' } }}
+            </span>
+            <ng-template #otherProducts>
+                <span>
+                    {{ "primary.portal.rateSheets.selected.benefitAmount.invalid.message" | replaceTag: { "##plans##" : 'base plans',
+                    "##ratesheetplan##" : 'plan(s)' } }}
+                </span>
+            </ng-template>
+        </mon-alert>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="addToRateSheet()">
+        <div class="plans-container" *ngIf="planSeries?.plans">
+            <ng-container *ngIf="isStdProduct$ | async as isStdProduct; else otherProducts">
+                <mat-label>
+                    <span language="primary.portal.ratesheet.benefitPeriod"></span>
+                </mat-label>
+                <mat-selection-list class="plans" formControlName="plans">
+                    <ng-container *ngIf="isToolTipAge; else isToolTipEligibleEmployees">
+                        <mat-list-option
+                            checkboxPosition="before"
+                            *ngFor="let plan of planSeries.plans"
+                            [value]="plan"
+                            [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageAge : '' "
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                            [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                        >
+                            {{ plan.shortName }}
+                        </mat-list-option>
+                    </ng-container>
+                    <ng-template #isToolTipEligibleEmployees>
+                        <mat-list-option
+                            checkboxPosition="before"
+                            *ngFor="let plan of planSeries.plans"
+                            [value]="plan"
+                            [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageEligibleEmployees : '' "
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                            [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                        >
+                            {{ plan.shortName }}
+                        </mat-list-option>
+                    </ng-template>
+                </mat-selection-list>
+            </ng-container>
+            <ng-template #otherProducts>
+                <mat-label>
+                    <span language="primary.portal.benefitsOffering.Plan"></span>
+                </mat-label>
+                <mat-selection-list class="plans" formControlName="plans">
+                    <ng-container *ngIf="isCarrierOfADV$ |async; else nonADV">
+                        <ng-container *ngIf="isToolTipAge; else isToolTipEligibleEmployees">
+                            <mat-list-option
+                                checkboxPosition="before"
+                                *ngFor="let plan of distinctPlansForADV"
+                                [value]="plan"
+                                [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageAge : '' "
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                                [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                            >
+                                {{ plan.shortName }}
+                            </mat-list-option>
+                        </ng-container>
+                        <ng-template #isToolTipEligibleEmployees>
+                            <mat-list-option
+                                checkboxPosition="before"
+                                *ngFor="let plan of distinctPlansForADV"
+                                [value]="plan"
+                                [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageEligibleEmployees : '' "
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                                [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                            >
+                                {{ plan.shortName }}
+                            </mat-list-option>
+                        </ng-template>
+                    </ng-container>
+
+                    <ng-template #nonADV>
+                        <ng-container *ngIf="isToolTipAge; else isToolTipEligibleEmployees">
+                            <mat-list-option
+                                checkboxPosition="before"
+                                *ngFor="let plan of planSeries.plans"
+                                [value]="plan"
+                                [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageAge : '' "
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                                [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                            >
+                                <span>{{ plan.name }}</span>
+                            </mat-list-option>
+                        </ng-container>
+                        <ng-template #isToolTipEligibleEmployees>
+                            <mat-list-option
+                                checkboxPosition="before"
+                                *ngFor="let plan of planSeries.plans"
+                                [value]="plan"
+                                [richTooltip]="disablePlans && disablePlans[plan.id] ? toolTipMessageEligibleEmployees : '' "
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                [disabled]="disablePlans ? disablePlans[plan.id] : false"
+                                [ngClass]="{'error': invalidPlanSelections[plan.id]}"
+                            >
+                                <span>{{ plan.name }}</span>
+                            </mat-list-option>
+                        </ng-template>
+                    </ng-template>
+                </mat-selection-list>
+            </ng-template>
+        </div>
+        <div class="plan-type-container" *ngIf="isCarrierOfADV$ | async">
+            <mat-label>
+                <span language="">Plan type</span>
+            </mat-label>
+            <ng-container *ngIf="form.controls.plans.value?.length > 0; else noPlansSelected">
+                <empowered-plan-type formControlName="planTypes" [planTypes]="planTypeOptions">
+                    <mat-error
+                        *ngIf="form.controls.planTypes.errors?.required"
+                        language="primary.portal.ratesheet.selection.required.errorMessage"
+                    ></mat-error>
+                </empowered-plan-type>
+            </ng-container>
+        </div>
+        <div class="coverage-level-container" *ngIf="coverageLevelOptions$ | async as coverageLevelOptions">
+            <div *ngIf="coverageLevelOptions?.length > 1">
+                <mat-label>
+                    <span language="primary.portal.quoteShop.coverageLevel"></span>
+                </mat-label>
+                <ng-container *ngIf="form.controls.plans.value?.length > 0; else noPlansSelected">
+                    <empowered-coverage-level
+                        formControlName="coverageOptions"
+                        [coverageLevels]="coverageLevelOptions"
+                        [disableCoverageLevels]="disableCoverageLevelOptions"
+                    >
+                        <mat-error
+                            *ngIf="form.controls.coverageOptions.errors?.required"
+                            language="primary.portal.ratesheet.selection.required.errorMessage"
+                        ></mat-error>
+                    </empowered-coverage-level>
+                </ng-container>
+            </div>
+        </div>
+        <div class="elimination-period-container" *ngIf="eliminationOptions$ | async as eliminationOptions">
+            <div *ngIf="eliminationOptions?.length > 0">
+                <mat-label>
+                    <span language="primary.portal.shoppingExperience.eliminationPeriod"></span>
+                </mat-label>
+                <ng-container *ngIf="form.controls.plans.value?.length > 0; else noPlansSelected">
+                    <mat-checkbox
+                        class="elimination-period-list"
+                        [indeterminate]="isIndeterminate"
+                        formControlName="selectAllEliminationPeriods"
+                    >
+                        <span language="primary.portal.ratesheet.selectAll"></span>
+                    </mat-checkbox>
+                    <mat-divider></mat-divider>
+                    <empowered-elimination-period
+                        formControlName="eliminationPeriods"
+                        [eliminationPeriodOptions]="eliminationOptions"
+                        [disableEliminationOptions]="disableEliminationPeriods"
+                        [requiredEliminationOptions]="requiredEliminationPeriodSelections"
+                    >
+                        <mat-error
+                            *ngIf="form.controls.eliminationPeriods.errors?.required"
+                            language="primary.portal.ratesheet.selection.required.errorMessage"
+                        ></mat-error>
+                    </empowered-elimination-period>
+                </ng-container>
+            </div>
+        </div>
+        <div class="benefit-amount-container" *ngIf="benefitAmountOptions$ | async as benefitAmountOptions">
+            <div *ngIf="benefitAmountOptions?.length > 0">
+                <ng-container *ngIf="(isStdProduct$ | async) === false || !(form.controls.plans.value?.length)">
+                    <mat-label>
+                        <span language="primary.portal.coverage.benefitamount"></span>
+                    </mat-label>
+                </ng-container>
+                <ng-container *ngIf="form.controls.plans.value?.length > 0; else noPlansSelected">
+                    <ng-container *ngIf="isOtherProductSelected$ | async">
+                        <ng-container *ngIf="benefitAmountOptions?.length > 1">
+                            <mat-checkbox
+                                class="benefit-amount-list"
+                                [indeterminate]="isIndeterminate"
+                                formControlName="selectAllBenefitAmounts"
+                            >
+                                <span language="primary.portal.ratesheet.selectAll"></span>
+                                <mat-error *ngIf="form.controls.benefitAmounts?.errors?.required"></mat-error>
+                            </mat-checkbox>
+                            <mat-divider></mat-divider>
+                        </ng-container>
+                    </ng-container>
+                    <empowered-benefit-amounts
+                        formControlName="benefitAmounts"
+                        [benefitAmountOptions]="benefitAmountOptions"
+                        [disableBenefitAmountOptions]="disableBenefitAmountOptions"
+                        [requiredBenefitAmountsSelection]="requiredBenefitAmountSelections"
+                        [minimumBenefitAmounts]="minimumBenefitAmountOptions"
+                    >
+                        <mat-error
+                            *ngIf="form.controls.benefitAmounts?.errors?.required"
+                            language="primary.portal.ratesheet.selection.required.errorMessage"
+                        ></mat-error>
+                    </empowered-benefit-amounts>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="(riderOptions$ | async) as options">
+            <ng-container *ngIf="options.length"
+                ><mat-label>
+                    <span language="primary.portal.benefitsOffering.filterRiders"></span
+                    ><span class="optional-text" language="primary.portal.common.optional"></span>
+                </mat-label>
+                <ng-container *ngIf="(planOptionsWithFilteredRiders$ | async) as plansFilteredRiders">
+                    <empowered-rider-options
+                        [hidden]="!form.controls.plans.value?.length"
+                        [planValueChanges]="form.controls.plans.valueChanges"
+                        [options]="options"
+                        [planOptionsFilteredRiders]="plansFilteredRiders"
+                        (ridersValueChange)="onRidersValueChange($event)"
+                    >
+                    </empowered-rider-options>
+                </ng-container>
+                <ng-container *ngIf="!form.controls.plans.value?.length">
+                    <ng-container *ngTemplateOutlet="noPlansSelected"></ng-container> </ng-container
+            ></ng-container>
+        </div>
+        <div>
+            <span [richTooltip]="form.controls.plans.value?.length ? '' : buttonDisabledTooltip" matTooltipPosition="above">
+                <button
+                    mat-button
+                    class="mon-btn-primary mon-mt-40 mon-mb-40 mon-mr-30 mon-btn-success"
+                    [ngClass]="{ 'mon-btn-primary': !includedInRateSheet || form.dirty, 'mon-btn-success': includedInRateSheet && form.pristine }"
+                    type="submit"
+                    [disabled]="!form.controls.plans.value?.length || (includedInRateSheet && form.pristine)"
+                >
+                    <!-- Add to rate sheet -->
+                    <span *ngIf="!includedInRateSheet"><span language="primary.portal.quickQuote.addToRateSheet"></span></span>
+                    <!-- In rate sheet -->
+                    <span *ngIf="(includedInRateSheet && form.pristine)"
+                        ><mon-icon class="check-icon mon-mr-5" iconName="check" [iconSize]="18"></mon-icon
+                        ><span class="added-text"><span language="primary.portal.rateSheets.planSelections.inRateSheet"></span></span
+                    ></span>
+                    <!-- save changes -->
+                    <span *ngIf="includedInRateSheet && form.dirty && form.controls.plans.value?.length">
+                        <span language="primary.portal.pricingPopup.saveChanges"></span>
+                    </span>
+                </button>
+            </span>
+        </div>
+    </form>
+</div>
+<ng-template #noPlansSelected>
+    <span *ngIf="(isOtherProductSelected$ | async) || (isWholeAndTermLifeProduct$ | async)" class="default-section-text">
+        {{ "primary.portal.ratesheet.defaultText" | replaceTag: { "##selection##" : plansLanguage } }}
+    </span>
+    <span *ngIf="isStdProduct$ | async" class="default-section-text">
+        {{ "primary.portal.ratesheet.defaultText" | replaceTag: { "##selection##" : benefitPeriodsLanguage } }}
+    </span>
+</ng-template>

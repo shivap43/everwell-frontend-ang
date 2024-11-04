@@ -1,0 +1,498 @@
+<!-- TODO: Language integration pending -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="coverageForm" class="quasi-modal">
+    <div class="modal-header">
+        <h2 mat-dialog-title>
+            {{languageStrings['primary.portal.editCoverage.edit']}} {{data.enrollData.plan.name}}
+            {{languageStrings['primary.portal.editCoverage.coverage']}}
+        </h2>
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div class="d-flex seperator">
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.editCoverage.coverageDate']}}</mat-label
+                    >
+                    <mat-form-field class="mon-date-field w-200">
+                        <input
+                            [matDatepicker]="coverageDatePicker"
+                            matInput
+                            formControlName="coverageDate"
+                            [attr.aria-label]="languageStrings['primary.portal.editCoverage.coverageDate']"
+                        />
+                        <mat-datepicker #coverageDatePicker> </mat-datepicker>
+                        <mat-datepicker-toggle matSuffix (click)="coverageDatePicker.open()">
+                            <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon> </mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-error></mat-error>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        mat-flat-button
+                        class="mon-btn-search mon-btn-primary"
+                        (click)="searchEnrollment()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                    >
+                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"> </mon-icon>
+                    </button>
+                </div>
+            </div>
+            <ng-template [ngIf]="!noDataFound" [ngIfElse]="noDataFoundTemplate">
+                <section>
+                    <div class="d-flex seperator coveragewrapper">
+                        <div class="beneicon">
+                            <mon-icon
+                                iconName="{{data.enrollData.plan.product.name}}"
+                                class="product-icon"
+                                iconSize="48"
+                            >
+                            </mon-icon>
+                        </div>
+
+                        <div class="coveragedetails">
+                            {{data.enrollData.plan.product.name}}
+
+                            <div>{{data.enrollData.plan.name}}</div>
+                        </div>
+
+                        <div class="status">
+                            <div class="statustxt" *ngIf="data.enrollData.status === 'Approved' && !isData.Future">
+                                <mon-icon iconName="Filled-check" class="mon-icon-status icon-success" iconSize="26">
+                                </mon-icon>
+                                <span>{{data.enrollData.status}}</span>
+                            </div>
+                            <div
+                                class="statustxt"
+                                *ngIf="data.enrollData.status === 'Lapsed' || data.enrollData.status === 'TERMINATED'"
+                            >
+                                <mon-icon
+                                    iconName="Filled-check"
+                                    iconSize="26"
+                                    class="mon-icon-close icon-warning"
+                                ></mon-icon>
+                                <span>{{data.enrollData.status}}</span>
+                            </div>
+                            <div class="statustxt" *ngIf="data.enrollData.status === 'Ended'">
+                                <mon-icon iconName="Filled-check" iconSize="26" class="mon-icon-status"></mon-icon>
+                                <span>{{data.enrollData.status}}</span>
+                            </div>
+                            <div class="statustxt" *ngIf="isCancelIcon(data.enrollData.status)">
+                                <mon-icon
+                                    iconName="cancel-circle"
+                                    iconSize="26"
+                                    class="mon-icon-close icon-danger"
+                                ></mon-icon>
+                                <span>{{data.enrollData.status}}</span>
+                            </div>
+                            <div *ngIf="isData.Future">
+                                <mon-icon iconName="Filled-dash" class="mon-icon-status  icon-warning" iconSize="26">
+                                </mon-icon>
+                                <span>{{data.enrollData.status}}</span>
+                            </div>
+                        </div>
+                        <div class="totalcost">
+                            <div>
+                                {{data.enrollData.totalCost | currency}}
+                                <span class="d-block">{{data.payFrequency}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="innerwrapper future-hint" *ngIf="isData.Future">
+                        <mon-alert class="message-block" alertType="warning">
+                            <span>
+                                {{languageStrings['primary.portal.editCoverage.planPending']}}
+                                <a href="javascript:void(0)" (click)="gotoPendingEnrollment()"
+                                    >{{languageStrings['primary.portal.editCoverage.pendingEnrollments']}}</a
+                                >
+                            </span>
+                        </mon-alert>
+                    </div>
+                    <div class="voidcoverage" *ngIf="isData.Current">
+                        <a
+                            href="javascript:void(0)"
+                            *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION"
+                            (click)="voidCoverage(this.data.enrollData.plan.name)"
+                            >{{languageStrings['primary.portal.editCoverage.voidCoverage']}}</a
+                        >
+                    </div>
+                    <div class="innerwrapper" *ngIf="this.data.enrollData.coverageLevel">
+                        <h3>{{languageStrings['primary.portal.editCoverage.coverageDetails']}}</h3>
+                        <div class="d-flex">
+                            <div class="mon-mr-20">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.editCoverage.coverageLevel']}}</mat-label
+                                >
+                                <div>{{data.enrollData.coverageLevel.name}}</div>
+                            </div>
+                            <div class="mon-mr-20">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.editCoverage.startDate']}}</mat-label
+                                >
+                                <mat-form-field class="mon-date-field" *ngIf="isData.Current || isData.Past">
+                                    <input
+                                        [matDatepicker]="coverageStartDatePicker"
+                                        matInput
+                                        formControlName="coverageStartDate"
+                                        [attr.aria-label]="languageStrings['primary.portal.editCoverage.startDate']"
+                                    />
+                                    <mat-datepicker #coverageStartDatePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="coverageStartDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon>
+                                        </mon-icon>
+                                    </mat-datepicker-toggle>
+                                </mat-form-field>
+                                <div *ngIf="isData.Future">
+                                    {{coverageForm.get("coverageStartDate").value | date: 'MM/dd/yyyy'}}
+                                </div>
+                            </div>
+                            <div *ngIf="!isContinous" class="mon-mr-20">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.editCoverage.endDate']}}</mat-label
+                                >
+                                <mat-form-field class="mon-date-field" *ngIf="isData.Current || isData.Past">
+                                    <input
+                                        [matDatepicker]="coverageEndDatePicker"
+                                        matInput
+                                        formControlName="coverageEndDate"
+                                        [min]="minDate"
+                                        (dateChange)="checkForCoverageEndDate()"
+                                        [attr.aria-label]="languageStrings['primary.portal.editCoverage.endDate']"
+                                    />
+                                    <mat-datepicker #coverageEndDatePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="coverageEndDatePicker.open()">
+                                        <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon>
+                                        </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-error *ngIf="coverageForm.get('coverageEndDate').hasError('matDatepickerMin')">
+                                        <span
+                                            >{{languageStrings['primary.portal.editCoverage.benefitDetails.coverageEndDate.validation']}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                                <div *ngIf="isData.Future">
+                                    {{coverageForm.get("coverageEndDate").value | date: 'MM/dd/yyyy'}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isData.Current || isData.Past" class="innerwrapper">
+                        <empowered-manage-dependent
+                            [enrolledData]="data.enrollData.enrollmentDependents"
+                            [expireAfter]="data.enrollData.validity.expiresAfter"
+                            [dependentHintMsg]="this.dependentMsg"
+                            (emitFormChangeEvent)="onDependentFormChange($event)"
+                            [memberInfo]="memberInfo"
+                            [mpGroupId]="mpGroupId"
+                        >
+                        </empowered-manage-dependent>
+                    </div>
+                    <div class="innerwrapper" *ngIf="isData.Current || isData.Past">
+                        <h3>{{languageStrings['primary.portal.editCoverage.benefitDetails']}}</h3>
+                        <div>
+                            <table [dataSource]="benefitDetailsDataSource" mat-table>
+                                <ng-container matColumnDef="field">
+                                    <th mat-header-cell *matHeaderCellDef></th>
+                                    <td class="normaltxt" mat-cell *matCellDef="let element">
+                                        <span>{{element}}</span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="values">
+                                    <th mat-header-cell *matHeaderCellDef></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div *ngIf="element === 'Benefit amount'">
+                                            <mat-form-field class="marginbottom-zero">
+                                                <mat-select
+                                                    formControlName="benefitAmount"
+                                                    (selectionChange)="checkForChanges()"
+                                                    [disableOptionCentering]="true"
+                                                >
+                                                    <mat-option
+                                                        *ngFor="let amount of this.benefitAmounts"
+                                                        [value]="amount"
+                                                    >
+                                                        {{ amount }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div *ngIf="element === 'Tax status'">
+                                            <mat-form-field class="marginbottom-zero">
+                                                <mat-select
+                                                    formControlName="taxStatus"
+                                                    (selectionChange)="checkForChanges()"
+                                                    [disableOptionCentering]="true"
+                                                >
+                                                    <mat-option *ngFor="let status of this.taxStatus" [value]="status">
+                                                        {{ status }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div *ngIf="element === 'Tobacco status'">
+                                            <mat-form-field class="marginbottom-zero">
+                                                <mat-select
+                                                    formControlName="tobaccoStatus"
+                                                    (selectionChange)="checkForChanges()"
+                                                    [disableOptionCentering]="true"
+                                                >
+                                                    <mat-option *ngFor="let val of this.tobaccoStatus" [value]="val">
+                                                        {{ val }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div *ngIf="element === this.payrollFrequencyLabel">
+                                            <mat-form-field class="marginbottom-zero">
+                                                <input
+                                                    matInput
+                                                    type="number"
+                                                    formControlName="payFrequencyCost"
+                                                    [attr.aria-label]="languageStrings['primary.portal.editCoverage.payFrequencyCost']"
+                                                />
+                                            </mat-form-field>
+                                        </div>
+                                        <div *ngIf="element === 'Employer contribution'">
+                                            <mat-form-field class="marginbottom-zero">
+                                                <input
+                                                    matInput
+                                                    type="number"
+                                                    formControlName="employeeContribution"
+                                                    [attr.aria-label]="languageStrings['primary.portal.editCoverage.employeeContribution']"
+                                                />
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="benefitDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: benefitDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="innerwrapper" *ngIf="(isData.Current || isData.Past) && isIncentiveData === true">
+                        <h3>{{languageStrings['primary.portal.editCoverage.incentivesSurcharges']}}</h3>
+                        <table [dataSource]="incentivesDataSouce" mat-table>
+                            <ng-container matColumnDef="name">
+                                <th mat-header-cell *matHeaderCellDef></th>
+                                <td class="normaltxt" mat-cell *matCellDef="let element">
+                                    {{element.name}}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="amount">
+                                <th mat-header-cell *matHeaderCellDef></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <mat-checkbox
+                                        [checked]="element.checked"
+                                        (change)="getCostValue($event,element, 'Incentive')"
+                                        >{{element.amount}}</mat-checkbox
+                                    >
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="incentiveDisplayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: incentiveDisplayedColumns;"></tr>
+                        </table>
+                    </div>
+
+                    <div
+                        class="innerwrapper"
+                        *ngIf="(isData.Current || isData.Past) && this.data.enrollData.enrollmentRiders && this.data.enrollData.enrollmentRiders.length > 0"
+                    >
+                        <h3>{{languageStrings['primary.portal.editCoverage.riders']}}</h3>
+                        <table [dataSource]="dataSource" mat-table>
+                            <!-- Rider Column -->
+                            <ng-container matColumnDef="RiderName">
+                                <th mat-header-cell *matHeaderCellDef></th>
+                                <td class="normaltxt" mat-cell *matCellDef="let element">
+                                    {{element.name}}
+                                </td>
+                            </ng-container>
+
+                            <!-- Selected Column -->
+                            <ng-container matColumnDef="Cost">
+                                <th mat-header-cell *matHeaderCellDef></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <section class="example-section">
+                                        <mat-checkbox
+                                            [checked]="element.checked"
+                                            (change)="getCostValue($event, element, 'Riders')"
+                                        >
+                                            {{element.memberCost}}
+                                        </mat-checkbox>
+                                    </section>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+                    <!--Beneficiaries start here-->
+                    <div
+                        *ngIf="(isData.Current || isData.Past) && (showBeneficiaryData || beneficiaryArray.length)"
+                        class="beneficiariscont innerwrapper"
+                    >
+                        <h3>{{languageStrings['primary.portal.editCoverage.beneficiaries']}}</h3>
+                        <div *ngIf="!this.noBeneficaryDataFound">
+                            <div class="d-flex">
+                                <div class="beneficiarlabel">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.editCoverage.beneficiaryName']}}</mat-label
+                                    >
+                                </div>
+                                <div class="beneficiarlabel">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.editCoverage.beneficiaryType']}}</mat-label
+                                    >
+                                </div>
+                                <div class="beneficiarlabel">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.editCoverage.precentageBenefit']}}</mat-label
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                formArrayName="beneficiaryForms"
+                                class="d-flex"
+                                *ngFor="let beneficiary of coverageForm.get('beneficiaryForms').controls; let i = index;"
+                            >
+                                <div [formGroupName]="i" class="d-flex">
+                                    <div class="bname mon-pr-20">
+                                        <mat-form-field class="bmarginbottom">
+                                            <mat-select
+                                                placeholder="Select"
+                                                formControlName="beneficiaryName"
+                                                [disableOptionCentering]="true"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let beneficiary of beneficiaryArray"
+                                                    [value]="beneficiary.id"
+                                                    [disabled]="getBeneficiaryStatus(beneficiary.id)"
+                                                    [ngClass]="{'add-beneficiary-disabled': getBeneficiaryStatus(beneficiary.id) }"
+                                                >
+                                                    {{getBeneficiaryName(beneficiary)}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error *ngIf="beneficiary?.controls?.beneficiaryName?.errors?.required">
+                                                {{languageStrings['primary.portal.editCoverage.required']}}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="btype mon-pr-20">
+                                        <mat-form-field class="bmarginbottom">
+                                            <mat-select
+                                                placeholder="Select"
+                                                formControlName="beneficiaryType"
+                                                (selectionChange)="checkForAllBeneficiaryPercentages(type)"
+                                                [disableOptionCentering]="true"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let beneficiary of beneficiaryType"
+                                                    [value]="beneficiary"
+                                                >
+                                                    {{beneficiary}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error *ngIf="beneficiary?.controls?.beneficiaryType?.errors?.required">
+                                                {{languageStrings['primary.portal.editCoverage.required']}}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="bpercent mon-pr-20">
+                                        <mat-form-field class="bmarginbottom">
+                                            <mat-select
+                                                placeholder="Select"
+                                                formControlName="beneficiaryPercent"
+                                                (selectionChange)="checkForAllBeneficiaryPercentages()"
+                                                [disableOptionCentering]="true"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let percentage of beneficiaryPercentage"
+                                                    [value]="percentage"
+                                                >
+                                                    {{percentage}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="beneficiary?.controls?.beneficiaryPercent?.errors?.required"
+                                            >
+                                                {{languageStrings['primary.portal.editCoverage.required']}}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="removebene">
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="isShowRemoveOption(beneficiary.controls.beneficiaryType.value)"
+                                            (click)="removeBeneficiary(i)"
+                                            class="link-danger"
+                                            >{{languageStrings['primary.portal.editCoverage.remove']}}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <mat-error
+                                *ngIf="beneficiaryFormsArray?.errors?.allocationMustBeHundred && !mustBePrimaryBeneficiaryFirst"
+                                >{{languageStrings["primary.portal.editCoverage.beneficiaryPercentError"]}}</mat-error
+                            >
+                            <mat-error *ngIf="mustBePrimaryBeneficiaryFirst"
+                                >{{languageStrings['primary.portal.editCoverage.primaryBeneficiary.validation']}}</mat-error
+                            >
+                            <a
+                                *ngIf="(beneficiaryFormsArray?.length < beneficiaryArray?.length) && !mustBePrimaryBeneficiaryFirst"
+                                href="javascript:void(0)"
+                                (click)="addAnotherBeneficiary()"
+                                >{{languageStrings['primary.portal.editCoverage.addbeneficiary']}}</a
+                            >
+                        </div>
+                        <div *ngIf="beneficiaryArray.length && beneficiaryFormsArray?.length === 0">
+                            <a href="javascript:void(0)" (click)="addFormControls()"
+                                >{{languageStrings['primary.portal.editCoverage.addbeneficiary']}}</a
+                            >
+                        </div>
+                    </div>
+                    <!--Beneficiaries end here-->
+
+                    <div class="employeecost" *ngIf="isData.Current || isData.Past">
+                        <div class="newcost">
+                            {{languageStrings['primary.portal.editCoverage.newemployeeCost']}}
+                        </div>
+                        <div class="emptotalcost">
+                            {{data.enrollData.totalCost | currency}} <span>{{data.payFrequency}}</span>
+                        </div>
+                    </div>
+                </section>
+            </ng-template>
+            <ng-template #noDataFoundTemplate>
+                <p>{{languageStrings['primary.portal.editCoverage.nocoverageFound']}}</p>
+            </ng-template>
+        </mat-dialog-content>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()"
+            >{{languageStrings['primary.portal.editCoverage.cancel']}}</a
+        >
+        <button
+            class="mon-btn-primary"
+            mat-flat-button
+            type="submit"
+            (click)="openCoverageChanging()"
+            [disabled]="isData.Past ? true : !isDataChange"
+        >
+            {{languageStrings['primary.portal.editCoverage.save']}}
+        </button>
+    </mat-dialog-actions>
+</form>

@@ -1,0 +1,31 @@
+.layout-header-2column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 0 convert-unit(30px, "rem") 0 convert-unit(20px, "rem");
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+
+        h2 {
+            font-size: convert-unit(36px, "rem");
+            @include fontFace("primary.light");
+        }
+    }
+
+    .columns {
+        display: flex;
+        flex-grow: 1;
+
+        .sidenav-area {
+            width: convert-unit(240px, "rem");
+            border-right: convert-unit(1px, "rem") solid get("color.gray.500");
+        }
+
+        .content-area {
+            flex-grow: 1;
+        }
+    }
+}

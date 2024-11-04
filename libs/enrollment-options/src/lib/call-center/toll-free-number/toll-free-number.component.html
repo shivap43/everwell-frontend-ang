@@ -1,0 +1,23 @@
+<mat-form-field class="toll-free-number-field"
+    ><input
+        matInput
+        [formControl]="formControl"
+        [maxLength]="US_TOLL_FREE_NUMBER_MAX_LENGTH"
+        empoweredPhoneNumberFormat
+        [includeDialingCode]="includeDialingCode"
+        empoweredNumberValidation
+        [allowDashes]="true"
+        (blur)="onBlur($event.target.value)"
+    />
+    <mat-error *ngIf="formControl.errors?.required"
+        ><span language="primary.portal.common.requiredField"></span
+    ></mat-error>
+    <mat-error *ngIf="formControl.errors?.pattern"
+        ><span language="primary.portal.callCenter.8x8.form.tollFreeNumber.errors.invalid"></span
+    ></mat-error>
+    <mat-error *ngIf="formControl.errors?.notFound"
+        ><span language="primary.portal.callCenter.8x8.form.tollFreeNumber.errors.notFound"></span
+    ></mat-error>
+</mat-form-field>
+
+<mat-hint>{{ hint }}</mat-hint>

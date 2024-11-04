@@ -1,0 +1,53 @@
+$generated-spacers: false;
+
+@mixin generate-spacers {
+    @if not $generated-spacers {
+        $prefix: "mon";
+        $properties: (
+            "m": margin,
+            "p": padding,
+        );
+        $sides: (
+            "t": top,
+            "b": bottom,
+            "l": left,
+            "r": right,
+            "x": (
+                left,
+                right,
+            ),
+            "y": (
+                top,
+                bottom,
+            ),
+            "": (
+                top,
+                right,
+                bottom,
+                left,
+            ),
+        );
+
+        @each $property-abbrev, $property-name in $properties {
+            @each $side-abbrev, $side-name in $sides {
+                @for $i from 0 through 32 {
+                    @if type-of($side-name) == list {
+                        .#{$prefix}-#{$property-abbrev}#{$side-abbrev}-#{$i} {
+                            @each $side in $side-name {
+                                #{$property-name}-#{$side}: $i * 0.25rem !important;
+                            }
+                        }
+                    } @else {
+                        .#{$prefix}-#{$property-abbrev}#{$side-abbrev}-#{$i} {
+                            #{$property-name}-#{$side-name}: $i * 0.25rem !important;
+                        }
+                    }
+                }
+            }
+        }
+
+        $generated-spacers: true !global;
+    }
+}
+
+@include generate-spacers;

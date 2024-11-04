@@ -1,0 +1,16 @@
+<!-- Pagination -->
+<div class="paginator-wrapper" [hidden]="(totalPages$ | async)<=1">
+    <mat-paginator
+        [pageSizeOptions]="pageSizeOption"
+        showFirstLastButtons
+        [pageIndex]="pageIndex$ | async"
+        [length]="totalItems$ | async"
+    ></mat-paginator>
+
+    <!--Form Field used to display the page index input -->
+    <mat-form-field class="paginator-input-wrapper">
+        <span language="primary.portal.common.page"></span>
+        <input class="paginator-input" [formControl]="pageNumberControl" matInput type="number" min="1" [max]="totalPages$ | async" />
+        <span language="primary.portal.common.of"></span><span class="space">{{totalPages$ | async}}</span>
+    </mat-form-field>
+</div>

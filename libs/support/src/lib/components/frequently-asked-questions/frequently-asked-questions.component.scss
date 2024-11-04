@@ -1,0 +1,102 @@
+@import "shared";
+
+.content-header {
+    margin: 0;
+    padding: convert-unit(15px, "rem") convert-unit(30px, "rem") convert-unit(17px, "rem");
+    font-weight: normal;
+    font-size: convert-unit(28px, "rem");
+    @include fontFace("primary.regular");
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    background-color: get("color.gray.100");
+    color: get("color.gray.1000");
+}
+
+.content-wrapper {
+    padding: map-get($spacers, 50) map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 30);
+    .faq-container {
+        display: flex;
+        flex-direction: row;
+        @include media-max("m") {
+            flex-wrap: wrap;
+        }
+    }
+
+    .accordion-indicator {
+        margin: 0 convert-unit(10px, "rem") 0 0;
+    }
+
+    h3 {
+        color: get("color.black");
+        font-weight: normal;
+        letter-spacing: 0;
+        margin: 0 0 convert-unit(24px, "rem");
+    }
+
+    .accordion-default {
+        ::ng-deep {
+            .mon-icon.accordion-indicator {
+                top: convert-unit(25px, "rem");
+                left: convert-unit(15px, "rem");
+            }
+
+            .mat-expansion-panel {
+                background-color: transparent;
+
+                &-header {
+                    height: auto !important;
+                    padding: convert-unit(25px, "rem") convert-unit(45px, "rem");
+                    font-size: convert-unit(16px, "rem");
+                    line-height: convert-unit(22px, "rem");
+                }
+
+                &-body {
+                    padding: 0 convert-unit(45px, "rem") convert-unit(20px, "rem");
+
+                    p {
+                        font-size: convert-unit(16px, "rem");
+                        line-height: convert-unit(22px, "rem");
+                    }
+                }
+
+                &-header-title {
+                    color: get("color.primary.500");
+                }
+
+                &.mat-expanded {
+                    background: get("color.white");
+                    border-width: 0 0 convert-unit(1px, "rem");
+
+                    &:first-of-type {
+                        border-top-width: convert-unit(1px, "rem");
+                    }
+                }
+            }
+        }
+    }
+}
+
+.faq-contact {
+    max-width: convert-unit(220px, "rem");
+    min-width: convert-unit(220px, "rem");
+
+    @include media-min("m") {
+        margin-left: map-get($spacers, 30);
+    }
+    @include media-max("m") {
+        margin-top: map-get($spacers, 30);
+    }
+    a {
+        word-break: break-word;
+    }
+    .contact-wrapper {
+        font-size: convert-unit(16px, "rem");
+        line-height: convert-unit(22px, "rem");
+        margin-bottom: convert-unit(19px, "rem");
+    }
+
+    .contact-label {
+        @include fontFace("primary.bold");
+        line-height: convert-unit(22px, "rem");
+        margin-bottom: convert-unit(5px, "rem");
+    }
+}

@@ -1,0 +1,178 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+
+<div class="dialog-content">
+    <div class="mon-px-30">
+        <h2 class="find-policyholder-content">
+            {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.changeAffectPolicy"]}}
+        </h2>
+        <ul *ngIf="policies && policies.length > 0">
+            <li *ngFor="let policy of policies">
+                <span *ngIf="policy.policyName">{{policy.policyName}}</span>
+            </li>
+        </ul>
+        <span class="find-policyholder-content" *ngIf="!noPolicyError"
+            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.noPolicy"]}}</span
+        >
+        <div class="find-policyholder-content">
+            <form
+                (ngSubmit)="onSubmit(affectedPoliciesForm.value,affectedPoliciesForm.valid)"
+                (keydown.enter)="$event.preventDefault()"
+                novalidate
+                [formGroup]="affectedPoliciesForm"
+            >
+                <div class="flex-form-wrapper">
+                    <h4>
+                        {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.importPolicy"]}}
+                        <span class="optional-text">{{languageStrings["primary.portal.common.optional"]}}</span>
+                    </h4>
+                    <div class="flex-form-item">
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.firstName"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="firstName"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="true"
+                                            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.firstName']"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.lastName"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="lastName"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="true"
+                                            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.lastName']"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.birthDate"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [matDatepicker]="picker"
+                                            formControlName="birthDate"
+                                            [max]="maxDate"
+                                            matInput
+                                            (keyup)="transform($event)"
+                                            readonly
+                                            disabled
+                                            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.birthDate']"
+                                        />
+
+                                        <mat-datepicker-toggle matSuffix [for]="picker">
+                                            <mon-icon
+                                                matDatepickerToggleIcon
+                                                class="calendar-icon"
+                                                iconName="calendar-date"
+                                                (click)="picker.open()"
+                                            ></mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div>
+                            <ng-container>
+                                <div>
+                                    <mat-label class="mat-label d-flex">
+                                        <span
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.policyNumber"]}}</span
+                                        >
+                                    </mat-label>
+                                </div>
+                                <div class="d-flex">
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="policyNumber"
+                                            class="mon-input"
+                                            matInput
+                                            [maxlength]="maxlength"
+                                            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.policyNumber']"
+                                        />
+                                        <mat-error *ngIf="affectedPoliciesForm.get('policyNumber').hasError('required')"
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.requiredField"]}}</mat-error
+                                        >
+                                        <mat-error *ngIf="affectedPoliciesForm.get('policyNumber').hasError('pattern')"
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.allowedEntry"]}}</mat-error
+                                        >
+                                        <mat-error
+                                            *ngIf="affectedPoliciesForm.get('policyNumber').hasError('noPolicyFound')"
+                                            >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.policyNotFound"]}}</mat-error
+                                        >
+                                    </mat-form-field>
+                                    <ng-container>
+                                        <button
+                                            mat-flat-button
+                                            class="mon-btn-search mon-btn-primary"
+                                            type="submit"
+                                            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.import']"
+                                        >
+                                            {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.import"]}}
+                                        </button>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="mon-mt-30">
+            <mon-alert alertType="danger" *ngIf="showErrorMessageEmptyPolicy">
+                <span>{{ errorMessageOnNextClick }}</span>
+            </mon-alert>
+        </div>
+        <div class="mon-mt-30">
+            <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+        </div>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <div>
+        <button
+            class="mon-btn-link"
+            [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.cancel']"
+            (click)="onCancel()"
+            mat-flat-button
+        >
+            <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.cancel"]}}</span>
+        </button>
+    </div>
+    <button
+        type="submit"
+        class="btn-right mon-btn-primary"
+        (click)="onNext()"
+        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.next']"
+        mat-flat-button
+    >
+        <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.affectedPolicies.next"]}}</span>
+    </button>
+</div>
+<div class="app-overlay-container"></div>

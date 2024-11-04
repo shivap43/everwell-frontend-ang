@@ -1,0 +1,145 @@
+<div class="info-modal size-medium" [hidden]="!displayPlanDetails">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeDialog()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div [formGroup]="form">
+        <div class="plan-detail-header">
+            <mat-label
+                class="mat-label"
+                *ngIf="data.isRider; else nonRiderLabel"
+                language="primary.portal.benefitsOffering.filterRiders"
+            ></mat-label>
+            <ng-template #nonRiderLabel>
+                <mat-label class="mat-label" language="primary.portal.planDetails.title"></mat-label>
+            </ng-template>
+            <h1 mat-dialog-title class="plan-header" [innerHTML]="data.planName"></h1>
+        </div>
+        <div class="plan-details-wrapper">
+            <form [formGroup]="form">
+                <div class="share-plan-documents" *ngIf="this.data.planOfferingId">
+                    <mon-icon iconName="email" iconSize="20" class="icon-black email-icon"></mon-icon>
+                    <a (click)="shareResource()">{{languageStringArray['primary.portal.planDetails.shareResources']}}</a>
+                </div>
+                <mat-label class="mat-label" *ngIf="data.states.length>1" language="primary.portal.planDetails.state"></mat-label>
+                <mat-form-field *ngIf="data.states.length>1" class="w-200">
+                    <mat-select
+                        formControlName="defaultState"
+                        (selectionChange)="getDocuments($event.value)"
+                        disableOptionCentering="true"
+                        [placeholder]="languageStrings.select"
+                    >
+                        <mat-option *ngFor="let state of data.states" [value]="state.abbreviation"> {{ state.abbreviation }} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </form>
+
+            <div *ngIf="planVideos.length===0 && planDocuments.length===0 && planDetails">
+                <mat-label class="mat-label mon-mb-0" language="primary.portal.planDetails.details"> </mat-label>
+                <div class="plan-description" [innerHTML]="planDescription"></div>
+                <ul *ngIf="data.displayRestrictions" class="details-tab">
+                    <li *ngIf="ageRestrictionMessage">{{ ageRestrictionMessage }}</li>
+                    <li *ngIf="validityMessage">{{ validityMessage }}</li>
+                    <li *ngIf="eligibleSubscriberMessage">{{ eligibleSubscriberMessage }}</li>
+                    <li *ngIf="basePremiumMessage">{{ basePremiumMessage }}</li>
+                </ul>
+            </div>
+            <mat-tab-group
+                [ngClass]="{'plan-details-empty' : planVideos.length===0 && planDocuments.length===0}"
+                animationDuration="0ms"
+                class="plan-details"
+            >
+                <mat-tab *ngIf="planVideos.length>0||planDocuments.length>0" [label]="languageStrings.details">
+                    <div *ngIf="planDetails">
+                        <div class="plan-description" [innerHTML]="planDescription"></div>
+                        <div *ngIf="deltaDentalPlanDetails.length>0">
+                            <div *ngFor="let detail of deltaDentalPlanDetails" class="coverage-details">
+                                <p class="coverage-name">{{detail.coverageDetailDisplayName}}</p>
+                                <p class="coverage-value">{{detail.coverageDetailDisplayValue}}</p>
+                            </div>
+                        </div>
+                        <ul *ngIf="data.displayRestrictions" class="details-tab">
+                            <li *ngIf="ageRestrictionMessage">{{ ageRestrictionMessage }}</li>
+                            <li *ngIf="validityMessage">{{ validityMessage }}</li>
+                            <li *ngIf="eligibleSubscriberMessage">{{ eligibleSubscriberMessage }}</li>
+                            <li *ngIf="basePremiumMessage">{{ basePremiumMessage }}</li>
+                        </ul>
+                    </div>
+                </mat-tab>
+
+                <mat-tab [label]="languageStrings.document" *ngIf="planDocuments.length>0">
+                    <div *ngFor="let document of planDocuments" class="mon-mt-20">
+                        <div class="d-flex mon-mb-20">
+                            <div class="mon-mr-5">
+                                <mon-icon iconName="file" iconSize="32" class="email-icon icon-black"></mon-icon>
+                            </div>
+                            <div *ngIf="!document.documentId">
+                                <a
+                                    [href]="safeURL(document.location)"
+                                    download="File.pdf"
+                                    target="_blank"
+                                    [attr.aria-label]="languageStrings.viewDocument + ' ' + this.document.name +  this.document.type "
+                                >
+                                    {{document.name}}
+                                </a>
+                            </div>
+                            <div *ngIf="document.documentId">
+                                <a
+                                    (click)="viewFile(document)"
+                                    [attr.aria-label]="languageStrings.viewDocument + ' ' + this.document.name +  this.document.type "
+                                >
+                                    {{document.name}}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab *ngIf="planVideos.length > 0" [label]="languageStrings.videos">
+                    <div class="mon-my-20">
+                        <iframe
+                            [src]="videoURL"
+                            allowfullscreen
+                            *ngIf="videoURL !== undefined"
+                            class="video-frame"
+                            title="{{videoName | titlecase}}"
+                        ></iframe>
+                    </div>
+                    <div *ngFor="let video of planVideos, let i=index" class="d-flex mon-mb-20">
+                        <div class="mon-mr-5">
+                            <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                        </div>
+                        <div>
+                            <mat-label [ngClass]="{'mat-label text-primary' : presentVideo!==i}">{{video.name | titlecase }}</mat-label>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="playVideo(i,video.location,video.name)"
+                                [ngClass]="{'hidden' : presentVideo===i}"
+                                language="primary.portal.planDetails.viewVideo"
+                                [attr.aria-label]="languageStrings.viewDocument + ' ' + this.video.name +  this.video.type"
+                            ></a>
+                            <p
+                                class="now-playing"
+                                [ngClass]="{'hidden' : presentVideo!==i}"
+                                language="primary.portal.planDetails.nowPlaying"
+                            ></p>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab *ngIf="carrierLinks.length > 0" [label]="languageStrings.links">
+                    <div *ngFor="let link of carrierLinks" class="mon-mt-20">
+                        <div class="d-flex mon-mb-20">
+                            <div class="mon-mr-5">
+                                <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                            </div>
+                            <div>
+                                <a href="{{link.website.link}}" target="_blank"> {{link.website.link}} </a>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>

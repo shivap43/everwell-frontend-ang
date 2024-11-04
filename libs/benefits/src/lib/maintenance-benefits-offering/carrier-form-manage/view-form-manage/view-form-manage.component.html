@@ -1,0 +1,24 @@
+<div class="info-modal size-extra-large">
+    <div class="modal-header">
+        <button mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']" (click)="close()" tabindex="-1">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title>{{documentTitle}}</h1>
+        <mon-alert alertType="danger" *ngIf="errorMessage" class="message-block">
+            <span>{{ errorMessage }}</span>
+        </mon-alert>
+        <div *ngIf="url" class="pdf-viewer">
+            <iframe id="documentFrame" [src]="url" name="targetframe" title="targetframe" class="carrier-form"> </iframe>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button mat-button type="button" class="mon-btn-primary" (click)="close()">
+            {{languageStrings["primary.portal.common.close"]}}
+        </button>
+    </mat-dialog-actions>
+    <ng-template [ngIf]="isLoading">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+</div>

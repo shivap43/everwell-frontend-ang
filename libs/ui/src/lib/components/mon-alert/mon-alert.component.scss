@@ -1,0 +1,133 @@
+@import "shared";
+
+$min-height: 30px;
+$border-radius: convert-unit(4px, "rem");
+$border-width-px: 1px;
+
+$icon-size-px: 20px;
+$icon-margin-px: 5px;
+
+$text-vertical-margin: 5px;
+$text-horizontal-margin: 10px;
+
+$close-icon-size-px: 10px;
+$close-icon-padding-px: 10px;
+
+$font-size: convert-unit(14px, "rem");
+$line-height: convert-unit(18px, "rem");
+
+mon-icon {
+    display: block;
+}
+
+:host {
+    display: block;
+    min-height: $min-height;
+    line-height: $line-height;
+    font-size: $font-size;
+
+    .alert-prefix {
+        // min-width is used to maintain width when middle content wraps and tries to shrink prefix icon
+        min-width: convert-unit($icon-size-px + $icon-margin-px * 2 - $border-width-px, "rem");
+        width: convert-unit($icon-size-px + $icon-margin-px * 2 - $border-width-px, "rem");
+
+        mon-icon {
+            height: convert-unit($icon-size-px, "rem");
+            width: convert-unit($icon-size-px, "rem");
+            line-height: convert-unit($icon-size-px, "rem");
+
+            margin: convert-unit($icon-margin-px - $border-width-px, "rem");
+            margin-right: convert-unit($icon-margin-px, "rem");
+        }
+
+        // Used to properly fill svg icon white since their path elements have .cls-1 class
+        ::ng-deep .mat-icon {
+            fill: get("color.white");
+            .cls-1 {
+                fill: get("color.white");
+            }
+        }
+    }
+}
+
+:host.closed {
+    display: none;
+}
+
+@mixin get-alert-color($color) {
+    border-color: $color;
+
+    .alert-prefix {
+        background-color: $color;
+    }
+}
+
+.mon-alert {
+    border-radius: $border-radius;
+    border-style: solid;
+    border-width: convert-unit($border-width-px, "rem");
+
+    display: flex;
+    align-content: space-between;
+    @include get-alert-color(get("color.primary.500"));
+
+    &.alert-danger {
+        @include get-alert-color(get("color.info.danger.500"));
+    }
+
+    &.alert-success {
+        @include get-alert-color(get("color.info.success"));
+    }
+
+    &.alert-warning {
+        @include get-alert-color(get("color.info.warn"));
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+
+        padding: $text-vertical-margin $text-horizontal-margin;
+    }
+
+    // Remove padding on the right since close button's padding will exist
+    // It's better to have the button take up that space so it's easier to click for accessibility
+    &.has-close-button {
+        .alert-content {
+            padding-right: 0;
+        }
+    }
+
+    // Anchor tags require to have their styles overridden
+    a.mon-btn-link {
+        font-size: $font-size;
+        line-height: $line-height;
+    }
+
+    .alert-suffix {
+        line-height: convert-unit($close-icon-size-px, "rem");
+        fill: get("color.white");
+
+        button {
+            line-height: inherit;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            // min-width is used to maintain width when middle content wraps and tries to shrink suffix icon
+            min-width: convert-unit($close-icon-size-px + $close-icon-padding-px * 2 - $border-width-px, "rem");
+            width: convert-unit($close-icon-size-px + $close-icon-padding-px * 2 - $border-width-px, "rem");
+            height: convert-unit($close-icon-size-px + $close-icon-padding-px * 2 - $border-width-px * 2, "rem");
+
+            mon-icon {
+                height: convert-unit($close-icon-size-px, "rem");
+                width: convert-unit($close-icon-size-px, "rem");
+
+                margin: convert-unit($close-icon-padding-px - $border-width-px * 2, "rem");
+                margin-left: convert-unit($close-icon-padding-px, "rem");
+            }
+        }
+    }
+}

@@ -1,0 +1,109 @@
+@import "shared";
+
+$tooltipBoxShadow: 0px 0px convert-unit(3px, "rem") get("color.gray.600");
+
+.rich-tooltip {
+    background: get("color.white");
+    color: get("color.black");
+    padding: convert-unit(10px, "rem");
+    font-size: convert-unit(14px, "rem");
+    min-width: convert-unit(120px, "rem");
+    max-width: convert-unit(450px, "rem");
+    box-shadow: $tooltipBoxShadow;
+    overflow: unset;
+    position: relative;
+    white-space: pre-line;
+    border-radius: convert-unit(4px, "rem");
+    margin: 0;
+
+    &:hover {
+        visibility: visible;
+    }
+
+    .pointer-arrow {
+        position: absolute;
+        width: convert-unit(12px, "rem");
+        height: convert-unit(12px, "rem");
+        transform: rotate(45deg);
+        background-color: get("color.white");
+        box-shadow: $tooltipBoxShadow;
+
+        &::after {
+            content: "";
+            position: absolute;
+            height: 175%;
+            width: 100%;
+            background-color: get("color.white");
+            top: convert-unit(-8px, "rem");
+            left: convert-unit(-5px, "rem");
+            z-index: 1;
+            transform: rotate(45deg);
+        }
+    }
+
+    &.placed-top-right {
+        .pointer-arrow {
+            top: auto;
+            left: auto;
+            right: convert-unit(20px, "rem");
+            bottom: convert-unit(-6px, "rem");
+            border-top: none;
+            border-left: none;
+        }
+    }
+
+    &.placed-bottom-right {
+        .pointer-arrow {
+            top: convert-unit(-6px, "rem");
+            left: auto;
+            right: convert-unit(20px, "rem");
+            bottom: auto;
+            border-bottom: none;
+            border-right: none;
+            transform: rotate(-135deg);
+        }
+    }
+
+    &.placed-top-left {
+        .pointer-arrow {
+            top: convert-unit(-6px, "rem");
+            left: convert-unit(20px, "rem");
+            right: auto;
+            bottom: auto;
+            border-top: none;
+            border-left: none;
+        }
+    }
+
+    &.placed-bottom-left {
+        .pointer-arrow {
+            top: auto;
+            left: convert-unit(20px, "rem");
+            right: auto;
+            bottom: convert-unit(-6px, "rem");
+            border-bottom: none;
+            border-right: none;
+            transform: rotate(-135deg);
+        }
+    }
+
+    &.tooltip-wrapper {
+        max-height: convert-unit(400px, "rem");
+        max-width: convert-unit(600px, "rem");
+
+        .message-container {
+            display: flex;
+            flex-flow: row wrap;
+
+            ::ng-deep div {
+                width: convert-unit(140px, "rem");
+            }
+        }
+    }
+
+    .message-container {
+        img {
+            vertical-align: text-bottom;
+        }
+    }
+}

@@ -1,0 +1,61 @@
+<div class="layout-header-2column">
+    <div class="header">
+        <h2 class="header-content">
+            <div>
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPricingQuasi.planNameCoverageDates']}}</mat-label
+                >
+                <span mat-dialog-title
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPricingQuasi.editPricesEligibility']}}</span
+                >
+            </div>
+            <button
+                mat-icon-button
+                (click)="alertModal()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </h2>
+    </div>
+    <div class="columns">
+        <div class="sidenav-area">
+            <mat-vertical-stepper
+                #progressIndicator
+                (selectionChange)="onStepChange($event)"
+                class="side-nav-stepper"
+                [linear]="true"
+            >
+                <mat-step>
+                    <ng-template matStepLabel>
+                        <span
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPricingQuasi.effectiveDate']}}</span
+                        >
+                    </ng-template>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>
+                        <span
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPricingQuasi.copySettings']}}</span
+                        >
+                    </ng-template>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>
+                        <span
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editPricingQuasi.setPrices']}}</span
+                        >
+                    </ng-template>
+                </mat-step>
+                <ng-template matStepperIcon="done">
+                    <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                </ng-template>
+            </mat-vertical-stepper>
+        </div>
+        <div class="content-area">
+            <empowered-effective-date-quasi *ngIf="step===1" class="quasi-modal"></empowered-effective-date-quasi>
+            <empowered-copy-settings-quasi *ngIf="step===2" class="quasi-modal"></empowered-copy-settings-quasi>
+            <empowered-price-eligibility-quasi *ngIf="step===3" class="quasi-modal"></empowered-price-eligibility-quasi>
+        </div>
+    </div>
+</div>

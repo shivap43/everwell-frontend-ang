@@ -1,0 +1,97 @@
+@import "shared";
+h2 {
+    margin-left: convert-unit(-15px, "rem");
+    @include fontFace("secondary.light");
+    font-weight: 300;
+    color: get("color.black");
+}
+.plan-price {
+    width: convert-unit(680px, "rem");
+    margin-top: convert-unit(20px, "rem");
+    p {
+        font-size: convert-unit(22px, "rem");
+        margin-bottom: convert-unit(2px, "rem");
+    }
+    span {
+        color: get("color.gray.700");
+        font-size: convert-unit(12px, "rem");
+    }
+}
+.plan-price-monthly {
+    margin-top: convert-unit(20px, "rem");
+    text-align: end;
+    p {
+        font-size: convert-unit(22px, "rem");
+        margin-bottom: convert-unit(2px, "rem");
+    }
+    span {
+        color: get("color.gray.700");
+        font-size: convert-unit(16px, "rem");
+    }
+}
+.plan-end {
+    margin: convert-unit(40px, "rem") convert-unit(-15px, "rem") 0 convert-unit(-15px, "rem");
+}
+.tick-icon {
+    ::ng-deep .mat-icon.mat-primary {
+        color: get("color.white");
+        .cls-1 {
+            fill: get("color.white");
+        }
+    }
+}
+.coverage-head {
+    &.active {
+        .plan-icon {
+            ::ng-deep.mat-icon.mat-primary {
+                color: get("color.white");
+                .cls-1 {
+                    fill: get("color.white");
+                }
+            }
+        }
+    }
+}
+.font-red {
+    color: get("color.info.danger.500") !important;
+}
+.cart-button {
+    display: flex;
+    justify-content: flex-end;
+    margin: convert-unit(30px, "rem") convert-unit(-15px, "rem") 0 convert-unit(-15px, "rem");
+}
+.plan-description {
+    margin-bottom: convert-unit(19px, "rem");
+    h2 {
+        margin-bottom: 0;
+    }
+    .plan-description-texts {
+        margin-top: convert-unit(10px, "rem");
+        margin-left: convert-unit(-15px, "rem");
+        color: get("color.gray.700");
+        max-width: convert-unit(580px, "rem");
+    }
+}
+
+.hsa-plan-row {
+    margin: 0 convert-unit(-15px, "rem");
+    .has-currency::ng-deep {
+        .mat-form-field-flex {
+            &:before {
+                content: "$";
+            }
+        }
+    }
+    .contribution-field {
+        width: convert-unit(200px, "rem");
+    }
+}
+.juvenile-plan {
+    padding-bottom: map-get($spacers, 10);
+    h2 {
+        margin-bottom: map-get($spacers, 20);
+    }
+    .dependent-age {
+        width: convert-unit(100px, "rem");
+    }
+}

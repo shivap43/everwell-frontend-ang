@@ -1,0 +1,328 @@
+<div class="settings-page-wrapper">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+    <mon-alert *ngIf="saveError" alertType="danger" class="mon-alert">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+    <div class="mon-mb-30 refresh-alert" *ngIf="isRefreshInProgress">
+        <mon-alert alertType="warning" closeButton="true">
+            <span language="primary.portal.benefitsOffering.warningMsg.refresh.inProgress"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30 refresh-alert" *ngIf="isSuccess">
+        <mon-alert alertType="success" closeButton="true">
+            <span language="primary.portal.benefitsOffering.successMsg.refresh.success"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30 refresh-alert" *ngIf="isServerError">
+        <mon-alert alertType="danger" closeButton="true">
+            <span language="primary.portal.benefitsOffering.errorMsg.refresh.serviceError"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30 refresh-alert" *ngIf="!validZip">
+        <mon-alert alertType="danger">
+            <span language="primary.portal.benefitsOffering.setting.invalidZipCode"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30 refresh-alert" *ngIf="isAccountRefreshFailure">
+        <mon-alert alertType="danger" closeButton="true">
+            <span language="primary.portal.benefitsOffering.errorMsg.refresh.accountRefreshFailure"></span>
+        </mon-alert>
+    </div>
+    <fieldset>
+        <legend class="sr-only">{{languageStrings['primary.portal.sidenav.settings']}}</legend>
+        <form [formGroup]="form" (ngSubmit)="onNext()">
+            <div class="update-settings-form">
+                <h2 class="mon-mb-0">{{languageStrings['primary.portal.benefitsOffering.setting.title']}}</h2>
+                <span language="primary.portal.benefitsOffering.setting.firstSubtitle"></span>
+                <span *ngIf="hasCensusUploadPermission">
+                    <a href="javascript:void(0)" (click)="navigateCensus()">
+                        {{languageStrings['primary.portal.benefitsOffering.setting.censusAnchor']}}
+                    </a>
+                </span>
+                <span *ngIf="!hasCensusUploadPermission" language="primary.portal.benefitsOffering.setting.censusAnchor"></span>
+                <span language="primary.portal.benefitsOffering.setting.middleSubtitle"></span>
+                <a class="display-inline-block" href="javascript:void(0)" (click)="navigateCommission()">
+                    {{languageStrings['primary.portal.benefitsOffering.setting.co-enrollersAnchor']}}
+                </a>
+                <span language="primary.portal.benefitsOffering.setting.endSubtitle"></span>
+                <ul>
+                    <li>
+                        <h3 class="mon-mt-40 mon-mb-5">{{languageStrings['primary.portal.benefitsOffering.setting.firstQuery']}}</h3>
+                    </li>
+                    <p class="mon-mb-20" language="primary.portal.benefitsOffering.setting.firstQueryTitle"></p>
+                    <label for="states">{{languageStrings['primary.portal.benefitsOffering.filterStates']}}</label>
+                    <div class="row">
+                        <div class="state-wrapper col-xs-12 col-sm-6 col-md-6">
+                            <mat-form-field class="state-input" (click)="input.focus()">
+                                <mat-chip-list #chipList aria-label="State selection" formControlName="stateControl">
+                                    <mat-chip
+                                        *ngFor="let state of statesList"
+                                        [removable]="!isSitusState(state)"
+                                        (removed)="addRemoveState(state)"
+                                    >
+                                        {{state}}
+                                        <a href="javascript:void(0)" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                                            <mon-icon iconSize="10" iconName="close" class="icon-close" matChipRemove></mon-icon>
+                                        </a>
+                                    </mat-chip>
+                                    <input
+                                        type="text"
+                                        matInput
+                                        [matAutocomplete]="auto"
+                                        #input
+                                        formControlName="stateControl"
+                                        [matChipInputFor]="chipList"
+                                        aria-label="search for state"
+                                        (blur)="removeText()"
+                                    />
+                                </mat-chip-list>
+                                <a
+                                    href="javascript:void(0)"
+                                    (click)="removeAllStates();"
+                                    matSuffix
+                                    [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                >
+                                    <mon-icon iconSize="10" iconName="close" class="mon-mr-10" *ngIf="statesList.length"> </mon-icon>
+                                </a>
+
+                                <mat-error *ngIf=" form.controls['stateControl'].errors?.requirement " [language]="getErrorState()">
+                                </mat-error>
+                                <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption>
+                                    <mat-option [ngClass]="isChecked? 'selected-state' : ''" *ngIf="!input.value.length">
+                                        <div *ngIf="!isSitusNY" (click)="selectAll(); $event.stopPropagation()">
+                                            <span language="primary.portal.benefitsOffering.setting.selectAll"></span>
+                                        </div>
+                                    </mat-option>
+                                    <mat-option
+                                        [ngClass]="isStateSelected(state.name)? 'selected-state' : ''"
+                                        *ngFor="let state of filteredState | async "
+                                    >
+                                        <div (click)="addRemoveState(state.name); $event.stopPropagation(); input.value=''">
+                                            <span>{{state.name}}</span>
+                                        </div>
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div>
+                        <li>
+                            <h3 language="primary.portal.benefitsOffering.setting.secondQuery.heading"></h3>
+                        </li>
+                        <span
+                            class="secondQuery-subHeading"
+                            language="primary.portal.benefitsOffering.setting.secondQuery.subHeading"
+                        ></span>
+                    </div>
+                    <div class="employee-count-row row">
+                        <div class="employee-count">
+                            <div class="min-eligible-employee-input-label">
+                                <label for="employee count" language="primary.portal.benefitsOffering.estimated.eligible.employee"></label>
+                            </div>
+                            <mat-form-field class="eligible-input">
+                                <input
+                                    matInput
+                                    type="text"
+                                    (input)="employeeCountChanged($event.target.value)"
+                                    formControlName="eligibleEmp"
+                                    aria-label="Eligible employees"
+                                    maxlength="6"
+                                />
+                                <mat-error [language]="getEmployeeError()"></mat-error>
+                                <mat-hint *ngIf="minEmployees && ((hasThirdPartyPlatforms$ | async) === false)">
+                                    {{ minEligibleEmpMsg}}
+                                </mat-hint>
+                            </mat-form-field>
+                        </div>
+                        <div class="employee-count">
+                            <div class="min-eligible-employee-input-label">
+                                <label
+                                    for="eligible employee count"
+                                    language="primary.portal.benefitsOffering.estimated.eligible.employee.for.aflac.DentalVision"
+                                ></label>
+                                <span class="edit-button" (click)="openArgusDialogOnEdit()" [ngClass]="{'disabled-apply': disableEditLink}"
+                                    ><a language="primary.portal.common.edit"></a
+                                ></span>
+                            </div>
+                            <mat-form-field class="eligible-input">
+                                <input
+                                    matInput
+                                    type="text"
+                                    (input)="employeeADVCountChanged($event.target.value)"
+                                    formControlName="eligibleADVEmp"
+                                    aria-label="Eligible ADV employees"
+                                    maxlength="6"
+                                    [disabled]="true"
+                                />
+                                <mat-hint *ngIf="minArgusEmployeesCheck"> {{ minEligibleADVEmpMsg}} </mat-hint>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ul>
+
+                <ng-container *configEnabled="'general.feature.enable.benefit_offering.tpp_questionaire'">
+                    <ng-container *hasPermission="'core.account.create.enrollmentPlatform'">
+                        <ng-container *ngIf="(hasThirdPartyPlatforms$ | async) === false">
+                            <div>
+                                <ul>
+                                    <li>
+                                        <h3>{{languageStrings['primary.portal.benefitOffering.settings.enrollmentThirdPartyPlatform']}}</h3>
+                                    </li>
+                                </ul>
+                                <p>
+                                    {{languageStrings['primary.portal.benefitOffering.settings.enrollmentThirdPartyPlatformAnswer']}}
+                                    <a href="javascript:void(0)" (click)="navigateToAddThirdParty()"
+                                        >{{languageStrings['primary.portal.benefitOffering.settings.thirdPartyPlatformAccountProfile']}}</a
+                                    >
+                                </p>
+                            </div>
+                            <div class="third-party-container">
+                                <mat-checkbox formControlName="isThirdPartyPlatformRequired"
+                                    >{{languageStrings['primary.portal.benefitOffering.settings.enrollmentThirdPartyPlatformYes']}}</mat-checkbox
+                                >
+                                <mon-alert
+                                    class="message-block"
+                                    alertType="warning"
+                                    *ngIf="this.form.controls.isThirdPartyPlatformRequired.value"
+                                >
+                                    <span
+                                        >{{languageStrings['primary.portal.benefitOffering.settings.futureThirdPartyPlatform']}}
+                                        <a href="javascript:void(0)" (click)="navigateToAddThirdParty()"
+                                            >{{languageStrings['primary.portal.benefitOffering.settings.thirdPartyPlatformAccountProfile']}}</a
+                                        ></span
+                                    >
+                                </mon-alert>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+            <!-- First popup -->
+            <div>
+                <ng-template #censusTemplate>
+                    <div class="info-modal">
+                        <div class="modal-header">
+                            <button
+                                mat-icon-button
+                                (click)="closeModal()"
+                                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                            >
+                                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                            </button>
+                        </div>
+                        <div mat-dialog-content>
+                            <h2 mat-dialog-title>{{languageStrings['primary.portal.benefitsOffering.setting.censusModal.title']}}</h2>
+                            <p class="mon-pt-0" language="primary.portal.benefitsOffering.setting.censusModal.subTitle"></p>
+
+                            <div class="mon-pt-15">
+                                <div>
+                                    <mat-label
+                                        class="mat-label state-names"
+                                        language="primary.portal.benefitsOffering.setting.censusModal.addState"
+                                    ></mat-label>
+                                    <div>
+                                        <span *ngFor="let state of addStates; let i = index" aria-label="search for state"
+                                            >{{state}}{{i === addStates.length-1 ? '' : ', '}}</span
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="mon-pt-20">
+                                    <mat-label
+                                        class="mat-label state-names"
+                                        language="primary.portal.benefitsOffering.setting.censusModal.removeState"
+                                    >
+                                    </mat-label>
+                                    <div>
+                                        <span *ngFor="let state of removeStates; let i = index" aria-label="remove for state"
+                                            >{{state}}{{i === removeStates.length-1 ? '' : ', '}}</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="mon-pt-20">
+                                    <mat-label
+                                        class="mat-label state-names"
+                                        language="primary.portal.benefitsOffering.setting.censusModal.eligibleEmployees"
+                                    >
+                                    </mat-label>
+                                    <div><span>{{censusData.count}}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between mon-py-25">
+                            <button class="mon-btn-link popup-btn-update" mat-flat-button (click)="closeModal()">
+                                {{languageStrings['primary.portal.benefitsOffering.setting.censusModal.dontUpdate']}}
+                            </button>
+                            <button class="mon-btn-primary popup-btn-next" mat-flat-button (click)="updateStates()">
+                                {{languageStrings['primary.portal.benefitsOffering.setting.censusModal.update']}}
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+            <!-- First popup -->
+            <!-- Second popup -->
+            <div>
+                <ng-template #licensedTemplate>
+                    <div class="info-modal">
+                        <div class="modal-header">
+                            <button
+                                mat-icon-button
+                                (click)="closeModal()"
+                                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                            >
+                                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                            </button>
+                        </div>
+
+                        <div mat-dialog-content>
+                            <h2 mat-dialog-title>{{languageStrings['primary.portal.benefitsOffering.setting.licensedModal.title']}}</h2>
+                            <div class="settings-wrap">
+                                <div language="primary.portal.benefitsOffering.setting.licensedModal.startSubTitle"></div>
+
+                                <div class="states-list" *ngFor="let states of notLicensedStates; let i = index">
+                                    {{states}}{{i === notLicensedStates.length -1 ? '' : '/'}}
+                                </div>
+
+                                <span language="primary.portal.benefitsOffering.setting.licensedModal.middleSubtitle"></span>
+                                <span language="primary.portal.benefitsOffering.setting.licensedModal.endSubtitle"></span>
+                                <span
+                                    *ngIf="notLicensedStates.length < 2"
+                                    language="primary.portal.benefitsOffering.setting.licensedModal.oneState"
+                                ></span>
+                                <span
+                                    *ngIf="notLicensedStates.length > 1"
+                                    language="primary.portal.benefitsOffering.setting.licensedModal.manyState"
+                                ></span>
+                            </div>
+                        </div>
+                        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between mon-py-25">
+                            <button class="mon-btn-link popup-btn-update" mat-flat-button (click)="closeModal()">
+                                {{languageStrings['primary.portal.common.back']}}
+                            </button>
+                            <button class="mon-btn-primary popup-btn-next" mat-flat-button (click)="nextStep()">
+                                {{languageStrings['primary.portal.benefitsOffering.setting.licensedModal.gotIt']}}
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+            <!-- Second popup -->
+            <div class="divider mon-mb-10"></div>
+
+            <div class="text-right mon-py-20">
+                <button
+                    class="btn-right mon-btn-primary mon-mr-30"
+                    [disabled]="isAccountDeactivated || !validZip"
+                    type="submit"
+                    mat-flat-button
+                >
+                    <span>{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                </button>
+            </div>
+        </form>
+    </fieldset>
+</div>
+
+<div class="app-overlay-container"></div>

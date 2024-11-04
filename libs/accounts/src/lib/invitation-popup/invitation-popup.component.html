@@ -1,0 +1,46 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h2 mat-dialog-title>{{title}}</h2>
+        <p>{{message}}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <div>
+            <button
+                (click)="closePopup()"
+                [mat-dialog-close]="true"
+                mat-button
+                class="mon-btn-link"
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            >
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+        </div>
+        <div>
+            <button
+                (click)="invitationAction(false)"
+                mat-flat-button
+                class="mon-btn-danger"
+                [attr.aria-label]="languageStrings['primary.portal.common.reject']"
+            >
+                {{languageStrings['primary.portal.common.reject']}}
+            </button>
+            <button
+                (click)="invitationAction(true)"
+                mat-flat-button
+                class="mon-btn-primary"
+                [attr.aria-label]="languageStrings['primary.portal.common.accept']"
+            >
+                {{languageStrings['primary.portal.common.accept']}}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

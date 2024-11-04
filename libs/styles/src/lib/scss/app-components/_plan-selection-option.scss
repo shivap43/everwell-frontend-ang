@@ -1,0 +1,83 @@
+.plan-card {
+    border-radius: 0;
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    width: convert-unit(190px, "rem");
+    box-shadow: none;
+    margin: 0 convert-unit(20px, "rem") convert-unit(20px, "rem") 0;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    height: calc(100% - 20px);
+    &:hover {
+        box-shadow: 0px 0px convert-unit(6px, "rem") 0px rgba(0, 0, 0, 0.25);
+    }
+    .coverage-head {
+        height: 100%;
+        color: get("color.gray.700");
+        text-align: center;
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+        p {
+            @include fontFace("primary.bold");
+            color: get("color.gray.700");
+            line-height: initial;
+            text-align: center;
+            padding: 0 convert-unit(10px, "rem") convert-unit(10px, "rem") convert-unit(10px, "rem");
+            white-space: normal;
+        }
+        &.active {
+            background: get("color.primary.500");
+            color: get("color.white");
+            p {
+                color: get("color.white");
+            }
+        }
+    }
+    .hsa-fsa {
+        border-bottom: none;
+    }
+    .benefit-amount,
+    .elimination-period {
+        height: 100%;
+        p {
+            margin: 0;
+            padding: 0 convert-unit(10px, "rem");
+            font-size: convert-unit(36px, "rem");
+            @include fontFace("secondary.regular");
+            font-weight: 300;
+        }
+    }
+    div {
+        height: convert-unit(45px, "rem");
+        margin: 0;
+        text-align: center;
+
+        p {
+            padding: convert-unit(10px, "rem");
+        }
+    }
+}
+.elimination-card {
+    width: convert-unit(150px, "rem");
+}
+.plan-select,
+.rider-elimination-coverage {
+    margin-bottom: convert-unit(20px, "rem");
+    .mat-form-field {
+        margin-bottom: convert-unit(10px, "rem");
+    }
+    p {
+        color: get("color.gray.700");
+    }
+}
+.rider-elimination-coverage {
+    margin-left: convert-unit(40px, "rem");
+}
+.plan-selection-radio {
+    .mat-radio-container {
+        position: absolute;
+        opacity: 0;
+    }
+    .mat-radio-label-content {
+        padding-left: 0;
+    }
+}

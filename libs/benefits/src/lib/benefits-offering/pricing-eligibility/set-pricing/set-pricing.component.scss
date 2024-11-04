@@ -1,0 +1,236 @@
+@import "shared";
+
+.set-prices-wrapper {
+    margin: 0 convert-unit(30px, "rem");
+
+    .make-eligibile-btn {
+        color: get("color.info.danger.500");
+        margin-right: 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .set-price-btn {
+        color: get("color.primary.500");
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .setprice-description {
+        margin-bottom: convert-unit(25px, "rem");
+        font-size: convert-unit(16px, "rem") !important;
+        @include fontFace("primary.regular");
+        line-height: convert-unit(22px, "rem");
+    }
+}
+
+.panel-white-out {
+    position: relative;
+
+    &:before {
+        content: " ";
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-color: rgba($color: get("color.white"), $alpha: 0.8);
+        z-index: 1;
+    }
+}
+
+:host .set-prices-wrapper {
+    ::ng-deep {
+        .mat-expansion-panel {
+            @include fontFace("primary.regular");
+            border: none;
+
+            .mat-expansion-panel-header {
+                background-color: get("color.gray.200");
+                margin-bottom: convert-unit(15px, "rem");
+                height: convert-unit(50px, "rem") !important;
+                align-items: center;
+                justify-content: space-between;
+                padding: convert-unit(25px, "rem") convert-unit(15px, "rem");
+            }
+
+            .mat-panel-title,
+            .mat-expansion-panel-header-title {
+                font-size: convert-unit(16px, "rem") !important;
+                color: get("color.black");
+                align-items: center;
+            }
+
+            .mat-expansion-panel-header-description {
+                font-size: convert-unit(16px, "rem") !important;
+                align-items: center;
+                justify-content: flex-end;
+                margin-right: convert-unit(3px, "rem");
+
+                .ineligible-icon {
+                    line-height: 10px;
+                    padding: 0px 5px;
+
+                    .mat-icon {
+                        color: rgba(0, 0, 0, 0.54) !important;
+                    }
+                }
+            }
+
+            .mat-expansion-panel-content#cdk-accordion-child-0 table {
+                .mat-expansion-panel-body {
+                    .mat-table {
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+
+        .mat-expansion-panel.mat-expanded {
+            .mat-expansion-panel-header {
+                margin-bottom: 0;
+            }
+
+            .mat-expansion-panel-header-description {
+                margin-right: convert-unit(3px, "rem");
+
+                button {
+                    display: none;
+                }
+            }
+        }
+
+        .mat-expansion-panel-body {
+            background-color: get("color.gray.200");
+            padding-bottom: convert-unit(10px, "rem");
+            margin-bottom: convert-unit(15px, "rem");
+
+            .setprice-edittabel {
+                border-top: convert-unit(1px, "rem") dotted get("color.gray.500") !important;
+            }
+
+            .mat-action-row {
+                padding: convert-unit(25px, "rem") convert-unit(8px, "rem") convert-unit(25px, "rem")
+                    convert-unit(24px, "rem");
+            }
+
+            mat-label,
+            .mat-label {
+                margin-top: convert-unit(30px, "rem");
+            }
+
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(60px, "rem");
+                }
+            }
+
+            .mat-table {
+                background-color: get("color.white");
+            }
+
+            .mat-table thead {
+                background-color: get("color.gray.200");
+            }
+
+            .mat-table td {
+                .mat-form-field {
+                    @include media-min("l") {
+                        width: convert-unit(125px, "rem");
+                    }
+
+                    @include media-max("l") {
+                        width: convert-unit(55px, "rem");
+                    }
+                }
+            }
+
+            .mat-table .mat-row:last-child .mat-cell {
+                border-bottom: none;
+            }
+
+            .mat-table .mat-row:nth-child(even),
+            .mat-table .mat-row:nth-child(odd) {
+                background-color: transparent;
+            }
+
+            .apply-button {
+                margin-left: convert-unit(12px, "rem");
+                vertical-align: top;
+                padding: 0px;
+                min-width: auto;
+            }
+
+            .copyprice-from {
+                .mat-form-field-flex {
+                    width: convert-unit(300px, "rem");
+                }
+
+                .mat-form-field-infix {
+                    padding: convert-unit(12px, "rem") 0px;
+                }
+
+                .mat-form-field-appearance-outline .mat-form-field-outline-gap {
+                    border: convert-unit(1px, "rem") solid get("color.gray.600");
+                    width: 100% !important;
+                }
+
+                .mat-form-field-outline-start,
+                .mat-form-field-outline-end {
+                    min-width: 0px;
+                    width: 0px !important;
+                    border: none;
+                }
+            }
+
+            .defemp-conntribute {
+                .mat-form-field {
+                    width: convert-unit(60px, "rem");
+                    display: inline-block;
+                    margin-right: convert-unit(10px, "rem");
+                }
+
+                .mat-form-field:last-child {
+                    width: convert-unit(80px, "rem");
+                }
+            }
+
+            .decline-code {
+                input {
+                    width: convert-unit(130px, "rem");
+                }
+            }
+
+            .noPricing {
+                padding: convert-unit(10px, "rem") 0px;
+            }
+        }
+
+        .mat-form-field-appearance-outline .mat-form-field-prefix,
+        .mat-form-field .mat-form-field-suffix {
+            top: 0;
+        }
+
+        .icon-danger,
+        .icon-success,
+        .icon-outline {
+            margin-top: convert-unit(0px, "rem");
+        }
+
+        .appliedIcon {
+            margin-top: 10px;
+        }
+    }
+
+    ::ng-deep .icon-danger,
+    ::ng-deep .icon-success,
+    ::ng-deep .icon-outline {
+        margin-top: convert-unit(0px, "rem");
+    }
+
+    ::ng-deep .appliedIcon {
+        margin-top: 10px;
+    }
+}

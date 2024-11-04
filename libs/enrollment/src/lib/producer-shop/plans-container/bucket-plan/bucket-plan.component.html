@@ -1,0 +1,94 @@
+<form [formGroup]="form" class="bucket-plan-container" data-test="eb-bucket-plans__form">
+    <div class="bucket-plan-content">
+        <p class="bucket-plan-description">{{planPanel?.planOffering?.plan?.description}}</p>
+        <empowered-plan-details-link
+            class="plan-details"
+            [planOffering]="planPanel.planOffering"
+            data-test="eb-bucket-plans__link--plan-details"
+        ></empowered-plan-details-link>
+        <div class="hsa-footer">
+            <p language="primary.portal.shoppingExperience.deduction"></p>
+        </div>
+    </div>
+
+    <div>
+        <mat-label class="mat-label plan-label" language="primary.portal.shoppingExperience.annualContribution">
+            <button
+                mat-icon-button
+                class="info-icon"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+                [richTooltip]="languageStrings['primary.portal.shoppingExperience.hsaPlanPara']"
+                data-test="eb-bucket-plans__button--info-tooltip"
+            >
+                <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="16"></mon-icon>
+            </button>
+        </mat-label>
+
+        <mat-form-field class="annual-contribution">
+            <span matPrefix language="primary.portal.bucketPlan.dollar"> </span>
+            <input
+                formControlName="annualContributionValue"
+                matInput
+                type="number"
+                data-test="eb-bucket-plans__form--input-annualContribution"
+                (keypress)="restrictNegativeValue($event)"
+            />
+        </mat-form-field>
+        <div *ngIf="rangeOfContribution$ | async as rangeOfContribution">
+            <mat-hint
+                class="range-contribution-hint"
+                *ngIf="!(form.controls.annualContributionValue.errors?.invalid
+            || (form.controls.annualContributionValue.dirty && form.controls.annualContributionValue.errors?.required))"
+            >
+                {{ "primary.portal.shoppingExperience.minMaxHsa" | replaceTag: { "#minhsa": rangeOfContribution.minimumContributionAmount |
+                currency : 'USD' : 'symbol' : '1.0-0', "#maxhsa": rangeOfContribution.maximumContributionAmount | currency : 'USD' :
+                'symbol' : '1.0-0' } }}
+            </mat-hint>
+        </div>
+        <mat-error
+            *ngIf=" 
+                form.controls.annualContributionValue.errors?.invalid
+                || (form.controls.annualContributionValue.dirty && form.controls.annualContributionValue.errors?.required)"
+        >
+            <div *ngIf="rangeOfContribution$ | async as rangeOfContribution">
+                {{ "primary.portal.shoppingExperience.minMaxHsaError" | replaceTag: { "#minhsa":
+                rangeOfContribution.minimumContributionAmount | currency : 'USD' : 'symbol' : '1.0-0', "#maxhsa":
+                rangeOfContribution.maximumContributionAmount | currency : 'USD' : 'symbol' : '1.0-0'} }}
+            </div>
+        </mat-error>
+
+        <div class="pay-frequency">
+            <span
+                class="amount"
+                *ngIf="contributionBasedOnPayrollFrequency$ | async as contributionBasedOnPayrollFrequency; else zeroPrice"
+            >
+                {{ contributionBasedOnPayrollFrequency | currency }} {{ languageStrings["primary.portal.common.star"]}}</span
+            >
+            <ng-template #zeroPrice>
+                <span class="amount">{{defaultContribution | currency }} {{ languageStrings["primary.portal.common.star"]}} </span>
+            </ng-template>
+            <span class="duration" *ngIf="payFrequency$ | async as payFrequency"> {{payFrequency?.name | lowercase}} </span>
+        </div>
+        <div class="bottom-wrapper">
+            <div class="bottom-button-wrapper">
+                <div class="d-flex">
+                    <ng-container *ngIf="enrollmentPlan">
+                        <a
+                            *ngIf="!planPanel?.cartItemInfo"
+                            href="javascript:void(0)"
+                            (click)="onCancel()"
+                            language="primary.portal.common.cancel"
+                        ></a>
+                    </ng-container>
+                    <empowered-add-update-cart-bucket-plan-button-wrapper
+                        (click)="setErrorOnInvalidForm()"
+                        [planPanel]="planPanel"
+                        data-test="eb-bucket-plans__button--add-update-cart"
+                    >
+                    </empowered-add-update-cart-bucket-plan-button-wrapper>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

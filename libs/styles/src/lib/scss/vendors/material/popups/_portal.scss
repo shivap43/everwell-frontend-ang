@@ -1,0 +1,148 @@
+$border-px: 1px;
+
+.empowered-portal-wrapper {
+    background-color: get("color.white");
+    border-radius: convert-unit(4px, "rem");
+    border: convert-unit($border-px, "rem") solid get("color.gray.600");
+
+    &.list-grid-filter {
+        max-width: convert-unit(440px, "rem");
+        font-size: convert-unit(14px, "rem") !important;
+        display: flex;
+        flex-direction: column;
+        max-height: convert-unit(320px, "rem");
+    }
+
+    &.select-job-class-portal {
+        width: convert-unit(160px, "rem");
+        max-height: convert-unit(230px, "rem") !important;
+    }
+
+    &.quote-shop,
+    &.quick-quote {
+        margin: convert-unit(18px, "rem") 0;
+        padding: map-get($spacers, 20);
+    }
+
+    &.location-settings {
+        max-width: convert-unit(267px, "rem");
+    }
+
+    &.more-settings {
+        max-height: convert-unit(474px, "rem");
+        overflow-y: auto;
+    }
+
+    &.quick-quote {
+        padding: map-get($spacers, 0);
+    }
+
+    &.producer-shop {
+        max-height: 75vh;
+        margin: convert-unit(18px, "rem") 0;
+        // Width needs to adjust to account for border-width
+        width: convert-unit(350px + $border-px * 2, "rem");
+
+        &.method {
+        }
+
+        &.location {
+        }
+
+        &.dates {
+        }
+
+        &.occupation {
+            // Width needs to adjust to account for border-width
+            width: convert-unit(150px + $border-px * 2, "rem");
+        }
+
+        &.more {
+            // Width needs to adjust to account for border-width
+            width: convert-unit(470px + $border-px * 2, "rem");
+        }
+
+        &.benefit {
+            width: convert-unit(150px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.elimination {
+            width: convert-unit(150px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.riders {
+            width: convert-unit(270px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.dependent {
+            width: convert-unit(150px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        .content {
+            display: block;
+            padding: map-get($spacers, 20);
+            padding-bottom: map-get($spacers, 10);
+
+            // wider browser support: defaults to auto, but overlay is preferred
+            overflow-y: auto;
+            overflow-y: overlay;
+
+            // cannot use convert-unit here
+            height: calc(100% - 53px);
+        }
+    }
+
+    &.rate-sheets {
+        max-height: 50vh;
+        margin-top: convert-unit(14px, "rem");
+        // Width needs to adjust to account for border-width
+        width: convert-unit(350px + $border-px * 2, "rem");
+
+        &.state {
+            width: convert-unit(230px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.channel {
+            width: convert-unit(187px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.payment {
+            width: convert-unit(230px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.job {
+            width: convert-unit(150px + $border-px * 2, "rem");
+            margin: map-get($spacers, 5) map-get($spacers, 20) 0 0;
+        }
+
+        &.age,
+        &.tobacco {
+            width: convert-unit(270px, "rem");
+        }
+
+        &.age-bands,
+        &.gender {
+            width: convert-unit(150px, "rem");
+        }
+
+        .content {
+            display: block;
+            padding: map-get($spacers, 20);
+            padding-bottom: map-get($spacers, 10);
+
+            // wider browser support: defaults to auto, but overlay is preferred
+            overflow-y: auto;
+            overflow-y: overlay;
+
+            // cannot use convert-unit here
+            height: calc(100% - 53px);
+        }
+    }
+}

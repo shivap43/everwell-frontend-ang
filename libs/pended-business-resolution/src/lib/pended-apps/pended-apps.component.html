@@ -1,0 +1,55 @@
+<div class="pended-apps">
+    <ng-template #producerLevel>
+        <div class="pended-apps-producer-view">
+            <ng-container *ngTemplateOutlet="producerView; context: {$implicit: SearchLevel.PRODUCER}"></ng-container>
+        </div>
+    </ng-template>
+    <mat-tab-group class="mon-tab-wrapper" animationDuration="0ms" *ngIf="visibleTabs.length > 1; else producerLevel">
+        <mat-tab
+            label="{{languageStrings['primary.portal.pendedBusiness.allPendedApplications']}}"
+            *ngIf="visibleTabs.includes(0)"
+        >
+            <ng-template matTabContent>
+                <empowered-all-pended-apps></empowered-all-pended-apps>
+            </ng-template>
+        </mat-tab>
+        <mat-tab
+            label="{{languageStrings['primary.portal.pendedBusiness.account']}}"
+            *ngIf="visibleTabs.includes(PendedBusinessTabsCopy.ALL)"
+        >
+            <ng-template matTabContent>
+                <empowered-account-tab></empowered-account-tab>
+            </ng-template>
+        </mat-tab>
+        <mat-tab
+            label="{{languageStrings['primary.portal.pendedBusiness.producer']}}"
+            *ngIf="visibleTabs.includes(PendedBusinessTabsCopy.PRODUCER)"
+        >
+            <ng-template matTabContent>
+                <ng-container
+                    *ngTemplateOutlet="producerView; context: {$implicit: SearchLevel.PRODUCER}"
+                ></ng-container>
+            </ng-template>
+        </mat-tab>
+        <mat-tab
+            label="{{languageStrings['primary.portal.pendedBusiness.dsc']}}"
+            *ngIf="visibleTabs.includes(PendedBusinessTabsCopy.DSC)"
+        >
+            <ng-template matTabContent>
+                <ng-container *ngTemplateOutlet="producerView; context: {$implicit: SearchLevel.DSC}"></ng-container>
+            </ng-template>
+        </mat-tab>
+        <mat-tab
+            label="{{languageStrings['primary.portal.pendedBusiness.rsc']}}"
+            *ngIf="visibleTabs.includes(PendedBusinessTabsCopy.RSC)"
+        >
+            <ng-template matTabContent>
+                <ng-container *ngTemplateOutlet="producerView; context: {$implicit: SearchLevel.RSC}"></ng-container>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+    <ng-template #producerView let-level>
+        <empowered-producer-tab [level]="level"></empowered-producer-tab>
+    </ng-template>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

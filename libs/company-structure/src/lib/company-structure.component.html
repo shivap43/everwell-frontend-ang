@@ -1,0 +1,19 @@
+<div class="wrapper-margin">
+    <div class="payroll-header">
+        <h1>
+            {{languageStrings['primary.portal.classes.ruleStructure']}}
+        </h1>
+    </div>
+    <mat-tab-group>
+        <mat-tab *hasPermission="'core.account.read.class'" label="Classes">
+            <ng-template matTabContent>
+                <empowered-classes></empowered-classes>
+            </ng-template>
+        </mat-tab>
+        <mat-tab *hasPermission="'core.account.read.region'" label="Regions">
+            <ng-template matTabContent>
+                <empowered-regions></empowered-regions>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</div>

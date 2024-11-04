@@ -1,0 +1,12 @@
+<form [formGroup]="regionTypeAudienceForm">
+    <empowered-chip-select
+        [chipOptions$]="allRegionChips$"
+        (chipChange)="monitorChipChange($event)"
+        [valuesChipControl]="regionTypeValueChipSelect"
+        [changeStrategy]="submitEvent$"
+    >
+    </empowered-chip-select>
+    <mat-error *ngIf="(validOnSubmit$ | async) === false">
+        <span language="primary.portal.common.selectionRequired"></span>
+    </mat-error>
+</form>

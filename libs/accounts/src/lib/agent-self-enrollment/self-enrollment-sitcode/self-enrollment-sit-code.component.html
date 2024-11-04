@@ -1,0 +1,49 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="false"></empowered-mon-spinner>
+    <form [formGroup]="stepControl">
+        <div class="step-header">
+            <mat-label class="mon-mt-0 mon-mb-0 mat-label">
+                {{languageStrings['primary.portal.enrollmentInfoPopup.step2']}}
+            </mat-label>
+            <h2 role="heading" mat-dialog-title>
+                {{ languageStrings['primary.portals.accounts.importAccount.step2.subtitle'] }}
+            </h2>
+        </div>
+        <div class="d-md-flex dropdown-section">
+            <div class="flex-item">
+                <mat-label class="mat-label"> {{languageStrings['primary.portal.prospects.writingNumber']}} </mat-label
+                ><mat-form-field
+                    ><mat-select
+                        [disableOptionCentering]="true"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        formControlName="writingNumber"
+                        [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                        (selectionChange)="onSelectOfWritingNo($event.value)"
+                        ><mat-option *ngFor="let writingNumber of writingNumbers" [value]="writingNumber">
+                            {{writingNumber.number}}
+                        </mat-option></mat-select
+                    ><mat-error>
+                        {{languageStrings["primary.portal.common.requiredField"]}}
+                    </mat-error></mat-form-field
+                >
+            </div>
+            <div class="flex-item col-3">
+                <mat-label class="mat-label"> {{languageStrings['primary.portal.prospects.sitCode']}} </mat-label
+                ><mat-form-field [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                    ><mat-select
+                        aria
+                        [disableOptionCentering]="true"
+                        formControlName="sitCode"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        ><mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">
+                            {{ sitCode.code }}
+                        </mat-option></mat-select
+                    ><mat-error>
+                        {{ languageStrings["primary.portal.common.requiredField"] }}
+                    </mat-error></mat-form-field
+                >
+            </div>
+        </div>
+    </form>
+</div>

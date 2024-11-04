@@ -1,0 +1,94 @@
+@import "shared";
+
+:host {
+    overflow-y: auto;
+    width: 100%;
+}
+
+.section {
+    ::ng-deep {
+        .mat-form-field-flex {
+            max-width: convert-unit(200px, "rem");
+        }
+    }
+
+    margin-bottom: convert-unit(20px, "rem");
+}
+
+.debit-card-msg {
+    margin-bottom: map-get($spacers, 25);
+}
+
+.view-details {
+    .draft,
+    .credit-card,
+    .debit-card {
+        display: flex;
+        align-items: baseline;
+        padding-bottom: map-get($spacers, 10);
+        .label {
+            font-size: convert-unit(14px, "rem");
+            width: convert-unit(120px, "rem");
+            color: get("color.black");
+            @include fontFace("primary.bold");
+            line-height: convert-unit(17px, "rem");
+        }
+    }
+    .edit-account {
+        margin-top: map-get($spacers, 10);
+        margin-bottom: map-get($spacers, 15);
+    }
+    .delete-account {
+        color: get("color.info.danger.500");
+    }
+    .section-container {
+        .header {
+            h2 {
+                line-height: map-get($spacers, 35);
+            }
+        }
+    }
+}
+.card-expiration-error {
+    color: get("color.info.danger.500");
+    position: relative;
+    top: 1px;
+}
+
+.card-expired-block {
+    width: convert-unit(654px, "rem");
+    height: convert-unit(44px, "rem");
+    margin-bottom: map-get($spacers, 20);
+}
+.card-expired-message {
+    font-size: convert-unit(14px, "rem");
+}
+.icon-danger {
+    position: relative;
+    top: 2px;
+}
+.alert-message {
+    width: fit-content;
+}
+.ach-information-alert {
+    width: convert-unit(530px, "rem");
+    margin-bottom: convert-unit(16px, "rem");
+}
+.radio-wrapper {
+    .mat-radio-group {
+        display: flex;
+        flex-direction: row;
+    }
+}
+.tpi-header {
+    margin-top: 0;
+    margin-bottom: convert-unit(30px, "rem");
+}
+.mat-checkbox {
+    ::ng-deep .mat-checkbox-inner-container {
+        margin-right: 0;
+    }
+}
+#billingAddresshdr {
+    margin-bottom: convert-unit(30px, "rem");
+}

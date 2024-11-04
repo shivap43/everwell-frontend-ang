@@ -1,0 +1,9 @@
+<div aria-live="polite" class="sr-only">
+    <span *ngIf="displaySpinner">{{languageStrings}}</span>
+</div>
+<div [ngClass]="inputClass" *ngIf="displaySpinner">
+    <div class="spinner-backdrop" *ngIf="backdrop" tabindex="0"></div>
+    <div class="mat-spinner-wrapper">
+        <mat-spinner strokeWidth="3" diameter="50" color="primary"></mat-spinner>
+    </div>
+</div>

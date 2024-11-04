@@ -1,0 +1,50 @@
+<mat-vertical-stepper
+    #progressIndicator
+    (selectionChange)="onStepChange($event)"
+    class="side-nav-stepper"
+    linear="true"
+>
+    <ng-container *ngIf="!memberId">
+        <mat-step [completed]="isFirstStepCompleted">
+            <ng-template matStepLabel>
+                <span language="primary.portal.dashboard.policyChangeRequestflow.sideNav.findPolicyHolder"></span>
+            </ng-template>
+        </mat-step>
+    </ng-container>
+
+    <ng-container *ngIf="memberId">
+        <mat-step [completed]="isFirstStepCompleted">
+            <ng-template matStepLabel>
+                <span language="primary.portal.dashboard.policyChangeRequestflow.sideNav.affectedPolicies"></span>
+            </ng-template>
+        </mat-step>
+    </ng-container>
+
+    <mat-step [completed]="isSecondStepCompleted">
+        <ng-template matStepLabel class="pcrmatStepLabel">
+            <span language="primary.portal.dashboard.policyChangeRequestflow.sideNav.requestPolicyChanges"></span>
+        </ng-template>
+    </mat-step>
+    <mat-step [completed]="isThirdStepCompleted">
+        <ng-template matStepLabel>
+            <span language="primary.portal.dashboard.policyChangeRequestflow.sideNav.policyChanges"></span>
+        </ng-template>
+        <ul #ulTransactionsList class="sub-step">
+            <li
+                *ngFor="let transactionForm of transactionForms"
+                [ngClass]="{'active': transactionForm == getSelectedScreen()}"
+            >
+                <span class="highlight">{{transactionForm}}</span>
+            </li>
+        </ul>
+    </mat-step>
+    <mat-step [completed]="isFourStepCompleted">
+        <ng-template matStepLabel>
+            <span language="primary.portal.dashboard.policyChangeRequestflow.sideNav.reviewSubmit"></span>
+        </ng-template>
+    </mat-step>
+    <!-- Icon overrides -->
+    <ng-template matStepperIcon="done">
+        <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+    </ng-template>
+</mat-vertical-stepper>

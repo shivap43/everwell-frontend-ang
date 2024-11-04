@@ -1,0 +1,77 @@
+@import "shared";
+
+:host ::ng-deep {
+    * {
+        outline: none !important;
+    }
+    .empowered-chip-list {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: convert-unit(345px, "rem");
+        .mat-form-field-infix {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .example-chip-list {
+            width: 100%;
+        }
+        .bg-selected-item {
+            background: blue($color: #000000) !important;
+        }
+        .mat-button {
+            padding: 0 0 0 0 !important;
+        }
+        .mat-chip-list-wrapper {
+            padding: 4px !important;
+            margin: 0 !important;
+            min-height: 40px;
+
+            .mat-icon {
+                height: 10px;
+                width: 10px;
+            }
+        }
+        .app .mat-form-field .mat-form-field-infix {
+            padding: 0;
+        }
+        .mat-form-field-flex {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .mat-chip-list-wrapper .mat-standard-chip,
+        .mat-chip-list-wrapper input.mat-input-element {
+            margin: 4px 2px;
+        }
+        .mat-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        .mat-button:hover {
+            background: none;
+            border-radius: 2px;
+        }
+        .mat-button-wrapper {
+            font-size: 10px;
+        }
+
+        .mat-standard-chip {
+            margin: 0 2px !important;
+        }
+    }
+}
+
+.selectable-chip {
+    padding-left: map-get($spacers, 20) !important;
+}
+
+.invalid {
+    ::ng-deep .mat-form-field-outline-thick > div {
+        border-color: get("color.info.danger.500");
+        background-color: get("color.info.danger.100");
+    }
+    .mat-form-field-infix {
+        color: get("color.info.danger.500");
+    }
+}

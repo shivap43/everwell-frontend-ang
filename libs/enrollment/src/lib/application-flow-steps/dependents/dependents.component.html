@@ -1,0 +1,111 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div *ngIf="stepType === stepTypeEnum.DEPENDENTSKAISER ; else vspDependentsScreen" class="section-container">
+    <div class="question-container">
+        <form [formGroup]="dependentsForm" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onSubmit()">
+            <div class="response-block">
+                <div class="response-type radio">
+                    <mat-radio-group formControlName="dependentSelection" (change)="checkDependentAge()">
+                        <mat-radio-button
+                            (change)="getPricingForDependent($event.value)"
+                            *ngFor="let dependent of dependentsToDisplay"
+                            [value]="dependent.value"
+                            [disabled]="dependent.disable"
+                            >{{dependent.viewValue.firstName}} {{dependent.viewValue.lastName}} |
+                            {{getDependentRelationFromId(dependent.relationId)}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                    <mat-error *ngIf="fieldErrorflag && dependentsForm.controls['dependentSelection'].invalid"
+                        >{{languageStrings['primary.portal.common.requiredField']}}
+                    </mat-error>
+                </div>
+                <div>
+                    <button
+                        class="mon-btn-secondary btn-sm"
+                        mat-flat-button
+                        type="button"
+                        (click)="navigateToDependents()"
+                        [disabled]="!canAccessAflacHQAc"
+                    >
+                        {{languageStrings['primary.portal.common.addDependent']}}
+                    </button>
+                </div>
+            </div>
+            <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                <button class="mon-btn-primary" type="submit" mat-flat-button>
+                    <span *ngIf="this.planObject.lastStep"
+                        ><span>{{languageStrings['primary.portal.applicationFlow.dependents.next']}}</span>
+                        <span>{{this.planObject.nextProduct}}</span>
+                    </span>
+                    <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<ng-template #vspDependentsScreen>
+    <div class="section-container">
+        <div *ngFor="let step of stepDetails; let dependentssectionindex=index;" class="question-container">
+            <div *ngIf="step.type === stepTypeEnum.DEPENDENTS">
+                <div class="question-block" id="dependentstep{{dependentssectionindex}}">
+                    <span *ngIf="step.directions" [innerHTML]="step.directions"></span>
+                    <span>
+                        <a (click)="navigateToDependents()"> {{languageStrings["primary.portal.applicationFlow.dependant"]}} </a>
+                    </span>
+                </div>
+                <div class="response-block">
+                    <div class="response-type checkbox" attr.aria-labelledby="dependentstep{{dependentssectionindex}}" tabindex="0">
+                        <mat-checkbox
+                            *ngFor="let vspDependent of vspDependentsToDisplay"
+                            (change)="onVspDependentSelectionChange($event)"
+                            [value]="vspDependent.value"
+                            [disabled]="vspDependent.disable"
+                            [checked]="checkPrePopulationStatus(vspDependent.value)"
+                        >
+                            {{vspDependent.viewValue.firstName}} {{vspDependent.viewValue.lastName}} |
+                            {{getDependentRelationFromId(vspDependent.relationId)}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="step.type === stepTypeEnum.TAX_STATUS">
+                <div class="question-container">
+                    <div class="question-block" id="planOptionpreTax{{dependentssectionindex}}">
+                        <p>{{languageStrings['primary.portal.applicationFlow.planOption.preTax']}}</p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group
+                                [disabled]="taxStatusReadOnly"
+                                [(ngModel)]="taxStatus"
+                                attr.aria-label="planOptionpreTax{{dependentssectionindex}}"
+                            >
+                                <mat-radio-button *ngFor="let taxOption  of taxOptions" [value]="taxOption.value">
+                                    {{taxOption.viewValue}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <mat-error
+                                *ngIf="vspDependentfieldErrorflag && selectedVspDependents.length === 0"
+                                language="primary.portal.common.requiredField"
+                            >
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="action-btns" *ngIf="taxOptions.length" [ngClass]="{'last-step': this.planObject.lastStep}">
+            <button class="mon-btn-primary" type="button" (click)="onSubmit()" mat-flat-button>
+                <span *ngIf="this.planObject.lastStep"
+                    ><span>{{languageStrings['primary.portal.applicationFlow.dependents.next']}}</span>
+                    <span>{{this.planObject.nextProduct}}</span>
+                </span>
+                <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </div>
+</ng-template>

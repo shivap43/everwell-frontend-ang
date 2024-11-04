@@ -1,0 +1,12 @@
+<div [formGroup]="form">
+    <empowered-checkbox-list
+        ngDefaultControl
+        formControlName="tobaccoStatuses"
+        [options]="(tobaccoStatuses$ | async)"
+        [showSelectAll]="false"
+        ><mat-error
+            *ngIf="form.controls.tobaccoStatuses.touched && form.controls.tobaccoStatuses.errors?.required"
+            language="primary.portal.common.selectionRequired"
+        ></mat-error
+    ></empowered-checkbox-list>
+</div>

@@ -1,0 +1,52 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="copyPlansForm" (ngSubmit)="onSubmit()" class="quasi-modal">
+    <div class="dialog-content copy-plan-year">
+        <h1 mat-dialog-title>
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.copyNewPlanYear.title']}}
+        </h1>
+        <p class="mon-mb-20">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.copyNewPlanYear.subTitle']}}
+        </p>
+        <mat-radio-group
+            (change)="onCopyPlanOptionSelectionChange()"
+            formControlName="copyPlanOption"
+            [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+            #radioGroup="matRadioGroup"
+        >
+            <div *ngIf="planYearOptions && planYearOptions.length >0">
+                <mat-radio-button [value]="appSettings.YES" class="mon-mb-10">
+                    <div class="radio-content">
+                        <div class="mon-mr-10">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.copyNewPlanYear.optionYes']}}
+                        </div>
+                        <div>
+                            <mat-form-field class="mon-m-0">
+                                <mat-select formControlName="selectPlanYearOption" disableOptionCentering="true">
+                                    <mat-option
+                                        *ngFor="let planYearOption of planYearOptions"
+                                        [value]="planYearOption.value"
+                                    >
+                                        {{planYearOption.viewValue}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </mat-radio-button>
+            </div>
+            <div>
+                <mat-radio-button [value]="appSettings.NO" class="mon-mb-10">
+                    <span
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.copyNewPlanYear.optionNo']}}</span
+                    >
+                </mat-radio-button>
+            </div>
+        </mat-radio-group>
+    </div>
+    <div class="dialog-footer justify-content-end">
+        <button mat-flat-button class="mon-btn-primary" type="submit">
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</form>

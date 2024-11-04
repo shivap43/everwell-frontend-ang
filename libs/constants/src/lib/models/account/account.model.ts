@@ -1,0 +1,42 @@
+import { AccountImportTypes, PartnerAccountType, ProspectType, RatingCode, StatusTypeValues } from "../../enums";
+import { AccountLock } from "../account-lock.model";
+import { GroupTaxIdAccountDetails } from "../group-account-id-tax-details.model";
+import { SitusState } from "../situs-state";
+import { ProspectInformation } from "../prospect-information.model";
+import { Contact } from "../contact.model";
+import { Accounts, IndividualTaxIdAccountDetails } from "../account.model";
+
+export interface Account extends Accounts {
+    id?: number;
+    name: string;
+    groupNumber?: string;
+    altGroupNumber?: number;
+    ratingCode?: RatingCode;
+    contact: Contact<"user">;
+    primaryContact: Contact<"default">;
+    situs: SitusState;
+    payFrequencyId: number;
+    type: ProspectType;
+    prospectInformation: ProspectInformation;
+    subordinateProducerId: number;
+    typeId: number;
+    status: StatusTypeValues;
+    readonly partnerAccountType: PartnerAccountType;
+    readonly partnerId: number;
+    employeeCount: number;
+    productsCount: number;
+    daysToEnroll: number;
+    taxId?: number;
+    duplicateTaxAccountIds?: number[];
+    taxMatchedIndividualAccounts?: IndividualTaxIdAccountDetails;
+    taxMatchedAflacGroupAccount?: GroupTaxIdAccountDetails;
+    accountNumber?: string;
+    aflacGroupNumber?: number;
+    importType?: AccountImportTypes;
+    enrollmentAssistanceAgreement: boolean;
+    thirdPartyPlatformsEnabled?: boolean;
+    companyCode?: string;
+    lock?: AccountLock;
+    locked?: boolean;
+    checkedOut?: boolean;
+}

@@ -1,0 +1,110 @@
+@import "shared";
+
+.proposal-plan-details {
+    padding: map-get($spacers, 30);
+
+    h2 {
+        margin: map-get($spacers, 0);
+    }
+}
+
+.proposal-plans-above-table {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.planTypeWrp {
+    width: 50%;
+    display: inline-block;
+}
+
+.planTypeoptionwrp {
+    padding-bottom: map-get($spacers, 25);
+}
+
+.planTypeoptionlabel {
+    @include fontFace("primary.bold");
+    margin: map-get($spacers, 15) 0;
+    text-align: left;
+}
+
+.form-radio-button {
+    margin-right: convert-unit(10px, "rem");
+}
+
+.form-radio-grp {
+    display: flex;
+    flex-direction: row;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.sub-header {
+    margin: convert-unit(7px, "rem") convert-unit(0px, "rem");
+    font-size: convert-unit(16px, "rem");
+}
+
+.filter-wrapper {
+    border-left: convert-unit(1px, "rem") dotted get("color.gray.500");
+    padding-left: convert-unit(20.5px, "rem") !important;
+    margin-bottom: convert-unit(12px, "rem");
+
+    .filter-sub-wrapper {
+        .mat-form-field {
+            padding-right: convert-unit(15px, "rem");
+
+            ::ng-deep {
+                .mat-form-field-flex {
+                    padding: convert-unit(9px, "rem") convert-unit(23px, "rem");
+                    letter-spacing: convert-unit(0px, "rem");
+                    font-weight: normal;
+                }
+
+                .mat-form-field-infix {
+                    padding: convert-unit(0px, "rem");
+                }
+            }
+        }
+    }
+}
+
+.row-selected {
+    height: convert-unit(36px, "rem");
+    background: get("color.primary.50");
+    border: convert-unit(1px, "rem") solid get("color.primary.500");
+    border-radius: convert-unit(0px, "rem");
+    letter-spacing: convert-unit(0px, "rem");
+    line-height: convert-unit(22px, "rem");
+}
+
+.max-row-selected {
+    height: convert-unit(36px, "rem");
+    background: get("color.info.warning.200");
+    border: convert-unit(1px, "rem") solid get("color.info.warn");
+    border-radius: convert-unit(0px, "rem");
+    letter-spacing: convert-unit(0px, "rem");
+    line-height: convert-unit(22px, "rem");
+}
+.text-wrap {
+    white-space: nowrap;
+    display: inline-flex;
+    width: 100%;
+    margin: map-get($spacers, 10) map-get($spacers, 0);
+}
+.missingEmployerFlyer {
+    font-style: italic;
+}
+::ng-deep .available-riders-tooltip {
+    max-height: convert-unit(400px, "rem");
+    max-width: convert-unit(600px, "rem") !important;
+    .message-container {
+        display: flex;
+        flex-flow: row wrap;
+        div {
+            width: convert-unit(140px, "rem");
+        }
+    }
+}

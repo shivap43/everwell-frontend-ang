@@ -1,0 +1,39 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    div:first-child {
+        padding: map-get($spacers, 0) map-get($spacers, 20);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: auto;
+    }
+
+    div:last-child {
+        padding: map-get($spacers, 20) map-get($spacers, 50) map-get($spacers, 20) map-get($spacers, 0);
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        background-color: get("color.gray.100");
+    }
+
+    hr {
+        width: 100%;
+    }
+}
+
+.pending-upload-alert {
+    margin: map-get($spacers, 30) map-get($spacers, 5) map-get($spacers, 0);
+}
+
+hr.bottom-rule {
+    margin-top: map-get($spacers, 20);
+}
+
+a.bottom-rule {
+    padding-bottom: map-get($spacers, 20);
+}

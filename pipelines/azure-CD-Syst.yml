@@ -1,0 +1,182 @@
+trigger: none
+pr: none
+
+pool: 
+  name: AflacAWSLinuxAgentPool
+
+resources:
+  pipelines:
+  - pipeline: Everwell-Frontend-CI
+    source: 'Application Pipelines/Frontend/everwell-frontend-ang-azure-CI'
+    trigger: 
+      branches:
+        include:
+        - sprint/sprint-*
+
+  repositories:
+  - repository: generic-templates
+    type: github
+    name: Aflac-Prod/DevOps-GenericPipeline-Templates
+    endpoint: Aflac-Prod
+  - repository: templates
+    type: github
+    name: Aflac-Prod/DevopsTemplates
+    endpoint: Aflac-Prod
+
+parameters:
+  - name: cleanProjectName
+    type: string
+    default: '7516051_Everwell-EEP'
+  - name: artifactsFolder
+    type: string
+    default: 'EverwellFrontend'
+
+stages:
+  - stage: Syst
+    displayName: Deploy to SYST
+    jobs:
+      - deployment: Syst_Deploy_Primary
+        displayName: 'Syst Deployment - Primary (us-east-1)'
+        environment: Syst
+        workspace:
+          clean: "all"
+        variables:
+          - group: 'EverwellSyst'
+          - group: 'EverwellSystPrimary'
+        pool: AflacAWSLinuxAgentPool
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: ArtifactoryGenericDownload@3
+                  inputs:
+                    connection: 'ArtifactoryServiceConnection'
+                    specSource: 'taskConfiguration'
+                    fileSpec: |
+                      {
+                        "files": [
+                          {
+                            "pattern": "Everwell-7516051-Binaries/Frontend/$(resources.pipeline.Everwell-Frontend-CI.runName).zip",
+                            "target": "$(System.DefaultWorkingDirectory)/"
+                          }
+                        ]
+                      }
+                - task: ExtractFiles@1
+                  inputs:
+                    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/Frontend/$(resources.pipeline.Everwell-Frontend-CI.runName).zip'
+                    destinationFolder: '$(System.DefaultWorkingDirectory)/deploy/'
+                    cleanDestinationFolder: true
+                    overwriteExistingFiles: true
+                - task: AWSCLI@1
+                  displayName: "Upload Website"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 's3'
+                    awsSubCommand: 'sync'
+                    awsArguments: '"$(System.DefaultWorkingDirectory)/deploy/" "s3://$(StaticResourcesBucketName)" --delete'
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.js" --exclude="assets/*" --content-type text/javascript --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.css" --content-type text/css --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.txt" --content-type text/plain --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+                - task: AWSCLI@1
+                  displayName: "Invalidate Cloudfront Cache"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 'cloudfront'
+                    awsSubCommand: 'create-invalidation'
+                    awsArguments: '--distribution-id $(CloudfrontDistributionId) --paths /*'
+      - deployment: Syst_Deploy_Secondary
+        displayName: 'Syst Deployment - Secondary (us-west-2)'
+        environment: Syst
+        workspace:
+          clean: "all"
+        variables:
+          - group: 'EverwellSyst'
+          - group: 'EverwellSystSecondary'
+        pool: AflacAWSLinuxAgentPool
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: ArtifactoryGenericDownload@3
+                  inputs:
+                    connection: 'ArtifactoryServiceConnection'
+                    specSource: 'taskConfiguration'
+                    fileSpec: |
+                      {
+                        "files": [
+                          {
+                            "pattern": "Everwell-7516051-Binaries/Frontend/$(resources.pipeline.Everwell-Frontend-CI.runName).zip",
+                            "target": "$(System.DefaultWorkingDirectory)/"
+                          }
+                        ]
+                      }
+                - task: ExtractFiles@1
+                  inputs:
+                    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/Frontend/$(resources.pipeline.Everwell-Frontend-CI.runName).zip'
+                    destinationFolder: '$(System.DefaultWorkingDirectory)/deploy/'
+                    cleanDestinationFolder: true
+                    overwriteExistingFiles: true
+                - task: AWSCLI@1
+                  displayName: "Upload Website"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 's3'
+                    awsSubCommand: 'sync'
+                    awsArguments: '"$(System.DefaultWorkingDirectory)/deploy/" "s3://$(StaticResourcesBucketName)" --delete'
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.js" --exclude="assets/*" --content-type text/javascript --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.css" --content-type text/css --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.txt" --content-type text/plain --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSCLI@1
+                  displayName: "Invalidate Cloudfront Cache"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 'cloudfront'
+                    awsSubCommand: 'create-invalidation'
+                    awsArguments: '--distribution-id $(CloudfrontDistributionId) --paths /*'

@@ -1,0 +1,139 @@
+<div class="dialog-content products-wrapper">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+    <div class="mon-pt-30" *ngIf="isError">
+        <mon-alert *ngIf="isError" alertType="danger" class="mon-alert">
+            <span [language]="errorMessage"></span>
+        </mon-alert>
+    </div>
+    <div *ngIf="!isTaxId && isTaxIdFeatureEnabled" role="status" class="alert-status">
+        <mon-alert iconAltText="Warning" alertType="warning" closeButton="true" class="mon-alert">
+            <span> {{ languageStrings["primary.portal.benefitsOffering.dentalVision.noTaxMsg"] }} </span>
+        </mon-alert>
+    </div>
+    <h2 class="mon-mb-0">{{languageStrings['primary.portal.benefitsOffering.product.title']}}</h2>
+    <p>{{languageStrings['primary.portal.benefitsOffering.product.subtitle']}}</p>
+    <div class="mon-mt-20 exception-alert" *ngIf="vasExceptions.length">
+        <ng-container *ngFor="let item of vasExceptions">
+            <mon-alert>
+                {{ "primary.portal.maintenanceBenefitsOffering.products.vasExceptionActive" | replaceTag: { "##effectivestarting##":
+                item.validity.effectiveStarting| date:dateFormat, "##expiresafter##": item.validity.expiresAfter| date:dateFormat,
+                "##vastype##": item.name } }}
+            </mon-alert>
+        </ng-container>
+    </div>
+    <div class="alert-status" *ngIf="showUnavailProdsWarning$ | async">
+        <mon-alert alertType="warning" class="mon-alert">
+            <span language="primary.portal.account.noSicAbiCode"></span>
+        </mon-alert>
+    </div>
+    <div *ngIf="productsView.length">
+        <table [dataSource]="productsView" mat-table>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="w-200"></th>
+                <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="element.name === VAS && disabled? 'shade-text-vas' : ''">{{ element.name }}</span>
+                    <a
+                        href="javascript:void(0)"
+                        class="wellthie-link"
+                        (click)="openWellthiePopup()"
+                        *ngIf="element.name===MEDICAL && ( agentLevel===AGENT_LEVEL_TWO||agentLevel===AGENT_LEVEL_THREE ) && (showWellthieLink$ | async)"
+                    >
+                        {{languageStrings["primary.portal.totalcost.launchWellthie"]}}
+                    </a>
+                    <div
+                        class="mon-mt-5"
+                        [ngClass]="element.name === VAS && disabled? 'atleast-txt-vas' : 'vas-text'"
+                        *ngIf="element.name === VAS"
+                    >
+                        <span *ngIf="minimumAflacToSelect>1">
+                            {{languageStrings["primary.portal.benefitOffering.productsVasError"] | replaceTag: {"##vascount##"
+                            :minimumAflacToSelect } }}
+                        </span>
+                        <span *ngIf="minimumAflacToSelect<2">
+                            {{languageStrings["primary.portal.benefitsOffering.productVas"].replace("##vascount##",minimumAflacToSelect)}}
+                        </span>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="carrier">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element" class="w-400">
+                    <span [ngClass]="element.name === VAS && disabled? 'shade-text-vas' : ''">{{ element.carrier.join(", ") }}</span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="individual">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox
+                        *ngIf="individualEligible"
+                        (change)="masterToggle('individual')"
+                        [checked]="
+            selection[fromIndividual].hasValue() && isAllSelected('individual')
+          "
+                        [indeterminate]="
+            selection[fromIndividual].hasValue() && !isAllSelected('individual')
+          "
+                        ><span language="primary.portal.benefitsOffering.product.selectAll"></span>
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox
+                        [disabled]="isDisabled(row, 'individual')"
+                        (change)="updateCheckedProducts($event, row, 'individual')"
+                        *ngIf="individualEligible && row.individualEligibility"
+                        [checked]="selection[fromIndividual].isSelected(row)"
+                    >
+                        <span language="primary.portal.benefitsOffering.product.individual"></span>
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="group">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox
+                        *ngIf="groupEligible"
+                        (change)="masterToggle('group')"
+                        [disabled]="!vasGroupEligible && disabled"
+                        [checked]="selection[fromGroup].hasValue() && isAllSelected('group')"
+                        [indeterminate]="selection[fromGroup].hasValue() && !isAllSelected('group')"
+                        ><span language="primary.portal.benefitsOffering.product.selectAll"></span>
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox
+                        [disabled]="isDisabled(row, 'group')"
+                        (change)="updateCheckedProducts($event, row, 'group')"
+                        *ngIf="groupEligible && row.groupEligibility"
+                        [checked]="selection[fromGroup].isSelected(row)"
+                        ><span language="primary.portal.benefitsOffering.product.group"></span>
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="productsColumn"></tr>
+            <tr mat-row *matRowDef="let row; columns: productsColumn"></tr>
+        </table>
+    </div>
+</div>
+<div class="dialog-footer justify-content-end">
+    <span *ngIf="this.data.opensFrom === 'copyNewPlanYear'">
+        <button
+            type="button"
+            (click)="onBack()"
+            class="mon-btn-secondary mon-mr-20"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span> {{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+    </span>
+    <button
+        class="mon-btn-primary"
+        type="button"
+        [disabled]="showSpinner"
+        (click)="nextClicked()"
+        mat-flat-button
+        [attr.aria-label]="languageStrings['primary.portal.common.next']"
+    >
+        <span> {{languageStrings['primary.portal.common.next']}}</span>
+        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+    </button>
+</div>

@@ -1,0 +1,66 @@
+@import "shared";
+
+.disabled {
+    color: gray;
+    cursor: not-allowed;
+    text-decoration: underline;
+    pointer-events: none;
+}
+
+.beneficiray-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: get("color.gray.200");
+    padding: convert-unit(20px, "rem");
+    margin: convert-unit(20px, "rem") 0;
+    border-radius: convert-unit(4px, "rem");
+
+    span {
+        margin: 0 convert-unit(20px, "rem") 0 0;
+    }
+    .beneficiary-input {
+        display: inline-block !important;
+        position: relative;
+        top: convert-unit(10px, "rem");
+    }
+    &-name {
+        width: convert-unit(400px, "rem");
+    }
+    &-member {
+        width: convert-unit(200px, "rem");
+    }
+
+    &-buttons {
+        display: flex;
+        width: convert-unit(348px, "rem");
+        justify-content: flex-end;
+        span {
+            margin: 0 0 0 convert-unit(20px, "rem");
+            .remove {
+                color: get("color.info.danger.500");
+            }
+        }
+    }
+}
+
+.add-edit-beneficiary {
+    ::ng-deep {
+        .flex-form-wrapper {
+            padding-bottom: convert-unit(10px, "rem");
+        }
+    }
+}
+
+.d-md-flex {
+    .flex-item {
+        flex: 1;
+    }
+}
+
+.beneficiary-checkbox {
+    display: flex;
+    ::ng-deep .mat-checkbox-layout {
+        white-space: normal;
+    }
+}

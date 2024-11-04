@@ -1,0 +1,147 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+<div class="planinfo-container" [ngClass]="{'expanded': showPanel, 'tpi-plan-info' : isTpi && !tpiLnlMode}">
+    <div class="planinfo-section">
+        <div class="planinfo-compact">
+            <div class="planinfo-view">
+                <h2 class="product-name" *ngIf="!isTpi || tpiLnlMode">{{application.productName}}</h2>
+                <p class="plan-name" [ngClass]="{'truncate-middle': !showPanel}">
+                    <span class="left">{{application.planName}}</span>
+                </p>
+                <p *ngIf="isTpi && !tpiLnlMode">
+                    <a
+                        href="javascript:void(0)"
+                        (click)="tpiViewPlanInfoModal()"
+                        [attr.arial-label]="languageStrings['primary.portal.applicationFlow.viewPlanInfo']"
+                    >
+                        {{languageStrings['primary.portal.applicationFlow.viewPlanInfo']}}
+                    </a>
+                </p>
+            </div>
+            <div class="price-view">
+                <h2>{{netCost | currency}}</h2>
+                <p class="pay-frequency">{{payFrequency.name}}</p>
+                <p *ngIf="(!showPanel && !isTpi) || (!showPanel && tpiLnlMode)">
+                    <a href="javascript:void(0)" (click)="togglePlanInfo(true)" attr.arial-label="View {{application.planName}} details">
+                        {{languageStrings['primary.portal.common.view']}}
+                    </a>
+                </p>
+                <p *ngIf="(showPanel && !isTpi) || (showPanel && tpiLnlMode)">
+                    <a href="javascript:void(0)" (click)="togglePlanInfo(false)" attr.arial-label="Hide {{application.planName}} details">
+                        {{languageStrings['primary.portal.common.hide']}}
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="tax-section-wrapper" *ngIf="(showPanel && showData && !isTpi) || (showPanel && showData && tpiLnlMode)">
+            <div class="tax-section">
+                <div class="content-column coverage-details">
+                    <div *ngIf="dependentNameToDisplay.length > 0">
+                        <span class="content-label base-adjustment-cost">
+                            {{languageStrings['primary.portal.applicationFlow.planInfo.dependentName']}}</span
+                        >
+                        <span>{{dependentNameToDisplay}}</span>
+                    </div>
+                    <div>
+                        <span class="content-label base-adjustment-cost"
+                            >{{languageStrings['primary.portal.applicationFlow.planInfo.coverageLevel']}}</span
+                        >
+                        <span>{{getCoverageLevelName(cartDetails.coverageLevelId)}}</span>
+                    </div>
+                    <div *ngIf="cartDetails.riders.length">
+                        <span class="content-label base-adjustment-cost">
+                            {{languageStrings['primary.portal.applicationFlow.planInfo.riders']}}
+                        </span>
+                        <span [innerHTML]="riderPlanDetails.join('')"></span>
+                    </div>
+                    <div>
+                        <span class="content-label base-adjustment-cost"
+                            >{{languageStrings['primary.portal.applicationFlow.planInfo.taxStatus']}}</span
+                        >
+                        <span
+                            *ngIf="planOfferingDetails.taxStatus===taxStatus.PRETAX"
+                            language="primary.portal.shoppingExperience.preTax"
+                        ></span>
+                        <span
+                            *ngIf="planOfferingDetails.taxStatus===taxStatus.POSTTAX"
+                            language="primary.portal.shoppingExperience.postTax"
+                        ></span>
+                        <span
+                            *ngIf="planOfferingDetails.taxStatus===taxStatus.VARIABLE"
+                            language="primary.portal.shoppingExperience.Variable"
+                        ></span>
+                        <span
+                            *ngIf="planOfferingDetails.taxStatus===taxStatus.UNKNOWN"
+                            language="primary.portal.quoteShop.plansDisplay.unknown"
+                        ></span>
+                    </div>
+                    <div>
+                        <span class="content-label base-adjustment-cost"
+                            >{{languageStrings['primary.portal.shoppingExperience.coverageDate']}}</span
+                        >
+                        <span>{{cartDetails.coverageEffectiveDate | date: dateFormat}}</span>
+                    </div>
+                </div>
+
+                <div class="content-column">
+                    <ng-container *ngIf="!isEmployerContributionPlan">
+                        <div>
+                            <span class="content-label base-adjustment-cost">
+                                {{languageStrings['primary.portal.applicationFlow.planInfo.baseCost']}}
+                            </span>
+                            <span>{{planCost | currency}} {{payFrequency.name}}</span>
+                        </div>
+                        <div *ngIf="!isBenefitDollarPresent || !isBenefitDollarConfigEnabled">
+                            <span class="content-label base-adjustment-cost">
+                                {{languageStrings['primary.portal.applicationFlow.planInfo.adjustments']}}
+                            </span>
+                            <ng-container *ngIf="planCost!==netCost; else zeroCostTemplate">
+                                -{{planCost-netCost | currency}} {{payFrequency.name}}
+                            </ng-container>
+                            <ng-template #zeroCostTemplate>
+                                <span> -{{languageStrings['primary.portal.applicationFlow.planInfo.zeroCost']}} {{payFrequency.name}}</span>
+                            </ng-template>
+                        </div>
+                    </ng-container>
+
+                    <div *ngFor="let fd of flexDollars">
+                        <span class="content-label base-adjustment-cost"> {{ fd.flexDollarOrIncentiveName }} </span>
+                        <span> {{fd.flexDollarOrIncentiveAmount | currency}} {{payFrequency.name}} </span>
+                    </div>
+                    <div>
+                        <span class="content-label base-adjustment-cost" *ngIf="isMemberPortal || isTpi">
+                            {{languageStrings['primary.portal.applicationFlow.planInfo.yourCost']}}
+                        </span>
+
+                        <span class="content-label base-adjustment-cost" *ngIf="!isMemberPortal && !isTpi">
+                            <strong>{{languageStrings['primary.portal.applicationFlow.planInfo.netCost']}}</strong>
+                        </span>
+                        <div class="final-cost-currency">
+                            <span class="currency"> {{netCost | currency}}</span>
+                            <span class="payFrequency"> {{payFrequency.name}} </span>
+                        </div>
+                    </div>
+
+                    <div class="action-links">
+                        <a
+                            href="javascript:void(0)"
+                            class="mon-btn-link"
+                            (click)="showPlanDetails()"
+                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.planInfo.planDetails']"
+                        >
+                            {{languageStrings['primary.portal.applicationFlow.planInfo.planDetails']}}
+                        </a>
+                        <a
+                            href="javascript:void(0)"
+                            class="text-danger"
+                            (click)="discard()"
+                            *ngIf="!isCompanyProvidedPlan"
+                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.planInfo.removeFromCart']"
+                        >
+                            {{languageStrings['primary.portal.applicationFlow.planInfo.removeFromCart']}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

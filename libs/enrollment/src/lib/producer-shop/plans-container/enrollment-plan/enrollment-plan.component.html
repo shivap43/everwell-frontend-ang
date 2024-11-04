@@ -1,0 +1,206 @@
+<ng-container *ngIf="selectedEnrollment$ | async as enrollment">
+    <ng-container *ngIf="memberData$ | async as member">
+        <ng-container *ngIf="notAutoEnrolledEnrollment$ | async as notAutoEnrolledEnrollment">
+            <div *ngIf="!editable">
+                <ng-container *ngIf="isGrandFatherEnrollment$ | async as isGrandFatherEnrollment">
+                    <p *ngIf="isGrandFatherEnrollment" class="plan-not-available">
+                        {{ languageStrings['primary.portal.quoteShop.grandfatheredPlan'] | replaceTag: { "#grandfatherfirstname":
+                        member.name.firstName } }}
+                    </p>
+                </ng-container>
+            </div>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="{edited: isEdit$ | async} as editData">
+        <p class="plan-not-available" *ngIf="enrollmentMessage$ | async as enrollmentMessage">
+            <ng-container *ngIf="memberData$ | async as member">
+                <span *ngIf="enrollmentMessage===enrollmentMessageEnum.ACTIVE_NO_EDIT;else plainMessages"
+                    >{{ languageStrings['primary.portal.shopPage.changes.keepCoverage'] | replaceTag: { "#firstname": member.name.firstName
+                    } }}&nbsp;<a
+                        href="javascript:void(0)"
+                        (click)="navigateToPCR()"
+                        language="primary.portal.primaryNav.policyChangeRequest"
+                    ></a
+                    >&nbsp;
+                    <span language="primary.portal.shopPage.page.message"></span>
+                </span>
+            </ng-container>
+
+            <ng-template #plainMessages>{{enrollmentMessage}}</ng-template>
+        </p>
+        <ng-container *ngIf="planPanel && editData.edited; else enrolledPlans">
+            <empowered-bucket-plan
+                *ngIf="(isBucketPlan$ | async); else standardPlan"
+                class="edit-plans"
+                [planPanel]="planPanel"
+            ></empowered-bucket-plan>
+            <ng-template #standardPlan>
+                <empowered-standard-plan class="edit-plans" [planPanel]="planPanel"></empowered-standard-plan>
+            </ng-template>
+        </ng-container>
+
+        <ng-template #enrolledPlans>
+            <div class="enrollment-plans">
+                <div>
+                    <div class="flex-wrapper">
+                        <mat-label class="mat-label"> {{ languageStrings["primary.portal.quoteShop.coverageLevel"] }} </mat-label>
+                        <p class="description">
+                            <ng-container *ngIf="coverageLevelName$ | async as coverageLevelName">
+                                <span
+                                    *ngIf="enrollment.coverageLevel.eliminationPeriod; else coverageLevel"
+                                    language="primary.portal.coverage.individual"
+                                ></span>
+                                <ng-template #coverageLevel> {{ coverageLevelName }} </ng-template>
+                            </ng-container>
+                        </p>
+                    </div>
+                    <div class="flex-wrapper" *ngIf="enrollment.benefitAmount">
+                        <mat-label class="mat-label">{{ languageStrings["primary.portal.shoppingExperience.benefitAmount"] }}</mat-label>
+                        <p class="description">{{ enrollment.benefitAmount | currency }}</p>
+                    </div>
+                    <div class="flex-wrapper" *ngIf="enrollment.coverageLevel.eliminationPeriod">
+                        <mat-label class="mat-label"
+                            >{{ languageStrings["primary.portal.shoppingExperience.eliminationPeriod"] }}</mat-label
+                        >
+                        <p class="description">{{ enrollment.coverageLevel.eliminationPeriod }}</p>
+                    </div>
+                    <div class="flex-wrapper" *ngIf="enrolledRiders$ | async as enrolledRiders">
+                        <ng-container *ngIf="enrolledRiders?.length">
+                            <mat-label class="mat-label" language="primary.portal.shopQuote.riders"></mat-label>
+                            <div class="riders">
+                                <ng-container *ngFor="let enrolledRider of enrolledRiders;">
+                                    <span> {{ enrolledRider.name}} </span>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="flex-wrapper">
+                        <mat-label class="mat-label">{{ languageStrings["primary.portal.quoteShop.taxStatus"] }}</mat-label>
+                        <p class="description">{{ taxStatusMapping[enrollment.taxStatus]}}</p>
+                    </div>
+                    <ng-container *ngIf="memberData$ | async as member">
+                        <div class="flex-wrapper">
+                            <mat-label class="mat-label">{{ languageStrings["primary.portal.quoteShop.coveredIndividuals"] }}</mat-label>
+                            <p class="description">
+                                {{ member.name.firstName }} {{ member.name.lastName }} {{
+                                languageStrings["primary.portal.shopPage.primaryInsured"] }}
+                                <span
+                                    class="d-block"
+                                    *ngIf="dependentCoverageLevel$ | async "
+                                    language="primary.portal.quoteShop.allEligibleDependents"
+                                >
+                                </span>
+                            </p>
+                        </div>
+                    </ng-container>
+                    <div class="flex-wrapper">
+                        <mat-label class="mat-label">{{languageStrings["primary.portal.shoppingExperience.coverageDate"]}}</mat-label>
+                        <p class="description">
+                            <ng-container *ngIf="coverageDateText$ | async as coverageDateText"> {{ coverageDateText }} </ng-container>
+                        </p>
+                    </div>
+
+                    <div class="flex-wrapper" *ngIf="beneficiaries$ | async as beneficiaries">
+                        <ng-container *ngIf="beneficiaries?.length">
+                            <mat-label class="mat-label"
+                                >{{ languageStrings["primary.portal.shoppingExperience.beneficiaries"] }}
+                            </mat-label>
+                            <div class="beneficiaries">
+                                <ng-container *ngFor="let beneficiary of beneficiaries; trackBy: trackByEnrollmentBeneficiary">
+                                    <span [ngSwitch]="beneficiary.beneficiary.type">
+                                        <span *ngSwitchCase="'ESTATE'" language="primary.portal.coverage.estate"></span>
+                                        <span *ngSwitchCase="'TRUST'">
+                                            {{ beneficiary.beneficiary.trustee.firstName }} {{ beneficiary.beneficiary.trustee.lastName }}
+                                        </span>
+                                        <span *ngSwitchCase="'CHARITY'" language="primary.portal.coverage.charity"></span>
+                                        <span *ngSwitchCase="'INDIVIDUAL'">
+                                            {{ beneficiary.beneficiary.name.firstName }} {{ beneficiary.beneficiary.name.lastName }}
+                                        </span>
+                                        ({{ beneficiary.allocationType | lowercase }}) - {{ beneficiary.percent}}%
+                                    </span>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div>
+                    <div class="cost-wrapper">
+                        <p class="cost-label" language="primary.portal.quoteShop.baseCost"></p>
+                        <span *ngIf="baseCost$ | async as baseCost">{{ baseCost | currency:'':'symbol':'1.2-2' }} </span>
+                    </div>
+                    <div class="cost-wrapper">
+                        <p class="cost-label">
+                            <span *ngIf="adjustmentAmount$ | async as adjustmentAmount; else adjustments">
+                                <ng-container
+                                    *ngIf="isNotCompanyProvided$ | async; else adjustments"
+                                    language="primary.portal.quoteShop.employerContribution"
+                                >
+                                </ng-container>
+                            </span>
+
+                            <ng-template #adjustments>
+                                <span language="primary.portal.quoteShop.adjustments"></span>
+                            </ng-template>
+                        </p>
+                        <p *ngIf="adjustmentAmount$ | async as adjustmentAmount; else noAdjustment">
+                            <span>{{adjustment + adjustmentAmount | currency:'':'symbol':'1.2-2'}}</span>
+                        </p>
+                        <ng-template #noAdjustment>
+                            <p>{{ adjustment}}</p>
+                        </ng-template>
+                    </div>
+                    <mat-divider class="border-seperator"></mat-divider>
+
+                    <div class="cost-wrapper">
+                        <p class="cost-label" language="primary.portal.applicationFlow.planInfo.netCost"></p>
+                        <p *ngIf="netCost$ | async as netCost">
+                            <span>{{netCost | currency:'':'symbol':'1.2-2'}}</span>
+                        </p>
+                    </div>
+                    <p *ngIf="payFrequency$ | async as payFrequency" class="pay-frequency">{{ payFrequency | lowercase }}</p>
+
+                    <div class="edit-details">
+                        <ng-container *ngIf="reinstatementInfo$ | async as reinstatementInfo; else editOrReEnroll">
+                            <empowered-reinstate-button-wrapper
+                                [planPanel]="planPanel"
+                                *ngIf="reinstatementInfo?.id; else editOrReEnroll"
+                            ></empowered-reinstate-button-wrapper>
+                        </ng-container>
+                        <ng-template #editOrReEnroll>
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                language="primary.portal.enrollmentPage.reEnrollOptions"
+                                *ngIf="reEnrollable$ | async as reEnrollable ; else editCoverage"
+                                (click)="onEdit()"
+                            ></button>
+                            <ng-template #editCoverage>
+                                <a
+                                    href="javascript:void(0)"
+                                    (click)="onEdit()"
+                                    language="primary.portal.coverage.editcoverage"
+                                    class="plan-details-link"
+                                    *ngIf="editable && !enrollment.plan.vasFunding"
+                                >
+                                </a>
+                            </ng-template>
+                        </ng-template>
+
+                        <empowered-plan-details-link
+                            [planOffering]="planPanel.planOffering"
+                            class="plan-details-link"
+                        ></empowered-plan-details-link>
+                        <empowered-end-coverage-link
+                            *ngIf="enableEndCoverageLink$ | async"
+                            [planOffering]="planPanel.planOffering"
+                        ></empowered-end-coverage-link>
+                        <empowered-plan-withdraw-link
+                            *ngIf="enablePlanWithdrawLink$ | async"
+                            [planOffering]="planPanel.planOffering"
+                        ></empowered-plan-withdraw-link>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </ng-container>
+</ng-container>

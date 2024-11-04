@@ -1,0 +1,107 @@
+@import "shared";
+
+.tpi-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: map-get($spacers, 0) map-get($spacers, 30);
+    justify-content: space-between;
+    height: convert-unit(50px, "rem");
+
+    .logo {
+        align-self: center;
+        display: inline-flex;
+        margin-right: map-get($spacers, 15);
+        .aflac-logo {
+            max-width: 100%;
+            height: convert-unit(40px, "rem");
+        }
+    }
+
+    .close-wrapper {
+        .mat-icon-button {
+            width: map-get($spacers, 15);
+            height: map-get($spacers, 15);
+            line-height: convert-unit(22px, "rem");
+
+            &:focus {
+                border-radius: 0;
+                box-shadow: map-get($spacers, 0) map-get($spacers, 0) convert-unit(1px, "rem") convert-unit(1px, "rem")
+                        get("color.primary.300"),
+                    map-get($spacers, 0) map-get($spacers, 0) convert-unit(3px, "rem") convert-unit(4px, "rem")
+                        get("color.primary.100");
+            }
+
+            mon-icon {
+                margin: map-get($spacers, 0);
+                vertical-align: top;
+            }
+
+            ::ng-deep .mat-button-focus-overlay {
+                background: get("color.white");
+            }
+        }
+    }
+}
+.tpi-header,
+.lnl-header {
+    .tpi-menu,
+    .lnl-menu {
+        display: flex;
+        .tpi-menu-link,
+        .lnl-menu-link {
+            color: get("color.gray.1000");
+            padding: convert-unit(12px, "rem") map-get($spacers, 30);
+            display: inline-flex;
+            border-bottom: convert-unit(3px, "rem") solid transparent;
+
+            &:hover {
+                text-decoration: none;
+                border-bottom: convert-unit(3px, "rem") solid get("color.gray.600");
+            }
+            &.active-link {
+                @include fontFace("primary.medium");
+                color: get("color.gray.900");
+                border-bottom: convert-unit(3px, "rem") solid get("color.gray.600");
+            }
+        }
+    }
+}
+.lnl-header {
+    div {
+        display: flex;
+        background-color: get("color.gray.800");
+        color: get("color.white");
+        height: convert-unit(50px, "rem");
+        justify-content: space-between;
+
+        .logo {
+            background-color: rgb(0, 171, 185);
+            flex: 0 0 convert-unit(240px, "rem");
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: map-get($spacers, 0) map-get($spacers, 20);
+
+            .aflac-lnl-logo {
+                max-width: 100%;
+                height: convert-unit(30px, "rem");
+            }
+        }
+
+        .contact-info {
+            display: flex;
+            color: white;
+            align-items: center;
+            padding: map-get($spacers, 0) map-get($spacers, 20);
+            font-size: convert-unit(22px, "rem");
+            font-weight: 300;
+            @include fontFace("primary.light");
+        }
+    }
+    .lnl-menu {
+        background-color: get("color.gray.100");
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    }
+}

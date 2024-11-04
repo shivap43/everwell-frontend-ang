@@ -1,0 +1,27 @@
+<mat-form-field
+    ><input
+        class="mon-input"
+        matInput
+        [formControl]="formControl"
+        [maxlength]="11"
+        empoweredSsnFormat
+        (blur)="onBlur()"
+        (focus)="onFocus()"
+        (input)="onInput($event.target.value)"
+        (paste)="onPaste()"
+        [attr.aria-label]="ariaLabel"
+    />
+    <a
+        *ngIf="showToggle && formControl.value && !formControl.disabled"
+        (click)="onToggle()"
+        href="javascript:void(0)"
+        class="nodec-link"
+        matSuffix
+    >
+        <span *ngIf="(showSSN$ | async) === false; else show" language="primary.portal.common.show"></span>
+        <ng-template #show><span language="primary.portal.common.hide"></span></ng-template>
+    </a>
+    <mat-hint *ngIf="showHint && isProducerPortal" language="secondary.portal.members.ssn.updateHint.agentAssisted"></mat-hint>
+    <mat-hint *ngIf="showHint && !isProducerPortal" language="secondary.portal.members.ssn.hint.selfService"></mat-hint>
+    <mat-error> <ng-content></ng-content></mat-error>
+</mat-form-field>

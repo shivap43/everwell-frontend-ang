@@ -1,0 +1,96 @@
+@import "shared";
+
+.tpi-main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    .tpi-content-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+
+        ::ng-deep {
+            .tpi {
+                &-content-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    overflow: hidden;
+                }
+
+                &-content {
+                    flex-grow: 1;
+                    overflow-y: auto;
+                    padding: map-get($spacers, 30);
+                }
+
+                &-footer {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: map-get($spacers, 25) map-get($spacers, 30);
+                    background-color: get("color.gray.100");
+                    border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+                    flex-shrink: 0;
+
+                    .mon-btn-link {
+                        min-width: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .tpi-footer {
+        padding: map-get($spacers, 25);
+        border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+        .mat-button {
+            margin-right: map-get($spacers, 20);
+            float: right;
+        }
+    }
+
+    /* Link and launch Changes */
+    &.lnl-wrapper {
+        height: 100%;
+
+        .tpi-content-body {
+            flex: 1 0 auto;
+            overflow: unset;
+            height: auto;
+
+            ::ng-deep {
+                .tpi {
+                    &-content-wrapper {
+                        height: auto;
+
+                        .shopping-experience-products {
+                            height: auto;
+                            overflow: unset;
+                        }
+                    }
+
+                    &-content {
+                        overflow: auto;
+                        padding: map-get($spacers, 30);
+
+                        &.tpi-mode-page-view {
+                            padding: 0;
+                            height: initial;
+                        }
+
+                        &.pda-form {
+                            height: calc(100vh - 475px);
+                        }
+                    }
+
+                    &-footer {
+                        background-color: get("color.white");
+                        border-top: none;
+                    }
+                }
+            }
+        }
+    }
+}

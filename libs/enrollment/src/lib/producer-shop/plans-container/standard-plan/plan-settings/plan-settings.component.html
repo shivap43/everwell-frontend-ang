@@ -1,0 +1,37 @@
+<empowered-settings-dropdown *ngIf="hasRiders$ | async" [meta]="ridersPortalMeta" [settingsDropdownContent]="riders" #ridersDropdown>
+    <empowered-riders class="content" #riders [portalRef]="ridersDropdown.portal" [planPanel]="planPanel"></empowered-riders>
+</empowered-settings-dropdown>
+
+<empowered-settings-dropdown
+    *ngIf="hasBenefitAmounts$ | async"
+    [meta]="benefitAmountPortalMeta"
+    [settingsDropdownContent]="benefit"
+    #benefitAmountDropdown
+>
+    <empowered-benefit-amount class="content" #benefit [portalRef]="benefitAmountDropdown.portal" [planPanel]="planPanel">
+    </empowered-benefit-amount>
+</empowered-settings-dropdown>
+
+<empowered-settings-dropdown
+    *ngIf="hasEliminationPeriods$ | async"
+    [meta]="eliminationPeriodPortalMeta"
+    [settingsDropdownContent]="elimination"
+    #eliminationPeriodDropdown
+>
+    <empowered-elimination-period class="content" #elimination [portalRef]="eliminationPeriodDropdown.portal" [planPanel]="planPanel">
+    </empowered-elimination-period>
+</empowered-settings-dropdown>
+
+<empowered-settings-dropdown
+    *ngIf="hasDependentAge$ | async"
+    [meta]="dependentAgePortalMeta"
+    [settingsDropdownContent]="dependentAge"
+    #dependentAgeDropdown
+>
+    <empowered-dependent-age
+        [planPanel]="planPanel"
+        class="content"
+        #dependentAge
+        [portalRef]="dependentAgeDropdown.portal"
+    ></empowered-dependent-age>
+</empowered-settings-dropdown>

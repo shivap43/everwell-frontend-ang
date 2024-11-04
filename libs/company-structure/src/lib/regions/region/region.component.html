@@ -1,0 +1,98 @@
+<mat-accordion>
+    <mat-expansion-panel
+        [ngClass]="{'panel-active': panelOpenState }"
+        hideToggle
+        (closed)="triggerPanelToggle(false)"
+        (opened)="triggerPanelToggle(true)"
+        class="group-title-expand"
+        [disabled]="true"
+    >
+        <mat-expansion-panel-header class="prevent-click" [ngClass]="{'add-region-title': addRegion, 'region-title': !addRegion}">
+            <mat-panel-title class="region-panel-title">
+                <ng-container [ngTemplateOutlet]="addRegion?addRegionTitle:regionTitle"></ng-container>
+            </mat-panel-title>
+            <mat-panel-description class="region-panel-desc">
+                <ng-container [ngTemplateOutlet]="addRegion?empty:regionDesc"></ng-container>
+            </mat-panel-description>
+            <ng-container *ngIf="regionName && !regionName.default" [ngTemplateOutlet]="addRegion?empty:regionLinks"> </ng-container>
+        </mat-expansion-panel-header>
+        <ng-container [ngTemplateOutlet]="addRegion?addRegionContent:regionContent"></ng-container>
+    </mat-expansion-panel>
+</mat-accordion>
+
+<!-- Templates -->
+<ng-template #regionTitle>
+    <div class="authorize-click">
+        <mat-progress-bar
+            *ngIf="regionName?.numberOfMembers/regionType?.totalNumberOfMembers*100 | number:'1.0-0' as popVal"
+            richTooltip="{{popVal}}% - {{regionName?.numberOfMembers}} {{regionName?.numberOfMembers === 1? 'employee': 'employees'}}"
+            matTooltipClass="pos-above"
+            matTooltipPosition="above"
+            mode="determinate"
+            [value]="popVal"
+        ></mat-progress-bar>
+    </div>
+
+    <h4 class="space">{{regionName?.name}}</h4>
+</ng-template>
+<ng-template #regionDesc>{{regionName?.description}}</ng-template>
+<ng-template #regionLinks>
+    <div class="authorize-click action-buttons">
+        <span class="space" *ngIf="panelOpenState">
+            <button mat-flat-button class="mon-btn-link" (click)="$event.stopPropagation(); cancelRegion()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button></span
+        >
+        <span class="space" *ngIf="!panelOpenState && !isPrivacyOnForEnroller">
+            <div [richTooltip]="getRemoveClassError()" matTooltipPosition="above" matTooltipClass="pos-above">
+                <button
+                    *isRestricted="permissionEnum.ACCOUNT_RESTRICT_DELETE_REGION_TYPE"
+                    mat-flat-button
+                    href="javascript:void(0)"
+                    [ngClass]="{'disabledLink': regionName?.numberOfMembers > 0 }"
+                    class="mon-btn-link link-danger"
+                    (click)="$event.stopPropagation(); openRemoveRegionDialog()"
+                    [tabIndex]="-1"
+                    [disabled]="regionName?.numberOfMembers > 0"
+                >
+                    {{languageStrings['primary.portal.common.remove']}}
+                </button>
+            </div></span
+        >
+        <span *ngIf="!panelOpenState && !isPrivacyOnForEnroller" class="space">
+            <button
+                *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_REGION_TYPE"
+                mat-flat-button
+                class="mon-btn-link"
+                (click)="editRegion()"
+                [tabIndex]="-1"
+            >
+                {{languageStrings['primary.portal.common.edit']}}
+            </button></span
+        >
+    </div>
+</ng-template>
+
+<ng-template #regionContent>
+    <ng-template [cdkPortalOutlet]="portalsService.selectedPortal"></ng-template>
+</ng-template>
+
+<ng-template #addRegionTitle>
+    <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_REGION ">
+        <a
+            href="javascript:void(0)"
+            (click)="addRegions()"
+            class="authorize-click add-class"
+            *ngIf="!panelOpenState && !isPrivacyOnForEnroller"
+            [tabIndex]="-1"
+            [attr.aria-label]="languageStrings['primary.portal.regions.addRegion']"
+            >{{ languageStrings['primary.portal.regions.addRegion'] }}</a
+        >
+    </ng-container>
+</ng-template>
+
+<ng-template #addRegionContent>
+    <ng-template [cdkPortalOutlet]="portalsService.selectedPortal"></ng-template>
+</ng-template>
+
+<ng-template #empty></ng-template>

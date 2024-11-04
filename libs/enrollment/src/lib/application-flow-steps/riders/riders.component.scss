@@ -1,0 +1,50 @@
+@import "shared";
+
+.rider-document {
+    display: inline-flex;
+    align-items: center;
+}
+
+.navigate {
+    margin-top: convert-unit(20px, "rem");
+}
+
+::ng-deep {
+    .appflow-section {
+        .section-step {
+            &.active-section {
+                .section-sub-step {
+                    padding-top: map-get($map: $spacers, $key: 10);
+
+                    &.active-section {
+                        border-bottom: none !important;
+
+                        .section-sub-step {
+                            &.level-next {
+                                min-height: convert-unit(600px, "rem") !important;
+                                border: convert-unit(1px, "rem") solid get("color.gray.500");
+                            }
+
+                            .section-container {
+                                min-height: map-get($spacers, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.pdf-links {
+    display: flex;
+    align-items: center;
+    margin-bottom: map-get($spacers, 5);
+    .file-icon {
+        margin: map-get($spacers, 0);
+        height: convert-unit(32px, "rem");
+    }
+    a {
+        margin-left: map-get($spacers, 5);
+    }
+}

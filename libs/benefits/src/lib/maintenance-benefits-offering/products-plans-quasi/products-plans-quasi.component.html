@@ -1,0 +1,141 @@
+<div class="layout-header-2column" *ngIf="(MaintenanceOfferingSteps$ | async) as MaintenanceOfferingSteps">
+    <div class="header">
+        <h2 class="header-content">
+            <span mat-dialog-title *ngIf="data.opensFrom==='products'"
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.addProducts']}}</span
+            >
+            <span mat-dialog-title *ngIf="data.opensFrom==='plans'">
+                {{languageStrings["primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.managePlans"].replace("#productName",data.productInformation.productName)}}
+            </span>
+            <span mat-dialog-title *ngIf="data.opensFrom==='copyNewPlanYear'"
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.createNewPlanYear']}}</span
+            >
+            <button
+                mat-icon-button
+                (click)="closeModal()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </h2>
+    </div>
+    <div class="columns">
+        <div class="sidenav-area">
+            <mat-vertical-stepper
+                #progressIndicator
+                (selectionChange)="onStepChange($event)"
+                class="side-nav-stepper"
+                [linear]="true"
+            >
+                <span *ngIf="this.data.opensFrom==='copyNewPlanYear'">
+                    <mat-step [completed]="defaultStepPosition>1">
+                        <ng-template matStepLabel>
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.copyPlanYear']}}
+                        </ng-template>
+                    </mat-step>
+                </span>
+                <span *ngIf="this.data.opensFrom==='products' || this.data.opensFrom==='copyNewPlanYear'">
+                    <mat-step [completed]="defaultStepPosition>2">
+                        <ng-template matStepLabel>
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.products']}}
+                        </ng-template>
+                    </mat-step>
+                </span>
+                <span *ngIf="this.data.opensFrom==='plans' && this.data.planType==='true'">
+                    <mat-step [completed]="defaultStepPosition>2">
+                        <ng-template matStepLabel>
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.planYear']}}
+                        </ng-template>
+                    </mat-step>
+                </span>
+                <mat-step [completed]="defaultStepPosition>3">
+                    <ng-template matStepLabel
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.plans']}}</ng-template
+                    >
+                    <ul #ulPlansList *ngIf="showPlansList" class="sub-step">
+                        <li
+                            *ngFor="let product of productList;let i=index"
+                            [ngClass]="{'active' : presentProductIndex == i, 'future-step': (presentProductIndex != i && !productList[i].completed) }"
+                        >
+                            <a (click)="initiateChangeProduct(product.id)">{{product.name}}</a>
+                        </li>
+                    </ul>
+                </mat-step>
+                <mat-step [completed]="defaultStepPosition>4">
+                    <ng-template matStepLabel>
+                        <span>{{languageStrings['primary.portal.benefitsOffering.avaliablity']}}</span>
+                    </ng-template>
+                </mat-step>
+                <mat-step
+                    [completed]="defaultStepPosition>MaintenanceOfferingSteps.PRICES_ELIGIBILITY+1"
+                    *ngIf="MaintenanceOfferingSteps.PRICES_ELIGIBILITY"
+                >
+                    <ng-template matStepLabel
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.pricesAndEligibility']}}</ng-template
+                    >
+                    <ul #ulPlansList class="sub-step">
+                        <li>
+                            <a
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.copySettings']}}</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.setPrices']}}</a
+                            >
+                        </li>
+                    </ul>
+                </mat-step>
+                <mat-step [completed]="defaultStepPosition>MaintenanceOfferingSteps.CARRIER_FORMS+1">
+                    <ng-template matStepLabel>
+                        <span
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.carrierForms']}}</span
+                        >
+                    </ng-template>
+                </mat-step>
+                <mat-step [completed]="defaultStepPosition>MaintenanceOfferingSteps.REVIEW_SUBMIT+1">
+                    <ng-template matStepLabel>
+                        <span
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.productsPlansQuasi.reviewAndSubmit']}}</span
+                        >
+                    </ng-template>
+                </mat-step>
+                <ng-template matStepperIcon="done">
+                    <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                </ng-template>
+            </mat-vertical-stepper>
+        </div>
+        <div class="content-area">
+            <empowered-copy-plans-new-planyear
+                [mpGroup]="data.mpGroup"
+                *ngIf="step===0 && this.data.opensFrom==='copyNewPlanYear'"
+                class="quasi-modal"
+            ></empowered-copy-plans-new-planyear>
+            <empowered-product-quasi
+                *ngIf="step===1 && (this.data.opensFrom==='products' || this.data.opensFrom==='copyNewPlanYear')"
+                class="quasi-modal"
+            ></empowered-product-quasi>
+            <empowered-plan-year-quasi
+                *ngIf="step===1 && this.data.opensFrom==='plans' && this.data.planType==='true'"
+                class="quasi-modal"
+            ></empowered-plan-year-quasi>
+            <empowered-plan-quasi *ngIf="step===2" class="quasi-modal"></empowered-plan-quasi>
+            <empowered-coverage-date-quasi *ngIf="step===3" class="quasi-modal"></empowered-coverage-date-quasi>
+            <empowered-plan-list-quasi
+                *ngIf="MaintenanceOfferingSteps.PRICES_ELIGIBILITY && step===MaintenanceOfferingSteps.PRICES_ELIGIBILITY"
+                class="quasi-modal"
+                (clickClassLink)="closeModal()"
+            ></empowered-plan-list-quasi>
+            <empowered-carrier-forms
+                [productCarrierId]="data?.productInformation?.carrierId"
+                [maintain]="true"
+                *ngIf="step===MaintenanceOfferingSteps.CARRIER_FORMS"
+                class="quasi-modal"
+            ></empowered-carrier-forms>
+            <empowered-review-submit-quasi
+                *ngIf="step===MaintenanceOfferingSteps.REVIEW_SUBMIT"
+                class="quasi-modal"
+            ></empowered-review-submit-quasi>
+        </div>
+    </div>
+</div>

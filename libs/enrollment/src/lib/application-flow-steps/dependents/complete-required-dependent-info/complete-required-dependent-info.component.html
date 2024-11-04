@@ -1,0 +1,159 @@
+<form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="dependent-wrapper">
+    <empowered-sheet>
+        <empowered-sheet-header>
+            <span language="primary.portal.applicationFlow.dependents.requiredInfo.title"></span>
+        </empowered-sheet-header>
+
+        <div class="content">
+            <h2>
+                <span
+                    >{{"primary.portal.applicationFlow.dependents.requiredInfo.subTitle" | replaceTag: { "##name##":
+                    data?.dependent?.name } }}</span
+                >
+            </h2>
+            <p>
+                <span language="primary.portal.applicationFlow.dependents.requiredInfo.info"></span>
+            </p>
+
+            <div class="flex-form-wrapper">
+                <mat-checkbox [formControl]="sameAsEmployee">
+                    <span
+                        >{{"primary.portal.applicationFlow.dependents.requiredInfo.sameAsEmployeeAddress" | replaceTag:
+                        { "##employee##": data?.member?.name } }}</span
+                    >
+                </mat-checkbox>
+
+                <div class="form-fields">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="formGroup?.controls?.address1">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label" id="address-1">
+                                    <span
+                                        language="primary.portal.members.dependent.personalInfo.streetAddress1"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input matInput formControlName="address1" aria-labelledby="address-1" />
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address1?.errors?.required"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address1.errors?.pattern"
+                                        language="primary.portal.members.dependentValidationMsg.streetAddress1Msg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address1?.errors?.maxlength as maxLengthError"
+                                        >{{"secondary.portal.applicationFlow.dependents.error.maxLength" | replaceTag: {
+                                        "##num##": maxLengthError.requiredLength } }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="formGroup?.controls?.address2">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label" id="address-2">
+                                    <span
+                                        language="primary.portal.members.dependent.personalInfo.streetAddress2"
+                                    ></span>
+                                    <span class="optional-text" language="primary.portal.common.optional"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input matInput formControlName="address2" aria-labelledby="address-2" />
+                                    <mat-hint language="primary.portal.members.streetAddressHint1"></mat-hint>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address2?.errors?.required"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address2?.errors?.pattern"
+                                        language="primary.portal.members.dependentValidationMsg.streetAddress1Msg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.address2?.errors?.maxlength as maxLengthError"
+                                        >{{"secondary.portal.applicationFlow.dependents.error.maxLength" | replaceTag: {
+                                        "##num##": maxLengthError.requiredLength } }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="formGroup?.controls?.city">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" id="city">
+                                    <span language="primary.portal.members.dependent.personalInfo.city"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input matInput formControlName="city" aria-labelledby="city" />
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.city?.errors?.required"
+                                        language="secondary.portal.members.requiredField"
+                                    >
+                                    </mat-error>
+                                    <mat-error *ngIf="formGroup?.controls?.city?.errors?.maxlength as maxLengthError"
+                                        >{{"secondary.portal.applicationFlow.dependents.error.maxLength" | replaceTag: {
+                                        "##num##": maxLengthError.requiredLength } }}</mat-error
+                                    >
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.city?.errors?.pattern"
+                                        language="secondary.portal.members.dependent.errors.city.pattern"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="formGroup?.controls?.state">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label" id="state">
+                                    <span language="primary.portal.members.dependent.personalInfo.state"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="state"
+                                        [placeholder]="placeHolderSelect"
+                                        disableOptionCentering="true"
+                                        aria-labelledby="state"
+                                    >
+                                        <mat-option
+                                            *ngFor="let state of (states$ | async)"
+                                            [value]="state.abbreviation"
+                                        >
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="formGroup?.controls?.state?.errors?.required"
+                                        language="secondary.portal.members.selectionRequired"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="formGroup?.controls?.zip as zip">
+                            <div class="flex-item w-100">
+                                <empowered-zip-code-input
+                                    [formControl]="zip"
+                                    inputLabel="primary.portal.accounts.zip"
+                                    stateMismatchError="primary.portal.applicationFlow.payments.matchState"
+                                    patternError="primary.portal.members.workValidationMsg.zip"
+                                    [stateControlValue]="formGroup.controls.state?.value"
+                                >
+                                </empowered-zip-code-input>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <empowered-sheet-footer>
+            <button mat-button class="mon-btn-primary" type="submit">
+                <span language="primary.portal.common.continue"></span>
+            </button>
+        </empowered-sheet-footer>
+    </empowered-sheet>
+</form>

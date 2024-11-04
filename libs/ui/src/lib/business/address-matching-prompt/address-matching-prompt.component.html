@@ -1,0 +1,263 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+<empowered-modal type="POPUP" [showCancel]="true">
+    <empowered-modal-header>
+        <span *ngIf="step1 || step2" language="primary.portal.confirm.applicant.addressInformation"></span>
+        <span *ngIf="step3" language="primary.portal.applicant.addressMatch.allowed"></span>
+        <ng-container *ngIf="step4">
+            <span *ngIf="isTpi" language="primary.portal.applicant.tpi.addressUpdate"></span>
+            <span *ngIf="isMPP || data.isDirect" language="primary.portal.applicant.addressUpdate"></span>
+            <span *ngIf="isMMP" language="primary.portal.applicant.mmp.addressUpdate"></span>
+        </ng-container>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-secondary" *ngIf="!step1" (click)="onBack()">
+            <span language="primary.portal.census.manualEntry.stepperBack"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step2 || step1" (click)="onNext()">
+            <span language="primary.portal.census.manualEntry.stepperNext"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step3" (click)="onContinue()">
+            <span language="primary.portal.common.continue"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step4 && isTpi" (click)="onGotIt()">
+            <span language="primary.portal.common.gotIt"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="step4 && !isTpi" type="submit" (click)="onSubmit()">
+            <span language="primary.portal.common.submit"></span>
+        </button>
+    </empowered-modal-footer>
+    <ng-container *ngIf="step1">
+        <div *ngIf="isMPP">
+            <p language="primary.portal.applicant.addressMatch.message" class="header-title"></p>
+        </div>
+        <div *ngIf="data.isDirect">
+            <p language="primary.portal.applicant.direct.addressMatch.message" class="header-title"></p>
+        </div>
+        <div *ngIf="isMMP || isTpi">
+            <p language="primary.portal.applicant.mmp.addressMatch.message" class="header-title"></p>
+        </div>
+        <div>
+            <p language="primary.portal.addressMatch.checkBox.message"></p>
+        </div>
+        <mat-checkbox [formControl]="isAgent" class="confirmation-select">
+            <span *ngIf="isMPP" language="primary.portal.applicant.agentOrOwner.addressMatch.confirmation"></span>
+            <span *ngIf="data.isDirect" language="primary.portal.applicant.direct.agentAddressMatch.confirmation"></span>
+            <span *ngIf="isMMP || isTpi" language="primary.portal.applicant.mmp.agentOrOwnerAddressMatch.confirmation"></span>
+        </mat-checkbox>
+    </ng-container>
+    <ng-container *ngIf="step2">
+        <div *ngIf="isMPP">
+            <p language="primary.portal.applicant.notAgentOrOwner.message" class="header-title"></p>
+        </div>
+        <div *ngIf="data.isDirect">
+            <p language="primary.portal.applicant.direct.notAgent.message" class="header-title"></p>
+        </div>
+        <div *ngIf="isMMP || isTpi">
+            <p language="primary.portal.applicant.mmp.notAgentOrOwner.message" class="header-title"></p>
+        </div>
+        <div>
+            <p language="primary.portal.addressMatch.checkBox.message"></p>
+        </div>
+        <mat-checkbox [formControl]="isRelatedToAgent" class="confirmation-select">
+            <span *ngIf="isMPP" language="primary.portal.applicant.agentOrOwnerRelation.addressMatch.confirmation"></span>
+            <span *ngIf="data.isDirect" language="primary.portal.applicant.direct.agentRelation.addressMatch.confirmation"></span>
+            <span *ngIf="isMMP || isTpi" language="primary.portal.applicant.mmp.agentOrOwnerRelation.addressMatch.confirmation"></span>
+        </mat-checkbox>
+    </ng-container>
+    <ng-container *ngIf="step3">
+        <span *ngIf="isMPP" language="primary.portal.applicant.agentOrOwner.addressMatched.message"></span>
+        <span *ngIf="data.isDirect" language="primary.portal.applicant.direct.agentAddressMatched.message"></span>
+        <span *ngIf="isMMP || isTpi" language="primary.portal.applicant.mmp.agentOrOwner.addressMatched.message"></span>
+    </ng-container>
+    <ng-container *ngIf="step4 && isTpi">
+        <mon-alert alertType="warning" class="message">
+            <p class="mon-mt-0" language="primary.portal.applicant.tpi.addressUpdate.warningMessage"></p>
+        </mon-alert>
+        <div *ngIf="data.isTPILnlSelfService">
+            <p class="message" language="primary.portal.applicant.tpi.addressUpdate.messageOne"></p>
+            <p class="message" language="primary.portal.applicant.tpi.addressUpdate.messageTwo"></p>
+        </div>
+        <div *ngIf="data.isTPILnlAgentAssisted">
+            <p class="message" language="primary.portal.applicant.tpiEnrollmentsPend.message"></p>
+        </div>
+        <div language="primary.portal.applicant.enrollmentsPend.note"></div>
+    </ng-container>
+    <ng-container *ngIf="step4 && !isTpi">
+        <div *ngIf="data.isDirect">
+            <p class="message" language="primary.portal.applicant.direct.mppEnrollmentsPend.message"></p>
+        </div>
+        <div *ngIf="isMPP">
+            <p class="message" language="primary.portal.applicant.mpp.enrollmentsPend.message"></p>
+        </div>
+        <div *ngIf="isMMP">
+            <p class="message" language="primary.portal.applicant.mmp.enrollmentsPend.message"></p>
+        </div>
+        <div *ngIf="!isMMP">
+            <p class="message" language="primary.portal.applicant.enrollmentsPend.note"></p>
+        </div>
+        <div class="radio-button-container">
+            <mat-radio-group class="radio-group-stacked" [formControl]="updateAddressOption" (change)="onUpdateAddressFormChange($event)">
+                <mat-radio-button [value]="updateAddressNot" class="form-radio-button-stacked"
+                    ><span *ngIf="isMPP || data.isDirect" language="primary.portal.applicant.addressNotUpdating.option"></span>
+                    <span *ngIf="isMMP" language="primary.portal.applicant.mmp.addressNotUpdating.option"></span>
+                </mat-radio-button>
+                <mat-radio-button [value]="updateAddress" [checked]="showUpdateAddressForm" class="form-radio-button-stacked"
+                    ><span *ngIf="isMPP || data.isDirect" language="primary.portal.applicant.addressUpdate.option"></span>
+                    <span *ngIf="isMMP" language="primary.portal.applicant.mmp.addressUpdate.option"></span>
+                </mat-radio-button>
+            </mat-radio-group>
+            <p
+                *ngIf="hasCifNumber && showUpdateAddressForm"
+                class="update-address-message"
+                language="primary.portal.tpiEnrollment.selfService.addressChangeConfirmation"
+            ></p>
+        </div>
+        <mon-alert *ngIf="isError" alertType="danger" class="message">
+            <p *ngIf="data.isDirect" class="mon-mt-0" language="primary.portal.applicant.direct.addressMatch.errorMessage"></p>
+            <p *ngIf="isMMP" class="mon-mt-0" language="primary.portal.applicant.mmp.addressMatch.errorMessage"></p>
+            <p *ngIf="isMPP" class="mon-mt-0" language="primary.portal.applicant.mpp.addressMatch.errorMessage"></p>
+        </mon-alert>
+        <form *ngIf="showUpdateAddressForm" class="form-address-update" [formGroup]="addressChangeForm" (ngSubmit)="onSubmit()">
+            <div mat-dialog-content class="flex-form-wrapper mon-p-0">
+                <div class="contact-account-container">
+                    <div class="d-flex">
+                        <ng-container>
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label" for="street-address-1">
+                                    <span language="primary.portal.members.personalLabel.streetAddress1"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input formControlName="streetAddress1" matInput id="streetAddress1" />
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.streetAddress1.errors?.required"
+                                        language="secondary.portal.accounts.contacts.required"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.streetAddress1.errors?.pattern && !addressChangeForm.controls.streetAddress1.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.address1Validation"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.streetAddress1.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label" for="street-address-2">
+                                    <span language="primary.portal.members.personalLabel.streetAddress2"></span>
+                                    <span language="primary.portal.common.optional" class="optional-text"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input formControlName="streetAddress2" matInput id="streetAddress2" />
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.streetAddress2.errors?.pattern && !addressChangeForm.controls.streetAddress2.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.address2Validation"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.streetAddress2.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="d-flex">
+                        <ng-container>
+                            <div class="w-260 mon-mr-20">
+                                <mat-label class="mat-label" for="city">
+                                    <span language="primary.portal.members.personalLabel.city"></span>
+                                    <span language="primary.portal.common.optional" class="optional-text"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input formControlName="city" matInput id="city" />
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.city.errors?.pattern && !addressChangeForm.controls.city.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.cityValidation"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.city.errors?.maxLength"
+                                        language="secondary.portal.profile.accountContacts.addUpdateContact.maxlengthValidation"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="w-100 mon-mr-20">
+                                <mat-label class="mat-label" for="state">
+                                    <span language="primary.portal.members.personalLabel.state"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select formControlName="state" id="state" disableOptionCentering="true">
+                                        <mat-option [value]="data.address.state">{{ data.address.state }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="w-120">
+                                <empowered-zip-code-input
+                                    [formControl]="addressChangeForm.controls.zip"
+                                    [stateControlValue]="stateControlValue$ | async"
+                                    [validateOnStateChange]="true"
+                                    [readonly]="false"
+                                >
+                                    <mat-error
+                                        *ngIf="addressChangeForm.controls.zip.errors?.required"
+                                        language="secondary.portal.members.workValidationMsg.required"
+                                    ></mat-error>
+                                </empowered-zip-code-input>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-flex">
+                        <ng-container>
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" for="county">
+                                    <span language="primary.portal.members.personalLabel.county"></span>
+                                    <span language="primary.portal.common.optional" class="optional-text"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="county"
+                                        [placeholder]="languageStrings['primary.portal.members.personalLabel.select']"
+                                        id="county"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let county of counties" [value]="county.id"> {{ county.name }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" for="country">
+                                    <span language="primary.portal.members.personalLabel.country"></span>
+                                    <span language="primary.portal.common.optional" class="optional-text"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="country"
+                                        [placeholder]="languageStrings['primary.portal.members.personalLabel.select']"
+                                        id="country"
+                                        disableOptionCentering="true"
+                                    >
+                                        <mat-option *ngFor="let country of countries" [value]="country"> {{ country }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-container>
+</empowered-modal>

@@ -1,0 +1,33 @@
+<div
+    *ngIf="alertOpen"
+    [ngClass]="{
+        'alert-danger': alertType === 'danger',
+        'alert-info': alertType === 'info',
+        'alert-success': alertType === 'success',
+        'alert-warning': alertType === 'warning',
+        'has-close-button': closeButton,
+        'mon-alert': true
+    }"
+    role="alert"
+>
+    <span class="alert-prefix">
+        <mon-icon [iconName]="alertIcon" [attr.aria-label]="alertNote" [attr.alt]="iconAltText"></mon-icon>
+    </span>
+
+    <span class="alert-content" #alertContent>
+        <span role="alertdialog" class="sr-only" [attr.aria-label]="alertNote"></span>
+        <ng-content></ng-content>
+        <span *ngIf="alertContent.children.length === 0" language="primary.portal.common.servertimeout"></span>
+    </span>
+
+    <span *ngIf="closeButton" class="alert-suffix">
+        <button (click)="alertClose()" aria-label="Close" mat-icon-button autofocus>
+            <mon-icon
+                [iconSize]="10"
+                iconName="close"
+                class="icon-black"
+                [attr.alt]="iconAltText.length > 0 ? 'Close' +  iconAltText + 'alert' : 'Close alert'"
+            ></mon-icon>
+        </button>
+    </span>
+</div>

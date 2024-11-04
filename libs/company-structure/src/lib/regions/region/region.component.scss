@@ -1,0 +1,61 @@
+@import "shared";
+
+:host {
+    .mat-expansion-panel {
+        margin: 0 convert-unit(50px, "rem") !important;
+        background-color: get("color.gray.200");
+
+        &.group-title-expand {
+            margin-bottom: convert-unit(15px, "rem") !important;
+
+            ::ng-deep {
+                .mat-expansion-panel-body {
+                    padding: 0;
+                }
+            }
+
+            &.mat-expanded {
+                padding-left: 0;
+            }
+        }
+        &:not(.mat-expanded) {
+            .mat-expansion-panel-header {
+                &.add-region-title {
+                    background-color: get("color.white");
+                    height: auto !important;
+                    padding: convert-unit(3px, "rem") 0;
+                }
+            }
+        }
+        &:hover {
+            .link-danger {
+                opacity: 1;
+            }
+        }
+    }
+
+    .mat-expansion-panel-header {
+        padding-left: convert-unit(15px, "rem");
+        padding-right: convert-unit(15px, "rem");
+
+        &.region-title {
+            padding-left: convert-unit(30px, "rem");
+        }
+        .region-panel-title {
+            h4 {
+                color: get("color.black");
+                @include fontFace("primary.regular");
+                font-size: convert-unit(18px, "rem");
+                font-weight: normal;
+            }
+            .add-class {
+                font-size: convert-unit(16px, "rem");
+            }
+        }
+        .region-panel-desc {
+            color: get("color.gray.700");
+            @include fontFace("primary.regular");
+            font-size: 16px;
+        }
+    }
+}

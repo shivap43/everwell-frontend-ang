@@ -1,0 +1,36 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <span *ngIf="data.cartItem"
+            >{{ "primary.portal.shoppingCart.planSource" | replaceTag: { "#previousplansource": previousPlanSource,
+            "#currentplansource": currentPlanSource } }}</span
+        >
+        <span *ngIf="!data.cartItem && !data.updatePlan"
+            >{{languageStrings['primary.portal.replacingPlan.previousSelection']}}</span
+        >
+        <span *ngIf="!data.cartItem && data.updatePlan"
+            >{{languageStrings['primary.portal.replacingPlan.planSettings']}}</span
+        >
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div *ngIf="data.cartItem">
+            <button mat-flat-button class="mon-btn-primary" (click)="closeAfterReplace()">
+                {{languageStrings['primary.portal.common.replace']}}
+            </button>
+        </div>
+        <div *ngIf="!data.cartItem">
+            <button mat-flat-button class="mon-btn-danger" (click)="closeAfterReplace()">
+                {{languageStrings['primary.portal.replacingPlan.addAndReplace']}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <p *ngIf="data.cartItem">{{languageStrings['primary.portal.shoppingCart.planSourceMessage']}}</p>
+        <p *ngIf="!data.cartItem && !data.updatePlan">
+            {{ "primary.portal.members.replacingPlan.replacePreviousSelection" | replaceTag: { "##productname##":
+            data.productName } }}
+        </p>
+        <p *ngIf="!data.cartItem && data.updatePlan">
+            {{ languageStrings['primary.portal.members.replacingPlan.replacePlanSettings'] }}
+        </p>
+    </div>
+</empowered-modal>

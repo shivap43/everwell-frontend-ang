@@ -1,0 +1,48 @@
+@import "shared";
+
+.plan-series-accordion {
+    ::ng-deep {
+        mat-expansion-panel {
+            &.mat-expanded {
+                border-left: convert-unit(1px, "rem") solid get("color.gray.500") !important;
+                border-right: convert-unit(1px, "rem") solid get("color.gray.500") !important;
+            }
+
+            .mat-expansion-panel-header {
+                .mat-content {
+                    align-items: center;
+                    .mat-expansion-panel-header-description {
+                        justify-content: flex-end;
+                        font-size: convert-unit(16px, "rem");
+                        color: get("color.gray.1000");
+
+                        .included-text {
+                            margin-top: convert-unit(3px, "rem");
+                        }
+                        .info-text {
+                            margin-top: convert-unit(4px, "rem");
+                        }
+                    }
+                }
+            }
+
+            .mat-expansion-panel-content {
+                .mat-expansion-panel-body {
+                    padding: 0;
+                }
+                display: flex;
+            }
+
+            .mat-expansion-indicator {
+                position: absolute;
+                left: map-get($spacers, 15);
+                top: convert-unit(22px, "rem");
+                display: flex;
+            }
+
+            .mat-expansion-indicator::after {
+                margin-top: convert-unit(-2px, "rem");
+            }
+        }
+    }
+}

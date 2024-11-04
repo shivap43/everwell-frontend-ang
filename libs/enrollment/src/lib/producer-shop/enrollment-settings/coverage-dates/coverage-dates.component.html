@@ -1,0 +1,118 @@
+<form [formGroup]="form" (submit)="onApply()" data-test="eb-coverage-dates__form">
+    <mat-checkbox [formControl]="useSharedDatePicker">
+        <span language="primary.portal.shopquote.aflac"></span>
+    </mat-checkbox>
+
+    <div class="datepickers">
+        <ng-container *ngIf="useSharedDatePicker.value">
+            <ng-container *ngIf="sharedCoverageDateFormValues$ | async as coverageDateFormValues">
+                <mat-label>{{ coverageDateFormValues.label }}</mat-label>
+
+                <ng-container
+                    *ngTemplateOutlet="datepicker;
+                    context: { formControl: sharedDatePicker, coverageDateFormValues, expandToFullRow: true }"
+                >
+                </ng-container>
+            </ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="!useSharedDatePicker.value">
+            <ng-container *ngIf="coverageDateFormValueSets$ | async as coverageDateFormValueSets">
+                <ng-container *ngFor="let formControl of coverageDatesArray.controls; let i = index; let even = even">
+                    <!-- Each row can show up to two datepickers at one time -->
+                    <!-- To properly line up the labels and still have the datepickers line up (with their error messages), labels need to be rendered together then datepickers + errors after -->
+                    <!-- To achieve this, we render the labels in pairs then datepickers in pairs -->
+                    <!-- This is why we skip each even iteration -->
+                    <ng-container *ngIf="even">
+                        <!-- Render labels in pairs -->
+                        <!-- Add special class if there's only one label so it takes up the full width -->
+                        <mat-label>{{ coverageDateFormValueSets[i].label }}</mat-label>
+                        <mat-label *ngIf="coverageDateFormValueSets[i + 1]">{{ coverageDateFormValueSets[i + 1].label }}</mat-label>
+
+                        <!-- Render datepickers in pairs -->
+                        <!-- Add special class if there's only one datepicker so it takes up the full width -->
+                        <ng-container
+                            *ngTemplateOutlet="datepicker;
+                            context: {
+                                formControl: coverageDatesArray.controls[i],
+                                coverageDateFormValues: coverageDateFormValueSets[i],
+                                expandToFullRow: !coverageDateFormValueSets[i + 1]
+                             }"
+                        >
+                        </ng-container>
+
+                        <ng-container *ngIf="coverageDateFormValueSets[i + 1]">
+                            <ng-container
+                                *ngTemplateOutlet="datepicker;
+                                context: { formControl: coverageDatesArray.controls[i + 1], coverageDateFormValues: coverageDateFormValueSets[i + 1] }"
+                            >
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</form>
+
+<div
+    class="message"
+    *ngIf="(nonAflacProductExists$ | async) && !useSharedDatePicker.value"
+    language="primary.portal.shopquote.shopquotediscription"
+></div>
+
+<ng-template
+    #datepicker
+    let-coverageDateFormValues="coverageDateFormValues"
+    let-formControl="formControl"
+    let-expandToFullRow="expandToFullRow"
+>
+    <div class="datepicker" [class.expand-to-full-row]="expandToFullRow">
+        <mat-form-field class="mon-date-field">
+            <input
+                #datepickerInput
+                matInput
+                empoweredDateTransform
+                data-test="eb-coverage-dates__input--date"
+                [formControl]="formControl"
+                [matDatepicker]="picker"
+                [attr.aria-label]='languageStrings["primary.portal.qle.addNewQle.criticalIllness"]'
+                [min]="coverageDateFormValues.coverageDateMoments.earliestCoverageStartDate"
+                [max]="coverageDateFormValues.coverageDateMoments.latestCoverageStartDate"
+                [matDatepickerFilter]="dateClass"
+            />
+
+            <mat-datepicker-toggle matSuffix [for]="picker">
+                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+            </mat-datepicker-toggle>
+
+            <mat-datepicker #picker></mat-datepicker>
+
+            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+
+            <mat-error *ngIf="formControl.errors as errors">
+                <ng-container *ngIf="errors.matDatepickerMin">
+                    {{ languageStrings['primary.portal.coverage.minDate'] | replaceTag : {"##mindate##":
+                    coverageDateFormValues.coverageDates.earliestCoverageStartDate | date: DateFormats.MONTH_DAY_YEAR } }}
+                </ng-container>
+
+                <ng-container *ngIf="errors.matDatepickerMax">
+                    {{ languageStrings["primary.portal.qle.addNewQle.dateCantBeMoreInFuture"] | replaceTag : {"##days##":
+                    coverageDateFormValues.minMaxDateDifference} }}
+                </ng-container>
+
+                <ng-container *ngIf="errors.matDatepickerFilter && !errors.matDatepickerMax && !errors.matDatepickerMin">
+                    {{ languageStrings['primary.portal.enrollment.coverage-dates.error.cannot-be-end-of-month'] }}
+                </ng-container>
+
+                <ng-container *ngIf="errors.required && !errors.matDatepickerParse?.text">
+                    {{ languageStrings["primary.portal.common.requiredField"] }}
+                </ng-container>
+
+                <ng-container *ngIf="errors.matDatepickerParse?.text">
+                    {{ languageStrings["primary.portal.common.invalidDate"] }}
+                </ng-container>
+            </mat-error>
+        </mat-form-field>
+    </div>
+</ng-template>

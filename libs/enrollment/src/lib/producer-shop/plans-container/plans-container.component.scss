@@ -1,0 +1,59 @@
+@import "shared";
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    @include media-min("l") {
+        padding-left: map-get($spacers, 30);
+    }
+
+    //media queries for adding padding between screen sizes 835px and 991px
+    @media only screen and (max-width: 991px) and (min-width: 835px) {
+        padding-left: map-get($spacers, 30);
+    }
+}
+
+$component: ".eb-plans";
+
+#{$component} {
+    .plans-alert {
+        margin-bottom: map-get($spacers, 20);
+    }
+
+    .decline-coverage-btn {
+        margin: map-get($spacers, 15) 0;
+    }
+
+    ::ng-deep .ban-icon {
+        margin: map-get($spacers, 0);
+        padding-right: map-get($spacers, 5);
+        .mat-icon.mat-primary {
+            vertical-align: middle;
+            color: get("color.gray.700");
+        }
+    }
+
+    .decline-coverage-disabled-btn {
+        min-width: auto;
+        border: convert-unit(1px, "rem") solid get("color.gray.400");
+    }
+
+    .in-cart-title {
+        margin: auto;
+    }
+
+    .edit-plans {
+        padding: 0;
+    }
+
+    a[disabled] {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
+    .hide-product-name {
+        @include media-max("l") {
+            display: none;
+        }
+    }
+}

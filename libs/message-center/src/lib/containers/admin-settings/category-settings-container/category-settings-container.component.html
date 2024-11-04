@@ -1,0 +1,51 @@
+<div>
+    <h2 [language]="MessageCenterLanguage.CATEGORY_SETTINGS_HEADER"></h2>
+
+    <p class="content" [language]="MessageCenterLanguage.CATEGORY_SETTINGS_CONTENT"></p>
+
+    <div class="container">
+        <div *ngFor="let category of categories$ | async" class="row">
+            <div class="col-5">
+                <mat-label [language]="MessageCenterLanguage.CATEGORY_SETTINGS_LABEL_CATEGORY_NAME"></mat-label>
+                <mat-form-field>
+                    <input matInput [value]="category.name" (change)="updateCategoryName($event, category.id)" />
+                </mat-form-field>
+            </div>
+    
+            <div class="col-7 container category-meta">
+                <div class="row">
+                    <ng-container *ngIf="category.numberOfThreads > 0; else noActiveThreads">
+                        <span class="col-7">
+                            <span>{{ category.numberOfThreads }}</span>
+                            <span [language]="MessageCenterLanguage.CATEGORY_SETTINGS_LABEL_CONVERSATIONS"></span>
+                            <span>{{ category.numberOfUnresolvedThreads }}</span>
+                            <span [language]="MessageCenterLanguage.CATEGORY_SETTINGS_LABEL_UNRESOLVED"></span>
+                        </span>
+                        <span class="inactive-remove col-5">
+                            <label [richTooltip]="removeTooltip" [language]="MessageCenterLanguage.CATEGORY_SETTINGS_LABEL_REMOVE"></label>
+                        </span>
+                    </ng-container>
+            
+                    <ng-template #noActiveThreads>
+                        <span class="col-7" [language]="MessageCenterLanguage.CATEGORY_SETTINGS_NO_CONVERSATIONS"></span>
+                        <span class="col-5">
+                            <button class="mon-btn-link col-5" 
+                                    (click)="onClickDeleteCategory(category.id)"
+                                    [language]="MessageCenterLanguage.CATEGORY_SETTINGS_CATEGORY_REMOVE">
+                            </button>
+                        </span>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <ng-container #dynamicCategoriesView></ng-container>
+    </div>
+
+    <button class="mon-btn-link" (click)="onClickAddDynamicCategory()" [language]="MessageCenterLanguage.CATEGORY_SETTINGS_ADD_CATEGORY"></button>
+</div>
+<div class="save-button-row">
+    <button mat-button class="mon-btn-primary" color="primary" (click)="onClickSaveCategories()" [language]="MessageCenterLanguage.CATEGORY_SETTINGS_SAVE"></button>
+</div>

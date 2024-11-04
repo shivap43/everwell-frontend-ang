@@ -1,0 +1,88 @@
+@import "shared";
+
+.coverage-wrapper {
+    & > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: get("color.gray.200");
+        min-height: convert-unit(54px, "rem");
+
+        & > div {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .mat-form-field {
+        margin-bottom: 0;
+
+        @include media-max("l") {
+            width: convert-unit(145px, "rem");
+        }
+    }
+}
+
+.mon-date-field {
+    width: convert-unit(138px, "rem");
+}
+
+.coverage-period,
+.enrollment-period {
+    display: flex;
+    margin-right: map-get($spacers, 20);
+}
+
+.plan-count {
+    width: convert-unit(75px, "rem");
+    text-align: right;
+}
+
+::ng-deep .mat-form-field {
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+
+        .mat-form-field-flex {
+            margin-top: 0;
+            background: get("color.white");
+        }
+    }
+}
+
+::ng-deep .add-plan-year {
+    max-width: none;
+    width: 100%;
+}
+
+:host ::ng-deep .mat-select-panel {
+    margin-left: convert-unit(6px, "rem") !important;
+}
+
+:host .create-planyear-form {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: convert-unit(5px, "rem");
+    align-items: flex-start;
+}
+
+.earliest-coverage-start-info {
+    margin: map-get($spacers, 0);
+}
+
+.aflac-year {
+    ::ng-deep {
+        .mat-form-field {
+            max-width: convert-unit(200px, "rem");
+        }
+    }
+}
+
+.apply-carriers-check {
+    ::ng-deep {
+        .mat-checkbox-layout {
+            &:focus-within {
+                outline: none;
+            }
+        }
+    }
+}

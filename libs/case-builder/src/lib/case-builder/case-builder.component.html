@@ -1,0 +1,73 @@
+<div class="content first-child">
+    <h1 language="primary.portal.dashboard.caseBuilderAdmins"></h1>
+    <p class="p-max-width">{{languageStrings['primary.portal.caseBuilderAdmin.static.content']}}</p>
+</div>
+<div class="error-alerts">
+    <mon-alert alertType="danger" *ngIf="apiError">
+        <span>{{ apiError }}</span>
+    </mon-alert>
+</div>
+<div [ngClass]="isDataFound && !hasBBName ? 'shift-right' : 'shift-left'">
+    <ng-container>
+        <button
+            [ngClass]="isDataFound?'mon-btn-secondary':'mon-btn-primary'"
+            mat-flat-button
+            [disabled]="isOnGoing || isPrivacyOnForEnroller || !hasCreatePermission"
+            (click)="showCaseBuilderPopup('add')"
+            [attr.aria-label]="languageStrings['primary.portal.caseBuilderAdmin.submit']"
+            language="primary.portal.caseBuilderAdmin.submit"
+        ></button>
+    </ng-container>
+</div>
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<div class="content last-child" *ngIf="isDataFound && !hasBBName">
+    <table [dataSource]="dataSource" mat-table>
+        <ng-container matColumnDef="caseBuilderAdmin">
+            <th mat-header-cell *matHeaderCellDef language="primary.portal.caseBuilderAdmin"></th>
+            <td *matCellDef="let element" mat-cell>{{ element.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="startDate">
+            <th mat-header-cell *matHeaderCellDef language="primary.portal.caseBuilderAdmin.startDate"></th>
+            <td *matCellDef="let element" mat-cell>{{ element.startDate }}</td>
+        </ng-container>
+        <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef language="primary.portal.caseBuilderAdmin.endDate"></th>
+            <td *matCellDef="let element" mat-cell>{{ element.endDate }}</td>
+        </ng-container>
+        <ng-container matColumnDef="manage">
+            <th mat-header-cell *matHeaderCellDef language="primary.portal.caseBuilderAdmin.manage"></th>
+            <td *matCellDef="let element" mat-cell>
+                <button
+                    *ngIf="!isPrivacyOnForEnroller && hasManagePermission && element.activateMenu"
+                    mat-icon-button
+                    [matMenuTriggerFor]="beforeMenu"
+                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                >
+                    <mon-icon
+                        iconName="ellipsis"
+                        [iconSize]="20"
+                        class="more-option icon-primary"
+                        title="{{languageStrings['primary.portal.caseBuilderAdmin.altText']}}"
+                    ></mon-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button mat-menu-item [disabled]="!hasUpdatePermission" (click)="showCaseBuilderPopup('edit', element)">
+                        {{languageStrings['primary.portal.caseBuilderAdmin.edit']}}
+                    </button>
+                    <button
+                        class="text-danger"
+                        [disabled]="element.disableRemove || !hasDeletePermission"
+                        (click)="openRemoveAlert(element.id, element.name)"
+                        mat-menu-item
+                    >
+                        {{languageStrings['primary.portal.caseBuilderAdmin.remove']}}
+                    </button>
+                </mat-menu>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+    </table>
+</div>

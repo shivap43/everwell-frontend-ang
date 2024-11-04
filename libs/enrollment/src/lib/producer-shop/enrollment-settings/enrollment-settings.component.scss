@@ -1,0 +1,55 @@
+@import "shared";
+
+:host {
+    display: flex;
+    justify-content: space-between;
+    height: auto;
+    min-height: convert-unit(45px, "rem");
+    border-bottom: convert-unit(1.5px, "rem") solid get("color.gray.500");
+    padding: map-get($spacers, 10) map-get($spacers, 0);
+
+    @include media-max("l") {
+        height: auto;
+    }
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    @include media-max("l") {
+        align-items: flex-start;
+    }
+
+    & > * {
+        white-space: nowrap;
+    }
+
+    &.settings {
+        padding-left: map-get($spacers, 5);
+    }
+
+    .settings-dropdown-block {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+.settings-title,
+.benefit-bank {
+    margin-right: map-get($spacers, 10);
+    color: get("color.gray.600");
+    letter-spacing: 2px;
+    line-height: convert-unit(14px, "rem");
+    font-size: convert-unit(14px, "rem");
+
+    @include media-max("l") {
+        padding-top: map-get($spacers, 5);
+    }
+}
+
+.wrapper.benefit-bank {
+    margin: convert-unit(6px, "rem") 0;
+    padding-left: convert-unit(30px, "rem");
+    border-left: 1px dashed get("color.gray.700");
+}

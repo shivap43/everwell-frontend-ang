@@ -1,0 +1,426 @@
+<!-- create prospects start here-->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="info-modal" *ngIf="dataLoadedFlag">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <ng-container *ngIf="currentStepIndex === 1">
+        <form [formGroup]="sicIrForm">
+            <div mat-dialog-content>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.steponeofThreee']}}</mat-label>
+                <h2 role="heading" class="heading-txt" mat-dialog-title>
+                    {{languageStrings['primary.portal.prospects.createProspect']}}
+                </h2>
+
+                <div class="sicir-number">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.sicirNo']}}</mat-label>
+                    <div class="sicir-input">
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="sicirNumber"
+                                autocomplete="off"
+                                maxlength="7"
+                                empoweredNumberValidation
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.sicirNo']"
+                            />
+                            <mat-error
+                                *ngIf="!sicIrForm.controls['sicirNumber'].value"
+                                language="secondary.portal.prospect.createProspect.requiredFeild"
+                            ></mat-error>
+                            <mat-error *ngIf="errorResp && sicIrForm.controls['sicirNumber'].value"
+                                >{{errorMsg}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="prospect-primaryproducer" *ngIf="displaySubOrdinateForm">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.prospects.accountPrimaryproducer']}}</mat-label
+                    >
+                    <mat-radio-group aria-label="Select an option" formControlName="radioOptions">
+                        <mat-radio-button value="1" class="primary-rbtn" checked="1"
+                            >{{languageStrings['primary.portal.prospects.me']}}</mat-radio-button
+                        >
+                        <mat-radio-button value="2" class="primary-rbtn"
+                            >{{languageStrings['primary.portal.prospects.someonefromMyteam']}}</mat-radio-button
+                        >
+                        <mat-form-field *ngIf="sicIrForm.controls['radioOptions'].value==='2'">
+                            <input
+                                type="text"
+                                formControlName="searchProducer"
+                                matInput
+                                class="producer-input"
+                                [matAutocomplete]="auto"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.someonefromMyteam']"
+                            />
+                            <mat-autocomplete
+                                autoActiveFirstOption
+                                #auto="matAutocomplete"
+                                class="producer-search-filter"
+                                (optionSelected)="selectedProducerOption($event.option)"
+                            >
+                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
+                                    <span class="producer-name">{{option.name}}</span>
+                                    <span class="producer-email">{{option.email}}</span>
+                                </mat-option>
+                            </mat-autocomplete>
+
+                            <mat-error
+                                *ngIf="sicIrForm.controls['searchProducer'].errors?.required"
+                                language="secondary.portal.prospect.createProspect.requiredFeild"
+                            >
+                            </mat-error>
+                            <mat-hint>{{languageStrings['primary.portal.prospects.producernameWriting']}}</mat-hint>
+                        </mat-form-field>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <div>
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="onClickCancel()" *ngIf="hideCancelButton"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                </div>
+                <div>
+                    <button class="mon-btn-primary" mat-flat-button type="submit" (click)="onClickNext()">
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-right"
+                            iconSize="12"
+                            iconName="right"
+                        ></mon-icon>
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </form>
+    </ng-container>
+    <!-- </mat-step> -->
+    <!-- <mat-step [stepControl]="addProspectInfoForm"> -->
+    <ng-container *ngIf="currentStepIndex === 2">
+        <form [formGroup]="addProspectInfoForm">
+            <div mat-dialog-content>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.steptowofThree']}}</mat-label>
+                <h2 role="heading" class="heading-txt" mat-dialog-title>
+                    {{languageStrings['primary.portal.prospects.addProspectinfo']}}
+                </h2>
+                <div class="content-wrapper">
+                    <div class="company-name">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.prospects.companyName']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="companyName"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.companyName']"
+                            />
+                            <mat-error
+                                *ngIf="addProspectInfoForm.get('companyName').hasError('required')"
+                                language="secondary.portal.prospect.createProspect.requiredFeild"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="addProspectInfoForm.get('companyName').hasError('pattern') &&
+                             !addProspectInfoForm.get('companyName').hasError('required')"
+                                language="secondary.portal.prospect.createProspect.companyName"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="!addProspectInfoForm.get('companyName').hasError('pattern') &&
+                            addProspectInfoForm.get('companyName').hasError('minlength') || addProspectInfoForm.get('companyName').hasError('maxlength') &&
+                         !addProspectInfoForm.get('companyName').hasError('required')"
+                                language="secondary.portal.prospect.createProspect.minLength"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="dropdown-section">
+                        <div class="situs-state">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.prospects.situsState']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    [disableOptionCentering]="true"
+                                    formControlName="situsState"
+                                    (selectionChange)="onSitusStateChange($event.value)"
+                                    [placeholder]="languageStrings['primary.portal.common.select']"
+                                >
+                                    <mat-option disabled
+                                        >{{languageStrings['primary.portal.common.select']}}</mat-option
+                                    >
+                                    <mat-option *ngFor="let state of situsStates" [value]="state.abbreviation"
+                                        >{{ state.abbreviation }}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addProspectInfoForm.controls['situsState'].errors?.required"
+                                    language="secondary.portal.prospect.createProspect.selectionRequired"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="situs-zip">
+                            <div class="search-producer">
+                                <empowered-zip-code-input
+                                    #situsZip
+                                    [formControl]="addProspectInfoForm?.controls?.situsZip"
+                                    [stateControlValue]="situsStateValue$ | async"
+                                    [validateOnStateChange]="true"
+                                    inputLabel="primary.portal.prospects.situsZip"
+                                >
+                                    <mat-error
+                                        *ngIf="addProspectInfoForm.controls['situsZip'].errors?.required "
+                                        language="secondary.portal.prospect.createProspect.requiredFeild"
+                                    >
+                                    </mat-error>
+                                </empowered-zip-code-input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--SIC and Partner group Number start here -->
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer">
+                <button
+                    class="mon-btn-secondary mon-mr-20"
+                    color="primary"
+                    mat-flat-button
+                    type="button"
+                    (click)="onClickBack(1)"
+                >
+                    <mon-icon
+                        class="mon-icon mon-directions-btn-icon icon-left"
+                        iconSize="12"
+                        iconName="left"
+                    ></mon-icon
+                    >{{languageStrings['primary.portal.common.back']}}
+                </button>
+                <div class="cancel-next-btn">
+                    <button class="mon-btn-primary" mat-flat-button type="submit" (click)="onClickNext()">
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-right"
+                            iconSize="12"
+                            iconName="right"
+                        ></mon-icon>
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </form>
+    </ng-container>
+    <!-- </mat-step> -->
+    <!-- <mat-step [stepControl]="createProspectForm"> -->
+    <ng-container *ngIf="currentStepIndex === 3">
+        <form [formGroup]="createProspectForm">
+            <div class="addcontact-info">
+                <div mat-dialog-content>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.prospects.stepthreeofThree']}}</mat-label
+                    >
+                    <div class="danger-msg">
+                        <mon-alert *ngIf="errorResp" alertType="danger">
+                            <span>{{errorMsg}}</span>
+                        </mon-alert>
+                    </div>
+                    <h2 role="heading" class="heading-txt" mat-dialog-title>
+                        {{languageStrings['primary.portal.prospects.addContactInfo']}}
+                    </h2>
+                    <div class="address">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.prospects.streetAddressone']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="streetAddress1"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.streetAddressone']"
+                            />
+                            <mat-error
+                                *ngIf="createProspectForm.controls['streetAddress1'].errors?.pattern &&
+                                !createProspectForm.controls['streetAddress1'].errors?.required"
+                                language="secondary.portal.prospect.createProspect.invalidaddress"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="!createProspectForm.controls['streetAddress1'].errors?.pattern &&
+                            !createProspectForm.controls['streetAddress1'].errors?.required  && createProspectForm.controls['streetAddress1'].errors?.maxlength"
+                                language="secondary.portal.prospect.createProspect.maxLength"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="createProspectForm.controls['streetAddress1'].errors?.required"
+                                language="secondary.portal.prospect.createProspect.requiredFeild"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="address">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.prospects.streetAddresstwo']}}<span class="optional-text"
+                                >{{languageStrings['primary.portal.common.optional']}}</span
+                            ></mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="streetAddress2"
+                                [attr.aria-label]="languageStrings['primary.portal.common.optional']"
+                            />
+                            <mat-hint class="mat-hint" id="mat-hint-4"
+                                >{{languageStrings['primary.portal.prospects.floorSuite']}}</mat-hint
+                            >
+                            <mat-error
+                                *ngIf="createProspectForm.controls['streetAddress2'].errors?.pattern "
+                                language="secondary.portal.prospect.createProspect.invalidaddress"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="!createProspectForm.controls['streetAddress2'].errors?.pattern &&
+                         createProspectForm.controls['streetAddress1'].errors?.maxlength"
+                                language="secondary.portal.prospect.createProspect.maxLength"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="place">
+                        <div class="city">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.prospects.city']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="city"
+                                    [attr.aria-label]="languageStrings['primary.portal.prospects.city']"
+                                />
+                                <mat-error
+                                    *ngIf="createProspectForm.controls['city'].errors?.required"
+                                    language="secondary.portal.prospect.createProspect.requiredFeild"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="!createProspectForm.controls['city'].errors?.pattern &&
+                            !createProspectForm.controls['city'].errors?.required  && createProspectForm.controls['city'].errors?.maxlength"
+                                    language="secondary.portal.prospect.createProspect.maxLength"
+                                ></mat-error>
+
+                                <mat-error
+                                    *ngIf="createProspectForm.controls['city'].errors?.pattern &&
+                                !createProspectForm.controls['city'].errors?.required"
+                                    language="primary.portal.common.city.patternError"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="state">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.prospects.state']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    [disableOptionCentering]="true"
+                                    formControlName="state"
+                                    (selectionChange)="onStateChange($event.value)"
+                                    [placeholder]="languageStrings['primary.portal.common.select']"
+                                >
+                                    <mat-option disabled
+                                        >{{languageStrings['primary.portal.common.select']}}</mat-option
+                                    >
+                                    <mat-option *ngFor="let state of situsStates" [value]="state.abbreviation">
+                                        {{state.abbreviation}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="createProspectForm.controls['state'].errors?.required"
+                                    language="secondary.portal.prospect.createProspect.selectionRequired"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="zip">
+                            <empowered-zip-code-input
+                                #zip
+                                [formControl]="createProspectForm.controls.zip"
+                                [stateControlValue]="stateValue$ | async"
+                                [validateOnStateChange]="true"
+                                inputLabel="primary.portal.prospects.zip"
+                            >
+                                <mat-error
+                                    *ngIf="addProspectInfoForm.controls['situsZip'].errors?.required "
+                                    language="secondary.portal.prospect.createProspect.requiredFeild"
+                                >
+                                </mat-error>
+                            </empowered-zip-code-input>
+                        </div>
+                    </div>
+                    <div class="contact-phone">
+                        <mat-label class="mat-label">
+                            <span>{{languageStrings['primary.portal.prospects.contactPhone']}}</span
+                            ><span class="optional-text"
+                                >{{languageStrings['primary.portal.common.optional']}}</span
+                            ></mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="contactPhone"
+                                [value]="createProspectForm.controls.contactPhone.value|phone"
+                                empoweredNumberValidation
+                                [allowDashes]="true"
+                                empoweredPhoneNumberFormat
+                                type="text"
+                                [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.contactPhone']"
+                            />
+                            <mat-error
+                                *ngIf="createProspectForm.controls['contactPhone'].errors?.pattern"
+                                language="secondary.portal.prospect.createProspect.invalidPhoneNumber"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="contact-email">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.prospects.contactEmail']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="contactEmail"
+                                maxlength="maxLength"
+                                [attr.aria-label]="languageStrings['primary.portal.prospects.contactEmail']"
+                            />
+                            <mat-error
+                                *ngIf="createProspectForm.controls['contactEmail'].errors?.pattern &&
+                             !createProspectForm.controls['contactEmail'].errors?.required"
+                                language="secondary.portal.prospect.createProspect.invalidEmail"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="createProspectForm.controls['contactEmail'].errors?.required "
+                                language="secondary.portal.prospect.createProspect.requiredFeild"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <button
+                        class="mon-btn-secondary mon-mr-20"
+                        color="primary"
+                        mat-flat-button
+                        type="button"
+                        (click)="onClickBack(2)"
+                    >
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                            iconSize="12"
+                            iconName="left"
+                        ></mon-icon
+                        >{{languageStrings['primary.portal.common.back']}}
+                    </button>
+                    <button class="mon-btn-primary" mat-flat-button type="submit" (click)="onClickNext()">
+                        <span>{{languageStrings['primary.portal.prospects.createProspect']}}</span>
+                    </button>
+                </mat-dialog-actions>
+            </div>
+        </form>
+    </ng-container>
+    <!-- </mat-step> -->
+    <!--Add prospect info start here step 2 of 2 -->
+    <!-- </mat-horizontal-stepper> -->
+</div>

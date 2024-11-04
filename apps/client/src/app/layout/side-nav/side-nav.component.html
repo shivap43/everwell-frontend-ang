@@ -1,0 +1,38 @@
+<mat-nav-list class="sideNav">
+    <mat-tree #tree [dataSource]="dataSource" [treeControl]="treeControl">
+        <!-- This is the tree node template for leaf nodes -->
+        <mat-tree-node
+            *matTreeNodeDef="let node"
+            matTreeNodePadding
+            [ngClass]="{'visually-hidden': (node.permission && (node.permission | async) === false) || (node.config && (node.config | async)  === false) || ((node.name === lifeEvent || node.name === POLICY_CHANGE_REQUEST ) && isAgentSelfEnrolled)}"
+        >
+            <!-- use a disabled button to provide padding for tree leaf -->
+            <a
+                class="sideNav-link"
+                mat-list-item
+                [routerLink]="node.route"
+                routerLinkActive="sideNav-link--active"
+                tabindex="0"
+            >
+                {{ node.name }}
+            </a>
+        </mat-tree-node>
+        <!-- This is the tree node template for top-level nodes -->
+        <mat-tree-node
+            *matTreeNodeDef="let node;when: isParent"
+            matTreeNodePadding
+            [ngClass]="{'visually-hidden': (node.permission && (node.permission | async) === false) || (node.config && (node.config | async)  === false)}"
+        >
+            <a
+                class="sideNav-parent"
+                mat-list-item
+                [routerLink]="node.route"
+                [routerLinkActive]="node.route ? 'sideNav-parent--active' : ''"
+                tabindex="0"
+            >
+                <mon-icon mat-list-icon [iconName]="node.icon" iconSize="20" aria-hidden="true"></mon-icon>
+                {{ node.name }}
+            </a>
+        </mat-tree-node>
+    </mat-tree>
+</mat-nav-list>

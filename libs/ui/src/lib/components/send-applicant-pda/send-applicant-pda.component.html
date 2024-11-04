@@ -1,0 +1,48 @@
+<div class="info-modal">
+    <form [formGroup]="contactForm" class="contact-form">
+        <mat-dialog-content>
+            <h2 mat-dialog-title language="primary.portal.applicationFlow.customerSignatureRequired"></h2>
+            <p>
+                <ng-container *ngIf="!hasMemberContact; else memberNotify">
+                    <span>{{ data.firstName }}</span>
+                    <span language="primary.portal.applicationFlow.emailNotHave"></span>
+                </ng-container>
+                <ng-template #memberNotify>
+                    <span>{{ "primary.portal.pda.notify" | replaceTag: { "##firstname##": data.firstName } }}</span>
+                </ng-template>
+            </p>
+
+            <mat-radio-group ngDefaultControl formControlName="contacts" class="contacts">
+                <ng-container *ngFor="let option of data.contactList">
+                    <mat-radio-button [value]="option" [disabled]="option.disableField">
+                        <div *ngIf="option.type === email" language="primary.portal.headset.email">{{option.contact}}</div>
+                        <div *ngIf="option.type === phoneNumber" language="primary.portal.headset.text">{{option.formatted}}</div>
+                        <div *ngIf="!option.type">{{option.contact}}</div>
+                    </mat-radio-button>
+                </ng-container>
+            </mat-radio-group>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <button
+                class="mon-btn-secondary"
+                mat-flat-button
+                (click)="closeDialog(SendPdaDialogAction.SKIP)"
+                language="primary.portal.applicationFlow.skipSendLater"
+            ></button>
+            <button
+                class="mon-btn-primary"
+                mat-flat-button
+                (click)="closeDialog(SendPdaDialogAction.SEND)"
+                *ngIf="hasMemberContact"
+                language="primary.portal.headset.sendto.applicant"
+            ></button>
+            <button
+                class="mon-btn-primary"
+                mat-flat-button
+                (click)="closeDialog(SendPdaDialogAction.ADD_CONTACT)"
+                *ngIf="!hasMemberContact"
+                language="primary.portal.applicationFlow.addContactInfo"
+            ></button>
+        </mat-dialog-actions>
+    </form>
+</div>

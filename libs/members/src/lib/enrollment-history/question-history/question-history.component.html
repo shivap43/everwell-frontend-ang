@@ -1,0 +1,17 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="underwriting-questions" *ngIf="underwritingQuestions && underwritingQuestions.length>0">
+    <div class="d-flex main-header-mat-tab">
+        <p class="left-content">{{languageStrings['primary.portal.activityHistory.underQues']}}</p>
+        <p class="right-content">{{languageStrings['primary.portal.activityHistory.updateFirstLast']}}</p>
+    </div>
+    <div class="question-answer-wrapper" *ngFor="let item of underwritingQuestions">
+        <div class="question-wrapper">
+            <span>{{languageStrings['primary.portal.activityHistory.questions']}}&nbsp;:&nbsp;</span>
+            <span>{{item.question}} </span>
+        </div>
+        <div class="answer-wrapper">
+            <span>{{languageStrings['primary.portal.activityHistory.answers']}}&nbsp;:&nbsp;</span>
+            <span>{{item.answer}}</span>
+        </div>
+    </div>
+</div>

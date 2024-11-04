@@ -1,0 +1,573 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading || isLoading"></empowered-mon-spinner>
+<empowered-tpi-secondary-header *ngIf="!invalidErrorMsgState && !invalidErrorMsgAge"
+    >{{languageStrings['primary.portal.tpi.partialCensus.completeProfile']}}</empowered-tpi-secondary-header
+>
+<form [formGroup]="partialCensusForm" *ngIf="!isSpinnerLoading" (ngSubmit)="saveInfo()" class="tpi-content-wrapper">
+    <div class="alert-wrapper" *ngIf="invalidErrorMsgState || invalidErrorMsgAge">
+        <mon-alert alertType="danger" *ngIf="errorMessage">
+            <span>{{ errorMessage }}</span>
+        </mon-alert>
+        <mon-alert alertType="info" *ngIf="agInfoMessage">
+            <span>{{ agInfoMessage }}</span>
+        </mon-alert>
+    </div>
+    <div class="tpi-content">
+        <div *ngIf="!invalidErrorMsgState && !invalidErrorMsgAge">
+            <div class="flex-form-wrapper">
+                <div class="alert-wrapper" *ngIf="error">
+                    <mon-alert alertType="danger">
+                        <span>{{ errorMessage }}</span>
+                    </mon-alert>
+                </div>
+                <div class="address-wrapper" *ngIf="!memberContactInfo.address.address1">
+                    <div class="address flex-item">
+                        <mat-label>{{languageStrings['primary.portal.tpiEnrollment.streetAddressOne']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="street1Control"
+                                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressOne']"
+                            />
+                            <mat-error
+                                *ngIf="(isFormSubmitted || partialCensusForm.controls['street1Control'].touched) && partialCensusForm.controls['street1Control'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.common.requiredField']}}
+                            </mat-error>
+                            <mat-error *ngIf="partialCensusForm.controls['street1Control'].errors?.pattern"
+                                >{{languageStrings['primary.portal.tpiEnrollment.tpiValidationMsg.streetAddres1']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="address flex-item">
+                        <mat-label
+                            >{{languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']}}<span class="optional-text"
+                                >{{languageStrings['primary.portal.common.optional']}}</span
+                            ></mat-label
+                        >
+    
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="street2Control"
+                                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']"
+                            />
+                            <mat-hint>{{languageStrings['primary.portal.callCenter.aptUnit']}}</mat-hint>
+                            <mat-error *ngIf="partialCensusForm.controls['street2Control'].errors?.pattern"
+                                >{{languageStrings['primary.portal.tpiEnrollment.tpiValidationMsg.streetAddres1']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="split-wrapper">
+                    <div class="flex-item" *ngIf="isEmployerNameFieldRequired">
+                        <mat-label class="mat-label" for="employer-name-tpp">
+                            <span>{{languageStrings["primary.portal.pda.form.employerName"]}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="employerName"
+                                matInput
+                                id="employer-name-tpp"
+                                [attr.aria-label]="languageStrings['primary.portal.direct.addCustomer.employerName']"
+                            />
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.employerName.errors?.required"
+                                language="primary.portal.common.requiredField"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.employerName.errors?.maxlength"
+                                language="secondary.portal.census.manualEntry.maxlength100"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="isOccupationFieldRequired">
+                        <mat-label>{{languageStrings['primary.portal.tpiEnrollment.jobTitle']}}</mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="occupation"
+                                matInput
+                                empoweredTrimSpace
+                                [maxlength]="max_length"
+                                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.jobTitle']"
+                            />
+                            <mat-error *ngIf="partialCensusForm.controls.occupation.errors?.pattern as patternError">
+                                <span
+                                    *ngIf="patternError && !patternError.nameWithHypenApostrophesValidation"
+                                    language="secondary.portal.members.workValidation.jobFields"
+                                >
+                                </span>
+                            </mat-error>
+                            <mat-error>
+                                <span *ngIf="isFormSubmitted && partialCensusForm.controls['occupation'].errors?.required">
+                                    {{languageStrings["primary.portal.common.requiredField"]}}
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="text-area" *ngIf="isOccupationDescriptionFieldRequired">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.jobDuties']}}</mat-label>
+                    <mat-form-field class="textarea">
+                        <textarea
+                            matInput
+                            formControlName="occupationDescription"
+                            empoweredTrimSpace
+                            rows="5"
+                            [maxlength]="max_length"
+                            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.jobDuties']"
+                        >
+                        </textarea>
+                        <mat-error *ngIf="partialCensusForm.controls.occupationDescription.errors?.pattern as patternError">
+                            <span
+                                *ngIf="patternError && !patternError.nameWithHypenApostrophesValidation"
+                                language="secondary.portal.members.workValidation.jobFields"
+                            >
+                            </span>
+                        </mat-error>
+                        <mat-error>
+                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['occupationDescription'].errors?.required">
+                                {{languageStrings["primary.portal.common.requiredField"]}}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="input-box" *ngIf="isEmployeeIdFieldRequired && memberInfo && !memberInfo?.workInformation?.employeeId">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.employeeID']}}</mat-label>
+                    <mat-form-field>
+                        <input formControlName="employeeID" matInput />
+                        <mat-error>
+                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['employeeID'].errors?.required">
+                                {{languageStrings["primary.portal.common.requiredField"]}}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div
+                    class="input-box"
+                    *ngIf="(isOrganizationFieldRequired && memberInfo && (!memberInfo.organizationId || memberInfo.organizationId ===1)) || isAccountRatingCodePEO"
+                >
+                    <mat-label>{{departmentFieldLabel}} </mat-label>
+                    <mat-form-field *ngIf="!isAccountRatingCodePEO">
+                        <mat-select
+                            disableOptionCentering="true"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            formControlName="departmentID"
+                            (selectionChange)="departmentChanged($event)"
+                        >
+                            <mat-option *ngIf="isAflacUser" [value]="ADD_NEW_DEPARTMENT_ID"
+                                >{{languageStrings["primary.portal.census.manualEntry.addNewDepartmentId"]}}</mat-option
+                            >
+                            <mat-option *ngFor="let departmentItem of organizations" [value]="departmentItem.id"
+                                >{{departmentItem.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['departmentID'].errors?.required">
+                                {{languageStrings["primary.portal.common.selectionRequired"]}}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="isAccountRatingCodePEO">
+                        <mat-select
+                            disableOptionCentering="true"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            formControlName="departmentID"
+                            (selectionChange)="departmentChanged($event)"
+                        >
+                            <mat-option *ngFor="let peoItem of peoDepartments" [value]="peoItem"
+                                >{{peoItem.name}} - {{peoItem.riskClass}}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error>
+                            <span
+                                *ngIf=" isAccountRatingCodePEO && isFormSubmitted && partialCensusForm.controls['departmentID'].errors?.required"
+                            >
+                                {{languageStrings["primary.portal.common.selectionRequired"]}}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="input-box" *ngIf="addNewDepartmentFlag">
+                    <mat-label>{{languageStrings["primary.portal.census.manualEntry.newDepartmentId"]}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="newDepartmentId"
+                            [attr.aria-label]="languageStrings['primary.portal.census.manualEntry.newDepartmentId']"
+                        />
+                        <mat-hint>{{languageStrings["primary.portal.census.manualEntry.newDepartmentIdHint"]}}</mat-hint>
+                        <mat-error>
+                            <span *ngIf="partialCensusForm.controls.newDepartmentId.errors?.pattern"
+                                >{{languageSecondaryStrings["secondary.portal.census.manualEntry.newDepartmentIdError"]}}</span
+                            >
+                            <span *ngIf="partialCensusForm.controls.newDepartmentId.errors?.required"
+                                >{{languageStrings["primary.portal.common.requiredField"]}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <!--SSN field addition starts-->
+                <div
+                    class="split-wrapper"
+                    *ngIf="isSSNMandatoryConfigEnabled && (!memberInfo?.ssn || (ssnConfirmationEnabled && !memberInfo?.ssnConfirmed))"
+                >
+                    <div class="flex-item">
+                        <mat-label class="mat-label ssn-field-wrapper" language="primary.portal.member.ssn_itin"></mat-label>
+                        <empowered-ssn-input
+                            formControlName="ssn"
+                            [regex]="validationRegex"
+                            [showToggle]="false"
+                            (inputChange)="onSSNInputChange($event)"
+                            [showHint]="memberInfo?.ssn"
+                            [isProducerPortal]="ssoAuthData.user.producerId"
+                        >
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.ssn?.errors?.required"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.ssn?.errors?.minlength"
+                                language="secondary.portal.members.dependent.personalInfo.ssnRequirements"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.ssn?.errors?.pattern && !partialCensusForm.controls['ssn'].errors?.minlength"
+                                language="primary.portal.member.invalid.ssn_itin"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.ssn?.errors?.duplicateSSNFound"
+                                language="primary.portal.members.api.ssn.duplicate.nonMmp"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.ssn?.errors?.duplicateITINFound"
+                                language="primary.portal.member.duplicate.itin"
+                            ></mat-error>
+                        </empowered-ssn-input>
+                    </div>
+                    <div class="flex-item" *ngIf="ssnConfirmationEnabled && !memberInfo?.ssnConfirmed">
+                        <mat-label class="mat-label" language="primary.portal.members.ssn.confirm"></mat-label>
+                        <empowered-ssn-input
+                            formControlName="confirmSSN"
+                            [regex]="validationRegex"
+                            [allowPaste]="false"
+                            (keyup)="confirmSSNFormControlUpdate($event.target)"
+                        >
+                            <mat-error
+                                *ngIf="partialCensusForm.controls.confirmSSN?.errors?.required"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error *ngIf="partialCensusForm.controls.confirmSSN?.errors?.invalid">
+                                <span language="secondary.portal.members.ssn.errors.match"></span>
+                            </mat-error>
+                        </empowered-ssn-input>
+                    </div>
+                </div>
+                <!--SSN field addition ends-->
+                <div *ngIf="enableSalaryFields">
+                    <div class="tooltip">
+                        <mat-label
+                            >{{languageStrings['primary.portal.tpiEnrollment.income']}}<a
+                                [richTooltip]="languageStrings['primary.portal.tpiEnrollment.annualIncome']"
+                                href="javascript:void(0)"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                class="icon-align"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="15" class="infoicon icon-primary"></mon-icon> </a
+                        ></mat-label>
+                    </div>
+                    <mat-radio-group
+                        class="enroll-radio"
+                        formControlName="income"
+                        (click)="$event.stopPropagation()"
+                        (change)="onRadioChange(partialCensusForm.get('income'),$event,'income')"
+                    >
+                        <div class="radio-btn">
+                            <mat-radio-button value="ANNUAL">{{languageStrings['primary.portal.tpiEnrollment.annual']}}</mat-radio-button>
+                        </div>
+                        <div class="input-box mon-ml-25" *ngIf="partialCensusForm.get('income').value==='ANNUAL'">
+                            <div class="hourly-rate">
+                                <mat-form-field>
+                                    <span matPrefix>{{languageStrings['primary.portal.setPrices.dollar']}}</span>
+                                    <input
+                                        matInput
+                                        formControlName="annualIncome"
+                                        (keyup)="validateNumber($event);checkIncomeValue()"
+                                        (change)="$event.stopPropagation()"
+                                        (blur)="checkIncomeValue()"
+                                    />
+                                    <mat-error>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['annualIncome'].errors?.required">
+                                            {{languageStrings["primary.portal.common.requiredField"]}}
+                                        </span>
+                                        <span
+                                            *ngIf="isFormSubmitted && (partialCensusForm.controls.annualIncome.errors?.min ||
+                                        partialCensusForm.controls.annualIncome.errors?.max)"
+                                        >
+                                            {{annualSalaryMinMaxErrorMessage}}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="radio-btn">
+                            <mat-radio-button value="BENEFIT">{{languageStrings['primary.portal.tpiEnrollment.hourly']}}</mat-radio-button>
+                        </div>
+                        <div class="hourly-box mon-ml-25" *ngIf="partialCensusForm.get('income').value==='BENEFIT'">
+                            <div class="flex-item">
+                                <mat-label>{{languageStrings['primary.portal.tpi.partialCensus.hourlyRate']}}</mat-label>
+                                <div class="hourly-rate">
+                                    <mat-form-field class="w-100">
+                                        <span matPrefix>{{languageStrings['primary.portal.setPrices.dollar']}}</span>
+                                        <input
+                                            matInput
+                                            formControlName="hourlyRate"
+                                            (keypress)="validateNumber($event)"
+                                            (blur)="setTotalHourlyIncome();checkIncomeValue()"
+                                            (change)="$event.stopPropagation()"
+                                        />
+                                        <mat-error>
+                                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['hourlyRate'].errors?.required">
+                                                {{languageStrings["primary.portal.common.requiredField"]}}
+                                            </span>
+                                            <span
+                                                *ngIf="isFormSubmitted && partialCensusForm.controls['hourlyRate'].errors?.pattern &&
+                                    !partialCensusForm.controls['hourlyRate'].errors?.min &&
+                                    !partialCensusForm.controls['hourlyRate'].errors?.max &&
+                                    partialCensusForm.controls['hourlyRate'].value"
+                                                >{{ languageSecondaryStrings["secondary.portal.common.work.errHoursPerWeekDecimal"]}}</span
+                                            >
+                                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['hourlyRate'].errors?.max"
+                                                >{{hourlyRateMoreThanMaxErrorMsg}}
+                                            </span>
+                                            <span *ngIf="isFormSubmitted && partialCensusForm.controls['hourlyRate'].errors?.min"
+                                                >{{hourlyRateLessThanMinErrorMsg}}
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="flex-item">
+                                <mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon>
+                            </div>
+                            <div class="flex-item">
+                                <mat-label>{{languageStrings['primary.portal.tpi.partialCensus.hoursPerWeek']}}</mat-label>
+                                <mat-form-field class="w-100">
+                                    <input
+                                        matInput
+                                        formControlName="hoursPerWeek"
+                                        empoweredNumberValidation
+                                        allowDecimals="true"
+                                        (input)="validateNumberDecimal($event.target)"
+                                        (focusout)="trimDecimalPoint($event.target);setTotalHourlyIncome()"
+                                        (blur)="setTotalHourlyIncome();checkIncomeValue()"
+                                        (change)="$event.stopPropagation()"
+                                    />
+                                    <mat-error>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['hoursPerWeek'].errors?.required">
+                                            {{languageStrings["primary.portal.common.requiredField"]}}
+                                        </span>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls.hoursPerWeek.errors?.max"
+                                            >{{hoursPerWeekMoreThanMaxErrorMsg}}
+                                        </span>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls.hoursPerWeek.errors?.min"
+                                            >{{hoursPerWeekLessThanMinErrorMsg}}
+                                        </span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon>
+                            </div>
+                            <div class="flex-item">
+                                <mat-label>{{languageStrings['primary.portal.tpi.partialCensus.weeksPerYear']}}</mat-label>
+                                <mat-form-field class="w-100">
+                                    <input
+                                        matInput
+                                        formControlName="weeksPerYear"
+                                        (keypress)="validateNumber($event)"
+                                        (blur)="setTotalHourlyIncome();checkIncomeValue()"
+                                        (change)="$event.stopPropagation()"
+                                    />
+                                    <mat-error>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['weeksPerYear'].errors?.required">
+                                            {{languageStrings["primary.portal.common.requiredField"]}}
+                                        </span>
+                                        <span
+                                            *ngIf="isFormSubmitted && partialCensusForm.controls['weeksPerYear'].errors?.pattern &&
+                                    !partialCensusForm.controls['weeksPerYear'].errors?.min &&
+                                    !partialCensusForm.controls['weeksPerYear'].errors?.max && partialCensusForm.controls['weeksPerYear'].value"
+                                        >
+                                            {{languageSecondaryStrings["secondary.portal.common.work.errHoursPerWeekDecimal"]}}</span
+                                        >
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['weeksPerYear'].errors?.max"
+                                            >{{weeksPerYearMoreThanMaxErrorMsg}}
+                                        </span>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['weeksPerYear'].errors?.min"
+                                            >{{weeksPerYearLessThanMinErrorMsg}}
+                                        </span>
+                                        <span *ngIf="isFormSubmitted && partialCensusForm.controls['weeksPerYear'].errors?.incorrect"
+                                            >{{youngerEmployeeHoursPerYearErr}}</span
+                                        >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">{{languageStrings['primary.portal.tpi.partialCensus.equalTo']}}</div>
+
+                            <div>
+                                <mat-label>&nbsp;</mat-label>
+                                <mat-form-field class="w-100">
+                                    <input matInput formControlName="totalIncomeForHourlyWage" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </mat-radio-group>
+                    <div class="alert-wrapper">
+                        <mon-alert alertType="warning" *ngIf="isIncomeHasLowValue">
+                            <span>{{languageStrings['primary.portal.tpi.partialCensus.incomeQualify']}}</span>
+                        </mon-alert>
+                    </div>
+                </div>
+                <div>
+                    <div
+                        *ngIf="!memberContactInfo || (!memberContactInfo.emailAddresses.length && !memberContactInfo.phoneNumbers.length)"
+                        class="txt-bottom"
+                    >
+                        {{languageStrings['primary.portal.tpiEnrollment.contactType']}}
+                    </div>
+                    <div
+                        *ngIf="!memberContactInfo || (!memberContactInfo.emailAddresses.length && !memberContactInfo.phoneNumbers.length)"
+                        class="alert-wrapper"
+                    >
+                        <mon-alert alertType="danger" *ngIf="!isAnyContactFilled">
+                            <span> {{languageStrings['primary.portal.tpi.partialCensus.emailRequired']}} </span>
+                        </mon-alert>
+                    </div>
+                    <div
+                        class="split-wrapper"
+                        *ngIf="!memberContactInfo || (!memberContactInfo.emailAddresses.length && !memberContactInfo.phoneNumbers.length)"
+                    >
+                        <div class="flex-item">
+                            <mat-label>{{languageStrings['primary.portal.tpiEnrollment.homePhone']}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    formControlName="homePhoneNumber"
+                                    matInput
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                    [maxlength]="phoneNumberLength"
+                                />
+                                <mat-error *ngIf="isFormSubmitted && partialCensusForm.controls['homePhoneNumber'].errors?.pattern">
+                                    {{languageSecondaryStrings["secondary.portal.members.contactValidationMsg.invalidPhoneNumber"]}}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item">
+                            <mat-label>{{languageStrings['primary.portal.tpiEnrollment.cellPhone']}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="cellPhoneNumber"
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                    [maxlength]="phoneNumberLength"
+                                />
+                                <mat-error *ngIf="isFormSubmitted && partialCensusForm.controls['cellPhoneNumber'].errors?.pattern">
+                                    {{languageSecondaryStrings["secondary.portal.members.contactValidationMsg.invalidPhoneNumber"]}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div
+                        *ngIf="((partialCensusForm.get('deliveryPreference').value === correspondenceType.ELECTRONIC || (isEBS && payLogixEnabled) ) && !memberContactInfo.emailAddresses.length)
+                    || (!memberContactInfo.emailAddresses.length && !memberContactInfo.phoneNumbers.length)"
+                        class="input-box"
+                    >
+                        <mat-label>{{languageStrings['primary.portal.tpiEnrollment.email']}}</mat-label>
+                        <mat-form-field>
+                            <input matInput formControlName="emailID" />
+                            <mat-error>
+                                <span *ngIf=" isFormSubmitted &&  partialCensusForm.controls['emailID'].errors?.required">
+                                    {{languageSecondaryStrings["secondary.portal.members.contactValidationMsg.emailRequired"]}}
+                                </span>
+                                <span *ngIf="isFormSubmitted && partialCensusForm.controls['emailID'].errors?.maxlength">
+                                    {{languageSecondaryStrings['secondary.portal.members.contactValidationMsg.maxlength60']}}
+                                </span>
+                                <span
+                                    *ngIf="isFormSubmitted && partialCensusForm.controls['emailID'].errors?.pattern && !partialCensusForm.controls['emailID'].errors?.maxlength"
+                                >
+                                    {{languageSecondaryStrings["secondary.portal.members.contactValidationMsg.invalidEmail"]}}
+                                </span>
+                                <span
+                                    *ngIf="isFormSubmitted && partialCensusForm.controls.emailID?.errors?.restrictedDomain
+                                                                        && !partialCensusForm.controls.emailID?.errors?.pattern
+                                                                        && !partialCensusForm.controls.emailID?.errors?.maxlength"
+                                >
+                                    {{languageSecondaryStrings["secondary.portal.members.api.email.restrictedDomain.errorMessage"]}}
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="delivery-radio-options">
+                <mat-label>{{languageStrings['primary.portal.tpiEnrollment.deliveryPreference']}}</mat-label>
+                <mat-radio-group formControlName="deliveryPreference" (change)="onChangeDeliveryPreference($event)">
+                    <div class="radio-btn">
+                        <mat-radio-button [value]="correspondenceType.ELECTRONIC"
+                            >{{languageStrings['primary.portal.tpi.partialCensus.electronic']}}</mat-radio-button
+                        >
+                    </div>
+                    <div class="radio-btn">
+                        <mat-radio-button [value]="correspondenceType.PAPER"
+                            >{{languageStrings['primary.portal.tpi.partialCensus.paper']}}</mat-radio-button
+                        >
+                    </div>
+                </mat-radio-group>
+                <div *ngIf="partialCensusForm.get('deliveryPreference').value == correspondenceType.ELECTRONIC && memberInfo">
+                    <mat-hint *ngIf="memberInfo.name.firstName && isAgentAssistedFlow"
+                        >{{languageStrings['primary.portal.members.mappPolicyDeliveryMsgElectronic'].replace('##memberFirstName##',
+                        memberInfo.name.firstName)}}</mat-hint
+                    >
+                    <mat-hint *ngIf="!isAgentAssistedFlow"
+                        >{{languageStrings['primary.portal.members.mmpElectronicPolicyDelivery']}}</mat-hint
+                    >
+                </div>
+                <div *ngIf="partialCensusForm.get('deliveryPreference').value == correspondenceType.PAPER && memberInfo">
+                    <mat-hint *ngIf="memberInfo.name.firstName && isAgentAssistedFlow"
+                        >{{languageStrings['primary.portal.members.mappPolicyDeliveryMsgPaper'].replace('##memberFirstName##',
+                        memberInfo.name.firstName)}}</mat-hint
+                    >
+                    <mat-hint *ngIf="!isAgentAssistedFlow">{{languageStrings['primary.portal.members.mmpPaperPolicyDelivery']}}</mat-hint>
+                </div>
+            </div>
+        </div>
+    </div>
+    <empowered-tpi-footer class="tpi-footer">
+        <div *ngIf="!tpiLnlMode">
+            <a
+                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                type="button"
+                (click)="onExit()"
+                mat-flat-button
+            >
+                {{languageStrings['primary.portal.tpiEnrollment.exit']}}
+            </a>
+        </div>
+        <div>
+            <button mat-button class="mon-btn-secondary" type="button" (click)="onBack()">
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+            <button mat-button class="mon-btn-primary mon-ml-20" type="submit">
+                {{languageStrings['primary.portal.common.continue']}}
+            </button>
+        </div>
+    </empowered-tpi-footer>
+</form>

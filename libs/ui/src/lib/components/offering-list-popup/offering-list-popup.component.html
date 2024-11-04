@@ -1,0 +1,45 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closePopup()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <div class="header">
+            <h1 mat-dialog-title class="mon-mb-15" language="primary.portal.shoppingCart.quoteLevelSettings.footer.benefitDollar"></h1>
+            <p>
+                {{costAdjustmentMessage}}. {{this.offeringList.length? languageStrings["primary.portal.benefitDollars.payment.message"]:
+                ''}}
+            </p>
+        </div>
+        <div class="scroll-content">
+            <ng-container *ngFor="let offering of offeringList">
+                <div class="offering-wrapper">
+                    <div class="offering-amount">
+                        <h2 *ngIf="offering.contributionType===benefitDollars.FLAT_AMOUNT">
+                            {{(offering.currentAmount ? offering.currentAmount : offering.amount) | currency }}
+                        </h2>
+                        <h2 *ngIf="offering.contributionType===benefitDollars.PERCENTAGE_AMOUNT">
+                            {{ (offering.currentAmount ? offering.currentAmount: offering.amount) + benefitDollars.PERCENTAGE}}
+                        </h2>
+                    </div>
+                    <div class="offering-description">
+                        <h4 *ngIf="offering.contributionType===benefitDollars.FLAT_AMOUNT else percentPart">
+                            <span [ngClass]="{'offering-name': (accountPayrollFrequency$ | async)?.length > PAY_FREQUENCY_SHORT_LENGTH}"
+                                >{{offering.name}} |
+                            </span>
+                            <span>{{accountPayrollFrequency$ | async}}</span>
+                        </h4>
+                        <ng-template #percentPart>
+                            <h4>{{offering.name}}</h4>
+                        </ng-template>
+                        <p>{{offering.description}}</p>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button [mat-dialog-close]="true" mat-flat-button (click)="closePopup()" class="mon-btn-primary">Got It</button>
+    </mat-dialog-actions>
+</div>

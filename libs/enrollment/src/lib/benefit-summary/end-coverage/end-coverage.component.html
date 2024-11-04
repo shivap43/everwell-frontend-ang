@@ -1,0 +1,133 @@
+<form [formGroup]="cancelCoverageForm">
+    <div>
+        <empowered-mon-spinner enableSpinner="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+    </div>
+    <empowered-modal type="POPUP" size="LG">
+        <empowered-modal-header>
+            <div [ngSwitch]="stepperIndex">
+                <div class="header-step-one" *ngSwitchCase="0">
+                    <span class="step-txt">{{languageStrings['primary.portal.endCoverage.stepOne']}}</span>
+                    <span>{{languageStrings['primary.portal.endCoverage.endCoverage']}}</span>
+                </div>
+                <div class="header-step-two" *ngSwitchCase="1">
+                    <span class="step-txt">{{languageStrings['primary.portal.endCoverage.stepTwo']}}</span>
+                    <span>{{languageStrings['primary.portal.endCoverage.confirmEndCoverage']}}</span>
+                </div>
+            </div>
+        </empowered-modal-header>
+        <empowered-modal-footer>
+            <div class="footer-step-one">
+                <button mat-flat-button class="mon-btn-primary" *ngIf="stepperIndex==0" (click)="onNext()">
+                    <span>{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+                </button>
+            </div>
+            <div class="footer-step-two">
+                <button mat-flat-button class="mon-btn-secondary" *ngIf="stepperIndex>0" (click)="onBack()">
+                    <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                    <span>{{languageStrings['primary.portal.common.back']}}</span>
+                </button>
+                <button mat-flat-button class="mon-btn-primary" *ngIf="stepperIndex==1" (click)="onConfirm()">
+                    <span>{{languageStrings['primary.portal.common.confirm']}}</span>
+                </button>
+            </div>
+        </empowered-modal-footer>
+        <div class="end-coverage-wrapper">
+            <mat-horizontal-stepper #horizontalStepper [selectedIndex]="stepperIndex" class="dialog-horizontal-stepper" [@.disabled]="true">
+                <mat-step [completed]="stepperIndex>0">
+                    <p *ngIf="isProducer || isAdmin">
+                        {{languageStrings['primary.portal.endCoverage.producerEndingCoverage'].replace("#planName",
+                        data.planName).replace("#employeeName", data.employeeName)}}
+                    </p>
+                    <p *ngIf="isMember">
+                        {{languageStrings['primary.portal.endCoverage.memberEndingCoverage'].replace("#planName", data.planName)}}
+                    </p>
+                    <div class="coverage-end-date">
+                        <div>
+                            <mat-label class="mat-label">{{languageStrings['primary.portal.endCoverage.coverageEndDate']}}</mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    matInput
+                                    #datePickerInput
+                                    [(ngModel)]="defaultCoverageEndDate"
+                                    [matDatepicker]="coverageEndDate"
+                                    formControlName="coverageEndDate"
+                                    [min]="todayDate"
+                                    empoweredDateTransform
+                                    [attr.aria-label]="languageStrings['primary.portal.endCoverage.coverageEndDate']"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="coverageEndDate">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #coverageEndDate></mat-datepicker>
+                                <mat-error> {{validateDate(datePickerInput.value)}} </mat-error>
+                                <mat-error *ngIf="this.cancelCoverageForm.controls.coverageEndDate?.errors?.maxAgeError">
+                                    {{languageStrings['primary.portal.common.datePast']}}
+                                </mat-error>
+                                <mat-error *ngIf="this.cancelCoverageForm.controls.coverageEndDate?.errors?.argusMaxAgeError">
+                                    {{languageStrings['primary.portal.endCoverage.argus.datePast']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="description">
+                        <mat-label class="mat-label" *ngIf="isAdmin; else comment"
+                            >{{languageStrings['primary.portal.qle.notesLabel']}}</mat-label
+                        >
+                        <ng-template #comment>
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.endCoverage.description']}}<span class="optional-text"
+                                    >{{languageStrings['primary.portal.common.optional']}}</span
+                                ></mat-label
+                            >
+                        </ng-template>
+                        <mat-form-field class="mon-mb-0">
+                            <textarea
+                                matInput
+                                [attr.aria-label]="languageStrings['primary.portal.endCoverage.description']"
+                                [maxLength]="TEXT_AREA_LENGTH"
+                                formControlName="description"
+                            ></textarea>
+                            <mat-hint *ngIf="!isAdmin">{{languageStrings['primary.portal.endCoverage.maxCharacters']}}</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </mat-step>
+                <mat-step [completed]="stepperIndex>1">
+                    <p *ngIf="isAdmin || isProducer">
+                        {{languageStrings['primary.portal.endCoverage.endingCoverage'].replace("#planName",
+                        data.planName).replace("#employeeName", data.employeeName)}}
+                        <span *ngIf="data.enrollmentTaxStatus === preTax && isProducer"
+                            >{{languageStrings['primary.portal.endCoverage.note']}}</span
+                        >
+                    </p>
+                    <p *ngIf="isMember">
+                        {{languageStrings['primary.portal.endCoverage.endingMemberCoverage'].replace("#planName", data.planName)}}
+                        <span *ngIf="data.enrollmentTaxStatus === preTax">{{languageStrings['primary.portal.endCoverage.note']}}</span>
+                    </p>
+                    <div class="confirm-end-coverage">
+                        <div class="coverage-view">
+                            <div class="label">{{languageStrings['primary.portal.endCoverage.coverageEndDate']}}</div>
+                            <div class="data">{{finalCoverageEndDate}}</div>
+                        </div>
+                        <div *ngIf="finalDescription && !spaceValidation" class="coverage-view">
+                            <div class="label" *ngIf="isAdmin; else notes">{{languageStrings['primary.portal.qle.notesLabel']}}</div>
+                            <div class="data">{{finalDescription}}</div>
+                        </div>
+                        <ng-template #notes>
+                            <div *ngIf="finalDescription && !spaceValidation" class="label">
+                                {{languageStrings['primary.portal.endCoverage.comments']}}
+                            </div>
+                        </ng-template>
+                    </div>
+                    <div *ngIf="showErrorMessage" class="error-msg">
+                        <mon-alert alertType="danger">
+                            <span> {{secondaryLanguageStrings["secondary.portal.endCoverage.pretaxErrorMessage"]}} </span>
+                        </mon-alert>
+                    </div>
+                    <div *ngIf="data.enrollmentTaxStatus===preTax" class="pretax" [innerHTML]="preTaxContent"></div>
+                </mat-step>
+            </mat-horizontal-stepper>
+        </div>
+    </empowered-modal>
+</form>

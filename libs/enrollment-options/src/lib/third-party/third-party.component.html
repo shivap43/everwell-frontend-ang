@@ -1,0 +1,90 @@
+<div class="third-party mon-mx-30">
+    <ng-container *configEnabled="'core.account.thirdPartyPlatform.enable'">
+        <h3 *ngIf="isDataFound === false">{{languageStrings['primary.portal.thirdParty.addparty_enrollment']}}</h3>
+        <div [ngClass]="!isDataFound ? 'd-none' : 'd-flex space-between mon-mb-20'">
+            <h3 class="mon-my-0">{{languageStrings['primary.portal.thirdParty.addparty_enrollment']}}</h3>
+            <div *hasPermission="'core.account.create.enrollmentPlatform'">
+                <a href="javascript:void(0)" (click)="showAddTPPPopup(thirdPartyPlatformsData)" *ngIf="!isPrivacyOnForEnroller"
+                    >{{languageStrings['primary.portal.thirdParty.addparty_platform']}}</a
+                >
+            </div>
+        </div>
+        <div [ngClass]="!isDataFound ? 'd-flex mon-mb-20' : 'd-none'">
+            <ng-container *hasPermission="'core.account.create.enrollmentPlatform'">
+                <a href="javascript:void(0)" (click)="showAddTPPPopup(thirdPartyPlatformsData)" *ngIf="!isPrivacyOnForEnroller"
+                    >{{languageStrings['primary.portal.thirdParty.addparty_platform']}}</a
+                >
+            </ng-container>
+        </div>
+    </ng-container>
+    <ng-template [ngIf]="showSpinner">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+
+    <div *ngIf="isMpGroupExist && isDataFound" class="boderbottom">
+        <table [dataSource]="dataSource" mat-table>
+            <ng-container matColumnDef="thirdPartyPlatformName">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.thirdParty.platform"></th>
+                <td *matCellDef="let element" mat-cell>{{ element.thirdPartyPlatform.name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.thirdParty.startdate"></th>
+                <td *matCellDef="let element" mat-cell>{{ element.validity.effectiveStarting | date: dateformat}}</td>
+            </ng-container>
+            <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.thirdParty.enddate"></th>
+                <td *matCellDef="let element" mat-cell>{{ element.validity?.expiresAfter | date: dateformat}}</td>
+            </ng-container>
+            <ng-container matColumnDef="viewDocument" *ngIf="user.credential$ | async as credential">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.thirdParty.technical_worksheet"></th>
+                <td *matCellDef="let element" mat-cell>
+                    <a href="javascript:void(0)" (click)="openPdfDocument(element.thirdPartyPlatform.id,'pdf')"
+                        >{{languageStrings['primary.portal.thirdParty.view_pdf']}}</a
+                    >
+                    |
+                    <a href="javascript:void(0)" (click)="openPdfDocument(element.thirdPartyPlatform.id,'xml')"
+                        >{{languageStrings['primary.portal.thirdParty.viewbyxml']}}</a
+                    >
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.thirdParty.manage"></th>
+                <td *matCellDef="let element" mat-cell>
+                    <button
+                        *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_ENROLLMENT_PLATFORM"
+                        mat-icon-button
+                        [matMenuTriggerFor]="beforeMenu"
+                        [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                    >
+                        <mon-icon
+                            iconName="ellipsis"
+                            [iconSize]="20"
+                            class="more-option icon-primary"
+                            *ngIf="!isPrivacyOnForEnroller"
+                        ></mon-icon>
+                    </button>
+                    <mat-menu #beforeMenu="matMenu" xPosition="before">
+                        <button
+                            mat-menu-item
+                            (click)="editExisting(element)"
+                            *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_ENROLLMENT_PLATFORM"
+                        >
+                            {{languageStrings['primary.portal.thirdParty.edit']}}
+                        </button>
+                        <button
+                            class="text-danger"
+                            [disabled]="element.isActive"
+                            mat-menu-item
+                            *isRestricted="permissionEnum.ACCOUNT_RESTRICT_DELETE_ENROLLMENT_PLATFORM"
+                            (click)="openAlert(element.thirdPartyPlatform.id,element.thirdPartyPlatform.name,element.validity)"
+                        >
+                            {{languageStrings['primary.portal.thirdParty.remove']}}
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+        </table>
+    </div>
+</div>

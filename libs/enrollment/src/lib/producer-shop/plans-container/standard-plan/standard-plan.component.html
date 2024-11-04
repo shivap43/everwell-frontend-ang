@@ -1,0 +1,88 @@
+<div *ngIf="enrollmentPlan">
+    <ng-container *ngIf="memberProfile$ | async as memberProfile">
+        <!-- THIS SECTION IS FOR Enrolled plans in edit mode and for re-enrollable enrollments -->
+        <ng-container *ngIf="isReEnrollmentPlan$ | async; else nonReEnrollment">
+            <p class="plan-alert-messages" *ngIf="planPanel?.cartItemInfo">
+                <span>
+                    {{ "primary.portal.shopPage.changes.autoEnrollment" | replaceTag: { "#firstname": memberProfile.name?.firstName } }}
+                </span>
+            </p>
+        </ng-container>
+        <ng-template #nonReEnrollment>
+            <!-- THIS SECTION IS FOR Enrolled plans in edit mode and for non re-enrollable enrollments -->
+            <p *ngIf="planPanel?.cartItemInfo" class="plan-alert-messages">
+                <span *ngIf="planPanel.enrollment.carrierStatus === carrierStatus.ACTIVE; else replaceCoverageMessage">
+                    <span language="primary.portal.shoppingCart.planOfferings.policyChangesMade"></span>
+                    <a
+                        href="javascript:void(0)"
+                        (click)="deleteAndCancelChanges(planPanel?.cartItemInfo?.id)"
+                        language="primary.portal.common.cancelChanges"
+                    ></a>
+                </span>
+                <ng-template #replaceCoverageMessage>
+                    <span
+                        >{{ "primary.portal.shoppingCart.planOfferings.replacePlanOfUsersCoverage" | replaceTag: { "##firstname##":
+                        memberProfile.name?.firstName } }}</span
+                    >
+                    <a
+                        href="javascript:void(0)"
+                        (click)="deleteAndCancelChanges(planPanel?.cartItemInfo?.id)"
+                        language="primary.portal.shoppingCart.planOfferings.goBackToPreviousCoverage"
+                    ></a>
+                </ng-template>
+            </p>
+        </ng-template>
+    </ng-container>
+</div>
+
+<ng-container *ngIf="planPanel.planOffering.type !== PlanType.REDIRECT">
+    <ng-template #planLoading>
+        <div class="spinner-container" *ngIf="displaySpinnerElement$ | async">
+            <empowered-mon-spinner [enableSpinner]="true" [backdrop]="false" inputClass="mon-spinner-shop"> </empowered-mon-spinner>
+        </div>
+    </ng-template>
+
+    <ng-container *ngIf="planOfferingPricings$ | async as planOfferingPricings ; else planLoading">
+        <ng-container *ngIf="planOfferingPricings?.length; else priceNotAvailable">
+            <empowered-plan-settings [backdropAnchor]="planPricesWrapper" [planPanel]="planPanel"></empowered-plan-settings>
+            <div #planPricesWrapper>
+                <empowered-plan-prices [planPanel]="planPanel"></empowered-plan-prices>
+            </div>
+            <div class="bottom-wrapper">
+                <div class="bottom-button-wrapper">
+                    <empowered-plan-details-link
+                        class="plan-details-link"
+                        [planOffering]="planPanel.planOffering"
+                    ></empowered-plan-details-link>
+                    <div class="d-flex">
+                        <ng-container *ngIf="enrollmentPlan">
+                            <!-- Should be displayed when enrollment is present without cartItem -->
+                            <a
+                                *ngIf="!planPanel?.cartItemInfo"
+                                href="javascript:void(0)"
+                                (click)="onCancel()"
+                                language="primary.portal.common.cancel"
+                            ></a>
+                        </ng-container>
+                        <empowered-add-update-cart-button-wrapper [planPanel]="planPanel"></empowered-add-update-cart-button-wrapper>
+                    </div>
+                </div>
+                <ng-container *ngIf="isSpouseKnockout$ | async">
+                    <div *ngIf="memberProfile$ | async as memberProfile" class="update-responses-link">
+                        {{ "primary.portal.shoppingExperience.spouseDisable" | replaceTag: { "#spouseDisable":
+                        memberProfile?.name?.firstName } }}
+                        <a
+                            href="javascript:void(0)"
+                            (click)="updateSpouseResponses()"
+                            language="primary.portal.shoppingExperience.updateEmployeeResponse"
+                        ></a>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+    </ng-container>
+
+    <ng-template #priceNotAvailable>
+        <div class="price-not-available">{{ noPricingsMessage$ | async }}</div>
+    </ng-template>
+</ng-container>

@@ -1,0 +1,216 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content change-address">
+    <form [formGroup]="changeAddressForm">
+        <div class="flex-form-wrapper mon-px-30">
+            <h3>{{languageStrings["primary.portal.policyChangeRequest.transactions.changeAddress.header"]}}</h3>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeAddress.streetAddress"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="address1"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.streetAddress']"
+                            />
+                            <mat-error *ngIf="(formControl['address1'].errors?.required )">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['address1'].errors?.maxlength "
+                                language="primary.portal.policyChangeRequest.transactions.maxLength100"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['address1'].errors?.pattern"
+                                language="primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeAddress.streetAddress2"
+                            ></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="address2"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.streetAddress2']"
+                            />
+                            <mat-error
+                                *ngIf="formControl['address2'].errors?.maxlength "
+                                language="primary.portal.policyChangeRequest.transactions.maxLength100"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['address2'].errors?.pattern"
+                                language="primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.changeAddress.city"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="city"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.city']"
+                            />
+                            <mat-error *ngIf="(formControl['city'].errors?.required )">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label
+                            class="mat-label"
+                            language="primary.portal.policyChangeRequest.transactions.changeAddress.state"
+                        >
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" class="mon-input" formControlName="state">
+                                <mat-option
+                                    *ngFor="let state of states$ | async"
+                                    value="{{ state.abbreviation }}"
+                                    (onSelectionChange)="validateZipCode()"
+                                >
+                                    {{ state.abbreviation }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="(formControl['state'].errors?.required )">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.selectionRequired"
+                                ></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="zipcode">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.changeAddress.zip"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="zip"
+                                (focusout)="validateZipCode()"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.zip']"
+                            />
+                            <mat-error *ngIf="(formControl['zip'].errors?.required )">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error>
+                                <span
+                                    *ngIf="formControl['zip'].errors?.zipValid "
+                                    language="primary.portal.policyChangeRequest.transactions.changeAddress.validationError.zip"
+                                >
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="attacher">
+                        <span>_</span>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.changeAddress.ext"></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="ext"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.ext']"
+                            />
+                            <mat-error>
+                                <span
+                                    *ngIf="formControl['ext'].errors?.pattern"
+                                    language="primary.portal.policyChangeRequest.transactions.changeAddress.validationError.ext"
+                                >
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.changeAddress.phone"></span>
+                            <span class="optional-text" language="primary.portal.common.optional"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="phoneNumber"
+                                empoweredNumberValidation
+                                [allowDashes]="true"
+                                empoweredPhoneNumberFormat
+                                type="text"
+                                [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeAddress.phone']"
+                            />
+                            <mat-error *ngIf="formControl['phoneNumber'].errors?.pattern">
+                                <span language="primary.portal.policyChangeRequest.transactions.invalidPhoneNumber">
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="ChangeAddress()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

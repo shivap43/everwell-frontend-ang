@@ -1,0 +1,45 @@
+<div class="mon-card-wrapper mon-my-25">
+    <mat-card class="mon-card mon-p-0">
+        <mat-card-content class="mon-mb-0">
+            <div *ngIf="verifyMethod == 'email'">
+                <mat-card-title language="primary.portal.forgotUsername.usernameSent.Title"></mat-card-title>
+                <strong>
+                    <p language="primary.portal.forgotUsername.usernameSent.Email"></p>
+                </strong>
+                <p class="mon-btn-link">{{this.contact }}.</p>
+                <strong>
+                    <p language="primary.portal.forgotUsername.usernameSent.matchAddress"></p>
+                </strong>
+            </div>
+            <div *ngIf="verifyMethod == 'phone'">
+                <mat-card-title language="primary.portal.forgotUsername.usernameSent.Title"></mat-card-title>
+                <strong>
+                    <p>
+                        {{ "primary.portal.forgotUsername.usernameSent.Mobile" | replaceTag: { "#mobile": this.contact }
+                        }}
+                    </p>
+                </strong>
+            </div>
+        </mat-card-content>
+        <mat-card-footer class="mon-card-footer mon-text-center mon-px-50 mon-mx-0  bg-gray-100">
+            <div>
+                <button
+                    class="mon-button-full-width mon-btn-primary"
+                    mat-flat-button
+                    routerLink="../../../login"
+                    [attr.aria-label]="languageStrings['primary.portal.common.returnToLogin']"
+                >
+                    {{languageStrings['primary.portal.common.returnToLogin']}}
+                </button>
+                <p class="mon-mt-30 text-center">
+                    <a
+                        href="javascript:void(0)"
+                        routerLink="{{ backRoute }}"
+                        [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                        >{{languageStrings['primary.portal.common.back']}}</a
+                    >
+                </p>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+</div>

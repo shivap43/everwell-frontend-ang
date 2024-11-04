@@ -1,0 +1,14 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>{{title}}</empowered-modal-header>
+    <div><p *ngIf="content">{{content}}</p></div>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            class="mon-btn-danger"
+            [mat-dialog-close]="true"
+            [aria-label]="languageStrings['primary.portal.common.remove']"
+        >
+            {{ languageStrings["primary.portal.common.remove"]}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

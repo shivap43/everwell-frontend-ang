@@ -1,0 +1,70 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span>{{languageStrings['primary.portal.proposals.preview.header']}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-flat-button color="primary" class="confirm-button" (click)="onSubmit(previewProposalForm)">
+            {{languageStrings['primary.portal.proposals.preview.confirm']}}
+        </button>
+    </empowered-modal-footer>
+
+    <p>{{languageStrings['primary.portal.proposals.preview.headerMessage']}}</p>
+
+    <ng-container *ngIf="(missingFlyerFeatureEnable$ | async) && missingFlyerInfo?.length > 0 && !isRatesSelected">
+        <mon-alert class="warning" alertType="warning" closeButton="true">
+            <div class="missingEmployerFlyer">
+                <div>{{languageStrings['primary.portal.previewProposal.employerFlyerUnavailable']}}</div>
+                <ul class="plan-list">
+                    <li *ngFor="let element of missingFlyerInfo">{{element.planName}}</li>
+                </ul>
+                <div>{{ languageStrings['primary.portal.previewProposal.ratesIncluded']}}</div>
+            </div>
+        </mon-alert>
+    </ng-container>
+
+    <div class="field-container col-md-6">
+        <mat-label class="mat-label preview-proposal-form-label"
+            >{{languageStrings['primary.portal.proposals.preview.proposalName']}}</mat-label
+        >
+        <span>{{data.name}}</span>
+    </div>
+
+    <form [formGroup]="previewProposalForm">
+        <div class="state-zip">
+            <div class="form-field-container col-md-4">
+                <span language="primary.portal.proposals.preview.state" class="preview-proposal-form-label"></span>
+                <mat-form-field class="preview-proposal-form-select">
+                    <mat-select formControlName="state" (selectionChange)="checkFlyerForStates($event.value)">
+                        <mat-option *ngFor="let state of allStates" value="{{state.abbreviation}}"> {{state.name}} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="form-zip-container col-md-3">
+                <mat-label class="mat-label">
+                    <span class="preview-proposal-form-label" language="primary.portal.proposals.preview.zip"></span
+                    ><span class="text-regular" language="primary.portal.common.optional"></span>
+                </mat-label>
+                <mat-form-field class="preview-proposal-form-input">
+                    <input
+                        matNativeControl
+                        formControlName="zip"
+                        [attr.aria-label]="languageStrings['primary.portal.proposals.preview.zip']"
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="form-field-container col-md-3">
+            <span language="primary.portal.proposals.preview.proposalType" class="preview-proposal-form-label"></span>
+            <mat-radio-group formControlName="proposalType" class="radio-group-stacked" (change)="chooseOption($event.value)">
+                <mat-radio-button value="FULL" class="form-radio-button-stacked">
+                    <span language="primary.portal.proposals.preview.proposalType.fullProposal"></span>
+                </mat-radio-button>
+                <mat-radio-button value="RATES_ONLY" class="form-radio-button-stacked">
+                    <span language="primary.portal.proposals.preview.proposalType.ratesOnly"></span>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+    </form>
+</empowered-modal>

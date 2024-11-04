@@ -1,0 +1,134 @@
+<section class="product-list">
+    <article class="product-item" *ngFor="let productOfr of productOfferings; let index = index;">
+        <div class="product-thumbnail">
+            <mon-icon
+                [fetchedIconPath]="productOfr.product.iconSelectedLocation"
+                [iconName]="productOfr.product.name"
+                [iconSize]="48"
+                class="product-icon"
+            ></mon-icon>
+        </div>
+        <div class="product-label">
+            <h2>{{productOfr.product.name}}</h2>
+            <span class="carrier-name">
+                <ng-container *ngIf="virginiaFeatureEnabled$ | async; else virginiaFeatureNotEnabled">
+                    <span
+                        class="text-right-margin-space"
+                        *ngIf="productOfr.multipleCarriers"
+                        language="primary.portal.members.planOptions"
+                    ></span>
+                    <ng-container>{{productOfr.product?.carrierName | aflacLegalName: productOfr.product?.legalName}}</ng-container>
+                </ng-container>
+                <ng-template #virginiaFeatureNotEnabled> {{productOfr.product?.carrierName}} </ng-template>
+            </span>
+            <div
+                [ngClass]="{'shopping-experience-plans' : isTpi}"
+                *ngIf="(!(productOfr.inCart || productOfr.declined)) && isTpi && !productOfr.enrollStatus && !tpiLnlMode"
+            >
+                {{productOfr.product.description}}
+            </div>
+            <div *ngIf="isTpi && !tpiLnlMode && isAgentAssisted" language="primary.portal.tpi.coverageStartsOn">
+                {{productOfr?.coverageDate | date:dateFormat}}
+            </div>
+            <div *ngIf="isTpi && !tpiLnlMode && !isAgentAssisted">
+                <div language="primary.portal.tpi.coverageStartsOn">{{productOfr?.tppSelfServiceCoverageStartDate | date:dateFormat}}</div>
+            </div>
+        </div>
+        <div class="product-description" [ngClass]="{'product-tpi-description' : isTpi ,  'lnl-product' : tpiLnlMode}">
+            <div>
+                <mon-icon iconName="cart" class="icon-primary" iconSize="19" *ngIf="productOfr.inCart"> </mon-icon>
+                <mon-icon
+                    iconName="In-cart-decline"
+                    iconSize="19"
+                    class="icon-danger"
+                    *ngIf="(productOfr.declined && !qualifyingEventStatuses[index]) || policiesExpired[index]"
+                >
+                </mon-icon>
+                <mon-icon
+                    iconName="Filled-check"
+                    iconSize="19"
+                    class="icon-success"
+                    *ngIf="((!productOfr.inCart && !productOfr.declined && productOfr.enrollStatus === 'Approved')
+                    && (qualifyingEventStatuses[index] === qleEndPlanRequestStatus.COVERAGE_CANCELLED || !qualifyingEventStatuses[index])) && !policiesExpired[index]"
+                >
+                </mon-icon>
+                <mon-icon
+                    iconName="Filled-check"
+                    iconSize="19"
+                    class="icon-warning"
+                    *ngIf="(!productOfr.inCart && !productOfr.declined && productOfr.enrollStatus === 'Lapsed') && !policiesExpired[index]"
+                >
+                </mon-icon>
+                <mon-icon
+                    iconName="Filled-dash"
+                    iconSize="19"
+                    class="icon-warning"
+                    *ngIf="((!productOfr.inCart && !productOfr.declined && productOfr.enrollStatus?.startsWith('Pending')
+                     && !qualifyingEventStatuses[index]) || (isWarnings[index])) && !policiesExpired[index]"
+                >
+                </mon-icon>
+                <span *ngIf="productOfr.inCart && !(isTpi || tpiLnlMode)">
+                    {{languageStrings[productOfr.companyProvided ? 'primary.portal.shoppingExperience.comapnyProvided' :
+                    'primary.portal.shoppingCart.planOfferings.inCart']}}
+                </span>
+                <span
+                    *ngIf="(productOfr.inCart && isTpi) || (productOfr.inCart && tpiLnlMode)"
+                    language="primary.portal.tpi.selected"
+                ></span>
+                <span *ngIf="productOfr.declined" language="primary.portal.shoppingExperince.declined"></span>
+                <span *ngIf="(!(productOfr.inCart || productOfr.declined)) && !isTpi && !tpiLnlMode && !qualifyingEventStatuses[index]">
+                    {{productOfr.enrollStatus ? productOfr.enrollStatus : productOfr.product.description}}
+                </span>
+                <span
+                    *ngIf="((!(productOfr.inCart || productOfr.declined)) && !isTpi && !tpiLnlMode &&
+                qualifyingEventStatuses[index]=== qleEndPlanRequestStatus.COVERAGE_CANCELLATION_REQUEST_SUBMITTED || qualifyingEventStatuses[index]=== qleEndPlanRequestStatus.PENDING_HR_APPROVAL) && !policiesExpired[index]"
+                    language="primary.portal.coverage.endCoverageRequested"
+                >
+                </span>
+                <span
+                    *ngIf="((!(productOfr.inCart || productOfr.declined)) && (isTpi || tpiLnlMode) && productOfr.enrollStatus) &&
+                        !policiesExpired[index] && productOfr.enrollStatus !== statusEnded"
+                >
+                    {{productOfr.enrollStatus}}
+                </span>
+                <span
+                    *ngIf="((!(productOfr.inCart || productOfr.declined)) && !isTpi && !tpiLnlMode &&
+                qualifyingEventStatuses[index] === qleEndPlanRequestStatus.COVERAGE_CANCELLED) && !policiesExpired[index]"
+                >
+                    {{productOfr.enrollStatus}}
+                    <p class="approved-status" *ngIf="policyEndDates[index]" language="primary.portal.coverage.policyEnds">
+                        {{policyEndDates[index] | date : dateFormat}}
+                    </p>
+                </span>
+                <span *ngIf="policiesExpired[index]"> {{statusEnded}} </span>
+            </div>
+            <div
+                *ngIf="((!(productOfr.inCart || productOfr.declined))  && tpiLnlMode && !productOfr.enrollStatus) && !policiesExpired[index]"
+                class="mon-mb-10"
+            >
+                {{productOfr.product.description}}
+            </div>
+        </div>
+        <div class="product-action">
+            <div *ngIf="!isWizardFlow">
+                <button
+                    mat-flat-button
+                    class="mon-btn-secondary"
+                    color="primary"
+                    type="button"
+                    (click)="showPlans(productOfr.id)"
+                    *ngIf="productOfr.inCart || productOfr.companyProvided || productOfr.enrollStatus==='Approved' ||
+                    productOfr.declined || grandfatheredPlan[productOfr.product.id] || !productOfr.inCart"
+                    [attr.aria-label]="languageStrings['primary.portal.shoppingExperience.viewPlans']"
+                >
+                    {{productOfr.planOfferings.length > 1 ? languageStrings['primary.portal.shoppingExperience.viewPlans'] :
+                    languageStrings['primary.portal.shoppingExperience.viewPlan']}}
+                </button>
+            </div>
+        </div>
+    </article>
+</section>
+
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>

@@ -1,0 +1,112 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title>{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.title']}}</h1>
+        <div class="flex-from-wrapper">
+            <div class="d-md-flex">
+                <div class="flex-item w-200">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.coverageReplacementDate']}}</mat-label
+                    >
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            [matDatepicker]="coverageReplacementDate"
+                            matInput
+                            empoweredDateTransform
+                            [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.coverageReplacementDate']"
+                        />
+                        <mat-datepicker #coverageReplacementDate></mat-datepicker>
+                        <mat-datepicker-toggle matSuffix (click)="coverageReplacementDate.open()">
+                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                        </mat-datepicker-toggle>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="mon-my-20">
+            <mat-label class="mat-label"
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.currentPlan']}}</mat-label
+            >
+            <p>{{oldPlanName.name}}</p>
+        </div>
+        <div>
+            <mat-label class="mat-label"
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.newPlan']}}</mat-label
+            >
+            <mat-form-field>
+                <mat-select
+                    matNativeControl
+                    [placeholder]="languageStrings['primary.portal.common.select']"
+                    disableOptionCentering="true"
+                    (selectionChange)="planChange($event,PlanName)"
+                    name="PlanName"
+                    [(ngModel)]="PlanName"
+                >
+                    <mat-option *ngFor="let item of plansDetails" [value]="item">{{item.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="flex-form-wrapper coverage-level-wrapper" *ngIf="coverageLevelDisplay">
+            <div class="d-md-flex header">
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.currentPlanCoverageLevel']}}</mat-label
+                    >
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.replacePlan.newPlanCoverageLevel']}}</mat-label
+                    >
+                </div>
+            </div>
+            <div class="d-md-flex coverage-level" *ngFor="let level of oldCoverageLevels; let i = index">
+                <div class="flex-item">
+                    {{level.name}}
+                </div>
+                <div class="flex-item">
+                    <mat-form-field class="mon-mb-0">
+                        <mat-select
+                            matNativeControl
+                            [placeholder]="languageStrings['primary.portal.common.select']"
+                            disableOptionCentering="true"
+                            (selectionChange)="coverageChange($event, i)"
+                            ><mat-option *ngFor="let item of newCoverageLevels" [value]="item"
+                                >{{item.name}}</mat-option
+                            >
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="closeModal(backButtonClicked)" mat-dialog-close>
+            {{languageStrings['primary.portal.common.cancel']}}
+        </a>
+        <div>
+            <button type="submit" mat-flat-button class="mon-btn-secondary" (click)="closeModal(backButtonClicked)">
+                <mon-icon
+                    class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                    iconSize="12"
+                    iconName="left"
+                    [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                ></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+            <button
+                type="button"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                [attr.aria-label]="languageStrings['primary.portal.common.replace']"
+                (click)="onNext()"
+            >
+                {{languageStrings['primary.portal.common.replace']}}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

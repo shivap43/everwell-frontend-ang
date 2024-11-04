@@ -1,0 +1,211 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div *ngIf="showContent">
+    <section class="section-container">
+        <div class="section-header">
+            <h3>{{planObject.currentSection.title}}</h3>
+        </div>
+        <div class="section-subheader">
+            <p [innerHTML]="direction"></p>
+        </div>
+        <div class="section-subheader">
+            <p [innerHTML]="beneficiaryLimitNote"></p>
+        </div>
+        <form [formGroup]="beneficiaryForms">
+            <div class="label-container">
+                <mat-label class="mat-label beneficiary-type-info" id="beneficiaryNamelbl"
+                    >{{languageStrings['primary.portal.applicationFlow.beneficiary.beneficiaryName']}}</mat-label
+                >
+                <mat-label class="mat-label beneficiary-type-info" id="beneficiaryTypelbl"
+                    >{{languageStrings['primary.portal.applicationFlow.beneficiary.beneficiaryType']}}
+
+                    <a
+                        [richTooltip]="languageStrings['primary.portal.applicationFlow.beneficiaryType.primary.info']"
+                        href="javascript:void(0)"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings['primary.portal.applicationFlow.beneficiaryType.primary.info']"
+                    >
+                        <mon-icon iconName="Filled-info" iconSize="14"></mon-icon>
+                    </a>
+                </mat-label>
+                <mat-label
+                    class="mat-label relationship-insurance"
+                    id="relationshipToProposedInsurance"
+                    *ngIf="isJuvenilePlan && relationshipToInsuredEnabled"
+                    >{{languageStrings['primary.portal.applicationFlow.beneficiary.relationshipToProposedInsurance']}}</mat-label
+                >
+                <mat-label class="mat-label percentage" id="percentBenefitlbl"
+                    >{{languageStrings['primary.portal.applicationFlow.beneficiary.percentBenefit']}}</mat-label
+                >
+            </div>
+            <div *ngFor="let iteration of selectedBeneficiaries; let i = index">
+                <div [formGroupName]="iteration">
+                    <div class="question-container mon-mt-0">
+                        <div class="response-block inline mon-mt-0">
+                            <div class="beneficiary-type-info">
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="name"
+                                        disableOptionCentering="true"
+                                        aria-labelledby="beneficiaryNamelbl"
+                                        [compareWith]="compareBeneficiary"
+                                    >
+                                        <mat-option
+                                            *ngFor="let beneficiaryOption of beneficiaryOptions | optionFilter: beneficiarySelections : i"
+                                            (click)="nameHashMap(iteration, beneficiaryOption, i); updateSelection(i, beneficiaryOption); createBeneficiary(beneficiaryOption, i)"
+                                            [value]="beneficiaryOption"
+                                        >
+                                            {{ beneficiaryOption.name }}<span
+                                                *ngIf="beneficiaryOption.duplicateName && beneficiaryOption.relation"
+                                                >{{ beneficiaryOption.relation }}</span
+                                            ></mat-option
+                                        >
+                                        <mat-option
+                                            ><a href="javascript:void(0)" (click)="openModal(iteration, i)"
+                                                >{{languageStrings['primary.portal.applicationFlow.beneficiary.newBeneficiary']}}</a
+                                            >
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="beneficiary-type-info">
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="type"
+                                        (selectionChange)="updateLimit(i,$event)"
+                                        disableOptionCentering="true"
+                                        [disabled]="isAGPlan && (isPrimaryBeneficiaryType$ | async)"
+                                        aria-labelledby="beneficiaryTypelbl"
+                                    >
+                                        <mat-option *ngFor="let type of beneficiaryTypes" [value]="type">{{ type }} </mat-option>
+                                    </mat-select>
+                                    <mat-error>{{ languageStrings['primary.portal.common.selectionRequired'] }}</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="relationship-insurance" *ngIf="isJuvenilePlan && relationshipToInsuredEnabled">
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="relationshipToProposedInsured"
+                                        aria-labelledby="relationshipToProposedInsurance"
+                                        [maxlength]="relationshipToInsuredMaxLength"
+                                    />
+                                    <mat-error
+                                        *ngIf="beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.required"
+                                        >{{ languageStrings['primary.portal.common.requiredField'] }}</mat-error
+                                    >
+                                    <mat-error
+                                        *ngIf="beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.maxlength"
+                                        language="secondary.portal.common.maxLength"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.pattern && !beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.invalidName.startsWithInvalidCharacter"
+                                        language="primary.portal.applicationFlow.invalidFormat"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.pattern && beneficiaryForms?.controls[iteration]['controls']['relationshipToProposedInsured']?.errors?.invalidName.startsWithInvalidCharacter"
+                                        language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg2"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="percentage">
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        type="text"
+                                        maxlength="3"
+                                        (keydown)="validateNumber($event)"
+                                        formControlName="percent"
+                                        autocomplete="off"
+                                        (paste)="$event.preventDefault()"
+                                        aria-labelledby="percentBenefitlbl"
+                                    />
+                                    <mat-error *ngIf="beneficiaryForms?.controls[iteration]['controls']['percent'].errors?.required"
+                                        >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                    >
+                                    <mat-error *ngIf="beneficiaryForms?.controls[iteration]['controls']['percent'].errors?.min"
+                                        >{{languageStrings['primary.portal.applicationFlow.beneficiary.percentCannotBeZero']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                            <div
+                                class="text-danger"
+                                *ngIf="beneficiaryCount > 1"
+                                (click)="removeBeneficiary(iteration); removeSelection(i)"
+                            >
+                                {{languageStrings['primary.portal.common.remove']}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <mat-error *ngIf="primaryLimitError"
+                    >{{
+                    languageStrings['primary.portal.applicationFlow.beneficiary.primaryBeneficiaryLimit'].replace("#primaryLimit",beneficiaryPrimaryLimit)
+                    }}
+                </mat-error>
+                <mat-error *ngIf="secondaryLimitError"
+                    >{{
+                    languageStrings['primary.portal.applicationFlow.beneficiary.secondaryBeneficiaryLimit'].replace("#secondaryLimit",beneficiarySecondaryLimit)
+                    }}</mat-error
+                >
+                <mat-error *ngIf="primaryPercentError || secondaryPercentError">
+                    {{ languageStrings['primary.portal.applicationFlow.beneficiary.benefitPercentages'] }}
+                </mat-error>
+                <mat-error *ngIf="primaryError"
+                    >{{ languageStrings['primary.portal.applicationFlow.beneficiary.selectPrimaryBeneficiary'] }}</mat-error
+                >
+            </div>
+            <!-- TODO static data should come from language -->
+            <button
+                mat-button
+                class="mon-btn-link"
+                type="button"
+                *ngIf="showAddBeneficiary"
+                [disabled]="beneficiaryForms.status === 'VALID'? !(primaryLimitError || secondaryLimitError)? false: true : true"
+                (click)="addAnotherBeneficiary()"
+            >
+                {{languageStrings['primary.portal.applicationFlow.beneficiary.addBeneficiary']}}
+            </button>
+            <div class="action-btns tpi-flow-border" [ngClass]="{'last-step': this.planObject.lastStep}">
+                <button
+                    id="submitAppFlowForm"
+                    *ngIf="planObject.lastStep"
+                    class="mon-btn-primary submit-app-flow-form"
+                    mat-flat-button
+                    (click)="onNext()"
+                >
+                    <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                        ><span>{{languageStrings['primary.portal.applicationFlow.beneficiary.next']}}</span>
+                        <span>{{this.planObject.nextProduct}}</span>
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                        >{{languageStrings['primary.portal.applicationFlow.beneficiary.nextAflacAlways']}}
+                    </span>
+                    <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                        >{{languageStrings['primary.portal.applicationFlow.beneficiary.nextBilling']}}
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                        >{{languageStrings['primary.portal.applicationFlow.beneficiary.nextFinishApplications']}}
+                    </span>
+                </button>
+                <button *ngIf="!planObject.lastStep" (click)="onNext()" class="mon-btn-primary" mat-flat-button>
+                    <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

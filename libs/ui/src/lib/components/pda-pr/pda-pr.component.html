@@ -1,0 +1,873 @@
+<!-- PDA form start -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="quasi-modal multiple-prod-wrapper" *ngIf="isConfigAvailable">
+    <form [formGroup]="prPDAForm" (ngSubmit)="onSubmit()">
+        <div class="flex-form-wrapper">
+            <mat-dialog-content class="scroll-content">
+                <mon-alert class="message-block" *ngIf="errorMessage" alertType="danger">{{errorMessage}} </mon-alert>
+                <mon-alert class="message-block" *ngIf="enrollmentType === enrollmentMethodEnum.VIRTUAL_FACE_TO_FACE" alertType="info">
+                    <span>{{languageStrings['primary.portal.pda.form.webexDisclaimer']}}</span>
+                </mon-alert>
+                <div class="alert-wrapper" *ngIf="!data.isOwnAccount">
+                    <mon-alert alertType="info"> {{languageStrings['primary.portal.pda.producerApplicantSignature']}} </mon-alert>
+                </div>
+                <div class="flex-form-item">
+                    <!-- Employee information start -->
+                    <div class="mon-mb-30">
+                        <h3>{{languageStrings['primary.portal.pda.form.employeeInfo']}}</h3>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.firstName']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-200">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            matInput
+                                            formControlName="firstName"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.firstName']"
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.mi']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-50">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            formControlName="mi"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.mi']"
+                                            matInput
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.lastName']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-200">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            formControlName="lastName"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.lastName']"
+                                            matInput
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.employeeSSN']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-200">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            formControlName="ssn"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.employeeSSN']"
+                                            [maxLength]="SSN_MAX_LENGTH"
+                                            matInput
+                                            (blur)="maskSSN()"
+                                            empoweredSsnFormat
+                                        />
+                                        <mat-error *ngIf="prPDAForm.controls.ssn.errors?.required">
+                                            {{languageStrings['primary.portal.common.requiredField']}}.
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.ssn.errors?.pattern && prPDAForm.controls.ssn.value.length === SSN_MAX_LENGTH"
+                                            language="primary.portal.members.dependentValidationMsg.ssnMsg2"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.ssn.value && prPDAForm.controls.ssn.value.length !== SSN_MAX_LENGTH"
+                                            language="primary.portal.members.dependentValidationMsg.ssnMsg1"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <mat-checkbox formControlName="insured" (change)="modifyEmployeeInsured($event)"
+                            >{{languageStrings['primary.portal.pda.form.employeeInsured']}}</mat-checkbox
+                        >
+                        <!-- Applicant Information -->
+                        <div *ngIf="!prPDAForm.controls.insured.value">
+                            <h3>{{languageStrings['primary.portal.sra.form.applicantInfo']}}</h3>
+                            <div class="d-md-flex">
+                                <ng-container>
+                                    <div class="flex-item">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.firstName']}}</span>
+                                        </mat-label>
+                                        <mat-form-field class="w-200">
+                                            <input
+                                                type="text "
+                                                class="mon-input"
+                                                matInput
+                                                formControlName="applicantFirstName"
+                                                (blur)="validateNamePattern('applicantFirstName')"
+                                                [attr.aria-label]="languageStrings['primary.portal.pda.form.firstName']"
+                                            />
+                                            <mat-error *ngIf="prPDAForm.controls.applicantFirstName.errors?.required">
+                                                {{languageStrings['primary.portal.common.requiredField']}}.
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="prPDAForm.controls.applicantFirstName.errors?.pattern && !prPDAForm.controls.applicantFirstName.errors?.hyphenPattern"
+                                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg1"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="prPDAForm.controls.applicantFirstName.errors?.pattern && prPDAForm.controls.applicantFirstName.errors?.hyphenPattern"
+                                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg2"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </ng-container>
+                                <ng-container>
+                                    <div class="flex-item">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.mi']}}</span>
+                                        </mat-label>
+                                        <mat-form-field class="w-50">
+                                            <input
+                                                type="text "
+                                                class="mon-input"
+                                                formControlName="applicantMI"
+                                                [attr.aria-label]="languageStrings['primary.portal.pda.form.mi']"
+                                                matInput
+                                                [maxlength]="MIDDLE_NAME_MAX_LENGTH"
+                                            />
+                                        </mat-form-field>
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.applicantMI.errors?.pattern"
+                                            language="primary.portal.formPageQuestion.useOnlyLetters"
+                                        ></mat-error>
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.applicantMI.errors?.maxlength"
+                                            language="primary.portal.members.document.note.miMaxLength"
+                                        ></mat-error>
+                                    </div>
+                                </ng-container>
+                                <ng-container>
+                                    <div class="flex-item">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.lastName']}}</span>
+                                        </mat-label>
+                                        <mat-form-field class="w-200">
+                                            <input
+                                                type="text "
+                                                class="mon-input"
+                                                formControlName="applicantLastName"
+                                                [attr.aria-label]="languageStrings['primary.portal.pda.form.lastName']"
+                                                matInput
+                                                (blur)="validateNamePattern('applicantLastName')"
+                                            />
+                                            <mat-error *ngIf="prPDAForm.controls.applicantLastName.errors?.required">
+                                                {{languageStrings['primary.portal.common.requiredField']}}.
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="prPDAForm.controls.applicantLastName.errors?.pattern && !prPDAForm.controls.applicantLastName.errors?.hyphenPattern"
+                                                language="secondary.portal.members.personalValidationMsg.lastNameMsg1"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="prPDAForm.controls.applicantLastName.errors?.pattern && prPDAForm.controls.applicantLastName.errors?.hyphenPattern"
+                                                language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <!-- Applicant Information end -->
+                    </div>
+                    <!-- Employee information end -->
+                    <!-- Payment information start -->
+                    <div class="mon-mb-30">
+                        <h3>{{languageStrings['primary.portal.pda.form.paymentInfo']}}</h3>
+                        <div class="d-md-flex mon-mb-20">
+                            <ng-container>
+                                <div class="flex-item" *ngIf="accountDetails">
+                                    <p>
+                                        {{ "primary.portal.pda.form.paymentAuthorizeContent" | replaceTag: { "##accountname##" :
+                                        accountDetails.name, "##accountnumber##" : accountDetails.number } }}
+                                    </p>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex mon-mb-20">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <p>{{languageStrings['primary.portal.pda.form.paymentContent']}}</p>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.departmentNum']}}</span>
+                                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-300">
+                                        <input
+                                            type="text"
+                                            class="mon-input"
+                                            formControlName="departmentNumber"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.departmentNum']"
+                                            matInput
+                                        />
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.departmentNumber?.errors?.maxlength || prPDAForm.controls.departmentNumber?.errors?.minlength"
+                                        >
+                                            {{languageStrings['primary.portal.pda.form.invalidDepartmentNumber']}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.location']}}</span>
+                                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-300">
+                                        <input
+                                            type="text"
+                                            class="mon-input"
+                                            formControlName="location"
+                                            [maxlength]="locationMaxLength"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.location']"
+                                            matInput
+                                        />
+                                        <mat-error
+                                            *ngIf="(prPDAForm.controls.location?.touched || isSubmitted) && prPDAForm.controls.location?.invalid"
+                                        >
+                                            {{languageStrings['primary.portal.pda.location.validationMsg']}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.deductionDate']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field w-200">
+                                        <input
+                                            formControlName="firstDeductionDate"
+                                            [matDatepicker]="firstDeductionDate"
+                                            empoweredDateTransform
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.deductionDate']"
+                                            [min]="minDate"
+                                            matInput
+                                            name="firstDeductionDate"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="firstDeductionDate">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #firstDeductionDate></mat-datepicker>
+                                        <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                        <mat-error *ngIf="prPDAForm.controls.firstDeductionDate.errors?.required">
+                                            {{languageStrings['primary.portal.common.requiredField']}}.
+                                        </mat-error>
+                                        <mat-error *ngIf="prPDAForm.controls.firstDeductionDate.errors?.matDatepickerMin">
+                                            {{languageStrings['primary.portal.pda.form.invalidDate']}}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.payrollMode']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-250 paroll-frequency">
+                                        <mat-select
+                                            [(ngModel)]="payrollMode"
+                                            disabled="true"
+                                            class="mon-input"
+                                            disableOptionCentering="true"
+                                            [ngModelOptions]="{standalone: true}"
+                                            [placeholder]="languageStrings['primary.portal.common.select']"
+                                        >
+                                            <mat-option [value]="payrollMode">{{payrollMode}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <!-- Payment information end -->
+
+                    <div class="mon-mb-30">
+                        <div class="policy-table">
+                            <ng-container>
+                                <table mat-table [dataSource]="dataSource" width="100%">
+                                    <ng-container matColumnDef="policy">
+                                        <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.resources.product']}}</th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="policyNumber">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings['primary.portal.pda.form.policyNumber']}}
+                                        </th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="totalPremium">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings['primary.portal.pda.form.totalPremium']}}
+                                        </th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employerContribution">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings['primary.portal.pda.form.employerContribution']}}
+                                        </th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employeeDeduction">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings['primary.portal.pda.form.employeeDeduction']}}
+                                        </th>
+                                    </ng-container>
+                                    <ng-container matColumnDef="remove">
+                                        <th mat-header-cell *matHeaderCellDef></th>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="policyName">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <mat-label
+                                                class="mat-label"
+                                                *ngIf="element.subPolicyName == null || element.subPolicyName == undefined;else subPolicy"
+                                            >
+                                                <span>{{ element.policyName }}</span>
+                                            </mat-label>
+                                            <ng-template #subPolicy>
+                                                <mat-label class="mat-label">
+                                                    <span>{{ element.subPolicyName }}</span>
+                                                </mat-label>
+                                            </ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="policyNumber2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        [(ngModel)]="element.policyNumber"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.policyNumber']"
+                                                        class="mon-input"
+                                                        matInput
+                                                        readonly
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="totalPremium2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        type="number"
+                                                        [(ngModel)]="element.totalPremium"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.totalPremium']"
+                                                        class="mon-input"
+                                                        maxlength="COST_MAX_LENGTH"
+                                                        readonly
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employerContribution2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container>
+                                                <mat-form-field [ngClass]="[element.oneFieldReqError ? 'taxValueReq' : '']">
+                                                    <input
+                                                        type="number"
+                                                        [(ngModel)]="element.employerContribution"
+                                                        [ngModelOptions]="{standalone: true} "
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employerContribution']"
+                                                        class="mon-input"
+                                                        maxlength="COST_MAX_LENGTH"
+                                                        readonly
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employeeDeduction2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container>
+                                                <mat-label class="mat-label">
+                                                    <span>{{element.employeeDeduction | currency}}</span>
+                                                </mat-label>
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="removeRow">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <mat-label class="mat-label"> </mat-label>
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <mat-label class="mat-label"> </mat-label>
+                                        </td>
+                                    </ng-container>
+                                    <tr
+                                        mat-header-row
+                                        *matHeaderRowDef="['policy', 'policyNumber', 'totalPremium','employerContribution','employeeDeduction', 'remove']"
+                                    ></tr>
+
+                                    <tr
+                                        mat-row
+                                        *matRowDef="let row; columns: displayedColumns;"
+                                        [ngClass]="{'life' : row.policyName == 'Life' && (row.subPolicyName == null || row.subPolicyName == undefined), 'employee'
+                                                            : row.subPolicyName == 'Employee', 'dependent' : row.subPolicyName == 'Dependent'}"
+                                    ></tr>
+                                </table>
+                            </ng-container>
+                            <ng-container>
+                                <table
+                                    mat-table
+                                    [dataSource]="dataSource2"
+                                    width="100%"
+                                    [ngClass]="{'oddLength' : (dataSource.data.length%2) != 0}"
+                                >
+                                    <ng-container matColumnDef="policyName">
+                                        <td mat-cell *matCellDef="let element;">
+                                            <mat-form-field
+                                                *ngIf="element.subPolicyName == null || element.subPolicyName == undefined;else subPolicy"
+                                            >
+                                                <mat-select
+                                                    class="mon-input"
+                                                    disabled
+                                                    [(ngModel)]="element.policyName"
+                                                    disableOptionCentering="true"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [placeholder]="languageStrings['primary.portal.common.select']"
+                                                >
+                                                    <mat-option [value]="element.policyName">{{element.policyName}}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <ng-template #subPolicy>
+                                                <mat-label class="mat-label">
+                                                    <span>{{ element.subPolicyName }}</span>
+                                                </mat-label>
+                                            </ng-template>
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-form-field>
+                                                <mat-select
+                                                    class="mon-input"
+                                                    formControlName="pdaPolicy"
+                                                    disableOptionCentering="true"
+                                                    (selectionChange)="onPolicySelection($event.value)"
+                                                    [placeholder]="languageStrings['primary.portal.common.select']"
+                                                >
+                                                    <mat-option *ngFor="let pdaPolicy of allowedPdaPolicyNames" [value]="pdaPolicy"
+                                                        >{{pdaPolicy}}</mat-option
+                                                    >
+                                                </mat-select>
+                                                <mat-error
+                                                    *ngIf="prPDAForm.controls.pdaPolicy?.errors?.required"
+                                                    language="primary.portal.pda.form.atLeastOnePolicy"
+                                                ></mat-error>
+                                            </mat-form-field>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="policyNumber2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        type="number"
+                                                        [(ngModel)]="element.policyNumber"
+                                                        (change)="updateErrorField(element)"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.policyNumber']"
+                                                        class="mon-input"
+                                                        matInput
+                                                        readonly
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="totalPremium2">
+                                        <td mat-cell *matCellDef="let element; let elementIndex=index;">
+                                            <ng-container>
+                                                <mat-form-field
+                                                    [ngClass]="[element.oneFieldReqError && !element.totalPremium ? 'taxValueReq' : '']"
+                                                >
+                                                    <input
+                                                        type="number"
+                                                        [(ngModel)]="element.totalPremium"
+                                                        (change)="updateEmployeeDeduction(element, elementIndex)"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.totalPremium']"
+                                                        class="mon-input"
+                                                        maxlength="COST_MAX_LENGTH"
+                                                        (keyup)="restrictNegativeValue($event.target.value, elementIndex, 'totalPremium')"
+                                                        matInput
+                                                    />
+                                                    <mat-error *ngIf="element.oneFieldReqError"> </mat-error>
+                                                </mat-form-field>
+                                                <div class="error" *ngIf="element.oneFieldReqError && !element.totalPremium">
+                                                    {{languageStrings['primary.portal.common.requiredField']}}
+                                                </div>
+                                            </ng-container>
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employerContribution2">
+                                        <td mat-cell *matCellDef="let element; let elementIndex=index;">
+                                            <ng-container>
+                                                <mat-form-field>
+                                                    <input
+                                                        type="number"
+                                                        [(ngModel)]="element.employerContribution"
+                                                        (change)="updateEmployeeDeduction(element, elementIndex)"
+                                                        [ngModelOptions]="{standalone: true} "
+                                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employerContribution']"
+                                                        maxlength="COST_MAX_LENGTH"
+                                                        class="mon-input"
+                                                        (keyup)="restrictNegativeValue($event.target.value, elementIndex, 'employerContribution')"
+                                                        matInput
+                                                    />
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employeeDeduction2">
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container> {{element.employeeDeduction | currency}} </ng-container>
+                                            <div class="error deduction-error" *ngIf="element.employerDeductionError">
+                                                {{languageStrings['primary.portal.pda.form.contributionError']}}
+                                            </div>
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="removeRow">
+                                        <td mat-cell *matCellDef="let element; let removePolicyIndex = index">
+                                            <a
+                                                *ngIf="element.subPolicyName == null || element.subPolicyName == undefined"
+                                                href="javascript:void(0)"
+                                                (click)="removePolicy(removePolicyIndex)"
+                                                >{{languageStrings['primary.portal.common.remove']}}</a
+                                            >
+                                        </td>
+                                        <td mat-footer-cell *matFooterCellDef>
+                                            <mat-label class="mat-label">
+                                                <span></span>
+                                            </mat-label>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr
+                                        mat-row
+                                        *matRowDef="let row; columns: displayedColumns;"
+                                        [ngClass]="{'life' : row.policyName == 'Life' && (row.subPolicyName == null || row.subPolicyName == undefined), 'employee' : row.subPolicyName == 'Employee', 'dependent' : row.subPolicyName == 'Dependent'}"
+                                    ></tr>
+                                    <tr
+                                        mat-footer-row
+                                        *matFooterRowDef="displayedColumns"
+                                        [ngClass]="{'odd-footer' : ((dataSource.data.length + dataSource2.data.length) % 2) != 0, 'even-footer' : ((dataSource.data.length + dataSource2.data.length) % 2) == 0}"
+                                    ></tr>
+                                </table>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <p>{{languageStrings['primary.portal.pda.form.deductionFrequencyPara']}}</p>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Deduction information start -->
+                    <div class="mon-mb-30">
+                        <h3>{{languageStrings['primary.portal.pda.form.deductionHeader']}}</h3>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.payrollDepartmentNumber']}}</span>
+                                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-200">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            matInput
+                                            formControlName="payrollDepartmentNumber"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.firstName']"
+                                        />
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.payrollDepartmentNumber?.errors?.maxlength || prPDAForm.controls.payrollDepartmentNumber?.errors?.minlength || prPDAForm.controls.payrollDepartmentNumber.errors?.pattern"
+                                        >
+                                            {{languageStrings['primary.portal.pda.form.invalidPayrollDepartmentNumber']}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="mon-mb-20">
+                            <mat-checkbox formControlName="suspendCurrentPayroll" (change)="suspendCurrentPayroll($event)"
+                                >{{languageStrings['primary.portal.pda.form.suspendCurrentPayroll']}}</mat-checkbox
+                            >
+                        </div>
+                        <div class="d-md-flex">
+                            <ng-container>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.CompanyName']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-300">
+                                        <input
+                                            type="text "
+                                            class="mon-input"
+                                            formControlName="companyName"
+                                            [attr.aria-label]="languageStrings['primary.portal.pda.form.CompanyName']"
+                                            matInput
+                                            (blur)="validateNamePattern('companyName')"
+                                        />
+                                        <mat-error *ngIf="prPDAForm.controls.companyName?.errors?.required">
+                                            {{languageStrings['primary.portal.common.requiredField']}}.
+                                        </mat-error>
+                                        <mat-error *ngIf="prPDAForm.controls?.companyName?.errors?.pattern as error">
+                                            <span *ngIf="!prPDAForm.controls.companyName.errors?.hyphenPattern; else hasHyphensApostrophes"
+                                                >{{secondaryLanguageStrings['secondary.portal.members.personalValidationMsg.lastNameMsg1']}}</span
+                                            >
+                                            <ng-template #hasHyphensApostrophes>
+                                                {{secondaryLanguageStrings['secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe']}}
+                                            </ng-template>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings['primary.portal.pda.form.amountToSuspend']}}</span>
+                                    </mat-label>
+                                    <mat-form-field class="w-150 suspend-amount">
+                                        <span matPrefix *ngIf="!suspendAmountEdit"
+                                            >{{languageStrings['primary.portal.pda.form.dollarSign']}}</span
+                                        >
+                                        <input
+                                            formControlName="suspendAmount"
+                                            matInput
+                                            type="number"
+                                            maxlength="COST_MAX_LENGTH"
+                                            (focus)="suspendAmountEdit=true"
+                                            (focusout)="suspendAmountChange()"
+                                        />
+                                        <mat-error *ngIf="prPDAForm.controls.suspendAmount?.errors?.required">
+                                            {{languageStrings['primary.portal.common.requiredField']}}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="prPDAForm.controls.suspendAmount?.errors?.maxlength || prPDAForm.controls.suspendAmount?.errors?.pattern"
+                                        >
+                                            {{languageStrings['primary.portal.pda.form.maxSuspendedAmountLength']}}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="mon-mb-20">
+                            <mat-checkbox formControlName="addNewDeduction"
+                                >{{languageStrings['primary.portal.pda.form.addNewDeduction']}}</mat-checkbox
+                            >
+                        </div>
+                        <!-- Applicant signature starts -->
+                        <div class="mon-mb-40">
+                            <ng-container *ngIf="showPin">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.enterPin']}}</span>
+                                </mat-label>
+                                <mat-form-field class="w-200">
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="pin"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.enterPin']"
+                                        matInput
+                                    />
+                                    <mat-error *ngIf="prPDAForm.controls.pin?.errors?.required">
+                                        {{languageStrings['primary.portal.pda.form.signRequired']}}.
+                                    </mat-error>
+                                    <mat-error *ngIf="prPDAForm.controls.pin?.errors?.pattern">
+                                        {{languageStrings['primary.portal.applicationFlow.invalidFormat']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="prPDAForm.controls.pin?.errors?.minlength">
+                                        {{languageStrings['primary.portal.applicationFlow.minthreeCharacters']}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngIf="!showPin">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings['primary.portal.pda.form.employeeSign']}}</span>
+                                </mat-label>
+                                <mat-form-field
+                                    class="w-200"
+                                    [ngClass]="{'employee-sign':isHeadset, 'highlight-required': enrollmentType === enrollmentMethodEnum.VIRTUAL_FACE_TO_FACE}"
+                                >
+                                    <input
+                                        type="text "
+                                        class="mon-input"
+                                        formControlName="signature"
+                                        [attr.aria-label]="languageStrings['primary.portal.pda.form.employeeSign']"
+                                        matInput
+                                    />
+                                    <mat-error *ngIf="prPDAForm.controls.signature?.errors?.required">
+                                        {{languageStrings['primary.portal.pda.form.signRequired']}}.
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="prPDAForm.controls.signature?.errors?.minlength && !prPDAForm.controls.signature?.errors?.pattern"
+                                    >
+                                        {{languageStrings['primary.portal.applicationFlow.oneCharacter']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="prPDAForm.controls.signature?.errors?.pattern">
+                                        {{secondaryLanguageStrings['secondary.portal.common.pattern.signature']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="prPDAForm.controls.signature?.errors?.maxlength && !prPDAForm.controls.signature?.errors?.pattern"
+                                    >
+                                        {{secondaryLanguageStrings['secondary.portal.common.maxLength50']}}
+                                    </mat-error>
+                                    <mat-hint *ngIf="!data.isOwnAccount && isSignatureEnabled">
+                                        {{languageStrings['primary.portal.pda.applicantSignatureLater']}}
+                                    </mat-hint>
+                                </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngIf="isHeadset">
+                                <p>{{languageStrings['primary.portal.pda.form.customerSignLater']}}</p>
+                            </ng-container>
+                            <div class="sign-date-info">
+                                <div class="info-wrapper">
+                                    <span>{{languageStrings['primary.portal.pda.form.date']}}</span>
+                                    <div *ngIf="minDate && data.isOwnAccount " class="flex-item">
+                                        <span>{{minDate | date: "MM/dd/yyyy "}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Applicant signature ends -->
+                    </div>
+                    <!-- Deduction information end -->
+                    <!-- Producer information start -->
+                    <div class="mon-mb-30">
+                        <div class="producer-info">
+                            <h3 [ngClass]="{'employee-sign':isHeadset}">{{languageStrings['primary.portal.pda.form.producerInfo']}}</h3>
+                            <div class="d-md-flex mon-my-10">
+                                <ng-container>
+                                    <div class="flex-item w-150">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.producerName']}}</span>
+                                        </mat-label>
+                                    </div>
+                                    <div *ngIf="producerName " class="flex-item">
+                                        <span>{{producerName}}</span>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <div class="d-md-flex mon-my-10">
+                                <ng-container>
+                                    <div class="flex-item w-150">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.date']}}</span>
+                                        </mat-label>
+                                    </div>
+                                    <div *ngIf="minDate " class="flex-item">
+                                        <span>{{minDate | date: "MM/dd/yyyy "}}</span>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <div class="d-md-flex mon-my-10">
+                                <ng-container>
+                                    <div class="flex-item w-150">
+                                        <mat-label class="mat-label">
+                                            <span>{{languageStrings['primary.portal.pda.form.writingNumber']}}</span>
+                                        </mat-label>
+                                    </div>
+                                    <div *ngIf="writingNumber " class="flex-item">
+                                        <span>{{writingNumber}}</span>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Producer information end -->
+                </div>
+            </mat-dialog-content>
+        </div>
+        <div *ngIf="openAs === 'quasi'">
+            <mat-divider></mat-divider>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" (click)="closePRPdaForm()" class="mon-btn-link">
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <button mat-flat-button class="mon-btn-primary" type="submit">{{languageStrings['primary.portal.common.save']}}</button>
+            </mat-dialog-actions>
+        </div>
+        <div class="tpi-footer justify-content-end" *ngIf="openAs === 'page' && flow !== 'appFlow'">
+            <button class="mon-btn-secondary" mat-button mat-flat-button (click)="onBack()">
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+            <button class="mon-btn-primary mon-ml-20" mat-button mat-flat-button type="submit">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+        <footer class="flex-form-footer submit-app-flow-form" *ngIf="flow === 'appFlow'">
+            <button id="submitAppFlowForm" mat-button class="mon-btn-primary" type="submit">
+                {{languageStrings['primary.portal.common.next']}}
+            </button>
+        </footer>
+    </form>
+</div>
+<!-- PDA form end -->

@@ -1,0 +1,27 @@
+<div class="account-tab-header">
+    <a href="javascript:void(0)" (click)="goBack()" *ngIf="currentViewDepth > 0">
+        <
+        <span> {{" " + languageStrings["primary.portal.shoppingExperience.backTo"]}} </span>
+        <span *ngIf="currentViewDepth === ViewDepthEnum.BY_PRODUCER">{{ " " + linkText}}</span>
+        <span *ngIf="currentViewDepth === ViewDepthEnum.BY_ACCOUNT">{{linkText}}</span>
+    </a>
+</div>
+<empowered-producer-apps
+    *ngIf="currentViewDepth === ViewDepthEnum.BY_PRODUCERS && !isSpinnerLoading"
+    [level]="level"
+    [data]="data"
+    (writingNumberClick)="onWritingNumberClick($event)"
+></empowered-producer-apps>
+<empowered-account-apps
+    *ngIf="currentViewDepth === ViewDepthEnum.BY_PRODUCER && !isSpinnerLoading"
+    [data]="accountData"
+    [headerTitle]="headerTitle"
+    (accountNumberClick)="onAccountNumberClick($event)"
+></empowered-account-apps>
+<empowered-group-details
+    *ngIf="currentViewDepth ===  ViewDepthEnum.BY_ACCOUNT && !isSpinnerLoading"
+    [accountNumber]="selectedAccountNumber"
+    [accountName]="selectedAccountName"
+    [data]="groupDetailsData"
+></empowered-group-details>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

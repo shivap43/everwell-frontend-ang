@@ -1,0 +1,32 @@
+<button mat-flat-button [matMenuTriggerFor]="createReportMenu" color="primary" class="create-report-button">
+    <span language="primary.portal.createReport.button"></span>
+    <mat-icon class="mon-btn-pulldown-indicator" svgIcon="arrowDown" aria-hidden="true"></mat-icon>
+</button>
+<mat-menu #createReportMenu="matMenu" class="report-menu">
+    <button
+        mat-menu-item
+        class="menu-item"
+        (click)="openCreateReportForm('demographics')"
+        language="primary.portal.createReport.demographics"
+    ></button>
+    <button
+        mat-menu-item
+        class="menu-item"
+        (click)="openCreateReportForm('enrollment')"
+        language="primary.portal.createReport.enrollment"
+    ></button>
+    <button
+        mat-menu-item
+        class="menu-item"
+        (click)="openCreateReportForm('deductions')"
+        language="primary.portal.createReport.deductions"
+    ></button>
+    <button mat-menu-item class="menu-item" (click)="openCreateReportForm('PDA')" language="primary.portal.createReportForm.pda"></button>
+    <button
+        *ngIf="(isAdminPortal$ | async) === false;"
+        mat-menu-item
+        class="menu-item"
+        (click)="openCreateReportForm('commissions')"
+        language="primary.portal.createReport.commissions"
+    ></button>
+</mat-menu>

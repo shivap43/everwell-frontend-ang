@@ -1,0 +1,32 @@
+@import "shared";
+.salary-calculation {
+    display: flex;
+
+    ::ng-deep {
+        .mat-form-field-infix {
+            width: convert-unit(89px, "rem");
+        }
+    }
+    .icons {
+        margin-top: convert-unit(28px, "rem");
+        margin-right: map-get($spacers, 20);
+
+        &.equal-symbol {
+            font-size: convert-unit(18px, "rem");
+        }
+
+        .close-icon {
+            margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 5) map-get($spacers, 0);
+        }
+    }
+    ::ng-deep {
+        .mat-form-field-appearance-outline .mat-form-field-prefix {
+            top: map-get($spacers, 0);
+        }
+    }
+}
+.error-text::before {
+    content: "\a";
+    white-space: pre;
+    line-height: convert-unit(20px, "rem");
+}

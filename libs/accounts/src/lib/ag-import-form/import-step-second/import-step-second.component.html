@@ -1,0 +1,291 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="step-header">
+    <mat-label class="mon-mt-0 mon-mb-0">
+        <ng-container *ngIf="!aflacAccount && aflacGroupNo; else stepTwoOfThree"
+            >{{languageStrings['primary.portal.aflacgroup.importaccount.step2of2']}}
+        </ng-container>
+        <ng-template #stepTwoOfThree
+            >{{languageStrings['primary.portal.aflacGroup.importAccount.stepTwoOfThree']}}
+        </ng-template>
+    </mat-label>
+    <h2 role="heading" mat-dialog-title>
+        {{languageStrings['primary.portal.aflacgroup.importaccount.step2.subtitle']}}
+    </h2>
+</div>
+
+<div mat-dialog-content *ngIf="producerSearchList">
+    <div class="aflac-writing-info aflac-group-wrapper">
+        <div class="account-wrapper">
+            <div *ngIf="aflacAccount">
+                {{aflacAccount.name | titlecase}}
+                <span *ngIf="aflacAccount.primaryContact.address as address">
+                    {{languageStrings['primary.portal.common.slash']}} {{address.city | titlecase}}, {{address.state}}
+                    <span>
+                        {{languageStrings['primary.portal.common.slash']}}
+                        {{languageStrings['primary.portals.accounts.importAccount.accountNo']}}
+                        {{aflacAccount.accountNumber | uppercase}}</span
+                    >
+                </span>
+            </div>
+            <div *ngIf="aflacGroupNo">
+                {{aflacGroupNo.name | titlecase}}
+                <span *ngIf="aflacGroupNo.primaryContact.address as address">
+                    {{languageStrings['primary.portal.common.slash']}} {{address.city | titlecase}}, {{address.state}}
+                    <span>
+                        {{languageStrings['primary.portal.common.slash']}}
+                        {{languageStrings['primary.portal.aflacgroup.importaccount.aflacGroupNo']}}
+                        {{aflacGroupNo.aflacGroupNumber}}</span
+                    >
+                </span>
+            </div>
+        </div>
+
+        <h4 class="primary-producer" *ngIf="isSubordinatesAvailable">
+            {{languageStrings['primary.portal.aflacgroup.importaccount.primaryProducer']}}
+        </h4>
+
+        <div class="content-wrapper flex-form-wrapper">
+            <form [formGroup]="stepControl">
+                <div class="d-md-flex dropdown-section" *ngIf="!isSubordinatesAvailable">
+                    <div class="flex-item">
+                        <mat-label
+                            >{{languageStrings['primary.portal.aflacgroup.importaccount.writingNumber']}}</mat-label
+                        >
+                        <mat-form-field>
+                            <mat-select
+                                aria-describedby="ag-writing-number1"
+                                [disableOptionCentering]="true"
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                formControlName="writingNumber"
+                                [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                (selectionChange)="onWritingNumberChange($event.value)"
+                            >
+                                <mat-option *ngFor="let writingNumber of writingNumbers" [value]="writingNumber">
+                                    {{writingNumber.number}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item sit-code">
+                        <mat-label>{{languageStrings['primary.portal.aflacgroup.importaccount.sitCode']}}</mat-label>
+                        <mat-form-field [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']">
+                            <mat-select
+                                aria-describedby="ag-scode"
+                                [disableOptionCentering]="true"
+                                formControlName="sitCode"
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                (selectionChange)="onSitCodeChange($event.value)"
+                            >
+                                <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">
+                                    {{sitCode.code}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error> </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <ng-container *configEnabled="sitCodeConfig">
+                        <div class="sit-code-tooltip">
+                            <a
+                                mat-icon-button
+                                [richTooltip]="stepControl.controls.sitCodeHierarchy.value"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                *ngIf="stepControl.controls.sitCode.value"
+                                class="sit-tooltip"
+                                [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                            >
+                                <mon-icon iconName="Filled-info" iconSize="18" class="icon-primary"></mon-icon>
+                            </a>
+                        </div>
+                    </ng-container>
+                </div>
+                <div *ngIf="isSubordinatesAvailable">
+                    <mat-radio-group
+                        [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                        formControlName="producer"
+                        (change)="onProducerChange($event)"
+                    >
+                        <mat-radio-button class="primary-radio" value="me">
+                            {{languageStrings['primary.portal.aflacgroup.importaccount.me']}}
+                        </mat-radio-button>
+                        <div></div>
+                        <div class="d-md-flex dropdown-section" *ngIf="stepControl.get('producer').value === 'me'">
+                            <div class="flex-item">
+                                <mat-label
+                                    >{{languageStrings['primary.portal.aflacgroup.importaccount.writingNumber']}}</mat-label
+                                >
+                                <mat-form-field
+                                    [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                >
+                                    <mat-select
+                                        aria-describedby="ag-writing-number2"
+                                        formControlName="writingNumber"
+                                        [disableOptionCentering]="true"
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        (selectionChange)="onWritingNumberChange($event.value)"
+                                    >
+                                        <mat-option
+                                            *ngFor="let writingNumber of writingNumbers"
+                                            [value]="writingNumber"
+                                        >
+                                            {{writingNumber.number}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="stepControl.get('writingNumber').errors?.required"
+                                        language="primary.portal.common.selectionRequired"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item sit-code">
+                                <mat-label
+                                    >{{languageStrings['primary.portal.aflacgroup.importaccount.sitCode']}}</mat-label
+                                >
+                                <mat-form-field
+                                    [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                >
+                                    <mat-select
+                                        aria-describedby="ag-scode-1"
+                                        formControlName="sitCode"
+                                        [disableOptionCentering]="true"
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        (selectionChange)="onSitCodeChange($event.value)"
+                                    >
+                                        <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">
+                                            {{sitCode.code}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="stepControl.get('sitCode').errors?.required"
+                                        language="primary.portal.common.selectionRequired"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <ng-container *configEnabled="sitCodeConfig">
+                                <div class="sit-code-tooltip">
+                                    <a
+                                        mat-icon-button
+                                        [richTooltip]="stepControl.controls.sitCodeHierarchy.value"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        *ngIf="stepControl.controls.sitCode.value"
+                                        class="sit-tooltip"
+                                        [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                                    >
+                                        <mon-icon iconName="Filled-info" iconSize="18" class="icon-primary"></mon-icon>
+                                    </a>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <mat-radio-button class="primary-radio" value="other">
+                            {{languageStrings['primary.portal.aflacgroup.importaccount.someOne']}}
+                        </mat-radio-button>
+                        <div *ngIf="stepControl.get('producer').value === 'other'">
+                            <mat-form-field class="search-producer">
+                                <input
+                                    type="text"
+                                    aria-label="Number"
+                                    matInput
+                                    formControlName="teamMember"
+                                    [matAutocomplete]="auto"
+                                />
+                                <mat-autocomplete
+                                    autoActiveFirstOption
+                                    #auto="matAutocomplete"
+                                    [displayWith]="showTeamMember"
+                                    (optionSelected)="selectedSubProducer($event.option.value.wn)"
+                                    class="producer-search-filter"
+                                >
+                                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                        <div class="producer-name">{{option.name}}</div>
+                                        <div class="producer-email">{{option.email}}</div>
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-error *ngIf="stepControl.get('teamMember').errors?.noProducer">
+                                    {{languageStrings['primary.portal.producerFilter.producernotFound']}}
+                                </mat-error>
+                            </mat-form-field>
+                            <span class="hint-txt">
+                                {{languageStrings['primary.portal.producerFilter.searchbyProducer']}}
+                            </span>
+                            <div class="d-md-flex mon-mt-10 dropdown-section">
+                                <div class="flex-item">
+                                    <mat-label
+                                        >{{languageStrings['primary.portal.aflacgroup.importaccount.writingNumber']}}</mat-label
+                                    >
+                                    <mat-form-field
+                                        [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    >
+                                        <mat-select
+                                            aria-describedby="ag-writing-number3"
+                                            formControlName="writingNumber"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                            (selectionChange)="onWritingNumberChange($event.value)"
+                                        >
+                                            <mat-option
+                                                *ngFor="let writingNumber of writingNumbers"
+                                                [value]="writingNumber"
+                                            >
+                                                {{writingNumber.number}}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="stepControl.get('writingNumber').errors?.required"
+                                            language="primary.portal.common.selectionRequired"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-item sit-code">
+                                    <mat-label
+                                        >{{languageStrings['primary.portal.aflacgroup.importaccount.sitCode']}}</mat-label
+                                    >
+                                    <mat-form-field
+                                        [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    >
+                                        <mat-select
+                                            aria-describedby="ag-scode-2"
+                                            formControlName="sitCode"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                            (selectionChange)="onSitCodeChange($event.value)"
+                                        >
+                                            <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">
+                                                {{sitCode.code}}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="stepControl.get('sitCode').errors?.required"
+                                            language="primary.portal.common.selectionRequired"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <ng-container *configEnabled="sitCodeConfig">
+                                    <div class="sit-code-tooltip">
+                                        <a
+                                            mat-icon-button
+                                            [richTooltip]="stepControl.controls.sitCodeHierarchy.value"
+                                            matTooltipPosition="above"
+                                            matTooltipClass="pos-above"
+                                            *ngIf="stepControl.controls.sitCode.value"
+                                            class="sit-tooltip"
+                                            [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                                        >
+                                            <mon-icon
+                                                iconName="Filled-info"
+                                                iconSize="18"
+                                                class="icon-primary"
+                                            ></mon-icon>
+                                        </a>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<!-- TODO: Language integration pending -->
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="heading">
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.editCoverage.previouslycoveryDependents']}}</h2>
+    </div>
+    <div class="scroll-content">
+        <div mat-dialog-content class="main-wrapper">
+            <table [dataSource]="dataSource" mat-table>
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.editCoverage.name']}}</th>
+                    <td class="normal-txt" *matCellDef="let element" mat-cell>{{ element.name }}</td>
+                </ng-container>
+                <ng-container matColumnDef="startDate">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.editCoverage.startDate']}}
+                    </th>
+                    <td *matCellDef="let element" mat-cell>
+                        {{ element.validity.effectiveStarting | date: 'MM/dd/yyyy'}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="endDate">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings['primary.portal.editCoverage.endDate']}}
+                    </th>
+                    <td *matCellDef="let element" mat-cell>
+                        {{ element.validity?.expiresAfter | date: 'MM/dd/yyyy'}}
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+            </table>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <button class="mon-btn-primary" mat-flat-button type="button" (click)="closeForm()">
+            {{languageStrings['primary.portal.editCoverage.close']}}
+        </button>
+    </mat-dialog-actions>
+</div>

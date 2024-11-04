@@ -1,0 +1,47 @@
+@import "shared";
+
+.new-benefits-offering {
+    padding: convert-unit(20px, "rem");
+    .heading {
+        margin: 0 0 convert-unit(20px, "rem") convert-unit(5px, "rem");
+    }
+    .alert-status {
+        margin-bottom: convert-unit(30px, "rem");
+
+        h4 {
+            margin: 0 0 convert-unit(5px, "rem");
+            font-size: convert-unit(14px, "rem");
+            @include fontFace("primary.bold");
+        }
+        .content {
+            width: 100%;
+            font-size: convert-unit(14px, "rem");
+            .description {
+                display: flex;
+                justify-content: space-between;
+            }
+            .plan-affected {
+                width: convert-unit(250px, "rem");
+                text-align: right;
+            }
+        }
+    }
+    ::ng-deep .mat-tab-label {
+        .icon-danger {
+            margin: 0 convert-unit(5px, "rem") 0 0;
+            display: inline-flex;
+        }
+        .mat-tab-body-content {
+            .title {
+                margin: convert-unit(30px, "rem") 0 convert-unit(20px, "rem") 0;
+            }
+        }
+    }
+    ::ng-deep .mat-expansion-panel-header-title {
+        .icon-danger,
+        .icon-warning {
+            margin: 0 convert-unit(5px, "rem") 0 0;
+            vertical-align: text-top;
+        }
+    }
+}

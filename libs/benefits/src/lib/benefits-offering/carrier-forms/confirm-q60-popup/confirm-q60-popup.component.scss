@@ -1,0 +1,37 @@
+@import "shared";
+
+.bold {
+    @include fontFace("primary.bold");
+}
+
+.details {
+    display: flex;
+
+    &__25 {
+        flex: 25%;
+    }
+
+    &__75 {
+        flex: 75%;
+    }
+}
+
+.riders-selected {
+    margin: map-get($spacers, 0);
+    padding: map-get($spacers, 0);
+    list-style-type: none;
+}
+
+h2 {
+    margin-bottom: map-get($spacers, 0);
+}
+
+:host ::ng-deep .mat-dialog-content {
+    padding-top: map-get($spacers, 0);
+}
+
+p {
+    &:not(:last-child) {
+        margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 0);
+    }
+}

@@ -1,0 +1,80 @@
+@import "shared";
+
+.current-coverage {
+    margin-top: convert-unit(20px, "rem");
+    font-size: convert-unit(22px, "rem");
+    color: get("color.black");
+}
+.current-coverage-text {
+    margin-bottom: convert-unit(20px, "rem");
+}
+.content-column {
+    width: 70%;
+}
+.content-column {
+    .plan-details-panel {
+        display: flex;
+        .dependent-name {
+            flex-direction: column;
+        }
+        .rider-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .content-value,
+        .tax-title {
+            width: 50%;
+            text-align: left;
+            padding-bottom: 8px;
+        }
+        .content-label {
+            @include fontFace("primary.bold");
+            min-width: convert-unit(142px, "rem");
+            max-width: convert-unit(142px, "rem");
+            text-align: left;
+        }
+    }
+    .content-action {
+        flex-direction: column;
+        margin-top: convert-unit(20px, "rem");
+        .mon-btn-link {
+            padding-bottom: convert-unit(5px, "rem");
+            width: auto;
+            font-size: convert-unit(16px, "rem");
+        }
+    }
+}
+.cost-adjustment-panel {
+    width: 30%;
+    .cost-adjustments {
+        display: flex;
+        @include fontFace("primary.regular");
+        .cost-value,
+        .cost-label {
+            text-align: right;
+            width: 81%;
+        }
+        .cost-label {
+            text-align: left;
+        }
+    }
+}
+.expansion-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.your-selection {
+    margin: 0 convert-unit(-24px, "rem") convert-unit(-16px, "rem") convert-unit(55px, "rem");
+}
+.dependent-name {
+    flex-direction: column;
+    display: flex;
+}
+.final-cost {
+    border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+    padding-top: convert-unit(10px, "rem");
+    margin-top: convert-unit(10px, "rem");
+    .cost-label {
+        @include fontFace("primary.bold");
+    }
+}

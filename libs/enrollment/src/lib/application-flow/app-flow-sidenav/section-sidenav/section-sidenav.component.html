@@ -1,0 +1,17 @@
+<mat-vertical-stepper
+    class="side-nav-stepper"
+    linear="true"
+    (selectionChange)="onSectionChange($event)"
+    #sectionIndicator
+>
+    <mat-step
+        *ngFor="let section of sections; let j=index"
+        [completed]=" unLockAllSteps || j < lastCompletedSectionIndex"
+    >
+        <ng-template matStepLabel>
+            <span richTooltip="{{ section }}" matTooltipClass="pos-above" matTooltipPosition="above"
+                >{{ section }}</span
+            >
+        </ng-template>
+    </mat-step>
+</mat-vertical-stepper>

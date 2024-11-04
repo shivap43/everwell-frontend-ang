@@ -1,0 +1,165 @@
+.paginator-wrapper {
+    position: relative;
+    color: get("color.gray.700");
+
+    .mat-paginator {
+        font-size: convert-unit(14px, "rem");
+
+        .mat-paginator-container {
+            padding: 0;
+            color: get("color.gray.700");
+
+            .mat-paginator-page-size {
+                margin-right: 0;
+
+                .mat-paginator-page-size-select {
+                    .mat-form-field-flex {
+                        .mat-form-field-outline-start {
+                            border: 0 !important;
+                            min-width: 0;
+                        }
+
+                        .mat-form-field-outline-end {
+                            border: convert-unit(1px, "rem") solid !important;
+                            border-radius: convert-unit(4px, "rem") !important;
+                            min-width: 0;
+                        }
+                    }
+                }
+
+                .mat-paginator-page-size-label {
+                    order: 2;
+                    border-right: convert-unit(1px, "rem") solid get("color.gray.500");
+                    padding: 0 convert-unit(10px, "rem") 0 0;
+                    line-height: convert-unit(12px, "rem");
+                    margin-right: convert-unit(10px, "rem");
+                }
+
+                .mat-paginator-page-size-select {
+                    order: 1;
+                    margin: 0;
+
+                    .mat-select-trigger {
+                        font-size: convert-unit(14px, "rem");
+                    }
+
+                    .mat-form-field-infix {
+                        padding: convert-unit(7px, "rem") 0;
+                    }
+                }
+            }
+
+            .mat-paginator-range-actions {
+                flex-grow: 1;
+
+                @include media-max("s") {
+                    justify-content: center;
+                }
+
+                .mat-icon-button {
+                    color: get("color.gray.700");
+                    width: convert-unit(32px, "rem");
+                    height: convert-unit(32px, "rem");
+                    line-height: convert-unit(32px, "rem");
+
+                    &:hover,
+                    &:focus {
+                        background: get("color.primary.500");
+                        border-radius: convert-unit(4px, "rem");
+                        color: get("color.white");
+                    }
+                }
+
+                .mat-icon-button[disabled] {
+                    color: get("color.gray.400");
+
+                    &:hover,
+                    &:focus {
+                        background: unset;
+                        border-radius: unset;
+                    }
+                }
+
+                .mat-paginator-range-label {
+                    flex-grow: 1;
+                    margin-left: 0;
+
+                    @include media-max("s") {
+                        position: absolute;
+                    }
+                }
+
+                .mat-paginator-navigation-previous {
+                    margin-right: convert-unit(120px, "rem");
+
+                    @include media-max("s") {
+                        margin-right: convert-unit(140px, "rem");
+                    }
+                }
+            }
+        }
+    }
+
+    .paginator-input-wrapper {
+        position: absolute;
+        top: 0;
+        right: convert-unit(60px, "rem");
+        width: convert-unit(127px, "rem");
+        font-size: convert-unit(14px, "rem");
+        margin-top: convert-unit(10px, "rem");
+        margin-bottom: 0;
+
+        @include media-max("s") {
+            display: none;
+        }
+
+        .mat-form-field-infix {
+            display: flex;
+            align-items: center;
+            padding: convert-unit(3px, "rem") 0 0 0;
+
+            .paginator-input {
+                text-align: center;
+                width: convert-unit(32px, "rem");
+                height: convert-unit(32px, "rem");
+                border: convert-unit(1px, "rem") solid;
+                border-radius: convert-unit(4px, "rem");
+                margin: 0 convert-unit(5px, "rem");
+            }
+        }
+
+        .mat-form-field-flex {
+            margin-top: 0;
+
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: transparent;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                .mat-form-field-outline-thick > div {
+                    border-color: transparent;
+                }
+            }
+        }
+    }
+
+    &.range-actions-hide {
+        .mat-paginator-range-actions,
+        .paginator-input-wrapper {
+            display: none;
+        }
+
+        .mat-paginator-container {
+            justify-content: flex-start;
+        }
+    }
+}
+
+.min-range-label {
+    padding: convert-unit(10px, "rem") 0 convert-unit(10px, "rem") 0;
+    color: get("color.gray.700");
+    font-size: convert-unit(14px, "rem");
+}

@@ -1,0 +1,72 @@
+@import "shared";
+.plan-icon {
+    padding: convert-unit(5px, "rem");
+    ::ng-deep.mat-icon.mat-primary {
+        color: get("color.gray.700");
+        .cls-1 {
+            fill: get("color.gray.700");
+        }
+    }
+}
+.coverage-head {
+    &.active {
+        .plan-icon {
+            ::ng-deep.mat-icon.mat-primary {
+                color: get("color.white");
+                path {
+                    fill: get("color.white");
+                }
+            }
+        }
+    }
+}
+.coverage-alert {
+    margin-bottom: convert-unit(20px, "rem");
+}
+.rider-select {
+    margin: convert-unit(10px, "rem") 0 convert-unit(20px, "rem") convert-unit(35px, "rem");
+    p {
+        color: get("color.gray.700");
+        font-size: convert-unit(16px, "rem");
+        margin-bottom: convert-unit(20px, "rem");
+    }
+    .mat-form-field {
+        margin-bottom: convert-unit(10px, "rem");
+        width: convert-unit(199px, "rem");
+    }
+    .rider-cost {
+        color: get("color.gray.700");
+        font-size: convert-unit(16px, "rem");
+    }
+}
+
+.plan-selection-radio {
+    display: flex;
+    flex-wrap: wrap;
+    .mat-radio-button {
+        position: relative;
+        ::ng-deep .mat-radio-label {
+            height: 100%;
+            .mat-radio-label-content {
+                height: 100%;
+            }
+        }
+        &.disabled {
+            .plan-card {
+                background-color: get("color.gray.300");
+                pointer-events: none;
+                .plan-icon {
+                    ::ng-deep {
+                        .mat-icon {
+                            color: #b1b1b1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+::ng-deep .coverage-level-select {
+    min-width: calc(100% + 140px) !important;
+    margin-top: convert-unit(30px, "rem") !important;
+}

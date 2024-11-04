@@ -1,0 +1,238 @@
+<div class="alert-wrapper">
+    <mon-alert alertType="danger" *ngIf="showErrorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="prod-wrapper">
+    <h2>{{languageString["primary.portal.commission.producer.header"]}}</h2>
+    <div *ngIf="noProducersFlag">
+        <p language="primary.portal.commission.producer.noProducers"></p>
+        <button
+            mat-flat-button
+            [attr.aria-label]="languageString['primary.portal.commission.producer.assignProducer']"
+            class="mon-btn-primary mon-my-10"
+            (click)="selectedOption(options[0])"
+        >
+            <span>{{languageString['primary.portal.commission.producer.assignProducer']}}</span>
+        </button>
+    </div>
+    <div class="search-filter-wraper" *ngIf="!noProducersFlag">
+        <div class="filter-wrapper">
+            <div class="prod-search-wrapper">
+                <mat-label class="mat-label" language="primary.portal.commission.producer.search"></mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        [(ngModel)]="searchInput"
+                        type="text"
+                        [attr.aria-label]="languageString['primary.portal.commission.producer.search']"
+                        autocomplete="off"
+                        class="mon-input"
+                        (keyup)="applySearchFilter($event.target.value)"
+                    />
+                    <mat-hint><span language="primary.portal.commission.producer.info"></span></mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="mon-pt-20" *ngIf="!isEnrollerRole || (isEnrollerRole && !this.enrollerReadOnlyConfig)">
+                <ng-container *isRestricted="permissionEnum.ACCOUNT_COMMISSIONS_RESTRICT_ADD_PRODUCER">
+                    <button
+                        *ngIf="!isEfinancialAgent"
+                        mat-flat-button
+                        [attr.aria-label]="languageString['primary.portal.commission.producer.addProducer']"
+                        class="mon-btn-secondary pull-down-sm"
+                        [matMenuTriggerFor]="addProducer"
+                    >
+                        <span>{{ languageString['primary.portal.commission.producer.addProducer'] }}</span>
+                        <mon-icon [iconSize]="10" iconName="down" class="icon-right"></mon-icon>
+                    </button>
+                </ng-container>
+                <mat-menu #addProducer="matMenu" xPosition="before">
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="languageString['primary.portal.commission.producer.addProducer']"
+                        *ngFor="let button of options"
+                        [value]="button.value"
+                        (click)="selectedOption(button)"
+                    >
+                        {{button.name}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    <div class="table-mask-wrapper">
+        <div class="mon-table-wraper" *ngIf="!noProducersFlag">
+            <table
+                mat-table
+                [dataSource]="dataSource"
+                mat-table
+                matSort
+                matSortDirection="asc"
+                matSortDisableClear
+                (matSortChange)="sortData($event)"
+            >
+                <ng-container matColumnDef="name">
+                    <th *matHeaderCellDef id="name" mat-header-cell mat-sort-header>
+                        <span language="primary.portal.commission.producer.table.name"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'name'}">
+                        <span> {{element.name}}</span>
+
+                        <span
+                            *ngIf="element.declinedInvite && !isDirect"
+                            language="primary.portal.commission.producer.table.declined"
+                        ></span>
+                        <span *ngIf="element.pendingInvite && !isDirect" language="primary.portal.commission.producer.table.invited"></span>
+
+                        <button
+                            mat-icon-button
+                            class="mon-ml-10"
+                            [attr.aria-label]="languageString['primary.portal.common.producerInfo']"
+                            [richTooltip]="element.matCarrierTooltipContent"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            *ngIf="element.matCarrierTooltipContent"
+                        >
+                            <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="16"></mon-icon>
+                        </button>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="role">
+                    <th *matHeaderCellDef id="role" mat-header-cell mat-sort-header>
+                        <span language="primary.portal.commission.producer.table.role"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'role'}">{{element.roleText}}</td>
+                </ng-container>
+                <ng-container matColumnDef="states">
+                    <th *matHeaderCellDef id="states" mat-header-cell mat-sort-header>
+                        <span language="primary.portal.commission.producer.table.license"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'states'}">
+                        <span *ngIf="element.states > 0">
+                            {{element.states }}
+                            <span *ngIf="element.states > 1" language="primary.portal.commission.producer.states"></span>
+                            <span *ngIf="element.states === 1" language="primary.portal.commission.producer.state"></span>
+                            <button
+                                mat-icon-button
+                                class="mon-ml-10"
+                                [attr.aria-label]="languageString['primary.portal.common.producerInfo']"
+                                [richTooltip]="element.licenseTooltipContent"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                *ngIf="element.states"
+                            >
+                                <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="16"></mon-icon>
+                            </button>
+                        </span>
+                        <span *ngIf="element.states === 0">
+                            <button
+                                [attr.aria-label]="languageString['primary.portal.commission.producer.noApplicableStates']"
+                                mat-icon-button
+                                class="mon-mr-10"
+                            >
+                                <mon-icon iconName="Filled-warning" [iconSize]="16" class="icon-warning"></mon-icon>
+                            </button>
+                            <span language="primary.portal.commission.producer.noApplicableStates"></span>
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="npn">
+                    <th id="npn" *matHeaderCellDef mat-header-cell mat-sort-header>
+                        <span language="primary.portal.commission.producer.table.npn"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'npn'}">{{element.npn}}</td>
+                </ng-container>
+                <ng-container matColumnDef="manage">
+                    <th id="manage" mat-header-cell *matHeaderCellDef>
+                        <span language="primary.portal.commission.producer.table.manage"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <ng-container *isRestricted="permissionEnum.ACCOUNT_COMMISSIONS_RESTRICT_MANAGE_PRODUCER">
+                            <div *ngIf="!isEnrollerRole || (isEnrollerRole && !this.enrollerReadOnlyConfig) || this.isRMOfPrimaryProducer">
+                                <button
+                                    mat-icon-button
+                                    [attr.aria-label]="languageString['primary.portal.common.producerInfo']"
+                                    [matMenuTriggerFor]="beforeMenu"
+                                    *ngIf="!element.pendingInvite && (element.role !== 'PRIMARY_PRODUCER' || element.declinedInvite) && !isManagingProducerForEnroller"
+                                >
+                                    <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary"></mon-icon>
+                                </button>
+                                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                    <button
+                                        [attr.aria-label]="languageString['primary.portal.commission.producer.changeRole']"
+                                        *ngIf="!element.declinedInvite && !isDirect && !element.isUnauthorized && !element.enrollerInvitesOnly"
+                                        (click)="changeRole(element.id, element.firstName, element.role)"
+                                        mat-menu-item
+                                    >
+                                        <span>{{ languageString['primary.portal.commission.producer.changeRole'] }}</span>
+                                    </button>
+                                    <button
+                                        class="text-danger"
+                                        [attr.aria-label]="languageString['primary.portal.commission.producer.table.remove']"
+                                        (click)="removeProducer(element.id, element.firstName, element.declinedInvite)"
+                                        mat-menu-item
+                                    >
+                                        <span>{{ languageString['primary.portal.commission.producer.table.remove'] }}</span>
+                                    </button>
+                                </mat-menu>
+                                <ng-container *hasPermission="permissionEnum.ACCOUNT_PRODUCER_DELETE">
+                                    <a
+                                        href="javascript:void(0)"
+                                        (click)="cancelInvite(element.id)"
+                                        [attr.aria-label]="languageString['primary.portal.commission.producer.table.cancel']"
+                                        *ngIf="element.pendingInvite && !isDirect && (element.showPendingInvite  || isPrimaryProducerRole)"
+                                        class="cancel-invite"
+                                        ><span>{{ languageString['primary.portal.commission.producer.table.cancel'] }}</span>
+                                    </a>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="noResults">
+                    <th mat-header-cell *matHeaderCellDef id="no-result" [attr.colspan]="10" class="text-center result-not-found">
+                        <span language="primary.portal.accounts.accountList.resultNotFound"></span> {{searchTerm}}
+                    </th>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                    *matRowDef="let row; columns: displayedColumns"
+                    [ngClass]="{'inactive': row.pendingInvite||row.declinedInvite}"
+                    mat-row
+                ></tr>
+                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource?.data.length != 0"></tr>
+            </table>
+        </div>
+        <div
+            *ngIf="!noProducersFlag"
+            class="min-range-label"
+            [hidden]="dataSource?.data.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1"
+        >
+            <span> {{ "primary.portal.commission.producer.showingItems" | replaceTag: { "##length##": dataSource?.data.length } }} </span>
+        </div>
+        <div
+            class="paginator-wrapper"
+            [hidden]="dataSource?.data.length === 0 || dataSource?.paginator?.getNumberOfPages() === 1"
+            [ngClass]="{'range-actions-hide': dataSource?.paginator?.getNumberOfPages() === 1}"
+        >
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                <span language="primary.portal.dashboard.policyChangeRequestList.page"></span>
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [attr.aria-label]="languageString['primary.portal.dashboard.policyChangeRequestList.page']"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ dataSource?.paginator?.getNumberOfPages() }}"
+                />
+                <span language="primary.portal.reportList.paginator.of"></span>
+                <span class="paginator-pages">{{dataSource?.paginator?.getNumberOfPages()}}</span>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

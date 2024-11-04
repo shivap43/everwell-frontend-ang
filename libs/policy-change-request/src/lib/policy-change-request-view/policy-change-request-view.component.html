@@ -1,0 +1,125 @@
+<div class="policyrequest">
+    <button mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']" class="closemodal">
+        <mon-icon class="mon-icon-close" iconSize="24" iconName="close" (click)="closeModal()"> </mon-icon>
+    </button>
+
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <div class="policyrequest-view">
+        <h1>{{policyFormDetails?.requestType}}</h1>
+        <div class="d-flex">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.policyholder"></mat-label>
+            <span>{{policyFormDetails?.policyHolderName}}</span>
+        </div>
+        <div class="d-flex">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.change"></mat-label>
+            <span class="changedescription" [innerHtml]="changeDescription"></span>
+        </div>
+        <div class="d-flex">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.requestNumber"></mat-label>
+            <span>{{policyFormDetails?.requestNumber}}</span>
+        </div>
+        <div class="d-flex">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.dateSubmitted"></mat-label>
+            <span>{{policyFormDetails?.dateSubmitted}}</span>
+        </div>
+        <div class="d-flex">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.status"></mat-label>
+            <span>
+                <!-- <mon-icon
+                    class="icon-warning"
+                    iconName="Filled-warning"
+                     [iconSize]="20"
+                ></mon-icon> -->
+                {{policyFormDetails?.status}}</span
+            >
+        </div>
+
+        <div [hidden]="dataSource?.length === 0" class="mon-mt-20">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.affectedPolicies"></mat-label>
+            <table mat-table [dataSource]="dataSource" matSort class="policy-table">
+                <!-- Header row  firstgroup -->
+                <ng-container [matColumnDef]="policyChangeViewColumnsMap[0].propertyName">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <span language="{{pcrLanguagePath}}.table.column.policyName"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let policyChangeView">{{ policyChangeView.policyName }}</td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="policyChangeViewColumnsMap[1].propertyName">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <span language="{{pcrLanguagePath}}.table.column.policyNumber"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let policyChangeView">{{ policyChangeView.policyNumber }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsArray"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsArray"></tr>
+            </table>
+        </div>
+
+        <div class="mon-mt-20" *ngIf="showUploadOption">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.supportingDocuments"></mat-label>
+            <span language="{{pcrLanguagePath}}.optional"></span>
+        </div>
+
+        <div *ngIf="showUploadOption" class="pcr-fileupload">
+            <empowered-pcr-file-upload
+                [supportingDocuments]="supportingDocuments"
+                [newDocumentIds]="documentIdArray"
+                [uploadApi]="uploadApi"
+                [formId]="formId"
+                [mpGroup]="mpGroup"
+                [memberId]="memberId"
+                [cifNumber]="cifNumber"
+                (getDocumentId)="getDocumentId($event)"
+                (removeDocument)="removeDocument($event)"
+            ></empowered-pcr-file-upload>
+        </div>
+        <div class="mon-mt-20" *ngIf="!showUploadOption && showDocumentList">
+            <mat-label class="mat-label" language="{{pcrLanguagePath}}.supportingDocuments"></mat-label>
+            <table mat-table [dataSource]="supportingDocumentList" matSort class="policy-table">
+                <ng-container [matColumnDef]="supportingDocumentsColumnsMap[0].propertyName">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let document">{{ document.fileName }}</td>
+                </ng-container>
+                <ng-container [matColumnDef]="supportingDocumentsColumnsMap[1].propertyName">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let document">{{ document.uploadDate }}</td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedDocumentColumnsArray"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedDocumentColumnsArray"></tr>
+            </table>
+        </div>
+    </div>
+    <div class="dialog-footer mon-mt-30 space-between">
+        <button
+            class="mon-btn-link text-left"
+            aria-label="Cancel"
+            mat-flat-button
+            *ngIf="showUploadOption"
+            (click)="cancelChanges()"
+        >
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+        <button
+            type="submit"
+            class="btn-right mon-btn-primary"
+            aria-label="Back"
+            mat-flat-button
+            *ngIf="!showUploadOption"
+            (click)="closeDialog()"
+        >
+            <span language="primary.portal.common.close"></span>
+        </button>
+        <button
+            type="submit"
+            class="btn-right mon-btn-primary"
+            aria-label="Next"
+            mat-flat-button
+            *ngIf="showUploadOption"
+            (click)="saveChanges()"
+        >
+            <span language="primary.portal.common.save"></span>
+        </button>
+    </div>
+</div>

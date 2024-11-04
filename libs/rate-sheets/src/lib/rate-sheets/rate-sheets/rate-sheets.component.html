@@ -1,0 +1,41 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner$ | async"></empowered-mon-spinner>
+<div class="rate-sheets">
+    <div class="top-header-container">
+        <div>
+            <h2 class="d-flex top-headericon-text">
+                <span language="primary.portal.rateSheets.title"></span>
+            </h2>
+        </div>
+        <span class="mon-mb-10 btn-header">
+            <a
+                href="javascript:void(0)"
+                [richTooltip]="(enableCreateRateSheet$ | async) ? null : buttonDisabledTooltipValue"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+            >
+                <button
+                    class="mon-btn-secondary mon-mr-20"
+                    mat-button
+                    [disabled]="(enableCreateRateSheet$ | async) === false"
+                    (click)="createRateSheet()"
+                >
+                    <span language="primary.portal.rateSheets.create"></span>
+                </button>
+            </a>
+        </span>
+    </div>
+
+    <div>
+        <empowered-rate-sheets-setting *ngIf="showRateSheetSettings" (resetEvent)="resetSettings()"></empowered-rate-sheets-setting>
+    </div>
+
+    <div class="products-plans">
+        <div class="products-container">
+            <empowered-products></empowered-products>
+            <div class="vertical-border"></div>
+        </div>
+        <div class="plans-container">
+            <empowered-plan-series></empowered-plan-series>
+        </div>
+    </div>
+</div>

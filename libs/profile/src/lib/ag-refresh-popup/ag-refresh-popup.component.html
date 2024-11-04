@@ -1,0 +1,22 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.aflacGroup.offeringUpdated']}}
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            class="mon-btn-primary"
+            [mat-dialog-close]="true"
+            [attr.aria-label]="languageStrings['primary.portal.common.gotIt']"
+        >
+            {{languageStrings['primary.portal.common.gotIt']}}
+        </button>
+    </empowered-modal-footer>
+    <div>
+        <p>
+            {{languageStrings["primary.portal.aflacGroup.planYearNameUpdated"] | replaceTag: {"##planyearname##":
+            this.data.planYearName} }}
+        </p>
+        <p>{{languageStrings['primary.portal.aflacGroup.resubmitOffering']}}</p>
+    </div>
+</empowered-modal>

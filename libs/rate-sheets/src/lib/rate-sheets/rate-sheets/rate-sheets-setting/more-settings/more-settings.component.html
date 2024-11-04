@@ -1,0 +1,28 @@
+<form [formGroup]="form">
+    <div class="mon-mr-15">
+        <empowered-zip-code-input
+            #zipCode
+            [formControl]="form?.controls?.zipCode"
+            [stateControlValue]="selectedState$ | async"
+            [validateOnStateChange]="true"
+            inputLabel="primary.portal.rateSheets.zip"
+            stateMismatchError="primary.portal.rateSheets.zip.matchState"
+            patternError="primary.portal.rateSheets.validationMessage.zip"
+        ></empowered-zip-code-input>
+    </div>
+    <div class="mon-mr-15">
+        <mat-label class="mat-label" language="primary.portal.rateSheets.sicCode"></mat-label>
+        <mat-form-field>
+            <input matInput empoweredNumberValidation autocomplete="false" formControlName="sicCode" [maxlength]="sicCodeMaxLength" />
+            <mat-hint language="primary.portal.rateSheets.sicCodeHint"></mat-hint>
+            <mat-error language="primary.portal.rateSheets.sicCodeRangeError"></mat-error>
+        </mat-form-field>
+    </div>
+    <div class="mon-mr-15">
+        <mat-label class="mat-label" language="primary.portal.rateSheets.eligibleEmployee"></mat-label>
+        <mat-form-field>
+            <input matInput empoweredNumberValidation formControlName="eligibleSubscribers" [maxlength]="eligibleSubscribersMaxLength" />
+            <mat-error language="primary.portal.rateSheets.editEstimate.nonZero"></mat-error>
+        </mat-form-field>
+    </div>
+</form>

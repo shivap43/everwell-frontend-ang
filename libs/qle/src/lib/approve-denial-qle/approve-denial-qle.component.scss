@@ -1,0 +1,79 @@
+@import "shared";
+
+.info-modal {
+    width: convert-unit(600px, "rem");
+    max-width: 100%;
+
+    .mat-dialog-content {
+        padding: 0;
+
+        .mat-dialog-title {
+            padding: convert-unit(50px, "rem") convert-unit(50px, "rem") 0;
+        }
+
+        .subtitle {
+            margin-bottom: convert-unit(20px, "rem");
+            padding: 0 convert-unit(50px, "rem");
+        }
+    }
+
+    .scroll-content {
+        padding: 0 convert-unit(50px, "rem") convert-unit(30px, "rem");
+        overflow-y: auto;
+        max-height: calc(100vh - 400px);
+    }
+
+    .read-only-control {
+        margin-bottom: convert-unit(20px, "rem");
+        display: flex;
+        align-items: flex-start;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        mat-label,
+        .mat-label {
+            font-size: convert-unit(16px, "rem");
+            flex: 0 0 convert-unit(105px, "rem");
+        }
+
+        .content {
+            flex: 1;
+            line-height: 1.15;
+        }
+    }
+
+    .mat-dialog-actions {
+        display: flex;
+        margin: 0;
+    }
+
+    .document-list {
+        margin-bottom: convert-unit(20px, "rem");
+        display: flex;
+        align-items: flex-start;
+
+        .doc-icon {
+            width: convert-unit(40px, "rem");
+
+            .mon-icon {
+                margin-left: convert-unit(-5px, "rem");
+                margin-top: 0;
+            }
+
+            ::ng-deep .mat-icon {
+                fill: get("color.black");
+            }
+        }
+
+        .doc-info {
+            flex-grow: 1;
+
+            > * {
+                line-height: 1.15;
+                font-size: convert-unit(14px, "rem");
+            }
+        }
+    }
+}

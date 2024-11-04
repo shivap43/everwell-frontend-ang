@@ -1,0 +1,12 @@
+<form [formGroup]="form" (submit)="onApply()" data-test="eb-elimination-period__form">
+    <mat-radio-group class="plan-radio-group" formControlName="selectedEliminationPeriod">
+        <mat-radio-button
+            class="plan-radio-button"
+            *ngFor="let eliminationPeriod of eliminationPeriods$ | async; trackBy: trackByEliminationPeriodName"
+            [value]="eliminationPeriod"
+            data-test="eb-elimination-period__form--radio-group"
+        >
+            {{ eliminationPeriod.name }}
+        </mat-radio-button>
+    </mat-radio-group>
+</form>

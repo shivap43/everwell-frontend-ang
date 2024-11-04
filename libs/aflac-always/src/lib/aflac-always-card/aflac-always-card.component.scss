@@ -1,0 +1,97 @@
+@import "shared";
+
+.aflac-always-card {
+    border: convert-unit(2px, "rem") solid #c6c6c6;
+    border-radius: convert-unit(5px, "rem");
+    display: flex;
+}
+
+.aflac-always-card-review-page {
+    border: convert-unit(1px, "rem") solid get("color.gray.300");
+    border-left: convert-unit(15px, "rem") solid get("color.gray.300");
+}
+
+.aflac-always-card > mon-icon {
+    padding: convert-unit(20px, "rem") 0 0 convert-unit(20px, "rem");
+    margin: 0;
+}
+
+.aflac-always-card-content {
+    padding: convert-unit(20px, "rem");
+    font-weight: 400;
+    flex: 1;
+}
+
+.aflac-always-card-content > h3 {
+    font-size: convert-unit(22px, "rem");
+    line-height: convert-unit(25.78px, "rem");
+    color: #000000;
+    margin: 0;
+}
+
+.aflac-always-card-content > p {
+    font-size: convert-unit(16px, "rem");
+    line-height: convert-unit(22px, "rem");
+    color: #5b5b5b;
+    padding: convert-unit(10px, "rem") 0 convert-unit(20px, "rem") 0;
+}
+
+.aflac-always-card-content > p > a > mon-icon {
+    position: relative;
+    top: convert-unit(3px, "rem");
+    margin: 0 convert-unit(5px, "rem") 0 convert-unit(5px, "rem");
+}
+
+.aflac-always-card-content .enrolled {
+    background-color: green !important;
+}
+
+.aflac-always-card-content > button > span::before {
+    content: "✓ ";
+}
+
+.aflac-always-card-content .pending-signature {
+    color: get("color.gray.700") !important;
+    background-color: get("color.gray.300") !important;
+    border: convert-unit(1px, "rem") solid get("color.gray.400");
+    cursor: not-allowed;
+    font-size: convert-unit(16px, "rem");
+}
+
+.review-button {
+    padding: 20px;
+}
+
+.align-sm-success {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    flex-direction: column;
+}
+
+.status-icon {
+    .mon-icon {
+        margin: 0 convert-unit(5px, "rem");
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .mat-icon {
+        margin: map-get($spacers, 5) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+    }
+}
+
+.icon-success {
+    display: flex;
+}
+
+.icon-danger {
+    display: flex;
+}
+
+.edit {
+    margin-left: map-get($spacers, 30);
+    line-height: map-get($spacers, 30);
+}

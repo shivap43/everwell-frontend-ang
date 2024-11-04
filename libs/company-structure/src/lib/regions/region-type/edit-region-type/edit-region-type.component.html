@@ -1,0 +1,67 @@
+<div class="edit-form-wrapper">
+    <form *ngIf="editRegionTypeForm" [formGroup]="editRegionTypeForm" (ngSubmit)="submit.focus(); editRegionType()">
+        <div class="region-name">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.regionTypeName']}}</mat-label>
+            <mat-form-field>
+                <input
+                    [attr.aria-label]="languageStrings['primary.portal.regions.regionTypeName']"
+                    formControlName="name"
+                    matInput
+                    (blur)="checkNameExists();"
+                />
+                <mat-error
+                    *ngIf="editRegionTypeForm.get('name').hasError('required')"
+                    language="primary.portal.common.requiredField"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editRegionTypeForm.get('name').hasError('pattern')"
+                    language="secondary.portal.common.pattern"
+                >
+                </mat-error>
+                <mat-error
+                    *ngIf="editRegionTypeForm.get('name').hasError('duplicateName')"
+                    language="secondary.portal.regions.duplicateName"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editRegionTypeForm.controls.name.errors?.maxlength"
+                    language="secondary.portal.common.maxLength"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <div class="region-desc">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.regionDescription']}}</mat-label>
+            <mat-form-field>
+                <input
+                    [attr.aria-label]="languageStrings['primary.portal.regions.regionDescription']"
+                    formControlName="description"
+                    matInput
+                />
+                <mat-error
+                    *ngIf="editRegionTypeForm.get('description').hasError('pattern')"
+                    language="secondary.portal.common.pattern"
+                >
+                </mat-error>
+                <mat-error
+                    *ngIf="editRegionTypeForm.controls.description.errors?.maxlength"
+                    language="secondary.portal.common.maxLength200"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <mat-label class="mat-label" primary.portal.regions.options></mat-label>
+        <div>
+            <mat-checkbox formControlName="determinesPlanAvailabilityOrPricing">
+                <span language="primary.portal.regions.planAvailibility"></span>
+            </mat-checkbox>
+        </div>
+
+        <div class="form-footer">
+            <button mat-button type="button" (click)="cancel()" class="mon-btn-secondary mon-mr-15">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <button #submit mat-button type="submit" class="mon-btn-primary">
+                {{data.actionType ===
+                'REGION_TYPE.CREATE'?languageStrings['primary.portal.regions.create']:languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+    </form>
+</div>

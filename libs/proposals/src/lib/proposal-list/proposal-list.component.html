@@ -1,0 +1,189 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="proposal-list-page">
+    <div class="mon-mb-30" *ngIf="isRefreshInProgress">
+        <mon-alert alertType="warning" closeButton="true">
+            <span language="primary.portal.benefitsOffering.warningMsg.refresh.inProgress"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30" *ngIf="isSuccess">
+        <mon-alert alertType="success" closeButton="true">
+            <span language="primary.portal.benefitsOffering.successMsg.refresh.success"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30" *ngIf="isServerError">
+        <mon-alert alertType="danger" closeButton="true">
+            <span language="primary.portal.benefitsOffering.errorMsg.refresh.serviceError"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30" *ngIf="isAccountRefreshFailure">
+        <mon-alert alertType="danger" closeButton="true">
+            <span language="primary.portal.benefitsOffering.errorMsg.refresh.accountRefreshFailure"></span>
+        </mon-alert>
+    </div>
+    <div class="alert-msg" *ngIf="!validZip">
+        <mon-alert alertType="warning">
+            <span> {{ languageStrings["primary.portal.proposals.invalidZipCode"] }} </span>
+        </mon-alert>
+    </div>
+    <h1 class="proposal-list-page-header" *ngIf="!message">
+        <span>{{languageStrings['primary.portal.proposals.list.header']}}</span>
+        <span [hidden]="!proposalList$ || (proposalList$ | async)?.length == 0">
+            <button
+                mat-flat-button
+                color="primary"
+                class="create-proposal-button"
+                (click)="createProposal()"
+                *hasPermission="'core.proposal.create'"
+                [disabled]="!validZip || isPrivacyOnForEnroller"
+            >
+                {{languageStrings['primary.portal.proposals.createProposal.button']}}
+            </button>
+        </span>
+    </h1>
+
+    <h2 class="proposal-list-page-header-with-message" *ngIf="message">
+        <span>{{languageStrings['primary.portal.proposals.list.header']}}</span>
+        <span [hidden]="!proposalList$ || (proposalList$ | async)?.length == 0" class="create-button">
+            <button
+                mat-flat-button
+                color="primary"
+                class="create-proposal-button"
+                (click)="createProposal()"
+                *hasPermission="'core.proposal.create'"
+            >
+                {{languageStrings['primary.portal.proposals.createProposal.button']}}
+            </button>
+        </span>
+    </h2>
+
+    <mon-alert alertType="success" closeButton="true" class="mon-alert alert-message" *ngIf="message && showAlertType===SUCCESS">
+        <span>{{message}}</span>
+    </mon-alert>
+    <mon-alert alertType="danger" closeButton="true" class="mon-alert alert-message" *ngIf="message && showAlertType===DANGER">
+        <span>{{message}}</span>
+    </mon-alert>
+
+    <ng-container *hasPermission="'core.proposal.read'">
+        <ng-container *ngIf="proposalList$ | async as proposalList">
+            <ng-container *ngIf="proposalList.length > 0" class="non-zero-state">
+                <table mat-table [dataSource]="proposalList">
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="primary.portal.proposals.list.name"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let proposal">{{proposal.name}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="coverageStartDate">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="primary.portal.proposals.list.coverageStartDate"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let proposal">{{proposal.coverageStartDate | date: 'MM/dd/yyyy'}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="createdBy">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="primary.portal.proposals.list.createdBy"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let proposal">{{proposal.createdBy.name}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="primary.portal.proposals.list.status"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let proposal">
+                            <span *ngIf="proposal.status === 'IN_PROGRESS'" language="primary.portal.proposals.list.status.inProgress">
+                            </span>
+                            <span *ngIf="proposal.status === 'COMPLETE'"> {{proposal.status | titlecase}} </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="manage">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="primary.portal.proposals.list.manage"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let proposal">
+                            <ng-container
+                                *ngIf="hasCreateProposalPermission$ && (((hasCreateProposalPermission$ | async) === false && proposal.status === 'COMPLETE') || (hasCreateProposalPermission$ | async) === true) && validZip"
+                            >
+                                <button
+                                    mat-icon-button
+                                    class="app-header-openPrimaryNavBtn"
+                                    [matMenuTriggerFor]="manageMenu"
+                                    *ngIf="proposal.status !== PROPOSAL_STATUS.IN_PROGRESS || !isPrivacyOnForEnroller"
+                                >
+                                    <mon-icon iconName="ellipsis" class="more-option icon-primary" aria-label="menu"></mon-icon>
+                                    <span class="cdk-visually-hidden">Open Navigation</span>
+                                </button>
+                                <mat-menu #manageMenu="matMenu">
+                                    <ng-container *hasPermission="'core.proposal.create'">
+                                        <ng-container *hasPermission="'core.proposal.update'">
+                                            <a
+                                                mat-menu-item
+                                                (click)="resumeOrEditProposal(proposal,RESUME)"
+                                                *ngIf="proposal.status === 'IN_PROGRESS'"
+                                                >{{languageStrings['primary.portal.proposals.list.resume']}}</a
+                                            >
+                                        </ng-container>
+                                    </ng-container>
+                                    <ng-container *hasPermission="'core.proposal.read'">
+                                        <a mat-menu-item (click)="previewProposal(proposal)" *ngIf="proposal.status === 'COMPLETE'"
+                                            >{{languageStrings['primary.portal.proposals.list.preview']}}</a
+                                        >
+                                    </ng-container>
+                                    <ng-container *hasPermission="'core.proposal.create'">
+                                        <ng-container *hasPermission="'core.proposal.read.email'">
+                                            <a mat-menu-item (click)="sendProposal(proposal)" *ngIf="proposal.status === 'COMPLETE'"
+                                                >{{languageStrings['primary.portal.proposals.list.send']}}</a
+                                            >
+                                        </ng-container>
+                                    </ng-container>
+                                    <ng-container *hasPermission="'core.proposal.create'">
+                                        <ng-container *hasPermission="'core.proposal.update'">
+                                            <a
+                                                mat-menu-item
+                                                (click)="resumeOrEditProposal(proposal)"
+                                                *ngIf="proposal.status === 'COMPLETE' && !isPrivacyOnForEnroller"
+                                                [disabled]="isPrivacyOnForEnroller"
+                                                >{{languageStrings['primary.portal.proposals.list.edit']}}</a
+                                            >
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="!isPrivacyOnForEnroller">
+                                        <a
+                                            mat-menu-item
+                                            (click)="removeProposal(proposal)"
+                                            class="text-danger"
+                                            *hasAllPermission="['core.proposal.delete','core.proposal.create']"
+                                            >{{languageStrings['primary.portal.proposals.list.remove']}}</a
+                                        >
+                                    </ng-container>
+                                </mat-menu>
+                            </ng-container>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="!proposalList$ || (proposalList$ | async)?.length == 0">
+        <p class="zero-state">
+            <span language="primary.portal.proposals.createProposal.message1"></span>
+            <ng-container *hasPermission="'core.proposal.create'">
+                <span language="primary.portal.proposals.createProposal.message2.part1"></span>
+                <span *ngIf="accountInfo$ | async as account">{{account.name}}</span>
+                <span language="primary.portal.proposals.createProposal.message2.part2"></span>
+            </ng-container>
+        </p>
+        <button
+            mat-flat-button
+            class="zero-state create-proposal-button mon-btn-primary"
+            (click)="createProposal()"
+            *hasPermission="'core.proposal.create'"
+            [disabled]="!validZip || isPrivacyOnForEnroller"
+        >
+            {{languageStrings['primary.portal.proposals.createProposal.button']}}
+        </button>
+    </ng-container>
+</div>

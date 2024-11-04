@@ -1,0 +1,147 @@
+<section class="mon-mx-20 mon-mt-40">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <mon-alert class="message-block" alertType="danger" *ngIf="showErrorMessage && !(errorOccur || hasError)">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <div>
+        <div class="d-flex justify-content-between">
+            <div class="d-flex">
+                <h1 *ngIf="!isAdmin" class="contacts-header">{{langStrings["primary.portal.profile.accountContacts.title"]}}</h1>
+                <h1 *ngIf="isAdmin" class="contacts-header">{{langStrings["primary.portal.profile.accountContacts.titleAdmin"]}}</h1>
+            </div>
+            <div class="add-new-contact-wrapper" *ngIf="!(contactInfoBilling && contactInfoBilling.length)">
+                <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_CONTACT">
+                    <button
+                        class="mon-btn-secondary"
+                        (click)="addBillingContact()"
+                        mat-flat-button
+                        type="button"
+                        *ngIf="!isPrivacyEnabledForEnroller"
+                    >
+                        {{ langStrings["primary.portal.profile.accountContacts.addItemButton"] }}
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+
+        <h2 class="mon-mb-0">{{langStrings["primary.portal.profile.accountContacts.primary"]}}</h2>
+        <div class="d-md-flex justify-content-between mon-mt-20" *ngIf="contactInfoPrimary && contactInfoPrimary.length > 0">
+            <table mat-table matSort [dataSource]="dataSourcePrimary">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.name"]}}</th>
+                    <td mat-cell *matCellDef="let element; let i = index">
+                        <span *ngIf="element.name"> {{element.name}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="address">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.address"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.addressText" [innerHTML]="element.addressText"> </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="phone">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.phone"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.phoneNumber"> {{element.phoneNumber | phone: country}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.email"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.email"> {{element.email}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.manage"]}}</th>
+                    <td mat-cell *matCellDef="let element;">
+                        <button
+                            class="mon-btn-link visible-on-row-hover"
+                            (click)="editContact(element, false)"
+                            type="button"
+                            *ngIf="(allowEditingAddress || allowEditingContactName || allowEditingPhoneNumber || allowEditingEmailAddress) && !isPrivacyEnabledForEnroller"
+                        >
+                            {{langStrings["primary.portal.profile.accountContacts.table.manageMenu.edit"]}}
+                        </button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsDocs"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsDocs"></tr>
+            </table>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div *ngIf="contactInfoBilling && contactInfoBilling.length > 0">
+            <h2 class="mon-mb-0">{{langStrings["primary.portal.profile.accountContacts.billing"]}}</h2>
+        </div>
+        <div class="d-md-flex justify-content-between mon-mt-20" *ngIf="contactInfoBilling && contactInfoBilling.length > 0">
+            <table mat-table matSort [dataSource]="dataSourceBilling">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.name"]}}</th>
+                    <td mat-cell *matCellDef="let element; let i = index">
+                        <span *ngIf="element.name"> {{element.name}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="address">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.address"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.addressText" [innerHTML]="element.addressText"> </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="phone">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.phone"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.phoneNumber"> {{element.phoneNumber | phone: country}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.email"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.email"> {{element.email}} </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.accountContacts.table.manage"]}}</th>
+                    <td mat-cell *matCellDef="let element;">
+                        <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_BILLING_CONTACT">
+                            <button
+                                mat-icon-button
+                                [attr.aria-label]="langStrings['primary.portal.profile.accountContacts.table.manage']"
+                                [matMenuTriggerFor]="beforeMenu"
+                                *ngIf="!isPrivacyEnabledForEnroller"
+                            >
+                                <mon-icon [iconSize]="20" iconName="ellipsis" class="more-option icon-primary"></mon-icon>
+                            </button>
+                            <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                <button mat-menu-item (click)="editContact(element, true)" type="button">
+                                    {{ langStrings["primary.portal.profile.accountContacts.table.manageMenu.edit"] }}
+                                </button>
+                                <button mat-menu-item (click)="confirmRemoveBillingContact(element.id)" type="button">
+                                    {{ langStrings["primary.portal.profile.accountContacts.table.manageMenu.remove"] }}
+                                </button>
+                            </mat-menu>
+                        </ng-container>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsDocs"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsDocs"></tr>
+            </table>
+        </div>
+        <ng-container *configEnabled="'general.feature.enable.email.opt.out'">
+            <div class="notification" *ngIf="updateEmailOptOut || readEmailOptOut">
+                <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_EMAIL_OPT_OUT">
+                    <h2>{{ langStrings["primary.portal.notification.notification"] }}</h2>
+                    <mat-checkbox (change)="changeValue($event)" [checked]="checked"
+                        ><span>{{ langStrings["primary.portal.notification.warning"] }}</span></mat-checkbox
+                    >
+                </ng-container>
+                <mon-alert class="message-block" alertType="danger" *ngIf="errorOccur">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+                <mon-alert class="message-block" alertType="danger" *ngIf="hasError">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+            </div>
+        </ng-container>
+    </div>
+</section>

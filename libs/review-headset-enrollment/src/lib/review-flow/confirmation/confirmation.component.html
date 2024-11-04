@@ -1,0 +1,19 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<form [formGroup]="thirdFormGroup">
+    <div class="header">
+        <h1>Confirmation</h1>
+    </div>
+
+    <p class="confirmation-text">
+        Your application has been successfully completed and will be sent for processing. If you have questions, please contact your HR
+        admin. Thank you for your business.
+    </p>
+
+    <button class="mon-btn-secondary mon-mr-20" *ngIf="memberId && groupId && isPayroll" (click)="logout()" mat-flat-button>
+        <span> Sign out</span>
+    </button>
+
+    <button class="mon-btn-primary" *ngIf="memberId && groupId && isPayroll" (click)="goToCoverageSummary()" mat-flat-button>
+        <span>Go to my coverage summary</span>
+    </button>
+</form>

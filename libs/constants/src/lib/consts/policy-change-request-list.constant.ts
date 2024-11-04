@@ -1,0 +1,18 @@
+export const PolicyChangeRequestList = {
+    allProductsSelected: "All",
+    noneProductsSelected: "None",
+    SEARCH: "search",
+    statusType: "status",
+    accountType: "account",
+    dateSubmittedType: "dateSubmitted",
+    nameType: "policyholdername",
+    numberType: "policynumber",
+    maxCharLenToDisplay: 31,
+    minSearchTextLength: 3,
+    pageNumberCount: 1,
+    escapeKey: "Escape",
+    enterKey: "Enter",
+    tabKey: "Tab",
+    cancel: "cancel",
+    submitted: "submitted",
+};

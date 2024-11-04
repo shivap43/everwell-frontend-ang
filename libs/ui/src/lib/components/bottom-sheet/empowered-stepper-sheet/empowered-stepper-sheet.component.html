@@ -1,0 +1,34 @@
+<div class="layout-header-2column" cdkTrapFocus>
+    <!--Header-->
+    <ng-content select="empowered-sheet-header"></ng-content>
+    <div class="columns">
+        <!-- sidenav -->
+        <div class="sidenav-area">
+            <ng-content select="empowered-tab-bar"></ng-content>
+        </div>
+        <div class="content-area">
+            <div class="quasi-modal">
+                <div class="dialog-content">
+                    <!-- stepper content -->
+                    <ng-content select="empowered-emp-stepper"></ng-content>
+                </div>
+                <div class="dialog-footer">
+                    <!-- stepper footer -->
+                    <div class="footer">
+                        <a
+                            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                            href="javascript:void(0)"
+                            class="mon-btn-link"
+                            mat-button
+                            mat-dialog-close
+                            (click)="close()"
+                        >
+                            {{languageStrings['primary.portal.common.cancel']}}
+                        </a>
+                        <ng-content select="empowered-sheet-footer"></ng-content>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header *ngIf="isUpdate">
+        <span [language]="MessageCenterLanguage.COMMENT_MODAL_HEADER_UPDATE"></span>
+    </empowered-modal-header>
+    <empowered-modal-header *ngIf="!isUpdate">
+        <span [language]="MessageCenterLanguage.COMMENT_MODAL_HEADER_SAVE"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            mat-raised-button
+            class="mon-btn-primary"
+            color="primary"
+            (click)="onSubmit()"
+            language="primary.portal.messageCenter.modals.comment.button"
+        ></button>
+    </empowered-modal-footer>
+
+    <p *ngIf="!isUpdate" [language]="MessageCenterLanguage.COMMENT_MODAL_CONTENT"></p>
+
+    <mat-label [language]="MessageCenterLanguage.COMMENT_MODAL_LABEL_COMMENT"></mat-label>
+    <form [formGroup]="editForm">
+        <mat-form-field>
+            <textarea matInput [formControlName]="fieldNameComment" cdkTextareaAutosize [cdkAutosizeMinRows]="5"></textarea>
+            <mat-error *ngIf="editForm?.controls?.fieldNameComment?.errors">
+                <span [language]="MessageCenterLanguage.COMMENT_MODAL_COMMENT_ERROR"></span>
+            </mat-error>
+        </mat-form-field>
+    </form>
+</empowered-modal>

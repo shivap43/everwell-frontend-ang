@@ -1,0 +1,100 @@
+@import "shared";
+
+::ng-deep .add-item {
+    .mat-dialog-container {
+        height: calc(100vh - 100px);
+        overflow: hidden;
+    }
+}
+
+.document-header {
+    h1 {
+        display: inline;
+        vertical-align: super;
+    }
+
+    .mon-icon ::ng-deep {
+        .cls-1 {
+            fill: get("color.gray.600");
+        }
+    }
+}
+
+.add-document-left {
+    margin-top: convert-unit(15px, "rem");
+}
+
+.add-document-right {
+    text-align: end;
+    margin-top: convert-unit(5px, "rem");
+}
+
+.contact-form {
+    margin-bottom: map-get($spacers, 20);
+
+    .contact-notify {
+        margin-bottom: map-get($spacers, 10);
+    }
+    .contacts {
+        display: flex;
+        flex-direction: column;
+        line-height: map-get($spacers, 25);
+        color: get("color.gray.900");
+
+        .mat-radio-button {
+            margin-bottom: map-get($spacers, 10);
+        }
+    }
+
+    ::ng-deep {
+        .mon-btn-success {
+            .mat-button-wrapper {
+                .tick-icon {
+                    margin-right: map-get($spacers, 5);
+                }
+            }
+        }
+    }
+}
+
+:host ::ng-deep .mat-table {
+    thead {
+        .mat-header-row {
+            .mat-column-notes {
+                width: 30%;
+            }
+
+            .mat-column-manage {
+                width: 10%;
+            }
+
+            .mat-column-modifiedOn {
+                width: 10%;
+            }
+
+            .mat-column-addedBy {
+                width: 10%;
+            }
+        }
+    }
+
+    .mat-row {
+        td {
+            &.mat-cell:first-of-type span a {
+                padding-left: 0px;
+                color: get("color.primary.500");
+                margin-bottom: convert-unit(10px, "rem");
+            }
+
+            a {
+                display: block;
+            }
+
+            &.mat-column-modifiedOn {
+                button {
+                    width: auto;
+                }
+            }
+        }
+    }
+}

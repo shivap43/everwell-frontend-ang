@@ -1,0 +1,229 @@
+@import "shared";
+
+$brandingWidth: 240px;
+
+/// Global App Layout
+.app {
+    &-root {
+        display: flex;
+        flex-direction: column;
+        /// - Avoid the IE 10-11 `min-height` bug.
+        /// - Use `%` instead of `vh` since `vh` is buggy in older mobile Safari.
+        height: 100%;
+
+        /// NOTE: Since AppComponent is set as ViewEncapsulation.None, it's important to use direct-descendent selector
+        ///       to prevent accidental cascade onto other .mat-sidenav-containers used in child components.
+        & > .mat-sidenav-container {
+            /// - Set `flex-shrink` to `0` to prevent some browsers from letting these items shrink to smaller
+            ///   than their content's default minimum size. See http://bit.ly/1Mn35US for details.
+            flex: 1 0 auto;
+
+            display: flex;
+            flex-direction: column;
+            background-color: get("color.white");
+            color: get("color.black");
+
+            .mat-drawer-container {
+                background-color: get("color.white");
+
+                @include media-max("l") {
+                    position: inherit !important;
+                }
+            }
+
+            .mat-sidenav-content {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+
+                .dashboard-sidenav {
+                    display: block;
+                }
+
+                &.mat-drawer-content {
+                    overflow: auto;
+                }
+            }
+        }
+    }
+
+    &-body {
+        /// - Set `flex-shrink` to `0` to prevent some browsers from letting these items shrink to smaller
+        ///   than their content's default minimum size. See http://bit.ly/1Mn35US for details.
+        flex: 1 0 auto;
+
+        display: flex;
+        flex-direction: column;
+
+        & > *:not(.router-outlet) {
+            /// - Set `flex-shrink` to `0` to prevent some browsers from letting these items shrink to smaller
+            ///   than their content's default minimum size. See http://bit.ly/1Mn35US for details.
+            flex: 1 0 auto;
+
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    &-sideNav {
+        position: relative;
+        width: 100vw;
+        background-color: get("color.white");
+        border-right: 1px solid get("color.gray.600");
+        padding-top: convert-unit(50px, "rem");
+
+        @include media-min("m") {
+            padding-top: 10px;
+            max-width: convert-unit(240px, "rem");
+        }
+
+        @include media-max("s") {
+            padding-top: map-get($spacers, 0);
+
+            .mat-drawer-inner-container {
+                padding-top: map-get($spacers, 50);
+            }
+        }
+
+        &-closeBtn.mat-icon-button {
+            position: absolute;
+            top: convert-unit(10px, "rem");
+            right: convert-unit(10px, "rem");
+        }
+
+        &-branding {
+            display: none;
+
+            .member-portal & {
+                @include media-min("m") {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: convert-unit(100px, "rem");
+                    border-bottom: 1px solid get("color.gray.600");
+                }
+            }
+        }
+
+        &-content {
+            display: flex;
+            width: 100%;
+        }
+    }
+
+    &-notification {
+        @include media-min("m") {
+            padding-top: 0;
+            max-width: convert-unit(400px, "rem");
+            overflow-x: hidden;
+            top: convert-unit(50px, "rem") !important;
+            bottom: convert-unit(75px, "rem") !important;
+        }
+
+        &.mat-drawer.mat-drawer-end {
+            transform: none;
+        }
+    }
+}
+
+.supportBtn {
+    height: 50px;
+    width: 40px;
+    border-radius: 0%;
+
+    &:hover {
+        text-decoration: none !important;
+        background: get("color.gray.1000");
+        color: $white;
+    }
+
+    .supportIcon {
+        width: convert-unit(24px, "rem") !important;
+        height: convert-unit(24px, "rem") !important;
+        // margin-left: convert-unit(15px, "rem") !important;
+        // margin-right: convert-unit(15px, "rem") !important;
+    }
+}
+
+.supportBtn {
+    height: 50px;
+    width: 40px;
+    border-radius: 0%;
+
+    &:hover {
+        text-decoration: none !important;
+        background: get("color.gray.1000");
+        color: $white;
+    }
+
+    .supportIcon {
+        width: convert-unit(24px, "rem") !important;
+        height: convert-unit(24px, "rem") !important;
+        // margin-left: convert-unit(15px, "rem") !important;
+        // margin-right: convert-unit(15px, "rem") !important;
+    }
+}
+
+.sidenav-content-without-margin {
+    margin-left: convert-unit(0px, "rem") !important;
+}
+
+.sidenav-content-with-margin {
+    margin-left: convert-unit(240px, "rem") !important;
+}
+
+.mat-drawer-content {
+    &.side-content-tpi-container {
+        overflow: hidden !important;
+    }
+    &.side-content-tpi-lnl-container {
+        overflow: auto !important;
+    }
+}
+
+.side-navigation {
+    .mat-drawer-backdrop {
+        background: rgba(255, 255, 255, 0.8);
+        top: map-get($spacers, 50);
+    }
+}
+
+.app-sidenav-hidden {
+    width: convert-unit(0px, "rem") !important;
+}
+
+.app-sidenav-visible {
+    width: 100vw;
+
+    @include media-max("m") {
+        width: convert-unit(240px, "rem");
+    }
+
+    @include media-max("s") {
+        width: 100vw;
+    }
+}
+
+.visually-hidden {
+    visibility: hidden !important;
+}
+
+.dialog-open-screen-blur {
+    .app-root {
+        filter: blur(1.5px);
+    }
+}
+
+_::-webkit-full-page-media,
+_:future,
+:root .mat-sidenav {
+    position: absolute;
+}
+
+.notification-panel {
+    .mat-drawer-backdrop {
+        top: map-get($spacers, 50);
+        bottom: convert-unit(73px, "rem");
+        background-color: rgba($color: get("color.white"), $alpha: 0.6);
+    }
+}

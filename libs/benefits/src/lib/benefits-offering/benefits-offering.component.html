@@ -1,0 +1,53 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div
+    class="benefit-offering-container"
+    *ngIf="this.credentialDetails && !this.credentialDetails.adminId && !restrictBOSetup; else hrAdminView"
+>
+    <div class="benefit-offering-header">
+        <h1 *ngIf="!isSharedAccount">{{languageStrings['primary.portal.benefitsOffering.title']}}</h1>
+        <h1 *ngIf="isSharedAccount">{{languageStrings['primary.portal.sharedCase.benefitsOffering.title']}}</h1>
+        <button
+            (click)="skipNonAg()"
+            mat-button
+            class="mon-btn-secondary"
+            *ngIf="isSharedAccount && !hasAGProductError"
+        >
+            {{languageStrings['primary.portal.benefitsOffering.skipNonAgSetup']}}
+        </button>
+    </div>
+    <a matButton class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+        <span class="selected-step-index"></span>
+        <span class="selected-step-label"></span>
+        <mon-icon class="icon-right" iconName="down" iconSize="10"></mon-icon>
+    </a>
+    <div class="benefits-container">
+        <div
+            app-Overlaystepper="stepperTrigger"
+            stepperId="benefitOfferingStepper"
+            class="left-stepper-content"
+            [ngClass]="{'shown': !display}"
+        >
+            <empowered-side-nav id="benefitOfferingStepper"></empowered-side-nav>
+        </div>
+        <div class="settings-content">
+            <div aria-live="polite">
+                <mon-alert
+                    *ngIf="hasError"
+                    alertType="danger"
+                    class="mon-alert d-flex justify-content-center mon-mt-30"
+                >
+                    <span>{{languageStrings['primary.portal.common.servertimeout']}}</span>
+                </mon-alert>
+            </div>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>
+
+<!-- HR Admin view of Initial Benefits Offering -->
+<ng-template #hrAdminView>
+    <div class="benefit-offering-header">
+        <h1 class="mon-mx-20">{{languageStrings['primary.portal.maintenanceBenefitsOffering.title']}}</h1>
+    </div>
+    <p class="mon-mx-20">{{languageStrings['primary.portal.maintenanceBenefitsOffering.zeroState']}}</p>
+</ng-template>

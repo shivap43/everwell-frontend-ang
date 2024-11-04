@@ -1,0 +1,66 @@
+<div *ngIf="selectedProduct$ | async as selectedProduct">
+    <h2>{{ selectedProduct?.product?.name }}</h2>
+    <mat-accordion *ngIf="includedPlanSeries$ | async as includedPlanSeries" class="accordion-default plan-series-accordion">
+        <ng-container *ngFor="let planSeries of selectedProduct.planSeries">
+            <mat-expansion-panel
+                [disabled]="disable ? disable[planSeries.id] : false"
+                [richTooltip]="disable[planSeries.id] ? toolTipMessage : '' "
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+                (opened)="onExpand(planSeries)"
+                (closed)="onClose(planSeries.id)"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ planSeries.name }}</mat-panel-title>
+                    <mat-panel-description>
+                        <ng-container
+                            *ngIf="(selectedProduct?.product?.id === dentalProductId && planSeries.id === aflacGroupCarrierID) else nonDentalGroupPlan"
+                        >
+                            <ng-container
+                                *ngIf="includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-' + MAC] && planSeries.categories === MAC"
+                            >
+                                <mon-icon iconName="circle-check" class="icon-success" [iconSize]="18"></mon-icon
+                                ><span class="included-text" language="primary.portal.quickQuote.includedInRateSheet"></span>
+                            </ng-container>
+                            <ng-container
+                                *ngIf="includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-' + PPO] && planSeries.categories === PPO"
+                            >
+                                <mon-icon iconName="circle-check" class="icon-success" [iconSize]="18"></mon-icon
+                                ><span class="included-text" language="primary.portal.quickQuote.includedInRateSheet"></span>
+                            </ng-container>
+                        </ng-container>
+                        <ng-template #nonDentalGroupPlan>
+                            <ng-container
+                                *ngIf="includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-'] 
+                            && !includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-MAC']"
+                            >
+                                <mon-icon iconName="circle-check" class="icon-success" [iconSize]="18"></mon-icon
+                                ><span class="included-text" language="primary.portal.quickQuote.includedInRateSheet"></span>
+                            </ng-container>
+                        </ng-template>
+                        <ng-container *ngIf="disable[planSeries.id]">
+                            <span class="info-text" language="primary.portal.quoteShop.dependency.infoNeeded"></span>
+                            <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="12"></mon-icon>
+                        </ng-container>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <ng-container *ngIf="(panelOpen$ | async)">
+                    <ng-container *ngIf="(selectedPlanSeries$ | async)?.planSeries?.id === planSeries.id">
+                        <div *ngIf="selectedRateSheetPlanSeriesOptions$ | async as selectedRateSheetPlanSeriesOptions">
+                            <empowered-plan-series-settings [selectedRateSheetPlanSeriesOptions]="selectedRateSheetPlanSeriesOptions">
+                            </empowered-plan-series-settings>
+                            <empowered-plan-selection
+                                [planSeries]="planSeries"
+                                [product]="selectedProduct.product"
+                                [includedInRateSheet]="includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-'] 
+                                || (includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-' + MAC] && planSeries.categories === MAC)
+                                || (includedPlanSeries[selectedProduct.product.id + '-' + planSeries.id + '-' + PPO] && planSeries.categories === PPO)"
+                                (saved)="closeAllPanels()"
+                            ></empowered-plan-selection>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </mat-expansion-panel>
+        </ng-container>
+    </mat-accordion>
+</div>

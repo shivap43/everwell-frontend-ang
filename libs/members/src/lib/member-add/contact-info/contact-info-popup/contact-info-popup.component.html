@@ -1,0 +1,209 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancelClick()" [attr.aria-label]="languageStrings.ariaClose">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+
+    <form [formGroup]="contactInfoPopupForm" *ngIf="!data.deletePopupFlag">
+        <div mat-dialog-content class="flex-form-wrapper">
+            <h1 mat-dialog-title *ngIf="!data.deletePopupFlag">{{data.title}}</h1>
+            <p
+                class="email-label"
+                *ngIf="data.emailLabel"
+                language="primary.portal.members.contactLabel.eDelivery.emailAddress"
+            ></p>
+            <div class="d-md-flex">
+                <ng-container *ngIf="hideFieldElementSetting.type">
+                    <div class="flex-item w-130">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.contactLabel.type"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('type'))"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="type"
+                                class="mon-input"
+                                [disabled]="((isAgentSelfEnrolled&& data.rowData.primary) || readOnlyFieldElementSetting.type)"
+                                [placeholder]="languageStrings.select"
+                            >
+                                <mat-option value="" language="primary.portal.common.select"></mat-option>
+                                <mat-option *ngFor="let type of data.fieldType" value="{{type}}" title="{{type}}"
+                                    >{{type | titlecase}}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="contactInfoPopupForm.get('type').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span>{{data.inputlabel}}</span>
+                        <span
+                            *ngIf="!(requiredFields && isRequiredField(data.inputName))"
+                            class="optional-text"
+                            language="primary.portal.common.optional"
+                        ></span>
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            *ngIf="data.isPhone; else email"
+                            [readonly]="isAgentSelfEnrolled && data.rowData.primary"
+                            formControlName="{{data.inputName}}"
+                            maxlength="{{data.vaidatorMaxLength}}"
+                            type="text"
+                            class="mon-input"
+                            matInput
+                            [attr.aria-label]="data.inputName"
+                            empoweredNumberValidation
+                            [allowDashes]="true"
+                            empoweredPhoneNumberFormat
+                        />
+                        <ng-template #email>
+                            <input
+                                [readonly]="isAgentSelfEnrolled && data.rowData.primary"
+                                formControlName="{{data.inputName}}"
+                                maxlength="{{data.vaidatorMaxLength}}"
+                                type="text"
+                                class="mon-input"
+                                matInput
+                                [attr.aria-label]="data.inputName"
+                            />
+                        </ng-template>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('duplicate') && data.inputName === 'phoneNumber' "
+                            language="secondary.portal.members.contactValidationMsg.DuplicateErrorMessage"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('duplicate') && data.inputName === 'email' "
+                            language="secondary.portal.members.emailValidationMsg.DuplicateErrorMessage"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('required')"
+                            language="secondary.portal.members.contactValidationMsg.required"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('maxlength')"
+                            language="secondary.portal.members.contactValidationMsg.maxlength60"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('pattern') && ! contactInfoPopupForm.get(data.inputName).hasError('maxlength') && data.inputlabel==='Email address'"
+                            language="secondary.portal.members.contactValidationMsg.invalidEmail"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="contactInfoPopupForm.get(data.inputName).hasError('pattern') && ! contactInfoPopupForm.get(data.inputName).hasError('maxlength') && data.inputlabel==='Phone number'"
+                            language="secondary.portal.members.contactValidationMsg.invalidPhoneNumber"
+                        >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <ng-container *ngIf="hideFieldElementSetting.extension">
+                    <div class="flex-item" *ngIf="data.isPhone && contactInfoPopupForm.get('type').value == 'WORK'">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.contactLabel.extention"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('extension'))"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="extension"
+                                type="text"
+                                class="mon-input"
+                                matInput
+                                [readonly]="readOnlyFieldElementSetting.extension"
+                                [attr.aria-label]="languageStrings.extension"
+                                maxlength="{{vaidatorExtMaxLength}}"
+                            />
+                            <mat-error
+                                *ngIf="contactInfoPopupForm.get('extension').hasError('required')"
+                                language="secondary.portal.members.contactValidationMsg.required"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="contactInfoPopupForm.get('extension').hasError('pattern')"
+                                language="secondary.portal.members.contactValidationMsg.invalidExtension"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+            </div>
+            <div *ngIf="data.isPhone">
+                <mat-checkbox formControlName="isMobile"
+                    ><span language="primary.portal.census.manualEntry.isMobilenumber"></span
+                ></mat-checkbox>
+            </div>
+            <ng-container *ngIf="hideFieldElementSetting.primary">
+                <div>
+                    <mat-checkbox
+                        [disabled]="data.contactLength === 0 || readOnlyFieldElementSetting.extension || data.rowData.primary || isEmailPhoneSelfEnrolledFlag"
+                        formControlName="primary"
+                        (click)="onreplacePrimary(data.isPhone,$event)"
+                        >{{textcheckbox}}</mat-checkbox
+                    >
+                </div>
+            </ng-container>
+        </div>
+        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                aria-label="Cancel"
+                (click)="onCancelClick()"
+                language="primary.portal.members.contactLabel.cancel"
+            >
+            </a>
+            <button
+                (click)="onSubmit()"
+                mat-flat-button
+                class="mon-btn-primary"
+                [disabled]="isAgentSelfEnrolled && data.rowData.primary"
+            >
+                {{data.contactButton}}
+            </button>
+        </div>
+    </form>
+    <div class="flex-form-wrapper" *ngIf="data.deletePopupFlag">
+        <div mat-dialog-content>
+            <div class="d-md-flex">
+                <div class="flex-item" mat-dialog-title>{{deleteMessage}}</div>
+            </div>
+        </div>
+        <div mat-dialog-actions class="dialog-footer d-md-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                aria-label="Cancel"
+                (click)="onCancelClick()"
+                language="primary.portal.members.contactLabel.cancel"
+            >
+            </a>
+            <button
+                mat-button
+                mat-flat-button
+                class="mon-btn-danger"
+                (click)="onDelete(data.isPhone,data.deletePopupFlag,data.rowindex)"
+                aria-label="Remove"
+                language="primary.portal.members.contactLabel.remove"
+            ></button>
+        </div>
+    </div>
+</div>

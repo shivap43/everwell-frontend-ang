@@ -1,0 +1,40 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closePopup()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content>
+        <div mat-dialog-title class="mon-mb-20">{{data.content}}</div>
+        <ng-container *ngIf="data.profileChangesData?.length && data.isStandaloneDemographicEnabled">
+            <span *ngIf="!isMMP" language="primary.portal.applicant.profileMatch.confirmMessage"></span>
+            <span *ngIf="isMMP" language="primary.portal.applicant.profileMatch.mmp.confirmMessage"></span>
+            <div>
+                <ul *ngFor="let control of data.profileChangesData">
+                    <li>{{control}}</li>
+                </ul>
+            </div>
+        </ng-container>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            *ngIf="this.data.secondaryButton && this.data.secondaryButton.buttonTitle"
+            (click)="secondaryButtonClick()"
+            class="mon-btn-secondary mon-mr-20"
+        >
+            {{data.secondaryButton.buttonTitle}}
+        </button>
+        <button
+            [mat-dialog-close]="true"
+            mat-button
+            *ngIf="this.data.primaryButton && this.data.primaryButton.buttonTitle"
+            (click)="primaryButtonClick()"
+            class="mon-btn-primary mon-px-30"
+        >
+            {{data.primaryButton.buttonTitle}}
+        </button>
+    </mat-dialog-actions>
+</div>

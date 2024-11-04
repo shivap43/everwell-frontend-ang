@@ -1,0 +1,73 @@
+<div class="info-modal" *ngIf="!formSuccess">
+    <div>
+        <empowered-mon-spinner enableSpinner="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+        <mon-alert *ngIf="showErrorMessage" alertType="danger" class="mon-alert" language="secondary.portal.common.somethingWrong">
+        </mon-alert>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content>
+            <h2 mat-dialog-title>
+                {{languageStrings['primary.portal.quoteShop.plansDisplay.importExistingPlan'].replace("##ProductName##", data.productName)}}
+            </h2>
+            <p class="mon-mb-20" *ngIf="memberInfo">
+                {{languageStrings['primary.portal.quoteShop.plansDisplay.toImportActivePlan'].replace("##FirstName##",
+                memberInfo.name.firstName)}}
+            </p>
+            <div class="mon-mb-20" *ngIf="memberInfo">
+                <p class="text-bold">{{memberInfo.name.firstName}} {{languageStrings['primary.portal.quoteShop.plansDisplay.dob']}}</p>
+                <p>{{memberInfo.birthDate | date : dateFormat}}</p>
+            </div>
+
+            <div class="w-200 d-flex">
+                <div>
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.quoteShop.plansDisplay.policyNumber']}}</mat-label>
+                    <mat-form-field class="policy-input-block">
+                        <input
+                            matInput
+                            type="text"
+                            #policyNumber
+                            formControlName="policyNumber"
+                            [attr.aria-label]="languageStrings['primary.portal.quoteShop.plansDisplay.policyNumber']"
+                        />
+                        <mat-error *ngIf="form.controls?.policyNumber.hasError('required')">
+                            <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.importPolicyError']}}</span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-error *ngIf="form.controls?.policyNumber.hasError('policyNumberInvalid')">
+                        <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.policyNoError']}}</span>
+                    </mat-error>
+                </div>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" (click)="onCancel()" class="mon-btn-link mon-px-0" mat-button mat-dialog-close
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <div>
+                <button class="mon-btn-primary" mat-flat-button type="submit">
+                    <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.importPlan']}}</span>
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</div>
+
+<div class="info-modal" *ngIf="formSuccess">
+    <div class="modal-header">
+        <button (click)="onCancel()" mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.quoteShop.plansDisplay.planImportedSuccessfully']}}</h2>
+        <p>
+            {{languageStrings['primary.portal.quoteShop.plansDisplay.importSuccessMsg'].replace("##firstName##",
+            memberInfo.name.firstName).replace("##product##",data.productName)}}
+        </p>
+    </div>
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button (click)="onCancel()" class="mon-btn-primary" mat-flat-button>
+            <span>{{languageStrings['primary.portal.common.gotIt']}}</span>
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,81 @@
+<empowered-modal type="POPUP" [showCancel]="false" size="MD">
+    <empowered-modal-header>
+        <h2
+            *ngIf="data.sicCode && data.industryCode && !data.acctype"
+            class="code-header"
+            language="primary.portal.accountRefreshModal.sicCodeAndIndustryCode.header"
+        ></h2>
+        <h2
+            *ngIf="data.sicCode && !data.industryCode && !data.acctype"
+            class="code-header"
+            language="primary.portal.accountRefreshModal.sicCode.header"
+        ></h2>
+        <h2
+            *ngIf="!data.sicCode && data.industryCode && !data.acctype"
+            class="code-header"
+            language="primary.portal.accountRefreshModal.industryCode.header"
+        ></h2>
+        <h2
+            *ngIf="data.acctype && (data.sicCode || data.industryCode)"
+            class="code-header"
+            language="primary.portal.accountRefreshModal.accountUpdated.header"
+        ></h2>
+        <h2
+            *ngIf="data.acctype && !(data.sicCode || data.industryCode)"
+            class="code-header"
+            language="primary.portal.accountRefreshModal.accountTypeUpdated.header"
+        ></h2>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-flat-button class="mon-btn-primary" (click)="closeModal()">
+            <span language="primary.portal.common.gotIt"></span>
+        </button>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <div>
+            <div>
+                <div *ngIf="data.sicCode && !data.industryCode">
+                    <ul>
+                        <li class="text-bold" language="primary.portal.accountRefreshModal.sicCode.header.withcolon">
+                            <span class="text-normal" language="primary.portal.accountRefreshModal.accidentAndDisability.available"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="data.industryCode && !data.sicCode">
+                    <ul>
+                        <li class="text-bold" language="primary.portal.accountRefreshModal.industryCode.header.withColon">
+                            <span class="text-normal" language="primary.portal.accountRefreshModal.industryCode.added"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="data.industryCode && data.sicCode">
+                    <ul>
+                        <li class="text-bold" language="primary.portal.accountRefreshModal.sicCodeAndIndustryCode.header.withColon">
+                            <span class="text-normal" language="primary.portal.accountRefreshModal.accidentAndDisability.available"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="code-detail">
+                    <div class="code-type" *ngIf="data.sicCode">
+                        <mat-label class="code-label" language="primary.portal.accountRefreshModal.sicCode"></mat-label>
+                        <span>{{data.sicCode}}</span>
+                    </div>
+                    <div class="code-type" *ngIf="data.industryCode">
+                        <mat-label class="code-label" language="primary.portal.accountRefreshModal.industryCode"></mat-label>
+                        <span>{{data.industryCode}}</span>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="data.acctype && (data.sicCode || data.industryCode)">
+                <ul>
+                    <li class="text-bold" language="primary.portal.accountRefreshModal.accountTypeUpdated.header.withColon">
+                        <span class="text-normal" language="primary.portal.accountRefreshModal.accountTypeUpdated.content"></span>
+                    </li>
+                </ul>
+            </div>
+            <div *ngIf="data.acctype && !(data.sicCode || data.industryCode)">
+                <p language="primary.portal.accountRefreshModal.accountTypeUpdated.content"></p>
+            </div>
+        </div>
+    </div>
+</empowered-modal>

@@ -1,0 +1,161 @@
+@import "shared";
+
+::ng-deep .upload-census {
+    .mat-dialog-container {
+        height: calc(100vh - 100px);
+        overflow: hidden;
+    }
+}
+
+h3 {
+    color: get("color.black");
+}
+
+.mat-hint {
+    margin: 5px 0 15px;
+}
+
+.files-list {
+    border-top: 1px solid get("color.black");
+    border-bottom: 1px solid get("color.black");
+    margin-top: 0;
+    padding: convert-unit(7px, "rem") 0;
+
+    ::ng-deep .mon-icon {
+        vertical-align: middle;
+
+        .mat-icon.mat-primary {
+            color: get("color.black");
+        }
+
+        .cls-1 {
+            fill: get("color.black");
+        }
+
+        &.icon-danger .cls-1 {
+            fill: get("color.info.danger.500");
+        }
+
+        &.icon-success .cls-1 {
+            fill: get("color.info.success");
+        }
+
+        &.icon-warning .cls-1 {
+            fill: get("color.info.warn");
+        }
+    }
+
+    p:last-child {
+        font-size: convert-unit(12px, "rem");
+
+        ::ng-deep .mon-icon {
+            vertical-align: sub;
+            margin-right: convert-unit(10px, "rem");
+        }
+    }
+}
+
+:host ::ng-deep .icon-black {
+    vertical-align: middle;
+}
+
+.quasi-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+
+    h2 {
+        margin: 0;
+    }
+
+    .mat-dialog-actions {
+        margin-bottom: convert-unit(9px, "rem");
+    }
+}
+
+.mat-dialog-content {
+    height: calc(100vh - 300px);
+
+    p.mon-subtitle span {
+        color: get("color.gray.600");
+        font-size: convert-unit(12px, "rem");
+        margin-bottom: convert-unit(15px, "rem");
+    }
+
+    .census-msg {
+        padding: convert-unit(15px, "rem") 0;
+
+        span:first-child {
+            margin-right: convert-unit(5px, "rem");
+        }
+
+        .mon-icon {
+            vertical-align: middle;
+        }
+    }
+
+    .saved-map-container {
+        padding: convert-unit(35px, "rem") 0 0;
+    }
+}
+
+.mon-alert {
+    margin: convert-unit(15px, "rem") 0;
+}
+
+.mat-form-field {
+    background: get("color.white");
+    width: 200px;
+    margin: 0;
+}
+
+.mat-table {
+    margin: convert-unit(20px, "rem") 0;
+
+    .icon-column {
+        width: 3%;
+    }
+
+    th {
+        width: convert-unit(300px, "rem");
+    }
+
+    tr td:nth-child(3) {
+        padding: 10px;
+    }
+
+    .mat-form-field {
+        .mat-form-field-wrapper {
+            padding: 0;
+        }
+
+        .mat-form-field-infix {
+            padding: convert-unit(7px, "rem");
+        }
+    }
+
+    td {
+        ::ng-deep .mat-icon svg .cls-1 {
+            fill: get("color.info.success");
+        }
+    }
+}
+
+.existing-doc-container {
+    padding-bottom: convert-unit(25px, "rem");
+
+    .mat-radio-button {
+        display: block;
+        margin: convert-unit(10px, "rem") 0;
+    }
+}
+
+.filemap-label {
+    margin-top: convert-unit(30px, "rem");
+}
+
+:host ::ng-deep {
+    .file-list-wrapper,
+    .mat-hint-desc {
+        width: convert-unit(600px, "rem");
+    }
+}

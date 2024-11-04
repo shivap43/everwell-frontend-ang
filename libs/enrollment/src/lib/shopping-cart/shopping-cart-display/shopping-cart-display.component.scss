@@ -1,0 +1,59 @@
+@import "shared";
+.expanded-view {
+    background-color: get("color.white");
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    width: convert-unit(577px, "rem");
+    position: absolute;
+    z-index: 999;
+    padding: 0px convert-unit(30px, "rem");
+}
+.add-cart-wrapper {
+    .mat-button {
+        vertical-align: middle;
+        padding-right: convert-unit(40px, "rem");
+        ::ng-deep .mat-button-focus-overlay {
+            background: none !important;
+        }
+        ::ng-deep .mat-button-wrapper {
+            position: relative;
+            display: block;
+        }
+    }
+}
+.cart-bubble {
+    position: absolute;
+    background: get("color.primary.500");
+    border-radius: 50%;
+    width: convert-unit(14px, "rem");
+    height: convert-unit(14px, "rem");
+    color: get("color.white");
+    font-size: convert-unit(11px, "rem");
+    @include fontFace("primary.bold");
+    left: convert-unit(32px, "rem");
+    top: 0;
+    text-align: center;
+}
+.danger-card-count {
+    .cart-bubble {
+        background: get("color.info.danger.500");
+    }
+}
+.waring-card-count {
+    .cart-bubble {
+        background: get("color.info.warn");
+    }
+}
+.shopping-cart-icon {
+    margin: 0;
+}
+.expanded-view {
+    padding: 0;
+    right: convert-unit(4px, "rem");
+}
+.cart-icon-cntr {
+    padding-right: convert-unit(20px, "rem");
+}
+.expanded-card-view {
+    opacity: 0;
+    z-index: 1;
+}

@@ -1,0 +1,77 @@
+<ng-container>
+    <div class="product-filter-wrapper">
+        <h4 class="show-title">{{languageStrings['primary.portal.producerFilter.show']}}</h4>
+        <mat-radio-group [(ngModel)]="filterOptionSelected">
+            <mat-radio-button *ngFor="let prod of producerData" value="{{prod.value}}" (change)="prodSelected($event)"
+                >{{prod.name}}</mat-radio-button
+            >
+        </mat-radio-group>
+        <div *ngIf="searchFlag">
+            <form [formGroup]="searchForm" class="search-box">
+                <mat-form-field class="search-producer">
+                    <input
+                        type="text"
+                        #search
+                        matInput
+                        formControlName="searchControl"
+                        #trigger="matAutocompleteTrigger"
+                        [matAutocomplete]="auto"
+                        (input)="disableApply($event.target.value)"
+                        (keyup.enter)="$event.stopPropogation()"
+                        [attr.aria-label]="languageStrings['primary.portal.producerFilter.searchbyProducer']"
+                    />
+                    <mat-autocomplete
+                        #auto="matAutocomplete"
+                        class="producer-search-filter"
+                        (optionSelected)="selectedProducerOption($event.option)"
+                    >
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
+                            <span class="producer-name">{{option.name}}</span>
+                            <span class="producer-email">{{option.email}}</span>
+                        </mat-option>
+                    </mat-autocomplete>
+
+                    <mat-error *ngIf="accessPermission"
+                        >{{languageStrings['primary.portal.producerFilter.producernotFound']}}</mat-error
+                    >
+                    <mat-error *ngIf="deniedPermission"
+                        >{{languageStrings['primary.portal.producerFilter.noAccessToAccounts']}}</mat-error
+                    >
+                    <mat-hint>{{languageStrings['primary.portal.producerFilter.searchbyProducer']}}</mat-hint>
+                </mat-form-field>
+                <button
+                    *ngIf="showMyTeamsAccountSearch$ | async"
+                    mat-flat-button
+                    [disabled]="searchButton"
+                    [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                    (click)="searchSpecificProducer($event)"
+                    class="mon-btn-primary search-icon-wrapper"
+                >
+                    <mon-icon iconName="search" class="icon-white" [iconSize]="25"></mon-icon>
+                </button>
+            </form>
+        </div>
+        <div class="mon-clear">
+            <div>
+                <a *ngIf="!searchFlag" href="javascript:void(0)" class="mon-reset" (click)="resetVal()"
+                    >{{languageStrings['primary.portal.producerFilter.reset']}}</a
+                >
+                <a
+                    *ngIf="searchControl != '' && searchFlag"
+                    href="javascript:void(0)"
+                    class="mon-reset"
+                    (click)="resetVal()"
+                    >{{languageStrings['primary.portal.producerFilter.reset']}}</a
+                >
+            </div>
+            <div>
+                <a *ngIf="applyFlag" href="javascript:void(0)" (click)="filterApply()" class="mon-apply"
+                    >{{languageStrings['primary.portal.producerFilter.apply']}}</a
+                >
+                <a *ngIf="!applyFlag" href="javascript:void(0)" class="apply-link-disabled"
+                    >{{languageStrings['primary.portal.producerFilter.apply']}}</a
+                >
+            </div>
+        </div>
+    </div>
+</ng-container>

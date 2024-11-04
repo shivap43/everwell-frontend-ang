@@ -1,0 +1,17 @@
+/* VARIABLES
+ *
+ * This file is rolls up all shared Sass variables for simplified importing via `@import "utilities/variables";`.
+ * For more information on this project's Sass architecture SEE: /libs/shared/src/lib/scss/README.md
+ */
+// Initialize $mon-config as an empty map. Then have each partial merge together for scalability and ease of maintenance.
+$mon-config: () !default;
+
+// Each partial below imports a map will be merged to create the full $mon-config map.
+@import "variables/breakpoint";
+@import "variables/color";
+@import "variables/layers";
+@import "variables/typography";
+@import "variables/grid";
+@import "variables/spacing";
+@import "variables/layout";
+@import "variables/radio";

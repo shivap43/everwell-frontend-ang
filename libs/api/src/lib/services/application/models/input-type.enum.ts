@@ -1,0 +1,12 @@
+export enum InputType {
+    INPUT = "INPUT",
+    MULTI_INPUT = "MULTIINPUT",
+    TEXTAREA = "TEXTAREA",
+    INITIALS = "INITIALS",
+    DATEPICKER = "DATEPICKER",
+    MULTISELECT = "MULTISELECT",
+    RADIO = "RADIO",
+    CHECKBOX = "CHECKBOX",
+    SELECT = "SELECT",
+    TEXT = "TEXT",
+}

@@ -1,0 +1,46 @@
+@import "shared";
+
+.vas-text {
+    font-weight: normal;
+    color: get("color.black");
+    font-size: convert-unit(12px, "rem");
+    @include fontFace("primary.regular");
+}
+
+.atleast-txt-vas {
+    color: get("color.gray.500");
+    font-weight: normal;
+    font-size: convert-unit(12px, "rem");
+}
+
+.shade-text-vas {
+    color: get("color.gray.500");
+    font-weight: normal;
+}
+
+.products-alert {
+    margin: map-get($spacers, 15) map-get($spacers, 0);
+}
+
+.mat-row {
+    td.mat-cell:first-of-type {
+        .wellthie-link {
+            color: get("color.primary.500");
+            font-size: convert-unit(12px, "rem");
+            @include fontFace("primary.regular");
+        }
+    }
+}
+
+.exception-alert {
+    ::ng-deep {
+        div {
+            margin-bottom: map-get($spacers, 10);
+        }
+    }
+}
+@media screen and (max-width: 760px) {
+    .table-responsive {
+        overflow-x: scroll;
+    }
+}

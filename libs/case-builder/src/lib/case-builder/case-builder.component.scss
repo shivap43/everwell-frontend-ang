@@ -1,0 +1,41 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .first-child {
+        padding: map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 10);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: auto;
+    }
+
+    .shift-left {
+        padding: map-get($spacers, 20) map-get($spacers, 20);
+        display: flex;
+        flex-direction: row;
+    }
+
+    .last-child {
+        padding: map-get($spacers, 0) map-get($spacers, 20);
+        display: flex;
+        flex-direction: row;
+    }
+
+    .shift-right {
+        padding: map-get($spacers, 20) map-get($spacers, 20);
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .p-max-width {
+        max-width: convert-unit(700px, "rem") !important;
+    }
+    .error-alerts {
+        margin: map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 0);
+    }
+}

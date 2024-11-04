@@ -1,0 +1,123 @@
+@import "shared";
+
+.mat-checkbox-layout {
+    display: block;
+}
+
+.mat-input-element {
+    line-height: 26px;
+}
+
+.mat-checkbox {
+    display: block;
+    ::ng-deep {
+        .mat-checkbox-inner-container {
+            height: convert-unit(20px, "rem");
+            width: convert-unit(20px, "rem");
+            margin-right: convert-unit(10px, "rem");
+            .mat-checkbox-frame {
+                border-radius: convert-unit(1px, "rem");
+                border-width: convert-unit(1px, "rem");
+            }
+        }
+        .mat-checkbox-label {
+            color: get("color.gray.900");
+            @include fontFace("primary.regular");
+            font-size: convert-unit(16px, "rem");
+            font-weight: normal;
+        }
+    }
+}
+
+:host {
+    ::ng-deep .mat-form-field {
+        .mat-form-field-flex {
+            .mat-form-field-outline-gap {
+                border-radius: 0;
+            }
+        }
+    }
+}
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    .mon-btn-secondary {
+        margin-right: convert-unit(20px, "rem");
+    }
+}
+.class-desc {
+    width: 600px;
+}
+.class-name {
+    width: 285px;
+}
+.pay-frequency-wrapper {
+    margin-top: convert-unit(15px, "rem");
+    display: flex;
+    height: convert-unit(75px, "rem");
+    .pay-frequency {
+        width: convert-unit(175px, "rem");
+    }
+    a {
+        margin: convert-unit(25px, "rem") 0 0 convert-unit(5px, "rem");
+    }
+}
+.edit-class-type-wrapper {
+    h4 {
+        margin-top: convert-unit(0px, "rem");
+    }
+    .mat-form-field.class-name,
+    .class-desc {
+        ::ng-deep .mat-form-field-infix {
+            padding: convert-unit(7px, "rem") 0 convert-unit(7px, "rem") 0;
+            .mat-input-element {
+                height: 25px;
+            }
+        }
+    }
+
+    .editclass-para {
+        margin: convert-unit(0px, "rem") 0 convert-unit(25px, "rem") 0;
+        font-size: convert-unit(16px, "rem");
+        color: get("color.black");
+    }
+    .mat-form-field.class-name,
+    .class-desc {
+        ::ng-deep .mat-form-field-infix {
+            padding: convert-unit(7px, "rem") 0 convert-unit(7px, "rem") 0;
+        }
+        .classtype-optional-text {
+            color: get("color.black");
+            @include fontFace("primary.regular");
+            font-size: 14px;
+            font-weight: normal;
+        }
+    }
+    .pay-frequency-notification {
+        color: get("color.gray.700");
+        @include fontFace("primary.regular");
+        font-size: convert-unit(12px, "rem");
+        font-weight: normal;
+        height: 14px;
+        letter-spacing: 0px;
+        margin-left: convert-unit(30px, "rem");
+    }
+}
+
+::ng-deep {
+    .ediclass-type-select-dropdown.mat-select-panel {
+        margin-top: convert-unit(27px, "rem") !important;
+        max-width: convert-unit(149px, "rem") !important;
+    }
+}
+
+.mat-checkbox {
+    &.cdk-focused.cdk-keyboard-focused {
+        ::ng-deep .mat-checkbox-inner-container {
+            .mat-checkbox-frame {
+                background-color: get("color.gray.800");
+                border: 1px solid get("color.gray.600");
+            }
+        }
+    }
+}

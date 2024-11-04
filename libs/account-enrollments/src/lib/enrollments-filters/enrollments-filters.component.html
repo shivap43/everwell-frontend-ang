@@ -1,0 +1,249 @@
+<div class="filter-wrapper-content">
+    <mat-label class="mat-label"
+        ><span>{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.filterTitle']}}</span></mat-label
+    >
+    <form [formGroup]="filterForm">
+        <div class="filter-sub-wrapper">
+            <mat-form-field
+                class="filter-selected"
+                *ngIf="showProducerFilter"
+                [ngClass]="{'filter-selected': producerFilterSelectedValue && producerFilterSelectedValue.length > 0, 'filter-applied': producerFilterSelectedValue && producerFilterSelectedValue.length }"
+            >
+                <label class="filter-label"
+                    ><span
+                        >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.filterProducerTitle']}}</span
+                    ></label
+                >
+                <mat-select
+                    #producerFilterDropdown
+                    multiple
+                    formControlName="producerFilter"
+                    disableOptionCentering="true"
+                    panelClass="list-grid-filter filter-renewal"
+                    (openedChange)="matSelectOpenHandler($event)"
+                    disableOptionCentering="true"
+                    (closed)="clickOutside(enrollmentFilterConstant.PRODUCT_FILTER)"
+                >
+                    <mat-select-trigger></mat-select-trigger>
+                    <div class="filter-options">
+                        <mat-option *ngFor="let item of producerFilterDropdownData" [value]="item"
+                            >{{item.name}}</mat-option
+                        >
+                    </div>
+                    <div class="mon-clear">
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                *ngIf="producerFilterSelectedValue && producerFilterSelectedValue.length"
+                                (click)="clearFilter(enrollmentFilterConstant.PRODUCT_FILTER)"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonClear']}}</a
+                            >
+                        </div>
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="applyFilter(enrollmentFilterConstant.PRODUCT_FILTER)"
+                                class="mon-apply"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonApply']}}</a
+                            >
+                        </div>
+                    </div>
+                </mat-select>
+                <label class="filter-label">{{ producerFilterDisplayText }}</label>
+            </mat-form-field>
+            <mat-form-field
+                class="filter-selected"
+                [ngClass]="{'filter-selected': enrollDateFilterSelectedValue && enrollDateFilterSelectedValue.length > 0, 'filter-applied': enrollDateFilterSelectedValue && enrollDateFilterSelectedValue.length }"
+            >
+                <label class="filter-label"
+                    ><span
+                        >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.filterEnrollDateTitle']}}
+                    </span></label
+                >
+                <mat-select
+                    #enrollDateFilterDropdown
+                    multiple
+                    formControlName="enrollDateFilter"
+                    disableOptionCentering="true"
+                    panelClass="list-grid-filter filter-enroll-date"
+                    (openedChange)="matSelectOpenHandler($event)"
+                    disableOptionCentering="true"
+                    (closed)="clickOutside(enrollmentFilterConstant.ENROLL_DATE_FILTER)"
+                >
+                    <mat-select-trigger>
+                        {{ enrollDateFilterDisplayText }}
+                    </mat-select-trigger>
+                    <div class="filter-options">
+                        <mat-option class="no-mat-pseudo-checkbox" [value]="enrollDateFilterSelectedValue"></mat-option>
+                        <mat-radio-group (change)="enrollDateFilterValueChange($event.value)">
+                            <mat-radio-button
+                                [checked]="enrollDateFilterSelectedValue === enrollDateFilterDropdownData[0].name"
+                                [value]="enrollDateFilterDropdownData[0].name"
+                                >{{enrollDateFilterDropdownData[0].displayText}}</mat-radio-button
+                            >
+                            <mat-form-field
+                                class="mon-date-field"
+                                *ngIf="enrollDateFilterSelectedValue === enrollDateFilterDropdownData[0].name"
+                            >
+                                <input
+                                    formControlName="specificDate"
+                                    [matDatepicker]="specificDatePicker"
+                                    matInput
+                                    [max]="today"
+                                    name="specificDatePicker"
+                                    (keyup)="transform($event)"
+                                    [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.filterEnrollment.specificDate']"
+                                />
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="specificDatePicker"
+                                    (click)="specificDatePicker.open()"
+                                >
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #specificDatePicker></mat-datepicker>
+                                <mat-hint
+                                    >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.dateFormatHint']}}</mat-hint
+                                >
+                            </mat-form-field>
+                            <mat-radio-button
+                                [checked]="enrollDateFilterSelectedValue === enrollDateFilterDropdownData[1].name"
+                                [value]="enrollDateFilterDropdownData[1].name"
+                                >{{enrollDateFilterDropdownData[1].displayText}}</mat-radio-button
+                            >
+                            <div
+                                *ngIf="enrollDateFilterSelectedValue === enrollDateFilterDropdownData[1].name"
+                                class="mon-date-field"
+                            >
+                                <empowered-date-range-picker
+                                    [startDateControl]="filterForm.get('startDate')"
+                                    [endDateControl]="filterForm.get('endDate')"
+                                    [maxDate]="today"
+                                ></empowered-date-range-picker>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                    <div class="mon-clear">
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                *ngIf="enrollDateFilterSelectedValue && enrollDateFilterSelectedValue.length"
+                                (click)="clearFilter(enrollmentFilterConstant.ENROLL_DATE_FILTER)"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonClear']}}</a
+                            >
+                        </div>
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="applyFilter(enrollmentFilterConstant.ENROLL_DATE_FILTER)"
+                                class="mon-apply"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonApply']}}</a
+                            >
+                        </div>
+                    </div>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field
+                class="filter-selected"
+                *ngIf="showSplitAppliedFilter"
+                [ngClass]="{'filter-selected': splitAppliedFilterSelectedValue && splitAppliedFilterSelectedValue.length > 0, 'filter-applied': splitAppliedFilterSelectedValue && splitAppliedFilterSelectedValue.length}"
+            >
+                <label class="filter-label"
+                    ><span
+                        >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.filterSplitAppliedTitle']}}</span
+                    ></label
+                >
+                <mat-select
+                    #splitAppliedFilterDropdown
+                    multiple
+                    formControlName="splitAppliedFilter"
+                    disableOptionCentering="true"
+                    panelClass="list-grid-filter filter-split-applied"
+                    (openedChange)="matSelectOpenHandler($event)"
+                    disableOptionCentering="true"
+                    (closed)="clickOutside(enrollmentFilterConstant.SPLIT_APPLIED_FILTER)"
+                >
+                    <mat-select-trigger>
+                        {{ splitAppliedFilterDisplayText }}
+                    </mat-select-trigger>
+                    <div class="filter-options">
+                        <mat-option *ngFor="let item of splitAppliedFilterDropdownData" [value]="item"
+                            >{{item.name}}</mat-option
+                        >
+                    </div>
+                    <div class="mon-clear">
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                *ngIf="splitAppliedFilterSelectedValue && splitAppliedFilterSelectedValue.length"
+                                (click)="clearFilter(enrollmentFilterConstant.SPLIT_APPLIED_FILTER)"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonClear']}}</a
+                            >
+                        </div>
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="applyFilter(enrollmentFilterConstant.SPLIT_APPLIED_FILTER)"
+                                class="mon-apply"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonApply']}}</a
+                            >
+                        </div>
+                    </div>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field
+                *ngIf="type === businessEnrollmentType.SENT"
+                [ngClass]="{'filter-selected': sendDateFilterSelectedValue && sendDateFilterSelectedValue.length > 0, 'filter-applied': sendDateFilterSelectedValue && sendDateFilterSelectedValue.length}"
+            >
+                <label class="filter-label"
+                    ><span
+                        >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.filterSendDateTitle']}}</span
+                    ></label
+                >
+                <mat-select
+                    multiple
+                    #sendDateFilterDropdown
+                    formControlName="sendDateFilter"
+                    disableOptionCentering="true"
+                    panelClass="list-grid-filter filter-send-date"
+                    (openedChange)="matSelectOpenHandler($event)"
+                    disableOptionCentering="true"
+                    (closed)="clickOutside(enrollmentFilterConstant.SEND_DATE_FILTER)"
+                >
+                    <mat-select-trigger></mat-select-trigger>
+                    <div class="filter-options">
+                        <mat-option class="no-mat-pseudo-checkbox" [value]="sendDateFilterSelectedValue"></mat-option>
+                        <mat-radio-group (change)="sendDateFilterValueChange($event.value)">
+                            <mat-radio-button
+                                *ngFor="let item of sendDateFilterDropdownData"
+                                [checked]="item.name === sendDateFilterSelectedValue"
+                                [value]="item.name"
+                                >{{item.displayText}}</mat-radio-button
+                            >
+                        </mat-radio-group>
+                    </div>
+                    <div class="mon-clear">
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                *ngIf="sendDateFilterSelectedValue && sendDateFilterSelectedValue.length"
+                                (click)="clearFilter(enrollmentFilterConstant.SEND_DATE_FILTER)"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonClear']}}</a
+                            >
+                        </div>
+                        <div>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="applyFilter(enrollmentFilterConstant.SEND_DATE_FILTER)"
+                                class="mon-apply"
+                                >{{languageStrings['primary.portal.accountEnrollments.filterEnrollment.buttonApply']}}</a
+                            >
+                        </div>
+                    </div>
+                </mat-select>
+                <label class="filter-label">{{ sendDateFilterDisplayText }}</label>
+            </mat-form-field>
+        </div>
+    </form>
+</div>

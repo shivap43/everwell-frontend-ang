@@ -1,0 +1,146 @@
+<div class="pended-account">
+    <empowered-pbr-sub-header
+        [showCompanyCodeSelect]="dataSource?.data?.length > 0"
+        (companyCodeSelectionChange)="onCompanyCodeSelectionChange($event)"
+    >
+        <h2>{{headerTitle + " "}}<span class="application-count">({{dataSource?.data?.length }})</span></h2>
+    </empowered-pbr-sub-header>
+    <div class="table-mask-wrapper" [hidden]="dataSource?.data?.length === 0">
+        <div class="results-grid table-mask-wrapper">
+            <table mat-table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+                <!-- Transmittal Number Column -->
+                <ng-container matColumnDef="accountNumber">
+                    <th *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.account"]}}</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'accountNumber'}">
+                        <span>
+                            <a href="javascript:void(0)" (click)="onAccountNumberClick(element)"
+                                >{{ element.accountNumber }}</a
+                            >
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="accountName">
+                    <th *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.accountName"]}}</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'accountName'}">
+                        <span>
+                            {{ element.accountName }}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="accountStatus">
+                    <th *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.accountStatus"]}}</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'accountStatus'}">
+                        <span>
+                            {{ element.accountStatus }}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="billingMode">
+                    <th *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.billMode"]}}</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'billingMode'}">
+                        <span>
+                            {{ element.billingMode }}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="phoneNumber">
+                    <th class="hidden-max-xl" *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.phone"]}}</span>
+                    </th>
+                    <td
+                        class="hidden-max-xl"
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'phoneNumber'}"
+                    >
+                        <span>
+                            {{ element.phoneNumber | phone: country }}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="state">
+                    <th class="hidden-max-xl" *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.state"]}}</span>
+                    </th>
+                    <td
+                        class="hidden-max-xl"
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'state'}"
+                    >
+                        <span>
+                            {{ element.state }}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="annualPremiumPended">
+                    <th *matHeaderCellDef mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.accountApps.apPended"]}}</span>
+                    </th>
+                    <td
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'annualPremiumPended'}"
+                        class="text-right"
+                    >
+                        <span>
+                            {{ element.annualPremiumPended | currency }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+        <div
+            class="min-range-label"
+            [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1 || dataSource?.filteredData?.length === 0"
+        >
+            <span>
+                {{ "primary.portal.commission.producer.showingItems" | replaceTag: { "##length##":
+                dataSource?.data?.length } }}
+            </span>
+        </div>
+        <div
+            class="paginator-wrapper"
+            [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() === 1 || dataSource?.filteredData?.length === 0"
+            [ngClass]="{'range-actions-hide': dataSource?.paginator?.getNumberOfPages() === 1}"
+        >
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                {{languageStrings["primary.portal.common.page"]}}
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ dataSource.paginator.getNumberOfPages() }}"
+                    [attr.aria-label]="languageStrings['primary.portal.common.page']"
+                />
+                <span
+                    >{{ languageStrings["primary.portal.reportList.paginator.of"] + " " +
+                    dataSource?.paginator?.getNumberOfPages() }}</span
+                >
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="no-results" *ngIf="dataSource?.filteredData?.length === 0 && dataSource?.data?.length !== 0">
+        {{languageStrings["primary.portal.pendedBusiness.allPendedApps.noResults"].replace("#companyCode",
+        selectedCompanyCode)}}
+    </div>
+    <div class="no-results" *ngIf="dataSource?.data?.length === 0">
+        {{languageStrings["primary.portal.pendedBusiness.zeroState"]}}
+    </div>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

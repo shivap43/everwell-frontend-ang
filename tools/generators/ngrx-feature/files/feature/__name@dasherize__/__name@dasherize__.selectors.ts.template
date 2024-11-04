@@ -1,0 +1,27 @@
+import { createFeatureSelector, createSelector, MemoizedSelector } from "@ngrx/store";
+import { State, <%= camelize(name) %>Adapter } from "./<%= dasherize(name) %>.state";
+import { <%= underscore(name).toUpperCase() %>_FEATURE_KEY } from "./<%= dasherize(name) %>.reducer"
+
+// Lookup the '<%= classify(name) %>' feature state managed by NgRx
+export const get<%= classify(name) %>State = createFeatureSelector<State>(<%= underscore(name).toUpperCase() %>_FEATURE_KEY);
+
+const { selectAll, selectEntities } = <%= camelize(name) %>Adapter.getSelectors();
+
+export const get<%= classify(name) %>Loaded = createSelector(get<%= classify(name) %>State, (state: State) => state.loaded);
+
+export const get<%= classify(name) %>Error = createSelector(get<%= classify(name) %>State, (state: State) => state.error);
+
+export const getAll<%= classify(name) %> = createSelector(get<%= classify(name) %>State, (state: State) => selectAll(state));
+
+export const get<%= classify(name) %>Entities = createSelector(get<%= classify(name) %>State, (state: State) => selectEntities(state));
+
+export const getSelectedId = createSelector(get<%= classify(name) %>State, (state: State) => state.selectedId);
+
+export const getSelected = createSelector(get<%= classify(name) %>Entities, getSelectedId, (entities, selectedId) =>
+    selectedId ? entities[selectedId] : undefined
+);
+
+export const select<%= classify(name) %>Error: MemoizedSelector<object,any> = createSelector(
+    get<%= classify(name) %>State,
+    get<%= classify(name) %>Error
+);

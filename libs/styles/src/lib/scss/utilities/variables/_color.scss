@@ -1,0 +1,220 @@
+@import "utilities/helpers/deep-map-merge";
+
+// ---------------------------------------------------------
+// COLOR MAP
+//
+// Creates an deep map of the project's color palette.
+// At build, this map will automatically be merged with all o
+// SEE: https://zeroheight.com/0ydh214/p/5050d1
+//
+// Example of use:
+// background-color: get("color.info.danger.500")
+// ---------------------------------------------------------
+
+// ---------------------------------------------------------
+// Color Defaults
+//
+// Here we set a few base variables that can be altered with 'lighten()' or 'darken()'
+// These should only be overridden with theme variables
+// ---------------------------------------------------------
+$mon--primary-base: #0c6cd7 !default;
+$mon--accent-base: #00abb9 !default;
+$mon--neutral-base: #adadad !default;
+$mon--warning-base: #ffc107 !default;
+$mon--danger-base: #c54843 !default;
+$black: #000;
+$white: #fff;
+
+$mon--primary-palette: (
+    "50": lighten($mon--primary-base, 50),
+    "100": lighten($mon--primary-base, 40),
+    "200": lighten($mon--primary-base, 30),
+    "300": lighten($mon--primary-base, 20),
+    "400": lighten($mon--primary-base, 10),
+    "500": $mon--primary-base,
+    "600": darken($mon--primary-base, 10),
+    "700": darken($mon--primary-base, 20),
+    "800": darken($mon--primary-base, 30),
+    "contrast": (
+        "50": $black,
+        "100": $black,
+        "200": $black,
+        "300": $black,
+        "400": $black,
+        "500": $black,
+        "600": $white,
+        "700": $white,
+        "800": $white,
+    ),
+);
+
+$mon--accent-palette: (
+    "500": $mon--accent-base,
+    "contrast": (
+        "500": $white,
+    ),
+);
+
+$mon--warning-palette: (
+    "200": lighten($mon--warning-base, 30),
+);
+
+$mon--danger-palette: (
+    "100": lighten($mon--danger-base, 40),
+    "300": lighten($mon--danger-base, 30),
+    "500": $mon--danger-base,
+);
+
+$mon--neutral-palette: (
+    "100": lighten($mon--neutral-base, 29.5),
+    "200": lighten($mon--neutral-base, 27),
+    "300": lighten($mon--neutral-base, 20.7),
+    "400": lighten($mon--neutral-base, 9.7),
+    "500": $mon--neutral-base,
+    "600": darken($mon--neutral-base, 24.7),
+    "700": darken($mon--neutral-base, 32),
+    "800": darken($mon--neutral-base, 44),
+    "900": darken($mon--neutral-base, 55),
+    "1000": darken($mon--neutral-base, 60.7),
+    "contrast": (
+        "100": $black,
+        "200": $black,
+        "300": $black,
+        "400": $black,
+        "500": $black,
+        "600": $white,
+        "700": $white,
+        "800": $white,
+        "900": $white,
+        "1000": $white,
+    ),
+);
+
+$mon-config: deep-map-merge(
+    (
+        "color": (
+            "montoya-primary": #00aab9,
+            "primary": map-merge($mon--primary-palette, ()),
+            "accent": map-merge($mon--accent-palette, ()),
+            "info": (
+                "danger": map-merge($mon--danger-palette, ()),
+                "warn": #f3b946,
+                "warning": map-merge($mon--warning-palette, ()),
+                "success": #3d862f,
+            ),
+            "product": (
+                "crimson": #ff3333,
+                "teal": #05536b,
+                "darkorchid": #ab4a9c,
+                "black": #000,
+                "yellow": #ffc107,
+                "sandybrown": #ffbf60,
+                "goldenglow": #f4eca9,
+                "purple": #6f42c1,
+            ),
+            "white": #fff,
+            "black": #000,
+            "purple": #6f42c1,
+            "pink": #e83e8c,
+            "lightYellow": #fef7e9,
+            "yellow": #ffc107,
+            "greenishBlue": #106d88,
+            "darkorchid": #ab4a9c,
+            "teal": #05536b,
+            "sandybrown": #ffbf60,
+            "silver": #767676,
+            "divider": #979797,
+            "gray": map-merge($mon--neutral-palette, ()),
+            "transparent": transparent,
+            "paleYellow": #fffceb,
+        ),
+    ),
+    $mon-config,
+    true
+);
+
+//
+// Color system
+//
+
+$blue: #007bff !default;
+$indigo: #6610f2 !default;
+$purple: #6f42c1 !default;
+$pink: #e83e8c !default;
+$red: #dc3545 !default;
+$orange: #fd7e14 !default;
+$yellow: #ffc107 !default;
+$green: #28a745 !default;
+$teal: #20c997 !default;
+$cyan: #17a2b8 !default;
+$silver: #767676;
+
+$colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$colors: map-merge(
+    (
+        "blue": $blue,
+        "indigo": $indigo,
+        "purple": $purple,
+        "pink": $pink,
+        "red": $red,
+        "orange": $orange,
+        "yellow": $yellow,
+        "green": $green,
+        "teal": $teal,
+        "cyan": $cyan,
+        "white": get("color.white"),
+        "gray": get("color.gray.600"),
+        "gray-dark": get("color.gray.800"),
+    ),
+    $colors
+);
+
+$primary: $blue !default;
+$secondary: get("color.gray.600") !default;
+$success: $green !default;
+$info: $cyan !default;
+$warning: $yellow !default;
+$danger: $red !default;
+$light: get("color.gray.100") !default;
+$dark: get("color.gray.800") !default;
+
+$theme-colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors: map-merge(
+    (
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "info": $info,
+        "warning": $warning,
+        "danger": $danger,
+        "light": $light,
+        "dark": $dark,
+    ),
+    $theme-colors
+);
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg: get("color.white") !default;
+$body-color: get("color.gray.900") !default;
+
+// Links
+//
+// Style anchor elements.
+
+$link-color: get("color.primary.500") !default;
+$link-decoration: none !default;
+$link-hover-color: darken($link-color, 15%) !default;
+$link-hover-decoration: underline !default;
+$dark-border: #3d3d3d;
+$smokywhite: #f2f2f2;
+$light-gray-border: #cacaca;
+$accordion-expanded: #adadad;
+$disabled-btn-border: #c6c6c6;
+$disabled-btn-background: #e2e2e2;
+$dark-gray: #666666;
+$disabled-arrow: #5b5b5b;

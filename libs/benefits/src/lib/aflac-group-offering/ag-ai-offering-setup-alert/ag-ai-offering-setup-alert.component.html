@@ -1,0 +1,29 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header>
+        {{languageStringsArray['primary.portal.aflacGroup.offering.offeringSetupComplete']}}
+    </empowered-modal-header>
+    <div>
+        <div>
+            {{languageStringsArray["primary.portal.aflacGroup.offering.approvalText"]}}
+        </div>
+    </div>
+
+    <empowered-modal-footer>
+        <button
+            mat-flat-button
+            class="mon-btn-secondary"
+            (click)="onSubmitOffering()"
+            [attr.aria-label]="languageStringsArray['primary.portal.aflacGroup.offering.setupSubmit']"
+        >
+            {{languageStringsArray["primary.portal.aflacGroup.offering.setupSubmit"]}}
+        </button>
+        <button
+            mat-flat-button
+            class="mon-btn-primary"
+            (click)="onNavigateToIBO()"
+            [attr.aria-label]="languageStringsArray['primary.portal.aflacGroup.offering.addNonAgBtn']"
+        >
+            {{languageStringsArray["primary.portal.aflacGroup.offering.addNonAgBtn"]}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

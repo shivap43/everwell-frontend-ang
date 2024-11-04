@@ -1,0 +1,18 @@
+import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
+import { <%= classify(name) %>Entity } from "./<%= dasherize(name) %>.model";
+
+import { ApiError } from "@empowered/shared";
+
+export const <%= camelize(name) %>Adapter: EntityAdapter<<%= classify(name) %>Entity> = createEntityAdapter();
+
+// By extending EntityState, State will include properties 'entities' and 'ids'
+export interface State extends EntityState<<%= classify(name) %>Entity> {
+    selectedId?: string | number; // which <%= classify(name) %> record has been selected
+    loaded: boolean; // has the <%= classify(name) %> list been loaded
+    error?: ApiError | null; // last known error (if any)
+}
+
+export const initialState: State = <%= camelize(name) %>Adapter.getInitialState({
+    // set initial required properties
+    loaded: false,
+});

@@ -1,0 +1,18 @@
+<div class="toast-body" [ngClass]="{'no-action-btn': !data.action}">
+    <div class="toast-body-message"><span> {{data.message}} </span></div>
+    <ng-container>
+        <a
+            href="javascript:void(0)"
+            (click)="actionFired()"
+            class="mon-btn-link toast-body-action-button"
+            tabindex="-1"
+            *ngIf="data.action"
+        >
+            <span>{{data.action.text}}</span>
+            <span class="cdk-visually-hidden" language="primary.portal.common.toastActionKeyboardCombo"></span>
+        </a>
+        <button mat-icon-button (click)="closeToast()" class="toast-body-close-button" tabindex="-1" *ngIf="!data.pending">
+            <mon-icon class="toast-body-close-button-icon" iconSize="10" iconName="close" aria-hidden="true"></mon-icon>
+        </button>
+    </ng-container>
+</div>

@@ -1,0 +1,18 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="false">
+    <empowered-modal-header>
+        <span>{{languageStrings["primary.portal.applicationFlow.policyReinstated"]}}</span>
+    </empowered-modal-header>
+    <p>
+        {{this.data.content}}
+    </p>
+    <p *ngIf="this.data.subContent">
+        {{this.data.subContent}}
+    </p>
+    <empowered-modal-footer>
+        <div>
+            <button class="mon-btn-primary popup-btn-update" mat-flat-button (click)="buttonClick()">
+                {{this.buttonTitle}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+</empowered-modal>

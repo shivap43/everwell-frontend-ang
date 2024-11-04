@@ -1,0 +1,95 @@
+@import "shared";
+:host {
+    display: flex;
+    flex-direction: column;
+}
+.modal-header {
+    h2 {
+        margin: 0px;
+    }
+}
+.content-wrapper {
+    flex-grow: 1;
+    height: calc(100vh - 280px) !important;
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: convert-unit(30px, "rem");
+        color: get("color.black");
+    }
+    .field-wrapper {
+        margin-right: convert-unit(15px, "rem");
+        &.coverage-date {
+            width: convert-unit(200px, "rem");
+        }
+        &.reason-notes-width {
+            width: convert-unit(260px, "rem");
+            @include media-min("l") {
+                width: convert-unit(300px, "rem");
+            }
+        }
+    }
+    .confirmation-wrapper {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+}
+.product-dates {
+    margin-top: convert-unit(20px, "rem");
+    width: 500px;
+    border-collapse: collapse;
+    .header {
+        color: get("color.gray.600");
+        border-bottom: 1px solid get("color.gray.400");
+        div:last-child {
+            padding: convert-unit(13px, "rem") convert-unit(10px, "rem");
+        }
+        th:first-child {
+            width: 60%;
+        }
+    }
+    > div {
+        display: flex;
+        border-bottom: 1px solid get("color.gray.400");
+        > div:first-child {
+            flex: 1;
+            padding: convert-unit(13px, "rem") convert-unit(10px, "rem");
+        }
+        > div:last-child {
+            flex: 2;
+            padding: convert-unit(5px, "rem") convert-unit(10px, "rem");
+            .mat-form-field {
+                margin: 0px;
+            }
+        }
+    }
+    thead {
+        text-align: left;
+        th {
+            padding: convert-unit(10px, "rem");
+            font-size: convert-unit(14px, "rem");
+            border-bottom: 2px solid get("color.black");
+        }
+    }
+    tbody {
+        td {
+            padding: convert-unit(10px, "rem");
+            border-bottom: 1px solid get("color.black");
+            .mat-form-field {
+                margin-bottom: convert-unit(0px, "rem");
+            }
+        }
+    }
+}
+.dialog-footer {
+    .mon-btn-secondary {
+        margin-right: convert-unit(20px, "rem");
+    }
+}
+::ng-deep .mat-select-panel {
+    min-width: calc(100% + 20px) !important;
+    margin-left: convert-unit(6px, "rem") !important;
+}
+ul {
+    padding-left: convert-unit(70px, "rem");
+    overflow: hidden;
+}

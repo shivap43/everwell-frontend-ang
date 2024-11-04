@@ -1,0 +1,63 @@
+@import "shared";
+
+:host {
+    ::ng-deep .mat-tab-group {
+        .mat-tab-label-container {
+            .mat-tab-label {
+                text-transform: none;
+
+                .mat-tab-label-content {
+                    line-height: convert-unit(18px, "rem");
+                }
+            }
+        }
+    }
+
+    ::ng-deep .min-range-label {
+        padding-bottom: convert-unit(10px, "rem");
+        font: convert-unit(14px, "rem");
+    }
+}
+
+.commission-wrapper {
+    .commission-header {
+        display: flex;
+        padding: map-get($spacers, 30);
+
+        h2 {
+            display: inline-flex;
+            color: get("color.gray.600");
+            font-size: 36px;
+            font-weight: normal;
+            margin: convert-unit(10px, "rem") 0;
+            @include fontFace("primary.light");
+        }
+
+        .book-icon {
+            ::ng-deep .mat-icon.mat-primary {
+                color: get("color.gray.600");
+
+                .cls-1 {
+                    fill: get("color.gray.600");
+                }
+            }
+        }
+    }
+
+    .content-area {
+        .mat-tab-group {
+            ::ng-deep .mat-tab-header {
+                margin: 0 convert-unit(30px, "rem");
+                display: block;
+
+                .mat-tab-label-container {
+                    .mat-tab-list {
+                        .mat-tab-labels {
+                            display: block;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

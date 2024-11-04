@@ -1,0 +1,12 @@
+<mat-label class="mat-label" [attr.aria-label]="label"> {{ label }} </mat-label>
+
+<mat-form-field>
+    <input
+        matInput
+        [formControl]="control"
+        (input)="onInput($event.target.value)"
+        [attr.aria-label]="languageStrings[languageKeys.eSignature]"
+        [disabled]="disabled"
+    />
+    <mat-error> <ng-content></ng-content></mat-error>
+</mat-form-field>

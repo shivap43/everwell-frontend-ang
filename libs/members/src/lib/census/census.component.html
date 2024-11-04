@@ -1,0 +1,147 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="!isloaded"></empowered-mon-spinner>
+<div *ngIf="isUploadCensusAccessible && this.permissionAvailability==='all'">
+    <div class="census-container">
+        <div class="census-main-container">
+            <h1>{{languageStrings["primary.portal.census.mainTitle"]}}</h1>
+            <p *ngIf="(hasPrivilege$ | async) && showAddEmployee" language="primary.portal.census.subTitle"></p>
+            <div class="census-btn">
+                <button
+                    mat-flat-button
+                    [matMenuTriggerFor]="newEmployee"
+                    color="primary"
+                    class="mon-btn-primary add-employees pull-down-sm"
+                    *ngIf="(hasPrivilege$ | async) && (!isTpiAccount || (showAddEmployee))"
+                >
+                    <span>{{languageStrings['primary.portal.members.membersList.addEmployees']}}</span>
+                    <mon-icon
+                        class="btn-pulldown-indicator"
+                        iconName="down"
+                        iconSize="10"
+                        aria-hidden="true"
+                        class="icon-right icon-white"
+                    ></mon-icon>
+                </button>
+                <mat-menu #newEmployee="matMenu" class="report-menu">
+                    <ng-container *ngIf="!isTpiAccount || (showUploadCensus && isTpiAccount)">
+                        <button
+                            mat-menu-item
+                            class="menu-item"
+                            (click)="uploadCensus()"
+                            [attr.aria-label]="languageStrings['primary.portal.census.uploadCensus']"
+                            *empoweredTpiRestrictedPermission
+                        >
+                            {{languageStrings["primary.portal.census.uploadCensus"]}}
+                        </button>
+                    </ng-container>
+                    <ng-container *ngIf="!isTpiAccount || (showCreateMember && isTpiAccount)">
+                        <button
+                            mat-menu-item
+                            class="menu-item"
+                            (click)="addEmployeeManually()"
+                            [attr.aria-label]="languageStrings['primary.portal.census.addEmployeeManually']"
+                            *empoweredTpiRestrictedPermission="{ requiredPermission: addEmployeeInHQAccountPermission }"
+                        >
+                            {{languageStrings["primary.portal.census.addEmployeeManually"]}}
+                        </button>
+                    </ng-container>
+                    <ng-container *configEnabled="'broker.census_upload.create_subscribers_from_existing_policies_service'">
+                        <button
+                            mat-menu-item
+                            class="menu-item"
+                            *ngIf="(importEmployeePermission$ | async) && (!isTpiAccount || (showImportAflac && isTpiAccount))"
+                            (click)="importFromAflac()"
+                        >
+                            {{importingFromAflac}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </div>
+        </div>
+
+        <div class="mon-estimate" *ngIf="hasPrivilege$ | async">
+            <div class="mon-estimate-container">
+                <p>
+                    <span language="primary.portal.census.eligibleEmployee"></span>
+                    <span *ngIf="displayEligibleEstimate">
+                        : <strong>{{eligibleEmployee}}</strong> |
+                        <a
+                            (click)="addEligibleEstimate()"
+                            class="mon-btn-link"
+                            [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                            >{{languageStrings["primary.portal.common.edit"]}}</a
+                        >
+                    </span>
+                </p>
+                <p *ngIf="this.portal==='PRODUCER'" class="estimate-section" language="primary.portal.census.estimateSection"></p>
+                <p *ngIf="this.portal==='ADMIN'" class="estimate-section" language="primary.portal.census.adminEstimateSection"></p>
+                <span *ngIf="!displayEligibleEstimate && isloaded">
+                    <button
+                        *ngIf="!displayEligibleEstimate && isloaded"
+                        (click)="addEligibleEstimate()"
+                        class="mon-btn-link"
+                        [attr.aria-label]="languageStrings['primary.portal.census.addEligibleEmployeeEstimate']"
+                        mat-button
+                    >
+                        {{languageStrings["primary.portal.census.addEligibleEmployeeEstimate"]}}
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="app-overlay-container"></div>
+</div>
+<div *ngIf="!isUploadCensusAccessible && this.permissionAvailability==='readAndUpdate'" class="census-main-container">
+    <h1>{{languageStrings["primary.portal.census.mainTitle"]}}</h1>
+    <div *ngIf="hasPrivilege$ | async">
+        <div *ngIf="displayEligibleEstimate">
+            <p><span language="primary.portal.census.estimateContainer"></span></p>
+            <p class="mon-my-30">
+                <span language="primary.portal.census.eligibleEmployee"></span>: <strong>{{eligibleEmployee}}</strong> |
+                <a lass="mon-btn-link" (click)="addEligibleEstimate()" [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                    >{{languageStrings["primary.portal.common.edit"]}}</a
+                >
+            </p>
+        </div>
+        <p *ngIf="!displayEligibleEstimate && isloaded">
+            <span language="primary.portal.census.addEligibleSection"></span>
+        </p>
+        <div class="census-btn">
+            <button
+                *ngIf="!displayEligibleEstimate && isloaded"
+                (click)="addEligibleEstimate()"
+                [attr.aria-label]="languageStrings['primary.portal.census.addEligibleEmployeeEstimate']"
+                class="mon-btn-primary"
+                mat-button
+            >
+                {{languageStrings["primary.portal.census.addEligibleEmployeeEstimate"]}}
+            </button>
+        </div>
+    </div>
+</div>
+<div *ngIf="!isUploadCensusAccessible && this.permissionAvailability==='readOnly'" class="census-main-container">
+    <h1>{{languageStrings["primary.portal.census.mainTitle"]}}</h1>
+    <div>
+        <div *ngIf="displayEligibleEstimate">
+            <p><span language="primary.portal.census.censusContainer"></span></p>
+            <p class="mon-my-30">
+                <span language="primary.portal.census.eligibleEmployee"></span>:
+                <strong>{{eligibleEmployee}}</strong>
+            </p>
+        </div>
+        <h3 *ngIf="!displayEligibleEstimate && isloaded">{{languageStrings["primary.portal.census.noEmployeesAdded"]}}</h3>
+        <p *ngIf="!displayEligibleEstimate && isloaded">
+            <span language="primary.portal.census.censusSectionContact"> </span>
+            <span> {{this.primaryContact}}</span>
+        </p>
+    </div>
+</div>
+<div *ngIf="!isUploadCensusAccessible && this.permissionAvailability==='none'" class="census-main-container">
+    <h1>{{languageStrings["primary.portal.census.mainTitle"]}}</h1>
+    <div>
+        <h3>{{languageStrings["primary.portal.census.noEmployeesAdded"]}}</h3>
+        <p>
+            <span language="primary.portal.census.censusSectionContact"> </span>
+            <span> {{this.primaryContact}}</span>
+        </p>
+    </div>
+</div>

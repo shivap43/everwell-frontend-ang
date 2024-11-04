@@ -1,0 +1,36 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            data-test="eb-redirect-confirmation-modal__button--close-redirect-modal-from-header"
+        >
+            <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content>
+        <h1 mat-dialog-title language="primary.portal.gohealth.title"></h1>
+
+        <span *ngIf="carrierId === medicalCarrierId" language="primary.portal.gohealth.redirectDescriptionIfEverwell"></span>
+        <span *ngIf="carrierId === aflacPassCarrierId" language="primary.portal.gohealth.redirectDescriptionIfAflacPassEverwell"></span>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            mat-dialog-close
+            (click)="closePopup()"
+            data-test="eb-redirect-confirmation-modal__button--close-redirect-modal-from-footer"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            language="primary.portal.common.cancel"
+        ></a>
+        <button
+            mat-flat-button
+            class="mon-btn-primary"
+            (click)="redirectToExternalLink()"
+            language="primary.portal.common.continue"
+            data-test="eb-redirect-confirmation-modal__button--continue-to-external-link"
+        ></button>
+    </mat-dialog-actions>
+</div>

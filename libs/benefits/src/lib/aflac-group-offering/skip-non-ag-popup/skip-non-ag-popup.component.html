@@ -1,0 +1,22 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.skipNonAgSetup.title']}}
+    </empowered-modal-header>
+    <div *ngIf="errorMessage">
+        <mon-alert alertType="danger">
+            <span> {{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <p>
+        {{languageStrings['primary.portal.skipNonAgSetup.description']}}
+    </p>
+    <empowered-modal-footer>
+        <button class="mon-btn-secondary" mat-button [mat-dialog-close]="false">
+            {{languageStrings['primary.portal.common.goBack']}}
+        </button>
+        <button class="mon-btn-primary submit-offering" mat-button (click)="submitAGOffering()">
+            {{languageStrings['primary.portal.skipNonAgSetup.submitAgOffering']}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

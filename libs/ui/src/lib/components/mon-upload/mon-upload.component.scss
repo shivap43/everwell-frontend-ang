@@ -1,0 +1,116 @@
+@import "shared";
+
+.file-list-wrapper {
+    &:first-child .files-list {
+        border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+        margin-top: map-get($spacers, 10);
+    }
+
+    .files-list {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+
+        ::ng-deep {
+            .mon-icon {
+                margin: 0;
+
+                .mat-icon {
+                    vertical-align: baseline;
+
+                    .cls-1 {
+                        color: get("color.gray.600");
+                    }
+                }
+            }
+
+            .icon-black .mat-icon {
+                vertical-align: text-top;
+                margin-right: convert-unit(5px, "rem");
+            }
+
+            .icon-success .mat-icon {
+                margin-right: convert-unit(10px, "rem");
+                vertical-align: sub;
+            }
+
+            .icon-warning .mat-icon {
+                margin-right: convert-unit(10px, "rem");
+                vertical-align: sub;
+            }
+
+            .icon-gray .mat-icon {
+                margin-left: convert-unit(15px, "rem");
+            }
+
+            .icon-danger .mat-icon {
+                margin-right: convert-unit(10px, "rem");
+                vertical-align: sub;
+            }
+        }
+
+        .file-item {
+            padding: convert-unit(12px, "rem") 0;
+            display: flex;
+            justify-content: space-between;
+            line-height: 2;
+
+            .file-name-wrapper {
+                display: flex;
+                flex-shrink: 0;
+                margin-right: map-get($spacers, 10);
+                p {
+                    display: flex;
+                }
+            }
+
+            .file-status {
+                display: flex;
+                font-size: convert-unit(12px, "rem");
+                > span {
+                    display: flex;
+                }
+            }
+
+            .mat-progress-bar {
+                height: convert-unit(2px, "rem");
+
+                .mat-progress-bar-background {
+                    fill: get("color.primary.500");
+                }
+            }
+
+            .file-name {
+                color: get("color.black");
+            }
+        }
+    }
+}
+
+.mat-hint,
+.mat-error {
+    display: flex;
+    margin: convert-unit(5px, "rem") 0;
+}
+
+.file-selected {
+    border-color: get("color.primary.500");
+}
+
+.file-not-selected {
+    border-color: get("color.info.danger.500");
+}
+
+.single-file-upload {
+    display: none;
+}
+
+.file-dragged .mon-btn-upload {
+    background-color: get("color.gray.100");
+    border-style: solid;
+}
+
+.mat-hint-desc > .mat-hint {
+    border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding: convert-unit(12px, "rem") 0;
+    margin: convert-unit(15px, "rem") 0 convert-unit(20px, "rem");
+}

@@ -1,0 +1,62 @@
+<mat-nav-list>
+    <div class="back-btn" *ngIf="backToList">
+        <!-- TODO : Add generic anchor links -->
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="optionSelectedTrigger(backToListName)">
+            <mon-icon iconSize="12" iconName="left" class="icon-left"> </mon-icon>
+            <span>{{backToListName}}</span>
+        </a>
+    </div>
+    <mat-divider class="dotted-divider" [inset]="false" *ngIf="backToList"></mat-divider>
+    <mat-accordion>
+        <ng-container *ngFor="let navOption of navigationOptions">
+            <ng-container
+                *ngIf="(!navOption.menuIntem.isConfigEnabled$ || (navOption.menuIntem.isConfigEnabled$ | async)) && (!navOption.menuIntem.hasPermission$ || (navOption.menuIntem.hasPermission$ | async))"
+            >
+                <ng-container
+                    *ngIf="(!navOption.menuIntem.isVisible$ || (navOption.menuIntem.isVisible$ | async)) && navOption.hireDateClause"
+                >
+                    <mat-expansion-panel
+                        [hideToggle]="!navOption.subMenuItem.length"
+                        [expanded]="checkExpandedStatus(navOption)"
+                        #business="matExpansionPanel"
+                    >
+                        <mat-expansion-panel-header
+                            *ngIf="!navOption.subMenuItem.length"
+                            [ngStyle]="{'border-left-color': business.expanded?(brandingColor$|async):null}"
+                            (click)="business.expanded = true; optionSelectedTrigger(navOption.menuIntem.name); menuItemClicked()"
+                            (keyup.enter)="business.expanded = true; optionSelectedTrigger(navOption.menuIntem.name);menuItemClicked()"
+                            (keyup.Space)="business.expanded = true; optionSelectedTrigger(navOption.menuIntem.name);menuItemClicked()"
+                        >
+                            <mat-panel-title>
+                                <mon-icon [iconName]="navOption.menuIntem.iconName" class="icon icon-sidenav"></mon-icon>
+                                <span class="title">{{navOption.menuIntem.name}}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <mat-expansion-panel-header
+                            *ngIf="navOption.subMenuItem.length"
+                            [ngStyle]="{'border-left-color': business.expanded?(brandingColor$|async):''}"
+                        >
+                            <mat-panel-title>
+                                <mon-icon [iconName]="navOption.menuIntem.iconName" class="icon icon-sidenav"></mon-icon>
+                                <span class="title">{{navOption.menuIntem.name}}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <ng-container *ngFor="let subMenuItem of  navOption.subMenuItem">
+                            <ng-container *ngIf="(!subMenuItem.isVisible$ || (subMenuItem.isVisible$|async))">
+                                <a
+                                    *ngIf="(!subMenuItem.isConfigEnabled$ || (subMenuItem.isConfigEnabled$ | async)) && (!subMenuItem.hasPermission$ || (subMenuItem.hasPermission$ | async))"
+                                    href="javascript:void(0)"
+                                    class="sub-menu"
+                                    [ngClass]="{'router-link-active' : subMenuItem.routerLinkActive}"
+                                    mat-list-item
+                                    (click)="menuItemClicked(); optionSelectedTrigger(subMenuItem.name); activeRoute(subMenuItem.path)"
+                                    ><span>{{subMenuItem.name}}</span></a
+                                >
+                            </ng-container>
+                        </ng-container>
+                    </mat-expansion-panel></ng-container
+                >
+            </ng-container>
+        </ng-container>
+    </mat-accordion>
+</mat-nav-list>

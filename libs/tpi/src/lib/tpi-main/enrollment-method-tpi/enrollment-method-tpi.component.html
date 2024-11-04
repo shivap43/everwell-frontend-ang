@@ -1,0 +1,169 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading || enrollmentSpinner"></empowered-mon-spinner>
+<empowered-tpi-secondary-header> {{languageStrings['primary.portal.shoppingExperience.header']}} </empowered-tpi-secondary-header>
+<form [formGroup]="enrollmentForm" *ngIf="!showEnrollmentInfoPopup" class="tpi-content-wrapper" (ngSubmit)="onSubmit()">
+    <div class="tpi-content">
+        <mon-alert *ngIf="isDisable" alertType="danger">
+            <span>{{languageStrings['primary.portal.enrollmentMethod.notPermittedForEnrollment']}}</span>
+        </mon-alert>
+        <div class="flex-form-wrapper">
+            <div class="d-md-flex flex-wrap">
+                <div class="flex-item">
+                    <mat-label id="method"> {{languageStrings["primary.portal.members.dependent.contactInfo.method"]}} </mat-label>
+                    <mat-form-field class="enrollment-method">
+                        <mat-select
+                            aria-labelledby="method"
+                            formControlName="enrollmentMethod"
+                            matNativeControl
+                            required
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            disableOptionCentering="true"
+                            (selectionChange)="changeEnrollment($event.value)"
+                            panelClass="select-enrollment-method"
+                        >
+                            <mat-option *ngFor="let method of enrollMethods" [value]="method"> {{replaceUnderscore(method)}} </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span *ngIf="enrollmentForm.controls['enrollmentMethod'].hasError('required')"
+                                >{{languageStrings['primary.portal.common.selectionRequired']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div *ngIf="disabilityEnrollmentRestrictionInfo$ | async as disabilityEnrollmentRestrictionInfo" class="d-md-flex flex-wrap">
+                <mon-alert class="message-block" alertType="info">
+                    <span>
+                        <span language="primary.portal.callCenter.8x8.form.alert.cannotEnrollDisability"></span>
+                        <a href="mailto:{{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail }}">
+                            {{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail }}
+                        </a>
+                    </span>
+                </mon-alert>
+            </div>
+
+            <div class="d-md-flex flex-wrap">
+                <div *ngIf="!isCallCenterAgent && stateDisplay" class="flex-item">
+                    <mat-label> {{languageStrings["primary.portal.accounts.state"]}} </mat-label>
+                    <mat-form-field class="enrollment-state">
+                        <input
+                            type="text"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollmentMethod.number']"
+                            matInput
+                            #stateinput
+                            formControlName="state"
+                            [formControl]="filterState"
+                            [matAutocomplete]="auto"
+                            required
+                            (blur)="removeStateText()"
+                            (keyup)="removeCity()"
+                            (input)="disableAutoComplete()"
+                            autocomplete="off"
+                        />
+                        <mon-icon class="icon-gray" iconSize="10" iconName="down" matSuffix></mon-icon>
+                        <mat-autocomplete
+                            #auto="matAutocomplete"
+                            (optionSelected)="getStateOptionSelected($event.option.value)"
+                            autoActiveFirstOption
+                        >
+                            <mat-option *ngFor="let state of filteredStateOptions | async" [value]="state"> {{state}} </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint *ngIf="!headSet">{{languageStrings['primary.portal.selectEnrollment.hintStateEnrollment']}}</mat-hint>
+                        <mat-hint *ngIf="headSet">{{languageStrings['primary.portal.selectEnrollment.hintEnrollee']}}</mat-hint>
+                        <mat-error> {{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div *ngIf="!isCallCenterAgent && cityDisplay" class="flex-item">
+                    <mat-label> {{languageStrings["primary.portal.accounts.city"]}} </mat-label>
+                    <mat-form-field class="enrollment-city">
+                        <input
+                            required
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollmentMethod.number']"
+                            matInput
+                            #cityinput
+                            formControlName="city"
+                            [formControl]="filterCity"
+                            [matAutocomplete]="auto1"
+                            (blur)="removeCityText()"
+                            (input)="captureTypedCity()"
+                            autocomplete="off"
+                        />
+                        <mat-autocomplete
+                            #auto1="matAutocomplete"
+                            (optionSelected)="getCityOptionSelected($event.option.value)"
+                            autoActiveFirstOption
+                        >
+                            <mat-option *ngFor="let city of filteredCityOptions | async" [value]="city"> {{city}} </mat-option>
+                        </mat-autocomplete>
+
+                        <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div
+            class="d-flex infocont mon-mb-20"
+            *ngIf="enrollmentForm.controls['enrollmentMethod'].value === 'CALL_CENTER' && isCallCenterError"
+        >
+            <mon-alert class="message-block" alertType="danger">
+                <span>
+                    <span>{{userCallCenter.name}}</span
+                    ><span>
+                        {{languageStrings['primary.portal.enrollmentMethod.requireMinEmp'].replace("#minSubscriberCount",userCallCenter.minSubscriberCount)}}</span
+                    >
+                </span>
+            </mon-alert>
+        </div>
+        <mon-alert *ngIf="methodChangeNYacc && !isNYGroupProducerNotLicensedInNY">
+            <span> {{languageStrings['primary.portal.situsState.nyGroupMessage']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="methodChangenonNYacc">
+            <span> {{languageStrings['primary.portal.situsState.non-nyGroupMessage']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="isNYGroupProducerNotLicensedInNY" alertType="danger">
+            <span>{{languageStrings['primary.portal.enrollmentMethod.nyGroupProducerNotLicensedInNY']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="isUSGroupProducerLicensedOnlyInNY" alertType="danger">
+            <span> {{languageStrings['primary.portal.enrollmentMethod.usGroupProducerLicensedOnlyInNY']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="isProducerNotLicensedInEmployeeState && !methodChangenonNYacc">
+            <span> {{languageStrings['primary.portal.enrollmentMethod.producerNotLicensedInEmployeeState']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="isProducerNotLicensedInCustomerState">
+            <span> {{languageStrings['primary.portal.enrollmentMethod.producerNotLicensedInCustomerState']}} </span>
+        </mon-alert>
+        <mon-alert *ngIf="eaaResponse?.isMissingEAAError" alertType="danger">
+            <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.crossBorderRestriction']}}</span>
+        </mon-alert>
+        <mon-alert *ngIf="eaaResponse?.isMissingEAAWarning" alertType="warning">
+            <span>{{languageStrings['primary.portal.enrollmentMethod.missingEAAWarning']}}</span>
+        </mon-alert>
+        <mon-alert *ngIf="carrierAppointmentNotLicensed" alertType="danger">
+            <span> {{languageStrings['primary.portal.enrollmentMethod.carrierAppointment.licenseNotAvailableForState']}} </span>
+        </mon-alert>
+    </div>
+
+    <empowered-tpi-footer class="tpi-footer">
+        <div *ngIf="!tpiLnlMode">
+            <a
+                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-flat-button
+                (click)="onExit()"
+                >{{ languageStrings["primary.portal.brandingModalExit.buttonExit"] }}</a
+            >
+        </div>
+        <button
+            class="mon-btn-primary"
+            mat-flat-button
+            type="submit"
+            [disabled]="isDisable || isNYGroupProducerNotLicensedInNY || isUSGroupProducerLicensedOnlyInNY || (isInvalidCity && enrollmentForm.controls['enrollmentMethod'].value === faceToFaceApiValue) || carrierAppointmentNotLicensed"
+        >
+            {{ languageStrings["primary.portal.common.continue"] }}
+        </button>
+    </empowered-tpi-footer>
+</form>

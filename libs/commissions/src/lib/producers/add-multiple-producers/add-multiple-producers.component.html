@@ -1,0 +1,501 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="modal-header">
+    <button
+        mat-icon-button
+        (click)="closePopup()"
+        mat-dialog-close
+        [attr.aria-label]="languageStrings['primary.portal.common.close']"
+    >
+        <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+    </button>
+</div>
+<div class="quasi-modal multiple-prod-wrapper">
+    <div mat-dialog-content class="mon-p-0">
+        <div class="mon-px-50">
+            <h2
+                mat-dialog-title
+                *ngIf="!isDirect"
+                [attr.aria-label]="languageStrings['primary.portal.commission.producer.multiple.addProducer']"
+            >
+                {{languageStrings['primary.portal.commission.producer.multiple.addProducer']}}
+            </h2>
+            <h2
+                mat-dialog-title
+                *ngIf="isDirect"
+                language="primary.portal.direct.commission.producer.multiple.addProducer"
+                [attr.aria-label]="languageStrings['primary.portal.direct.commission.producer.multiple.addProducer']"
+            >
+                {{languageStrings['primary.portal.direct.commission.producer.multiple.addProducer']}}
+            </h2>
+        </div>
+    </div>
+    <div>
+        <mat-dialog-content class="scroll-content">
+            <div class="description">
+                <span *ngIf="!isDirect" language="primary.portal.commission.producer.multiple.notifyInfo"></span>
+                <span
+                    *ngIf="isDirect"
+                    language="primary.portal.direct.commission.producer.multiple.addProducer.subHeader"
+                ></span>
+                <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                    <span>{{errorMessage}}</span>
+                </mon-alert>
+            </div>
+            <mat-tab-group animationDuration="0ms" (selectedTabChange)="OnTabChange($event)">
+                <mat-tab [label]="languageStrings['primary.portal.commission.producer.multiple.tab.recent']">
+                    <div class="mon-tab-sub-wrapper multiple-desc-sub-wrapper">
+                        <span language="primary.portal.commission.producer.multiple.tab.recent.description"></span>
+                    </div>
+                </mat-tab>
+                <mat-tab
+                    [label]="languageStrings['primary.portal.commission.producer.multiple.tab.hierarchy']"
+                    *ngIf="showHeirarchyTab"
+                >
+                    <div class="mon-tab-sub-wrapper mon-px-0">
+                        <div class="search-filter-wraper my-hierarchy-wrapper mon-mt-30">
+                            <form [formGroup]="myhierarchyForm">
+                                <div class="search-wrapper">
+                                    <mat-label class="mat-label"
+                                        ><span language="primary.portal.commission.producer.multiple.search"></span
+                                    ></mat-label>
+                                    <div>
+                                        <mat-form-field>
+                                            <input
+                                                (keyup)="applySearchFilter($event)"
+                                                class="mon-input"
+                                                matInput
+                                                type="text"
+                                                formControlName="searchProducer"
+                                                autocomplete="off"
+                                                [attr.aria-label]="languageStrings['primary.portal.commission.producer.multiple.search']"
+                                            />
+                                            <mat-hint
+                                                language="primary.portal.commission.producer.multiple.filter.hint"
+                                            ></mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="filter-wrapper">
+                                    <mat-label class="mat-label"
+                                        ><span language="primary.portal.commission.producer.multiple.filter"></span
+                                    ></mat-label>
+                                    <div class="filter-sub-wrapper">
+                                        <mat-form-field class="carrier">
+                                            <label class="filter-label"
+                                                ><span
+                                                    language="primary.portal.commission.producer.multiple.filter.carrier"
+                                                ></span
+                                            ></label>
+                                            <mat-select
+                                                #carrierHierarchyFilterDropdown
+                                                multiple
+                                                formControlName="carrierFilter"
+                                                disableOptionCentering="true"
+                                                panelClass="list-grid-filter myhierarchy-carrier"
+                                                disableOptionCentering="true"
+                                                (closed)="hierarchyFilterClickOutside(filterType.CARRIER)"
+                                            >
+                                                <mat-select-trigger>
+                                                    : {{ getDisplayText(filterType.CARRIER, myhierarchyForm)}}
+                                                    <span
+                                                        *ngIf="myhierarchyForm.get(formField.CARRIER_FILTER)?.value?.length > 1 && myhierarchyForm.get(formField.CARRIER_FILTER)?.value?.length != carrierList.length"
+                                                        class="example-additional-selection"
+                                                    >
+                                                        (+{{myhierarchyForm.get(formField.CARRIER_FILTER)?.value?.length
+                                                        - 1}})
+                                                    </span>
+                                                </mat-select-trigger>
+                                                <div class="filter-options">
+                                                    <mat-checkbox
+                                                        class="mat-option"
+                                                        [disableRipple]="true"
+                                                        (change)="selectAll(filterType.CARRIER, $event, tabType.MY_HIERARCHY)"
+                                                    >
+                                                        <span
+                                                            language="primary.portal.commission.producer.multiple.all.carriers"
+                                                        ></span>
+                                                    </mat-checkbox>
+                                                    <mat-divider></mat-divider>
+                                                    <mat-option *ngFor="let item of carrierList" [value]="item.id"
+                                                        >{{item.name}}</mat-option
+                                                    >
+                                                </div>
+                                                <div class="mon-clear">
+                                                    <div>
+                                                        <a
+                                                            *ngIf="myhierarchyForm.get(formField.CARRIER_FILTER)?.value?.length > 0"
+                                                            (click)="hierarchyFilterReset(filterType.CARRIER)"
+                                                            href="javascript:void(0)"
+                                                        >
+                                                            {{languageStrings['primary.portal.common.clear']}}
+                                                        </a>
+                                                    </div>
+                                                    <div>
+                                                        <a
+                                                            (click)="hierarchyFilterApply(filterType.CARRIER)"
+                                                            href="javascript:void(0)"
+                                                            class="mon-apply"
+                                                        >
+                                                            {{languageStrings['primary.portal.common.apply']}}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <mat-form-field class="state">
+                                            <label class="filter-label"
+                                                ><span
+                                                    language="primary.portal.commission.producer.multiple.filter.state"
+                                                ></span
+                                            ></label>
+                                            <mat-select
+                                                #stateHierarchyFilterDropdown
+                                                multiple
+                                                formControlName="stateFilter"
+                                                disableOptionCentering="true"
+                                                panelClass="list-grid-filter myhierarchy-state"
+                                                (closed)="hierarchyFilterClickOutside(filterType.STATE)"
+                                            >
+                                                <mat-select-trigger>
+                                                    : {{ getDisplayText(filterType.STATE, myhierarchyForm)}}
+                                                    <span
+                                                        *ngIf="myhierarchyForm.get(formField.STATE_FILTER)?.value?.length > 1 && myhierarchyForm.get(formField.STATE_FILTER)?.value?.length != LicensedStateList.length"
+                                                        class="example-additional-selection"
+                                                    >
+                                                        (+{{myhierarchyForm.get(formField.STATE_FILTER)?.value?.length -
+                                                        1}})
+                                                    </span>
+                                                </mat-select-trigger>
+                                                <div class="filter-options">
+                                                    <mat-checkbox
+                                                        class="mat-option"
+                                                        [disableRipple]="true"
+                                                        (change)="selectAll(filterType.STATE, $event, tabType.MY_HIERARCHY)"
+                                                    >
+                                                        <span
+                                                            language="primary.portal.commission.producer.multiple.all.states"
+                                                        ></span>
+                                                    </mat-checkbox>
+                                                    <mat-divider></mat-divider>
+                                                    <mat-option
+                                                        *ngFor="let item of LicensedStateList"
+                                                        [value]="item.abbreviation"
+                                                        >{{item.name}}</mat-option
+                                                    >
+                                                </div>
+                                                <div class="mon-clear">
+                                                    <div>
+                                                        <a
+                                                            *ngIf="myhierarchyForm.get(formField.STATE_FILTER)?.value?.length > 0"
+                                                            (click)="hierarchyFilterReset(filterType.STATE)"
+                                                            href="javascript:void(0)"
+                                                        >
+                                                            {{languageStrings['primary.portal.common.clear']}}
+                                                        </a>
+                                                    </div>
+                                                    <div>
+                                                        <a
+                                                            (click)="hierarchyFilterApply(filterType.STATE)"
+                                                            href="javascript:void(0)"
+                                                            class="mon-apply"
+                                                        >
+                                                            {{languageStrings['primary.portal.common.apply']}}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab [label]="languageStrings['primary.portal.commission.producer.multiple.tab.all']">
+                    <div class="mon-tab-sub-wrapper">
+                        <div class="search-filter-wraper">
+                            <form [formGroup]="allProducerForm" (ngSubmit)="onFilterAllProducer()">
+                                <div class="filter-wrapper all-producer-tab-wrapper">
+                                    <div class="search">
+                                        <mat-label class="mat-label"
+                                            ><span
+                                                language="primary.portal.commission.producer.multiple.filter.name"
+                                            ></span
+                                        ></mat-label>
+                                        <mat-form-field class="mon-mr-10">
+                                            <input
+                                                matInput
+                                                formControlName="nameFilter"
+                                                autocomplete="off"
+                                                [attr.aria-label]="languageStrings['primary.portal.commission.producer.multiple.filter.name']"
+                                            />
+                                            <mat-error></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="carrier">
+                                        <mat-label class="mat-label"
+                                            ><span
+                                                language="primary.portal.commission.producer.multiple.filter.carrier"
+                                            ></span
+                                        ></mat-label>
+                                        <mat-form-field class="mon-mr-10">
+                                            <mat-select
+                                                #carrierAllProducerFilterDropdown
+                                                panelClass="list-grid-filter"
+                                                disableOptionCentering="true"
+                                                formControlName="carrierFilter"
+                                                multiple
+                                                placeholder="Select"
+                                            >
+                                                <mat-select-trigger
+                                                    >{{ getDisplayText(filterType.CARRIER, allProducerForm)}}
+                                                    <span
+                                                        *ngIf="allProducerForm.get(formField.CARRIER_FILTER)?.value?.length > 1 && allProducerForm.get(formField.CARRIER_FILTER)?.value?.length != carrierList.length"
+                                                        class="example-additional-selection"
+                                                    >
+                                                        (+{{allProducerForm.get(formField.CARRIER_FILTER)?.value?.length
+                                                        - 1}})
+                                                    </span>
+                                                </mat-select-trigger>
+                                                <div class="filter-options">
+                                                    <mat-checkbox
+                                                        class="mat-option"
+                                                        [disableRipple]="true"
+                                                        (change)="selectAll(filterType.CARRIER, $event, tabType.ALL_PRODUCERS)"
+                                                    >
+                                                        <span
+                                                            language="primary.portal.commission.producer.multiple.all.carriers"
+                                                        ></span>
+                                                    </mat-checkbox>
+                                                    <mat-divider></mat-divider>
+                                                    <mat-option *ngFor="let item of carrierList" [value]="item.id"
+                                                        >{{item.name}}</mat-option
+                                                    >
+                                                </div>
+                                            </mat-select>
+                                            <mat-error></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="state">
+                                        <mat-label class="mat-label"
+                                            ><span
+                                                language="primary.portal.commission.producer.multiple.filter.state"
+                                            ></span
+                                        ></mat-label>
+                                        <mat-form-field class="mon-mr-10">
+                                            <mat-select
+                                                #stateAllProducerFilterDropdown
+                                                disableOptionCentering="true"
+                                                formControlName="stateFilter"
+                                                multiple
+                                                placeholder="Select"
+                                                panelClass="list-grid-filter"
+                                            >
+                                                <mat-select-trigger
+                                                    >{{ getDisplayText(filterType.STATE, allProducerForm)}}
+                                                    <span
+                                                        *ngIf="allProducerForm.get(formField.STATE_FILTER)?.value?.length > 1 && allProducerForm.get(formField.STATE_FILTER)?.value?.length != LicensedStateList.length"
+                                                        class="example-additional-selection"
+                                                    >
+                                                        (+{{allProducerForm.get(formField.STATE_FILTER)?.value?.length -
+                                                        1}})
+                                                    </span>
+                                                </mat-select-trigger>
+                                                <div class="filter-options">
+                                                    <mat-checkbox
+                                                        class="mat-option"
+                                                        [disableRipple]="true"
+                                                        (change)="selectAll(filterType.STATE, $event, tabType.ALL_PRODUCERS)"
+                                                    >
+                                                        <span
+                                                            language="primary.portal.commission.producer.multiple.all.states"
+                                                        ></span>
+                                                    </mat-checkbox>
+                                                    <mat-divider></mat-divider>
+                                                    <mat-option
+                                                        *ngFor="let item of LicensedStateList"
+                                                        [value]="item.abbreviation"
+                                                        >{{item.name}}</mat-option
+                                                    >
+                                                </div>
+                                            </mat-select>
+                                            <mat-error></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="search-button">
+                                        <button
+                                            #submit
+                                            mat-flat-button
+                                            class="mon-btn-search mon-btn-primary mon-px-15"
+                                            color="primary"
+                                            type="submit"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                        >
+                                            <mon-icon
+                                                class="mon-icon-search mon-m-0"
+                                                iconSize="25"
+                                                iconName="search"
+                                            ></mon-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+            <div class="table-mask-wrapper">
+                <div class="mon-table-wraper">
+                    <table mat-table [dataSource]="dataSource">
+                        <ng-container matColumnDef="select">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <mat-checkbox
+                                    (change)="onAllElementSelection($event)"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                    [disabled]="!(dataSource?.data && dataSource?.data.length)"
+                                >
+                                </mat-checkbox>
+                                <span class="sr-only">
+                                    check box
+                                </span>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <div *ngIf="!element.associatedProducer">
+                                    <mat-checkbox
+                                        (click)="$event.stopPropagation()"
+                                        (change)="onSingleElementSelection($event,element)"
+                                        [checked]="selection.isSelected(element.id)"
+                                    >
+                                    </mat-checkbox>
+                                </div>
+                                <div *ngIf="element.associatedProducer">
+                                    <mat-checkbox checked="true" disabled="true"> </mat-checkbox>
+                                </div>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="name">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <span language="primary.portal.commission.producer.multiple.table.name"></span>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.name}}
+
+                                <button
+                                    *ngIf="element.carrierTooltip"
+                                    mat-icon-button
+                                    [richTooltip]="element.carrierTooltip"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageStrings['primary.portal.addSingleProducer.infoIcon']"
+                                >
+                                    <mon-icon
+                                        iconName="Filled-info"
+                                        class="infoicon icon-primary"
+                                        [iconSize]="18"
+                                    ></mon-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="states">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <span
+                                    language="primary.portal.commission.producer.multiple.table.licensedStates"
+                                ></span>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <span *ngIf="element.licensedStates.length > 0">
+                                    <span>{{ element.licensedStates.length }} </span>
+                                    <span
+                                        *ngIf="element.licensedStates.length === 1"
+                                        language="primary.portal.commission.producer.multiple.state"
+                                    ></span>
+                                    <span
+                                        *ngIf="element.licensedStates.length > 1"
+                                        language="primary.portal.commission.producer.multiple.states"
+                                    ></span>
+                                    <button
+                                        *ngIf="element.licensedStateTooltip"
+                                        mat-icon-button
+                                        [richTooltip]="element.licensedStateTooltip"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        [attr.aria-label]="languageStrings['primary.portal.addSingleProducer.infoIcon']"
+                                    >
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            class="infoicon icon-primary"
+                                            [iconSize]="18"
+                                        ></mon-icon>
+                                    </button>
+                                </span>
+                                <span *ngIf="element.licensedStates.length === 0">
+                                    <button
+                                        mat-icon-button
+                                        [attr.aria-label]="languageStrings['primary.portal.commission.producer.multiple.noState']"
+                                    >
+                                        <mon-icon
+                                            iconName="Filled-warning"
+                                            class="icon-warning"
+                                            [iconSize]="18"
+                                        ></mon-icon>
+                                    </button>
+                                    <span language="primary.portal.commission.producer.multiple.noState"></span>
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="npn">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <span language="primary.portal.commission.producer.multiple.table.npn"></span>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.npn}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="noResults">
+                            <th
+                                mat-header-cell
+                                *matHeaderCellDef
+                                [attr.colspan]="10"
+                                class="text-center result-not-found"
+                            >
+                                {{ getNoDataOnFilterErrorMessage()}}
+                            </th>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                        <tr *matRowDef="let row; columns: displayColumns" mat-row></tr>
+                        <tr
+                            mat-header-row
+                            *matHeaderRowDef="['noResults']"
+                            [hidden]="dataSource?.data?.length != 0"
+                        ></tr>
+                    </table>
+                </div>
+            </div>
+        </mat-dialog-content>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link mon-px-0"
+            mat-button
+            mat-dialog-close
+            (click)="closePopup()"
+            language="primary.portal.common.cancel"
+        >
+            {{languageStrings['primary.portal.common.cancel']}}
+        </a>
+        <button
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            mat-flat-button
+            type="submit"
+            (click)="addProdcuers()"
+            [disabled]="producersInvited"
+        >
+            {{
+            languageStrings["primary.portal.commission.producer.multiple.tab.addBtn"].replace("##NUMBEROFPRODUCERS##",this.selection.selected.length)
+            }}
+        </button>
+    </mat-dialog-actions>
+</div>

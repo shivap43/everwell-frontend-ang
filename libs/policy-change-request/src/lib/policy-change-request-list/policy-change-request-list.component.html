@@ -1,0 +1,484 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="!isLoading"></empowered-mon-spinner>
+<div [hidden]="totalPoliciesCount" class="policyChangeRequestwrapper">
+    <h1>{{languageStrings.policyChangeRequests}}</h1>
+    <p *ngIf="showZeroStateMessage">{{languageStrings.noPolicyChangeRequestMPP}}</p>
+    <p *ngIf="!showZeroStateMessage">{{languageStrings.noPolicyChangeRequestMAPMMP}}</p>
+    <button mat-button class="mon-btn-primary" (click)="navigateToPolicyChangeFlow()">{{languageStrings.requestAChange}}</button>
+</div>
+
+<!-- TODO - commented code will be removed once PCR list issue is fixed -->
+<div [hidden]="!totalPoliciesCount">
+    <!-- Outer Wrapper -->
+    <div class="member-list-wrapper">
+        <h1 role="heading">
+            <span>{{languageStrings.policyChangeRequests}}</span><span class="mon-ml-10 account-count">({{totalPoliciesCount}})</span>
+        </h1>
+        <div class="pcrsuccess">
+            <mon-alert alertType="success" *ngIf="successMessage"><span>{{successMessage}}</span></mon-alert>
+        </div>
+        <!-- Search Filter -->
+        <div class="search-filter-wraper flex-column" *ngIf="!memberId">
+            <div [formGroup]="form" class="w-100-percent d-flex flex-row justify-content-between align-items-center">
+                <div class="search-wrapper mon-pr-20">
+                    <mat-label class="mat-label" language="{{pcrLanguagePath}}.searchPolicy"></mat-label>
+                    <div (click)="searchInputEvent($event)" (empoweredClickOutside)="clickOutsideElement($event)">
+                        <mat-form-field>
+                            <input
+                                [attr.aria-label]="languageStrings.searchPolicies"
+                                type="text"
+                                class="mon-pt-5"
+                                matInput
+                                formControlName="searchInput"
+                                autocomplete="off"
+                                (keyup)="applySearchFilter($event)"
+                                (keydown.Tab)="onKey($event)"
+                            />
+                        </mat-form-field>
+                        <div *ngIf="searchTerm && searchTerm.length >= 3 && dropdownStatus" class="search-box-wrapper">
+                            <div class="search-box-sub-wrapper">
+                                <mat-action-list>
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label w-80">{{languageStrings.policyHolderName}}</mat-label>
+                                        <span class="field-value">
+                                            <a
+                                                href="javascript:void(0)"
+                                                value="name"
+                                                mat-flat-button
+                                                (click)="filterByIdName('policyHolderName')"
+                                                >{{searchTerm}}</a
+                                            >
+                                        </span>
+                                    </div>
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label field-id w-80" language="{{pcrLanguagePath}}.policyNumber"> </mat-label>
+                                        <span class="field-value">
+                                            <a href="javascript:void(0)" value="id" mat-flat-button (click)="filterByIdName('policyNumber')"
+                                                >{{searchTerm}}</a
+                                            >
+                                        </span>
+                                    </div>
+                                </mat-action-list>
+                            </div>
+                        </div>
+                        <mat-hint class="mon-hint-msg">{{languageStrings.searchHint}}</mat-hint>
+                    </div>
+                </div>
+                <div class="filter-wrapper">
+                    <mat-label class="mat-label mon-label">{{languageStrings.filters}}</mat-label>
+                    <div class="filter-sub-wrapper">
+                        <!-- Date Submitted -->
+                        <mat-form-field
+                            [ngClass]="{'filter-applied': isFilterApplied}"
+                            [attr.aria-label]="languageStrings.dateSubmitted"
+                            (click)="resetFilterOptions('dateSubmitted')"
+                        >
+                            <label>{{languageStrings.dateSubmitted}}</label>
+
+                            <mat-select
+                                #dateSubmittedFilterDropdown
+                                disableOptionCentering
+                                disableOptionCentering="true"
+                                panelClass="list-grid-filter filter-date-submitted"
+                                (openedChange)="matSelectOpenHandler($event)"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="filter-options">
+                                    <!-- Start and End Date -->
+                                    <mat-option></mat-option>
+                                    <div class="d-md-flex mon-mx-20">
+                                        <ng-container>
+                                            <div class="flex-item mon-mr-20">
+                                                <mat-label class="mat-label" for="start-date">
+                                                    <span>{{languageStringsArray['primary.portal.members.workLabel.startDate']}}</span>
+                                                </mat-label>
+                                                <mat-form-field class="mon-date-field">
+                                                    <input
+                                                        matInput
+                                                        id="start-date"
+                                                        [formControl]="startDate"
+                                                        [matDatepicker]="pickerStartDate"
+                                                        [max]="maxDate"
+                                                        [min]="minStartDate"
+                                                        #datePickerStartInput
+                                                        (keyup)="transform($event)"
+                                                        [attr.aria-label]="languageStringsArray['primary.portal.members.workLabel.startDate']"
+                                                    />
+                                                    <mat-hint
+                                                        >{{languageStringsArray['primary.portal.members.workLabel.dateFormat']}}</mat-hint
+                                                    >
+                                                    <mat-datepicker-toggle matSuffix [for]="pickerStartDate">
+                                                        <mon-icon
+                                                            matDatepickerToggleIcon
+                                                            iconName="calendar-date"
+                                                            (click)="pickerStartDate.open()"
+                                                        ></mon-icon>
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #pickerStartDate></mat-datepicker>
+                                                    <mat-error *ngIf="isDateInvalid"
+                                                        >{{validateStartDate('startDate', datePickerStartInput.value)}}</mat-error
+                                                    >
+                                                    <mat-error *ngIf="startDate.hasError('startDateError')"
+                                                        >{{languageStrings.startDateErrorMessage}}</mat-error
+                                                    >
+                                                </mat-form-field>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container>
+                                            <div class="flex-item">
+                                                <mat-label class="mat-label" for="end-date">
+                                                    <span>{{languageStringsArray['primary.portal.members.workLabel.endDate']}}</span>
+                                                </mat-label>
+                                                <mat-form-field class="mon-date-field">
+                                                    <input
+                                                        matInput
+                                                        id="end-date"
+                                                        [formControl]="endDate"
+                                                        [matDatepicker]="pickerEndDate"
+                                                        [max]="maxDate"
+                                                        [min]="minEndDate"
+                                                        #datePickerEndInput
+                                                        (keyup)="transform($event)"
+                                                        [attr.aria-label]="languageStringsArray['primary.portal.members.workLabel.endDate']"
+                                                    />
+                                                    <!-- adding align='none' to avoid duplicating mat-hints under a mat-form-field, however this 
+                                                    is be fixed in higher version on angular material -->
+                                                    <mat-hint [align]="'none'"
+                                                        >{{languageStringsArray['primary.portal.members.workLabel.dateFormat']}}</mat-hint
+                                                    >
+                                                    <mat-datepicker-toggle matSuffix [for]="pickerEndDate">
+                                                        <mon-icon
+                                                            matDatepickerToggleIcon
+                                                            iconName="calendar-date"
+                                                            (click)="pickerEndDate.open()"
+                                                        ></mon-icon>
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #pickerEndDate></mat-datepicker>
+                                                    <mat-error *ngIf="isDateInvalid"
+                                                        >{{validateEndDate('endDate', datePickerEndInput.value)}}</mat-error
+                                                    >
+                                                    <mat-error *ngIf="endDate.hasError('endDateError')"
+                                                        >{{languageStrings.endDateErrorMessage}}</mat-error
+                                                    >
+                                                </mat-form-field>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                    <!-- Start and End date -->
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="clearFilterList('dateSubmitted')"
+                                                >{{languageStrings.clear}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="submitFilterList('dateSubmitted')" class="mon-apply"
+                                                >{{languageStrings.apply}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label">{{displayDateSubmittedContent}}</label>
+                        </mat-form-field>
+                        <!-- Datesubmitted -->
+
+                        <!-- Status -->
+                        <ng-container *ngIf="!forMediumDevices">
+                            <mat-form-field
+                                [attr.aria-label]="languageStrings.status"
+                                *ngIf="statusList.length !== 0"
+                                (click)="resetFilterOptions('status')"
+                            >
+                                <label class="filter-label">{{languageStrings.status}}</label>
+
+                                <mat-select
+                                    #statusFilterDropdown
+                                    [formControl]="statuses"
+                                    multiple
+                                    disableOptionCentering
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-renewal"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-option *ngFor="let status of statusList" [value]="status"> {{status}} </mat-option>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a
+                                                    *ngIf="filterDataStatusList.length !== 0"
+                                                    href="javascript:void(0);"
+                                                    (click)="clearFilterList('status')"
+                                                    >{{languageStrings.clear}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a href="javascript:void(0);" (click)="submitFilterList('status')" class="mon-apply"
+                                                    >{{languageStrings.apply}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label">{{displayStatusContent}}</label>
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- statuss -->
+                        <!-- Account -->
+
+                        <mat-form-field
+                            [attr.aria-label]="languageStrings.account"
+                            (click)="resetFilterOptions('account')"
+                            *ngIf="showZeroStateMessage"
+                        >
+                            <label
+                                class="filter-label"
+                                [attr.aria-label]="languageStrings.account"
+                                language="{{pcrLanguagePath}}.account"
+                            ></label>
+
+                            <mat-select
+                                #accountFilterDropdown
+                                disableOptionCentering="true"
+                                multiple
+                                panelClass="list-grid-filter filter-account"
+                                (openedChange)="matSelectOpenHandler($event)"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="filter-options">
+                                    <div class="field-wrapper" [hidden]="accountList.length === 0">
+                                        <mat-label class="mat-label" language="{{pcrLanguagePath}}.account"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select
+                                                placeholder="Select"
+                                                disableOptionCentering="true"
+                                                [formControl]="accounts"
+                                                [attr.aria-label]="languageStrings.account"
+                                            >
+                                                <mat-option language="primary.portal.common.select" disabled></mat-option>
+                                                <mat-option *ngFor="let account of accountList" [value]="account"> {{account}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <ng-container *ngIf="accountList.length === 0">
+                                        <span language="{{pcrLanguagePath}}.noChangeRequestAccount"></span>
+                                    </ng-container>
+                                </div>
+
+                                <div class="mon-clear">
+                                    <div *ngIf="accountList.length !== 0">
+                                        <a *ngIf="filterDataAccountName" href="javascript:void(0)" (click)="clearFilterList('account')"
+                                            >{{languageStrings.clear}}</a
+                                        >
+                                    </div>
+                                    <div *ngIf="accountList.length !== 0">
+                                        <a href="javascript:void(0)" (click)="submitFilterList('account')" class="mon-apply"
+                                            >{{languageStrings.apply}}</a
+                                        >
+                                    </div>
+                                    <div *ngIf="accountList.length === 0">
+                                        <a
+                                            href="javascript:void(0)"
+                                            (click)="closeFilterList('account')"
+                                            class="mon-apply"
+                                            language="{{pcrLanguagePath}}.close"
+                                            [attr.aria-label]="languageStrings.close"
+                                            >{{languageStrings.close}}</a
+                                        >
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label">{{displayAccountContent}}</label>
+                        </mat-form-field>
+
+                        <!-- Account -->
+
+                        <!-- MORE Filter -->
+                        <button #moreFilterOrigin class="more-button" (click)="moreFilterView()" *ngIf="forMediumDevices">
+                            {{languageStrings.more}}
+                        </button>
+
+                        <!-- MORE Filter -->
+                    </div>
+                </div>
+                <button mat-button class="mon-btn-secondary requestchange" (click)="navigateToPolicyChangeFlow()">
+                    {{languageStrings.requestAChange}}
+                </button>
+                <button
+                    class="mon-btn-secondary btn-sm icon-only"
+                    [attr.aria-label]="languageStrings.downloadReport"
+                    [matMenuTriggerFor]="menu"
+                >
+                    <mon-icon [iconSize]="20" iconName="ellipsis" class="icon-primary"></mon-icon>
+                    <span class="sr-only">menu icon</span>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item mat-row target="_blank" class="download" (click)="downloadPolicyList()">
+                        {{languageStrings.downloadReport}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+        <button mat-button class="mon-btn-secondary" *ngIf="memberId" (click)="navigateToPolicyChangeFlow()">
+            {{languageStrings.requestAChange}}
+        </button>
+        <!-- Search Filter -->
+        <!-- Table - Policy change request -->
+        <div class="w-100-percent member-list-table-detail results-grid table-mask-wrapper" [ngClass]="{'grid-overlay' : filterOpen}">
+            <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
+                <!-- Header row  firstgroup -->
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[0].propertyName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        <span language="{{pcrLanguagePath}}.table.column.policyHolder"></span>
+                    </th>
+
+                    <td
+                        mat-cell
+                        [ngClass]="{'sorted-column': activeCol === policyChangeRequestListColumnsMap[0].propertyName}"
+                        *matCellDef="let policyChangeRequest"
+                    >
+                        <a href="javascript:void(0)">{{policyChangeRequest.policyHolderName}}</a>
+                    </td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[1].propertyName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-100">
+                        <span language="{{pcrLanguagePath}}.table.column.requestNumber"></span>
+                    </th>
+                    <td
+                        mat-cell
+                        [ngClass]="{'sorted-column': activeCol === policyChangeRequestListColumnsMap[1].propertyName}"
+                        *matCellDef="let policyChangeRequest"
+                        class="text-left"
+                    >
+                        {{policyChangeRequest.requestNumber}}
+                    </td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[2].propertyName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        <span language="{{pcrLanguagePath}}.table.column.requestType"></span>
+                    </th>
+                    <td
+                        class="mon-pl-10"
+                        mat-cell
+                        [ngClass]="{'sorted-column': activeCol === policyChangeRequestListColumnsMap[2].propertyName}"
+                        *matCellDef="let policyChangeRequest"
+                    >
+                        {{policyChangeRequest.requestType}}
+                    </td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[3].propertyName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        <span language="{{pcrLanguagePath}}.table.column.dateSubmitted"></span>
+                    </th>
+                    <td
+                        mat-cell
+                        [ngClass]="{'sorted-column': activeCol === policyChangeRequestListColumnsMap[3].propertyName}"
+                        *matCellDef="let policyChangeRequest"
+                        class="text-left mon-pl-10"
+                    >
+                        {{ policyChangeRequest.dateSubmitted }}
+                    </td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[4].propertyName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        <span language="{{pcrLanguagePath}}.table.column.status"></span>
+                    </th>
+                    <td
+                        mat-cell
+                        [ngClass]="{'sorted-column': activeCol === policyChangeRequestListColumnsMap[4].propertyName}"
+                        *matCellDef="let policyChangeRequest"
+                        class="mon-pl-10"
+                    >
+                        <!-- <span>  <mon-icon
+                                        class="icon-warning"
+                                        iconName="Filled-warning"
+                                        [iconSize]="15"
+                                    ></mon-icon
+                                    ></span> -->
+                        {{ policyChangeRequest.status }}
+                    </td>
+                </ng-container>
+                <ng-container [matColumnDef]="policyChangeRequestListColumnsMap[5].propertyName">
+                    <th mat-header-cell *matHeaderCellDef class="text-left">
+                        <span language="{{pcrLanguagePath}}.table.column.manage"></span>
+                    </th>
+
+                    <td mat-cell *matCellDef="let policyChangeRequest" class="text-left">
+                        <button class="mon-btn-link visible-on-row-hover" (click)="viewAndEditPolicyChanges(policyChangeRequest)">
+                            <span
+                                >{{languageStringsArray['primary.portal.dashboard.policyChangeRequestList.table.column.viewAndEdit']}}</span
+                            >
+                        </button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsArray"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsArray"></tr>
+            </table>
+
+            <div
+                *ngIf="resultsLoaded && dataSource.data.length === 0"
+                class="w-100-percent no-results-found text-center mon-pt-50 mon-pb-50"
+            >
+                <span language="{{pcrLanguagePath}}.noResultsFound"></span>
+                <span *ngIf="noResultsFoundMessage" language="{{pcrLanguagePath}}.for"></span>
+                <span
+                    language="{{pcrLanguagePath}}.dateSubmittedResult"
+                    *ngIf="(filter.dateSubmitted.startDate || filter.dateSubmitted.endDate) && filter.query.status.length === 0 && filter.query.account.length === 0 && latestOperation === 'dateSubmitted'"
+                ></span>
+                <span
+                    language="{{pcrLanguagePath}}.statusResult"
+                    *ngIf="filter.query.status.length !== 0 && filter.query.account.length === 0 && latestOperation === 'status' && !filter.dateSubmitted.startDate && !filter.dateSubmitted.endDate"
+                ></span>
+                <span
+                    language="{{pcrLanguagePath}}.accountResult"
+                    *ngIf="filter.query.account.length !== 0 && filter.query.status.length === 0 && latestOperation === 'account' && !filter.dateSubmitted.startDate && !filter.dateSubmitted.endDate"
+                ></span>
+                <span
+                    language="{{pcrLanguagePath}}.{{noResultsFoundMessage}}"
+                    *ngIf="filter.query.status.length !== 0 && filter.query.account.length !== 0"
+                ></span>
+                <span *ngIf="noResultsFoundMessage"> {{ noResultsFoundMessage }}</span>
+            </div>
+        </div>
+        <!-- Table Policy change request -->
+        <!-- TODO - Use language and update functionality -->
+        <div class="min-range-label" [hidden]="dataSource.data.length === 0 || dataSource.paginator.getNumberOfPages() > 1">
+            Showing {{ dataSource.data.length }} items
+        </div>
+        <!-- Pagination -->
+        <div class="paginator-wrapper" [hidden]="dataSource.data.length === 0 || dataSource.paginator.getNumberOfPages() === 1">
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                <span>{{languageStringsArray['primary.portal.dashboard.policyChangeRequestList.page']}}</span>
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ dataSource.paginator.getNumberOfPages() }}"
+                    [attr.aria-label]="languageStringsArray['primary.portal.dashboard.policyChangeRequestList.page']"
+                />
+                of {{ dataSource.paginator.getNumberOfPages() }}
+            </mat-form-field>
+        </div>
+        <!-- pagination -->
+    </div>
+    <!-- outer wrapper -->
+</div>
+
+<!-- TODO - Checking for MPP and Direct Path to hide Aflac Always Card EVE-38426 -->
+<div *ngIf="(isAflacAlways$ | async) && this.memberId && !this.globalPCR && !isDirectFlow" class="aflac-always">
+    <empowered-aflac-always-card
+        bodyLanguageString="primary.portal.dashboard.policyChangeRequestList.AflacAlwaysCard.content"
+        [mpGroupId]="mpGroup"
+        [memberId]="memberId"
+        [isMemberPortal]="isMemberFlow"
+    ></empowered-aflac-always-card>
+</div>

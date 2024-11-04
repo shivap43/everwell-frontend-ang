@@ -1,0 +1,87 @@
+@import "shared";
+
+.carrier-content {
+    margin: 0 convert-unit(30px, "rem");
+
+    > div {
+        &:last-of-type {
+            border-bottom: 1px solid get("color.gray.500");
+        }
+    }
+
+    h2 {
+        margin: convert-unit(30px, "rem") 0;
+    }
+
+    .carrier-forms-list {
+        display: flex;
+        padding: convert-unit(15px, "rem") 0;
+        border-top: 1px solid get("color.gray.600");
+        align-items: center;
+
+        @include media-max("xl") {
+            flex-wrap: wrap;
+        }
+
+        .carrier-logo {
+            min-width: convert-unit(200px, "rem");
+            max-width: convert-unit(200px, "rem");
+            text-align: center;
+            margin: 0 convert-unit(30px, "rem");
+
+            @include media-max("l") {
+                margin: 0 convert-unit(10px, "rem");
+                min-width: convert-unit(100px, "rem");
+                max-width: convert-unit(100px, "rem");
+            }
+
+            img {
+                max-height: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .dotted-border-left {
+            width: convert-unit(1px, "rem");
+            height: convert-unit(66px, "rem");
+        }
+
+        .carrier-name {
+            padding: 0 convert-unit(30px, "rem");
+            flex-grow: 1;
+
+            @include media-max("l") {
+                padding: 0 convert-unit(10px, "rem");
+            }
+
+            h3 {
+                margin: 0;
+            }
+        }
+
+        .carrier-status {
+            padding: 0 convert-unit(30px, "rem");
+            min-width: convert-unit(200px, "rem");
+            max-width: convert-unit(200px, "rem");
+
+            @include media-max("l") {
+                padding: 0 convert-unit(10px, "rem");
+            }
+
+            .mon-icon {
+                margin: 0;
+                vertical-align: sub;
+            }
+        }
+
+        .carrier-actions {
+            min-width: convert-unit(130px, "rem");
+            max-width: convert-unit(130px, "rem");
+            margin: 0 convert-unit(30px, "rem");
+
+            button {
+                width: 100%;
+            }
+        }
+    }
+}

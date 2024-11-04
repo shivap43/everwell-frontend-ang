@@ -1,0 +1,13 @@
+<ng-container *ngIf="parentTabState$ | async as parentTabs">
+    <ng-container *ngIf="tabState$ | async as tabStates">
+        <empowered-tab
+            *ngFor="let parentTab of parentTabs; let i = index;"
+            [tabMeta]="parentTab"
+            [subTabs]="findChildren(tabStates, parentTab.tabId)"
+            [stepNumber]="i+1"
+            [tabs]="tabs"
+            [canVisit]="enabledTabIds.includes(parentTab.tabId)"
+        >
+        </empowered-tab>
+    </ng-container>
+</ng-container>

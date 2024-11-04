@@ -1,0 +1,50 @@
+<ng-container>
+    <mat-accordion class="accordion-default">
+        <ng-container *ngFor="let offering of benefitDollarOffering">
+            <mat-expansion-panel class="group-expand" [disabled]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <div class="offering-list">
+                            <h4>
+                                <ng-container *ngIf="!offering.isApproved">
+                                    <mon-icon
+                                        [richTooltip]="languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.pendingAdminApproval']"
+                                        iconSize="16"
+                                        iconName="Filled-warning"
+                                        class="icon-warning"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                    >
+                                    </mon-icon>
+                                </ng-container>
+                                {{offering.name}} | {{offering.contributionType === amountFlat?(offering.amount |
+                                currency) :offering.amount}} {{offering.contributionType ===
+                                amountFlat?payFrequency:""}} {{offering.contributionType ===
+                                amountPercentage?percentageSuffix:""}}
+                            </h4>
+                        </div>
+                        <div
+                            *hasAnyPermission="['core.account.create.benefitbank','core.account.update.benefitbank','core.account.delete.benefitbank']"
+                        >
+                            <button
+                                class="mon-btn-link text-danger"
+                                (click)="removeOffering(offering.id)"
+                                [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+                            >
+                                {{languageStrings['primary.portal.common.remove']}}
+                                <span class="sr-only">{{offering.name}}</span>
+                            </button>
+                            <button
+                                class="mon-btn-link"
+                                (click)="editOffering(offering.id)"
+                                [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                            >
+                                {{languageStrings['primary.portal.common.edit']}}
+                            </button>
+                        </div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+        </ng-container>
+    </mat-accordion>
+</ng-container>

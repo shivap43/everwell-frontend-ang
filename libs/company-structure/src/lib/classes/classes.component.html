@@ -1,0 +1,31 @@
+<div *ngIf="classTypesDisplay" class="classes-wrapper">
+    <div class="class-header">
+        <h2>{{languageStrings["primary.portal.classes.header"]}}</h2>
+        <p *ngIf="!zeroState; else zero" language="primary.portal.classes.subHeader" class="sub-header"></p>
+    </div>
+    <ng-template #zero>
+        <p language="primary.portal.class.headerParagraph"></p>
+    </ng-template>
+    <div class="class-whole-section" [ngClass]="{'zero-state':zeroState,'non-zero-state':!zeroState }">
+        <empowered-class-type
+            [addClassType]="true"
+            [zeroState]="zeroState"
+            [classTypesList]="getClassTypesList()"
+        ></empowered-class-type>
+
+        <div *ngFor="let classTypeDisplayObj of classTypesDisplay">
+            <empowered-class-type
+                #firstClassTypeView
+                [addClassType]="false"
+                [zeroState]="zeroState"
+                [classTypeDetails]="classTypeDisplayObj"
+                [classTypesList]="getClassTypesList()"
+                [importPeoAlertType]="importPeoAlert"
+                [spinner]="isLoading"
+                (refreshImportPeo)="importPeoData()"
+            ></empowered-class-type>
+        </div>
+    </div>
+</div>
+
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>

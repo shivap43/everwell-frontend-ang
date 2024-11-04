@@ -1,0 +1,97 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content">
+    <form [formGroup]="removeRiderForm">
+        <div class="flex-form-wrapper mon-px-30">
+            <h3>
+                {{languageStrings['primary.portal.policyChangeRequest.transactions.removeRider.header']}}
+            </h3>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.removeRider.ridersToRemoved']}}
+                            </span>
+                        </mat-label>
+
+                        <div class="list">
+                            <div class="item mon-mb-5" *ngFor="let rider of riderList; let i = index">
+                                <ng-container formArrayName="riderIds">
+                                    <mat-checkbox
+                                        [ngClass]="{'pcrcheckbox': this.removeRiderForm.dirty && this.counter === 0}"
+                                        [formControlName]="i"
+                                        (change)="onCheckedRider($event.checked, rider.riderId);"
+                                    >
+                                        <span>{{rider.policyName}}</span>
+                                    </mat-checkbox>
+                                </ng-container>
+                            </div>
+                            <mat-error *ngIf="this.removeRiderForm.errors && this.counter === 0">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.selectionRequired']}}
+                                </span>
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-md-flex" *ngIf="formControl['otherRider']">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.removeRider.otherRider']}}
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="otherRider"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.removeRider.otherRider']"
+                            />
+                            <mat-error *ngIf="formControl['otherRider'].errors?.required">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span>
+                {{languageStrings['primary.portal.common.cancel']}}
+            </span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>
+                {{languageStrings['primary.portal.common.back']}}
+            </span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="removeRider()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span>
+                {{languageStrings['primary.portal.common.next']}}
+            </span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="tpi-main-wrapper" [ngClass]="{'lnl-wrapper' : tpiLnlMode}">
+    <empowered-tpi-primary-header></empowered-tpi-primary-header>
+    <empowered-tpi-content-body class="tpi-content-body"></empowered-tpi-content-body>
+    <!-- Below for link and launch footer -->
+    <empowered-lnl-footer *ngIf="tpiLnlMode"></empowered-lnl-footer>
+    <empowered-tpi-footer *ngIf="!tpiLnlMode && isModalFooterEnabled$ | async" class="tpi-footer">
+        <button mat-button class="mon-btn-primary" (click)="onExit()" language="primary.portal.tpiEnrollment.exit"></button>
+    </empowered-tpi-footer>
+</div>

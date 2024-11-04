@@ -1,0 +1,211 @@
+<div class="edit-form-wrapper">
+    <mon-alert *ngIf="showErrorMessage" alertType="danger" role="alert">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+    <form *ngIf="editRegionForm" [formGroup]="editRegionForm" (ngSubmit)="submit.focus(); createOrEditRegion()">
+        <h3 *ngIf="!isEditForm">{{languageStrings['primary.portal.regions.addNewRegion']}}</h3>
+        <div class="region-name">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.regionName']}}</mat-label>
+            <mat-form-field>
+                <input
+                    [attr.aria-label]="languageStrings['primary.portal.regions.regionName']"
+                    formControlName="name"
+                    matInput
+                    (blur)="checkNameExists();"
+                />
+                <mat-error
+                    *ngIf="editRegionForm.get('name').hasError('required')"
+                    language="primary.portal.common.requiredField"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editRegionForm.get('name').hasError('pattern')"
+                    language="secondary.portal.common.pattern"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editRegionForm.get('name').hasError('duplicateName')"
+                    language="secondary.portal.classes.duplicateName"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editRegionForm.controls.name.errors?.maxlength"
+                    language="secondary.portal.common.maxLength"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <div class="region-desc">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.description']}}</mat-label>
+            <mat-form-field>
+                <input
+                    [attr.aria-label]="languageStrings['primary.portal.regions.description']"
+                    formControlName="description"
+                    matInput
+                />
+                <mat-error
+                    *ngIf="editRegionForm.get('description').hasError('pattern')"
+                    language="secondary.portal.common.pattern"
+                >
+                </mat-error>
+                <mat-error
+                    *ngIf="editRegionForm.controls.description.errors?.maxlength"
+                    language="secondary.portal.common.maxLength200"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <div class="define-region">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.defineRegion']}}</mat-label>
+            <mat-form-field>
+                <mat-select formControlName="defineRegionBy">
+                    <mat-option *ngFor="let region of defineRegionBy" [value]="region">
+                        {{region}}
+                    </mat-option>
+                </mat-select>
+                <mat-error
+                    *ngIf="editRegionForm.get('defineRegionBy').hasError('required')"
+                    language="primary.portal.common.selectionRequired"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <div class="region-name" *ngIf="regionFormsControls.defineRegionBy.value =='By state'">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.chooseStates']}}</mat-label>
+            <mat-form-field
+                *ngIf="regionFormsControls.defineRegionBy.value =='By state'"
+                class="state-input"
+                (click)="input.focus()"
+            >
+                <mat-chip-list #chipList formControlName="stateControl">
+                    <mat-chip
+                        *ngFor="let state of statesList"
+                        [selectable]="selectable"
+                        [removable]="true"
+                        (removed)="removeState(state)"
+                    >
+                        {{state}}
+                        <a href="javascript:void(0)" aria-label="remove state">
+                            <mon-icon iconName="close" class="icon-black" matChipRemove [iconSize]="10"></mon-icon>
+                        </a>
+                    </mat-chip>
+                    <input
+                        type="text"
+                        matInput
+                        [matAutocomplete]="auto"
+                        #input
+                        formControlName="stateControl"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputFor]="chipList"
+                        (blur)="removeText()"
+                        [attr.aria-label]="languageStrings['primary.portal.regions.chooseStates']"
+                    />
+                </mat-chip-list>
+                <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption>
+                    <mat-option
+                        [ngClass]="isStateSelected(state.name)? 'selected-state' : ''"
+                        *ngFor="let state of filteredState | async"
+                        [value]="state.name"
+                        [disabled]="regionTypeStates.includes(state.abbreviation) && data.actionType === ActionType.region_create"
+                    >
+                        <div (click)="addRemoveState(state); $event.stopPropagation();">
+                            <span>{{state.name}}</span>
+                        </div>
+                    </mat-option>
+                </mat-autocomplete>
+                <mat-error
+                    *ngIf="editRegionForm.get('stateControl').hasError('required')"
+                    language="primary.portal.common.selectionRequired"
+                ></mat-error>
+            </mat-form-field>
+            <mat-error
+                *ngIf="showErrorZipRange && errRegionType == 'composition.states' && errStateNumber == 1 && showDuplicateErr"
+                language="secondary.portal.regions.errorRegionState"
+            ></mat-error>
+            <mat-error
+                *ngIf="showErrorZipRange && errRegionType == 'composition.states' && errStateNumber > 1 && showDuplicateErr"
+                language="secondary.portal.regions.errorRegionStates"
+            ></mat-error>
+        </div>
+        <div class="flex-item" *ngIf="regionFormsControls.defineRegionBy.value =='By zip code range'">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.regions.zipCode']}}</mat-label>
+            <div class="flex-item region-name">
+                <mat-form-field>
+                    <input
+                        [attr.aria-label]="languageStrings['primary.portal.regions.zipCode']"
+                        formControlName="ZipCodeFrom"
+                        (focus)="removeZipCodeErr()"
+                        matInput
+                    />
+                    <mat-error
+                        *ngIf="editRegionForm.get('ZipCodeFrom').hasError('required')"
+                        language="primary.portal.common.requiredField"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="editRegionForm.get('ZipCodeFrom').hasError('pattern')"
+                        language="secondary.portal.regions.errorZipCode"
+                    ></mat-error>
+                </mat-form-field>
+            </div>
+            <span>To</span>
+            <div class="flex-item region-name">
+                <mat-form-field>
+                    <input
+                        [attr.aria-label]="languageStrings['primary.portal.regions.zipCode']"
+                        formControlName="ZipCodeTo"
+                        (focus)="removeZipCodeErr()"
+                        matInput
+                    />
+                    <mat-error
+                        *ngIf="editRegionForm.get('ZipCodeTo').hasError('required')"
+                        language="primary.portal.common.requiredField"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="editRegionForm.get('ZipCodeTo').hasError('pattern')"
+                        language="secondary.portal.regions.errorZipCode"
+                    ></mat-error>
+                </mat-form-field>
+                <span
+                    ><a *ngIf="rangesArray" (click)="addRanges();"
+                        >{{languageStrings['primary.portal.regions.addanotherRange']}}</a
+                    ></span
+                >
+            </div>
+            <mat-error
+                *ngIf="showErrorZipRange && errRegionType == 'composition.ranges' && showInvalidZipErr"
+                language="secondary.portal.regions.errorRegionName"
+            >
+            </mat-error>
+            <mat-error
+                *ngIf="showErrorZipRange && errRegionType == 'composition.ranges' && inValidPostalCode"
+                language="secondary.portal.regions.errorInvalidZip"
+            >
+            </mat-error>
+            <mat-error *ngIf="isDuplicateRange" language="secondary.portal.regions.errorDuplicateRange"></mat-error>
+            <mat-error
+                *ngIf="showInvalidZipErr && !showErrorZipRange"
+                language="secondary.portal.regions.errorRegionName"
+            ></mat-error>
+            <mat-error
+                *ngIf="inValidPostalCode && !showErrorZipRange"
+                language="secondary.portal.regions.errorInvalidZip"
+            ></mat-error>
+            <!--Replacepipe need work-->
+            <!-- This range can't be used because it overlaps with the region {{errRegionName}} -->
+            <div *ngIf="rangesArray">
+                <div *ngFor="let range of rangesArray; let i=index;">
+                    <span>
+                        {{ "primary.portal.regions.rangeStartEnd" | replaceTag: { "#rangestart": this.range.start,
+                        "#rangeend": this.range.end } }}
+                    </span>
+                    <span><a (click)="removeZipRange(i);">{{languageStrings['primary.portal.common.remove']}}</a></span>
+                    <!--Replacepipe need work-->
+                    <!-- {{range.start}} to {{range.end}} -->
+                </div>
+            </div>
+        </div>
+        <div class="form-footer" mat-dialog-actions>
+            <button mat-button type="button" (click)="cancel()" class="mon-btn-secondary mon-mr-15">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <button #submit mat-button type="submit" class="mon-btn-primary">
+                {{data.actionType ===
+                'REGION.CREATE'?languageStrings['primary.portal.regions.create']:languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+    </form>
+</div>

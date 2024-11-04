@@ -1,0 +1,341 @@
+<section class="carriers-wrapper">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <div class="header">
+        <h1 class="carrier-header">{{langStrings["primary.portal.profile.carriers.title"]}}</h1>
+    </div>
+    <div *ngIf="isAGOnly && hasAflacImportAccess">
+        <h2>{{langStrings['primary.portal.benefitsOffering.aflac']}}</h2>
+        <a (click)="importAccount(false)"> {{langStrings['primary.portal.aflacgroup.importaccount.importAflacAccount']}} </a>
+    </div>
+    <div *ngIf="isAIOnly || isSharedAccount">
+        <div class="zero-state" *ngIf="!carriersList.length">{{langStrings['primary.portal.profile.carriers.zeroState']}}</div>
+        <div *ngFor="let carrier of carriersList">
+            <h2>{{carrier.carrier.name}}</h2>
+            <div *ngIf="carrier.carrierAttributes.hasOwnProperty(carrierAttributeType.SIC_CODE)">
+                <div class="account-details-wrapper">
+                    <p class="text-bold">{{langStrings['primary.portal.profile.carriers.sicCode']}}</p>
+                    <p>{{carrier.carrierAttributes[carrierAttributeType.SIC_CODE]}}</p>
+                </div>
+            </div>
+            <div *ngIf="carrier.carrierAttributes.hasOwnProperty(carrierAttributeType.INDUSTRY_CODE)">
+                <div class="account-details-wrapper">
+                    <p class="text-bold">{{langStrings['primary.portal.profile.carriers.industryCode']}}</p>
+                    <p>{{carrier.carrierAttributes[carrierAttributeType.INDUSTRY_CODE]}}</p>
+                </div>
+            </div>
+            <div *ngIf="carrier.carrierAttributes">
+                <div class="account-details-wrapper">
+                    <p class="text-bold">{{langStrings['primary.portal.profile.carriers.empId']}}</p>
+                    <p>{{carrier.carrierAttributes[carrierAttributeType.EMP_ID]}}</p>
+                </div>
+            </div>
+            <div *ngIf="carrier.carrierAttributes">
+                <div class="account-details-wrapper">
+                    <p class="text-bold">{{langStrings['primary.portal.profile.carriers.department']}}</p>
+                    <p>{{carrier.carrierAttributes[carrierAttributeType.DEPARTMENT]}}</p>
+                </div>
+            </div>
+            <div *ngIf="carrier.carrierContacts?.data?.length">
+                <div class="d-flex justify-content-between">
+                    <h3>{{langStrings["primary.portal.profile.carriers.contacts.title"]}}</h3>
+
+                    <button class="mon-btn-link" (click)="addCarrierContact(carrier.carrier, true)">
+                        {{langStrings["primary.portal.profile.carriers.contacts.addContact"]}}
+                    </button>
+                </div>
+                <div class="table-mask-wrapper">
+                    <div class="mon-table-wraper">
+                        <table mat-table matSort [dataSource]="carrier?.carrierContacts">
+                            <ng-container matColumnDef="name">
+                                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.carriers.contacts.name"]}}</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    <span *ngIf="element.name">
+                                        <strong>{{element.name}}</strong>
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="address">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    {{langStrings["primary.portal.profile.carriers.contacts.address"]}}
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <div *ngIf="element.address" [innerHTML]="element.address"></div>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="phone">
+                                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.carriers.contacts.phone"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.phoneNumber"> {{element.phoneNumber | phone: country}} </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="email">
+                                <th mat-header-cell *matHeaderCellDef>{{langStrings["primary.portal.profile.carriers.contacts.email"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.email"> {{element.email}} </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="primary">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    {{langStrings["primary.portal.profile.carriers.contacts.primary"]}}
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.isPrimary">
+                                        <mon-icon class="check-icon" iconName="check" iconSize="19"></mon-icon>
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="manage">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    {{langStrings["primary.portal.profile.carriers.contacts.manage"]}}
+                                </th>
+                                <td mat-cell *matCellDef="let element;">
+                                    <button
+                                        mat-icon-button
+                                        [matMenuTriggerFor]="beforeMenu"
+                                        [attr.aria-label]="langStrings['primary.portal.common.moreMenuOption']"
+                                    >
+                                        <mon-icon iconName="ellipsis" iconSize="20" class="more-option icon-primary"></mon-icon>
+                                    </button>
+                                    <mat-menu #beforeMenu="matMenu">
+                                        <button (click)="EditCarrierContact(element, carrier.carrier,  false)" mat-menu-item>
+                                            <span>{{langStrings["primary.portal.common.edit"]}}</span>
+                                        </button>
+                                        <button
+                                            class="text-danger"
+                                            (click)="removeCarrierContact(carrier.carrier.id, element.id)"
+                                            mat-menu-item
+                                        >
+                                            <span>{{langStrings["primary.portal.common.remove"]}}</span>
+                                        </button>
+                                    </mat-menu>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="noResults">
+                                <th
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    id="no-result"
+                                    [attr.colspan]="10"
+                                    class="text-center result-not-found"
+                                >
+                                    <span>{{langStrings["primary.portal.profile.carriers.contacts.noResultFound"]}}</span>
+                                </th>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayColumns"></tr>
+                            <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="carrier.carrierContacts?.data?.length != 0"></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <ng-container *hasPermission="'core.account.read.carrier.contact'">
+                <div *ngIf="!carrier.carrierContacts?.data?.length">
+                    <a (click)="addCarrierContact(carrier.carrier,  false)"
+                        >{{langStrings["primary.portal.profile.carriers.contacts.addContact"]}}</a
+                    >
+                </div>
+            </ng-container>
+            <mat-divider class="mon-mt-40"></mat-divider>
+        </div>
+    </div>
+
+    <div *ngIf="isAIOnly && canImportAg && hasAflacImportAccess && currentAccount.type !== 'PROSPECT'">
+        <h2>{{langStrings["primary.portal.aflacgroup.importaccount.aflacGroup"]}}</h2>
+        <ng-container *ngIf="isApprovalPending && !isPrivacyOnForEnroller">
+            <a
+                class="disabled"
+                [richTooltip]="langStrings['primary.portal.aflacgroup.importaccount.importAflacGroup.tooltip']"
+                matTooltipPosition="above"
+            >
+                {{langStrings["primary.portal.aflacgroup.importaccount.importAflacGroup"]}}
+            </a>
+        </ng-container>
+        <ng-container *ngIf="!isApprovalPending && !isPrivacyOnForEnroller">
+            <a (click)="importAccount(true)"> {{langStrings["primary.portal.aflacgroup.importaccount.importAflacGroup"]}} </a>
+        </ng-container>
+    </div>
+
+    <!-- AG carrier view start here -->
+
+    <div *ngIf="(isAGOnly || isSharedAccount)">
+        <div class="aflac-group">
+            <div class="ag-heading">
+                <div>
+                    <h2>{{langStrings['primary.portal.aflacgroup.carrier.aflacGroup']}}</h2>
+                </div>
+                <div
+                    *ngIf="(agRefreshStatus$ | async) || ((recentApprovalRequest?.status === approvalRequestTypes?.SUBMITTED_TO_HQ) && (hasReadAflacAccountPermission$ | async)) || ((canUnlink$ | async) && isSharedAccount)"
+                >
+                    <button mat-flat-button class="more-option-wrapper" [matMenuTriggerFor]="beforeMenu">
+                        <mon-icon iconName="ellipsis" iconSize="20" class="more-option icon-primary"></mon-icon>
+                    </button>
+                    <mat-menu #beforeMenu="matMenu" xPosition="before" class="ag-menu">
+                        <button *ngIf="(agRefreshStatus$ | async)" mat-menu-item (click)="refreshAflacGroupAccount()">
+                            <span>{{langStrings['primary.portal.aflacgroup.carrier.refreshAGInfo']}}</span>
+                        </button>
+                        <ng-container *hasPermission="userPermissions?.READ_AFLAC_ACCOUNT">
+                            <button
+                                *ngIf="recentApprovalRequest?.status === approvalRequestTypes?.SUBMITTED_TO_HQ"
+                                mat-menu-item
+                                (click)="reviewFlow()"
+                            >
+                                {{langStrings['primary.portal.aflacGroup.offering.reviewBenefit']}}
+                            </button>
+                        </ng-container>
+                        <ng-container *ngIf="canUnlink$ |async">
+                            <button *ngIf="isSharedAccount" class="text-danger" (click)="removeAflacAccount()" mat-menu-item>
+                                <span>{{langStrings['primary.portal.aflacgroup.carrier.removeAflacGroup']}}</span>
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </div>
+            </div>
+            <h3>{{langStrings['primary.portal.aflacgroup.carrier.generalInfo']}}</h3>
+            <div class="aflac-info">
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.organization']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.organization}}</div>
+                    <div *ngIf="!aflacGroupInfo?.organization" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.AGNumber']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.aflacGroupNumber}}</div>
+                    <div *ngIf="!aflacGroupInfo?.aflacGroupNumber" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.AGFileName']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.aflacGroupFileName}}</div>
+                    <div *ngIf="!aflacGroupInfo?.aflacGroupFileName" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.employeeIDType']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.employeeIdType}}</div>
+                    <div *ngIf="!aflacGroupInfo?.employeeIdType" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.situsState']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.situsState?.name}}({{aflacGroupInfo?.situsState?.abbreviation}})</div>
+                    <div *ngIf="!aflacGroupInfo?.situsState.name" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+                <div>
+                    <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.hoursPerweek']}}</div>
+                    <div class="ag-data">{{aflacGroupInfo?.hoursPerWeek}}</div>
+                    <div *ngIf="!aflacGroupInfo?.hoursPerWeek" class="ag-data">
+                        {{langStrings['primary.portal.profile.carriers.notAvailable']}}
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="aflacGroupInfo?.agents?.length" class="agent-info">
+                <h3>{{langStrings['primary.portal.aflacgroup.carrier.agentInfo']}}</h3>
+                <table mat-table [dataSource]="agentInfoSource">
+                    <!-- writingAgent Column -->
+                    <ng-container matColumnDef="writingAgent">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.writingAgent']}}</th>
+                        <td mat-cell *matCellDef="let element">{{element.fullName}}</td>
+                    </ng-container>
+
+                    <!-- writingNumber Column -->
+                    <ng-container matColumnDef="writingNumber">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.writingNumber']}}</th>
+                        <td mat-cell *matCellDef="let element">{{element.writingNumber}}</td>
+                    </ng-container>
+
+                    <!-- email Column -->
+                    <ng-container matColumnDef="agentEmail">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.email']}}</th>
+                        <td mat-cell *matCellDef="let element">{{element.email}}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayAgentInfo"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayAgentInfo;"></tr>
+                </table>
+            </div>
+            <div *ngIf="aflacGroupInfo?.billingAccounts" class="billing-acc-info">
+                <h3>{{langStrings['primary.portal.aflacgroup.carrier.billingAccountInfo']}}</h3>
+
+                <table mat-table [dataSource]="billingInfoSource">
+                    <!-- billingno Column -->
+                    <ng-container matColumnDef="billingAccountNumber">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.billingAccountNumber']}}</th>
+                        <td mat-cell *matCellDef="let element">{{element.accountNumber}}</td>
+                    </ng-container>
+
+                    <!-- deductionRegister Column -->
+                    <ng-container matColumnDef="deductionRegister">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.deductionRegister']}}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.deductionRegistrationDate | date: dateFormat }}</td>
+                    </ng-container>
+
+                    <!-- firstDeduction Column -->
+                    <ng-container matColumnDef="firstDeduction">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.firstDeduction']}}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.firstDeduction | date:dateFormat }}</td>
+                    </ng-container>
+                    <!--createdDate Colum-->
+                    <ng-container matColumnDef="createdOn">
+                        <th mat-header-cell *matHeaderCellDef>{{langStrings['primary.portal.aflacgroup.carrier.createdOn']}}</th>
+                        <td mat-cell *matCellDef="let element">{{ element.createDate | date:dateFormat }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayBillingAccountInfo"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayBillingAccountInfo;"></tr>
+                </table>
+            </div>
+        </div>
+        <!--Location info start here-->
+        <div *ngIf="aflacGroupInfo?.locations" class="location-info">
+            <h3>{{langStrings['primary.portal.aflacgroup.carrier.locationInfo']}}</h3>
+
+            <mat-accordion class="accordion-default">
+                <div *ngFor="let location of aflacGroupInfo?.locations">
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                            <mon-icon iconSize="10" iconName="Caret-down" class="accordion-indicator icon-black"></mon-icon>
+                            <mat-panel-title>{{location?.address?.state}} {{location?.locationName}}</mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.city']}}</div>
+                            <div class="ag-data">{{location?.address?.city}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.primaryContact']}}</div>
+                            <div class="ag-data">{{location?.primaryContact}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.locationCode']}}</div>
+                            <div class="ag-data">{{location?.locationCode}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.stateProvince']}}</div>
+                            <div class="ag-data">{{location?.address?.state}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.address1']}}</div>
+                            <div class="ag-data">{{location?.address?.address1}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.address2']}}</div>
+                            <div class="ag-data">{{location?.address?.address2}}</div>
+                        </div>
+                        <div class="address-info">
+                            <div class="label">{{langStrings['primary.portal.aflacgroup.carrier.zipPostalCode']}}</div>
+                            <div class="ag-data">{{location?.address?.zip}}</div>
+                        </div>
+                    </mat-expansion-panel>
+                </div>
+            </mat-accordion>
+        </div>
+        <!--Location info end here-->
+    </div>
+</section>

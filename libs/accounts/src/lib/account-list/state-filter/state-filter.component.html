@@ -1,0 +1,70 @@
+<div class="state-select-control">
+    <div class="chiplist-wrapper">
+        <a
+            href="javascript:void(0)"
+            *ngIf="stateChipList.length !== 0"
+            (click)="resetChips()"
+            class="icon-clear"
+            [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+        >
+            <mon-icon [iconSize]="10" class="icon-black" iconName="close"></mon-icon>
+        </a>
+        <mat-chip-list #stateFilterChipList (click)="chipListWrapperClickHandler()">
+            <mat-chip *ngFor="let state of stateChipList" [removable]="stateFilterChipRemovable" (removed)="chipRemoveHandler(state)">
+                {{state}}
+                <mon-icon matChipRemove *ngIf="stateFilterChipRemovable" [iconSize]="10" class="icon-black" iconName="close"></mon-icon>
+            </mat-chip>
+            <input
+                class="state-filter-input"
+                #stateFilterAutoCompleteInput
+                [matChipInputFor]="stateFilterChipList"
+                [matChipInputSeparatorKeyCodes]="stateFilterSeparatorKeysCodes"
+                [matChipInputAddOnBlur]="stateFilterAddOnBlur"
+                (matChipInputTokenEnd)="stateFilterAdd($event)"
+                (focus)="onFocusHandler($event)"
+                (input)="onInputHandler($event)"
+                autocomplete="off"
+                [(ngModel)]="stateSearchTerm"
+            />
+        </mat-chip-list>
+    </div>
+    <div class="list-group" role="listbox" *ngIf="renderStateList.length > 0" [ngClass]="{'expanded': renderStateList.length > 0}">
+        <div class="list-item select-all" (click)="selectAllHandler()" *ngIf="renderStateList.length >= SELECTALL_THRESHOLD">
+            {{languageStrings['primary.portal.common.selectAll']}}
+        </div>
+
+        <empowered-list-item
+            *ngFor="let state of renderStateList; index as index"
+            [item]="state"
+            (itemSelectionHandler)="createStateChip(state.abbreviation)"
+            [itemSelected]="stateChipList.includes(state.abbreviation.toUpperCase())"
+            class="list-group-item"
+            [ariaLabel]="[state.name]"
+        >
+            {{state.abbreviation}}
+        </empowered-list-item>
+    </div>
+</div>
+
+<div class="mon-clear action-buttons">
+    <div>
+        <a
+            *ngIf="stateChipList.length > 0"
+            href="javascript:void(0)"
+            (click)="clearHandler()"
+            [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+        >
+            {{languageStrings['primary.portal.common.clear']}}
+        </a>
+    </div>
+    <div>
+        <a
+            href="javascript:void(0)"
+            (click)="applyHandler()"
+            class="mon-apply"
+            [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+        >
+            {{languageStrings['primary.portal.common.apply']}}
+        </a>
+    </div>
+</div>

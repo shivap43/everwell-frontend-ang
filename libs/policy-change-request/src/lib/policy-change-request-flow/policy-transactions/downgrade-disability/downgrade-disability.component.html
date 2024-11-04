@@ -1,0 +1,303 @@
+<div class="dialog-content">
+    <div class="d-flex">
+        <h3 class="mon-pl-30">{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.header']}}</h3>
+    </div>
+    <div class="flex-form-wrapper mon-px-30">
+        <form [formGroup]="downgradeForm">
+            <div *ngIf="!downgradeForm.dirty;else other_description">
+                <span language="primary.portal.policyChangeRequest.transactions.downgradeDisability.description"></span>
+            </div>
+            <ng-template #other_description>
+                <span language="primary.portal.policyChangeRequest.transactions.downgradeDisability.other_description"></span>
+            </ng-template>
+            <div class="d-md-flex mon-mt-20">
+                <ng-container>
+                    <div class="flex-item" formGroupName="decreaseMonthlyBenefitAmount">
+                        <mat-checkbox
+                            formControlName="isChecked"
+                            type="checkbox"
+                            (change)="showFromAndToControls($event.checked, 'decreaseMonthlyBenefitAmount')"
+                        >
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.decreaseMonthlyBenefitAmount']}}</span
+                            >
+                        </mat-checkbox>
+                        <div class="d-md-flex mon-mt-20">
+                            <div class="flex-item" *ngIf="formControl['decreaseMonthlyBenefitAmount'].controls['from']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.from']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="from"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.from']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['from']?.errors?.required && isSubmitted"
+                                >
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMonthlyBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseMonthlyBenefitAmount']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromValidation']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['from']?.errors?.maxlength">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromAndToMaxLengthValiadtion']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['from']?.errors?.pattern">
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}} </span>
+                                </mat-error>
+                            </div>
+                            <div class="flex-item" *ngIf="formControl['decreaseMonthlyBenefitAmount'].controls['to']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.to']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="to"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.to']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['to']?.errors?.required && isSubmitted"
+                                >
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMonthlyBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseMonthlyBenefitAmount']?.controls['to']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toValidation']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['to']?.errors?.maxlength">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromAndToMaxLengthValiadtion']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMonthlyBenefitAmount']?.controls['to']?.errors?.pattern">
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}} </span>
+                                </mat-error>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="d-md-flex">
+                <ng-container>
+                    <div class="flex-item" formGroupName="decreaseMaximumBenefitPeriod">
+                        <mat-checkbox
+                            formControlName="isChecked"
+                            type="checkbox"
+                            (change)="showFromAndToControls($event.checked, 'decreaseMaximumBenefitPeriod')"
+                        >
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.decreaseMaximumBenefitAmount']}}</span
+                            >
+                        </mat-checkbox>
+                        <div class="d-md-flex mon-mt-20">
+                            <div class="flex-item" *ngIf="formControl['decreaseMaximumBenefitPeriod'].controls['from']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromMonths']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="from"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromMonths']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['from']?.errors?.required && isSubmitted"
+                                >
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}} </span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMaximumBenefitPeriod'].errors?.isToValueIsGreater && !formControl['decreaseMaximumBenefitPeriod']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromValidation']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['from']?.errors?.maxlength">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromAndToMaxLengthValiadtion']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['from']?.errors?.pattern">
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}} </span>
+                                </mat-error>
+                            </div>
+                            <div class="flex-item" *ngIf="formControl['decreaseMaximumBenefitPeriod'].controls['to']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toMonths']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="to"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toMonths']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['to']?.errors?.required && isSubmitted"
+                                >
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}} </span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseMaximumBenefitPeriod'].errors?.isToValueIsGreater && !formControl['decreaseMaximumBenefitPeriod']?.controls['to']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toValidation']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['to']?.errors?.maxlength">
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromAndToMaxLengthValiadtion']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['decreaseMaximumBenefitPeriod']?.controls['to']?.errors?.pattern">
+                                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}} </span>
+                                </mat-error>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="d-md-flex">
+                <ng-container>
+                    <div class="flex-item" formGroupName="increaseEliminationPeriod">
+                        <mat-checkbox
+                            formControlName="isChecked"
+                            type="checkbox"
+                            (change)="showFromAndToControls($event.checked, 'increaseEliminationPeriod')"
+                        >
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.increaseEliminationPeriod']}}</span
+                            >
+                        </mat-checkbox>
+                        <div class="d-md-flex mon-mt-20">
+                            <div class="flex-item" *ngIf="formControl['increaseEliminationPeriod'].controls['from']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromDays']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="from"
+                                        class="mon-input"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.fromDays']"
+                                        (selectionChange)="onEliminationPeriodChange($event.value, false)"
+                                    >
+                                        <mat-option
+                                            *ngFor="let fromEliminationPeriod of fromEliminationPeriodOptions"
+                                            [value]="fromEliminationPeriod"
+                                        >
+                                            {{fromEliminationPeriod}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['increaseEliminationPeriod']?.controls['from']?.errors?.required && isSubmitted"
+                                >
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                            </div>
+                            <div class="flex-item" *ngIf="formControl['increaseEliminationPeriod'].controls['to']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toDays']}}</span
+                                    >
+                                </mat-label>
+
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="to"
+                                        class="mon-input"
+                                        [placeholder]="languageStrings['primary.portal.common.select']"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.toDays']"
+                                        [disabled]="!(formControl['increaseEliminationPeriod'].controls['from'].value)"
+                                    >
+                                        <mat-option
+                                            *ngFor="let toEliminationPeriod of toEliminationPeriodOptions"
+                                            [value]="toEliminationPeriod"
+                                        >
+                                            {{toEliminationPeriod}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['increaseEliminationPeriod']?.controls['to']?.errors?.required && isSubmitted"
+                                >
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                                <mat-error *ngIf="formControl['increaseEliminationPeriod']?.controls['to']?.hasError('noHigherPeriod')">
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgrade.higherEliminationError']}}</span
+                                    >
+                                </mat-error>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </form>
+        <mat-divider aria-hidden="true" class="mon-my-20"></mat-divider>
+        <div class="d-md-flex">
+            <div class="flex-item">
+                <p>
+                    <span> {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.aggrementTitle']}} </span>
+                </p>
+                <ul>
+                    <li>{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.aggrementCondition1']}}</li>
+                    <li>{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.aggrementCondition2']}}</li>
+                    <li>{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeDisability.aggrementCondition3']}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button type="button" class="mon-btn-secondary" mat-flat-button (click)="back()">
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+        <button type="submit" class="mon-btn-primary mon-ml-20" (click)="submitDowngradeDisabilityRequest()" mat-flat-button>
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

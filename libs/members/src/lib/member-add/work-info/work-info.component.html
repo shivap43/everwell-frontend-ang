@@ -1,0 +1,1274 @@
+<div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+    <div class="work-form">
+        <form
+            [formGroup]="memberWorkForm"
+            (ngSubmit)="triggerUpdateSalary(memberWorkForm.value)"
+            (keydown.enter)="$event.preventDefault()"
+            novalidate
+        >
+            <fieldset>
+                <legend class="sr-only">{{languageStrings['primary.portal.members.workLabel.workInfo']}}</legend>
+                <div class="flex-form-wrapper">
+                    <h2>{{languageStrings['primary.portal.members.workLabel.workInfo']}}</h2>
+
+                    <div class="mon-my-20" *ngIf="errorMessage">
+                        <mon-alert alertType="danger">
+                            <span>{{errorMessage}}</span>
+                        </mon-alert>
+                    </div>
+                    <div formGroupName="workInformation" *ngIf="isDirect">
+                        <div class="d-md-flex flex-wrap">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" for="employer-name-direct">
+                                    <span>{{languageStrings["primary.portal.direct.addCustomer.employerName"]}}</span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="employerName"
+                                        matInput
+                                        id="employer-name-direct"
+                                        class="mon-input"
+                                        [readonly]="readOnlyFieldElementSetting.employerName"
+                                        [attr.aria-label]="languageStrings['primary.portal.direct.addCustomer.employerName']"
+                                        (input)="employerNameInputHandler($event)"
+                                    />
+                                    <mat-error
+                                        *ngIf="employerNameRequiredFieldError"
+                                        [language]="'secondary.portal.members.workValidationMsg.required'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div formGroupName="address" *ngIf="!isMember" class="flex-form-item">
+                        <ng-container *ngIf="hideFieldElementSetting.isPrimaryAddress">
+                            <div class="d-md-flex mon-mb-20">
+                                <mat-checkbox
+                                    type="checkbox"
+                                    formControlName="isPrimaryAddress"
+                                    (change)="defaultAddressCheck($event)"
+                                    [disableControl]="readOnlyFieldElementSetting.isPrimaryAddress || isAflacReadOnly || isPartialEdit || disableFormFields || isVestedAgent"
+                                >
+                                    <span *ngIf="userIsProducerAdmin"
+                                        >{{languageStrings["primary.portal.members.workLabel.primaryAddressCheck"]}}</span
+                                    >
+                                    <span *ngIf="!userIsProducerAdmin"
+                                        >{{languageStrings["primary.portal.members.workLabel.myPrimaryAddress"]}}</span
+                                    >
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="hideFieldElementSetting.address1">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" for="street-address-1">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.streetAddress1"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('address1'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="address1"
+                                            matInput
+                                            id="street-address-1"
+                                            class="mon-input"
+                                            [readonly]="readOnlyFieldElementSetting.address1"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.streetAddress1']}} {{languageStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="validateMessage('address','address1')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].address['controls'].address1.errors?.pattern"
+                                            [language]="'primary.portal.members.workValidationMsg.streetAddress1'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.address2">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" for="street-address-2">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.streetAddress2"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('address2'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="address2"
+                                            matInput
+                                            id="street-address-2"
+                                            class="mon-input"
+                                            [readonly]="readOnlyFieldElementSetting.address2"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.streetAddress2']}} {{languageStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-hint>{{languageStrings["primary.portal.members.workLabel.floorOrSuite"]}} </mat-hint>
+                                        <mat-error
+                                            *ngIf="validateMessage('address','address2')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].address['controls'].address2.errors?.pattern"
+                                            [language]="'primary.portal.members.workValidationMsg.streetAddress2'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="hideFieldElementSetting.city">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" for="city">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.city"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('city'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="city"
+                                            matInput
+                                            class="mon-input"
+                                            id="city"
+                                            [readonly]="readOnlyFieldElementSetting.city"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.city']}} {{languageStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                            disableOptionCentering="true"
+                                        />
+                                        <mat-error
+                                            *ngIf="validateMessage('address','city')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].address['controls'].city.errors?.pattern"
+                                            [language]="'primary.portal.common.city.patternError'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.state">
+                                <div class="flex-item w-250">
+                                    <mat-label class="mat-label" id="memberState">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.state"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('state'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="state"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            aria-labelledby="memberState"
+                                            class="mon-input"
+                                            (ngModelChange)="updateStateSelection($event)"
+                                            [disableControl]="readOnlyFieldElementSetting.state || disableFormFields"
+                                            (selectionChange)="isFormValueChange = true"
+                                            disableOptionCentering="true"
+                                        >
+                                            <mat-option value="">
+                                                {{languageStrings["primary.portal.members.workLabel.select"]}}</mat-option
+                                            >
+                                            <mat-option
+                                                *ngFor="let state of states"
+                                                value="{{ state.abbreviation }}"
+                                                title="{{ state.abbreviation }}"
+                                            >
+                                                {{ state.abbreviation }}</mat-option
+                                            >
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].address['controls'].state.errors?.required"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.zip">
+                                <div class="flex-item w-100">
+                                    <empowered-zip-code-input
+                                        [formControl]="memberWorkForm['controls'].address['controls'].zip"
+                                        [stateControlValue]="stateControlValue$ | async"
+                                        [validateOnStateChange]="true"
+                                        [readonly]="readOnlyFieldElementSetting.zip"
+                                        [ariaLabel]="'zip-code'"
+                                    >
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].address['controls'].zip.errors?.required"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        ></mat-error>
+                                    </empowered-zip-code-input>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.countyId">
+                                <div class="flex-item w-250">
+                                    <mat-label class="mat-label" id="memberCounty">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.county"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('countyId'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="countyId"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            aria-labelledby="memberCounty"
+                                            class="mon-input"
+                                            [disabled]="readOnlyFieldElementSetting.countyId || memberWorkForm['controls'].address['controls'].countyId.disabled || isAflacReadOnly || isPartialEdit || disableFormFields || isVestedAgent"
+                                            (selectionChange)="isFormValueChange = true"
+                                        >
+                                            <mat-option *ngFor="let county of counties" [value]="county.id"> {{ county.name }} </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="validateMessage('address','countyId')"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.country">
+                                <div class="flex-item w-250">
+                                    <mat-label class="mat-label" id="memberCountry">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.country"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('country'))" class="optional-text">
+                                            {{languageStrings["primary.portal.common.optional"]}}
+                                        </span>
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="country"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            aria-labelledby="memberCountry"
+                                            class="mon-input"
+                                            [disableControl]="readOnlyFieldElementSetting.country || disableFormFields"
+                                            (selectionChange)="isFormValueChange = true"
+                                            disableOptionCentering="true"
+                                        >
+                                            <mat-option> {{languageStrings["primary.portal.members.workLabel.select"]}} </mat-option>
+                                            <mat-option *ngFor="let country of countries" value="{{ country }}" title="{{ country }}">
+                                                {{ country }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="validateMessage('address','country')"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div formGroupName="workInformation" class="flex-form-item">
+                        <div class="terminationAlert" *isRestricted="permissionEnum.MEMBER_RESTRICT_MANAGE_EMPLOYEE">
+                            <mon-alert *ngIf="terminationFlag" alertType="warning" closeButton="true">
+                                <span language="primary.portal.members.workLabel.warningAfterTermination"></span>
+                            </mon-alert>
+                        </div>
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="isEmployerNameFieldEnabled && !isDirect && !isMember">
+                                <div class="flex-item field-wrapper">
+                                    <mat-label class="mat-label" for="employer-name-mpp">
+                                        <span>{{languageStrings["primary.portal.pda.form.employerName"]}}</span>
+                                        <span *ngIf="!isEmployerNameFieldReadOnly" class="optional-text">
+                                            {{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="employerName"
+                                            matInput
+                                            id="employer-name-mpp"
+                                            class="mon-input"
+                                            [attr.aria-label]="languageStrings['primary.portal.direct.addCustomer.employerName']"
+                                            (input)="employerNameInputHandler($event)"
+                                        />
+                                        <mat-error
+                                            *ngIf="memberWorkForm.controls.workInformation['controls'].employerName.errors?.maxlength"
+                                            [language]="'secondary.portal.census.manualEntry.maxlength100'"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.hireDate && !isMember">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" id="hire-date">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.hireDate"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('hireDate'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            formControlName="hireDate"
+                                            matInput
+                                            aria-labelledby="hire-date"
+                                            [matDatepicker]="pickerHireDate"
+                                            [readonly]="readOnlyFieldElementSetting.hireDate"
+                                            (keyup)="transform($event)"
+                                            (dateInput)="validatehireDateChange($event)"
+                                            (dateChange)="validatehireDateChange($event)"
+                                            #datePickerInput
+                                            (keyup)="transform($event)"
+                                            (input)="isFormValueChange = true"
+                                            [disabled]="isPartialEdit || isAflacReadOnly || isVestedAgent"
+                                        />
+                                        <mat-hint>{{languageStrings["primary.portal.members.workLabel.dateFormat"]}} </mat-hint>
+                                        <mat-datepicker-toggle matSuffix [for]="pickerHireDate">
+                                            <mon-icon
+                                                matDatepickerToggleIcon
+                                                iconName="calendar-date"
+                                                (click)="pickerHireDate.open()"
+                                                aria-labelledby="hire-date"
+                                            ></mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #pickerHireDate></mat-datepicker>
+                                        <mat-error *ngIf="isDateInvalid">
+                                            <span class="sr-only">Error: </span>
+                                            {{validateDate('hireDate', 'memberWorkForm', datePickerInput.value)}}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="hireDateLessThen14 &&
+                                      !(memberWorkForm['controls'].workInformation['controls'].hireDate.errors?.required) &&
+                                      !(memberWorkForm['controls'].workInformation['controls'].hireDate.value === null)"
+                                            [language]="'secondary.portal.members.workValidationMsg.employeeAgeLimit'"
+                                        >
+                                        </mat-error>
+                                        <mat-error *ngIf="hireDateIsFutureDate">
+                                            <span [language]="'secondary.portal.members.workValidationMsg.termination.cannotBeMoreThan'">
+                                            </span>
+                                            {{hireDateDaysConfig}}
+                                            <span [language]="'secondary.portal.members.workValidationMsg.termination.daysInTheFuture'">
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.terminationDate">
+                                <div class="flex-item" *ngIf="terminationFlag && userIsProducerAdmin">
+                                    <mat-label class="mat-label" for="termination-date">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.terminationDate"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('terminationDate'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            formControlName="terminationDate"
+                                            matInput
+                                            id="termination-date"
+                                            [matDatepicker]="pickerTerminationDate"
+                                            (dateInput)="validateTerminationDate($event)"
+                                            (dateChange)="validateTerminationDate($event)"
+                                            [readonly]="readOnlyFieldElementSetting.terminationDate"
+                                            #datePickerInput
+                                            (keyup)="transform($event)"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.terminationDate']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-hint>{{languageStrings["primary.portal.members.workLabel.dateFormat"]}} </mat-hint>
+                                        <mat-datepicker-toggle matSuffix [for]="pickerTerminationDate">
+                                            <mon-icon
+                                                matDatepickerToggleIcon
+                                                iconName="calendar-date"
+                                                aria-labelledby="termination-date"
+                                            ></mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #pickerTerminationDate></mat-datepicker>
+                                        <mat-error *ngIf="isDateInvalid">
+                                            <span class="sr-only">Error: </span>
+                                            {{validateDate('terminationDate', 'memberWorkForm', datePickerInput.value)}}
+                                        </mat-error>
+                                        <mat-error *ngIf="terminationDateIsFutureDate">
+                                            <span [language]="terminationDateError"></span>
+                                        </mat-error>
+                                        <mat-error *ngIf="terminationDateBeforeHireDate">
+                                            <span [language]="'secondary.portal.members.workValidationMsg.termination.beforeHireDate'">
+                                            </span>
+                                        </mat-error>
+                                        <mat-error *ngIf="terminationDateIsPastDate">
+                                            <span [language]="terminationDateError"> </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.terminationCodeId">
+                                <div class="flex-item" *ngIf="terminationFlag && userIsProducerAdmin">
+                                    <mat-label class="mat-label" id="termination-code">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.terminationCode"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('terminationCode'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="terminationCodeId"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            class="mon-input"
+                                            aria-labelledby="termination-code"
+                                            (input)="isFormValueChange = true"
+                                        >
+                                            <mat-option>{{languageStrings["primary.portal.members.workLabel.select"]}} </mat-option>
+                                            <mat-option
+                                                *ngFor="let codes of terminationCodes"
+                                                value="{{ codes.id }}"
+                                                title="{{ codes.id }}"
+                                            >
+                                                {{ codes.description }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','terminationCodeId')"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <ng-container *ngIf="hideFieldElementSetting.terminationComments">
+                            <div class="d-md-flex flex-wrap" *ngIf="terminationFlag && userIsProducerAdmin">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" id="termination-comments">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.terminationComments"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('terminationComments'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="multiline-input w-500">
+                                        <textarea
+                                            rows="5"
+                                            formControlName="terminationComments"
+                                            matInput
+                                            class="mon-input"
+                                            aria-labelledby="termination-comments"
+                                            [readonly]="readOnlyFieldElementSetting.terminationComments"
+                                            (input)="isFormValueChange = true"
+                                        ></textarea>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','terminationComments')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].workInformation['controls'].terminationComments.errors?.maxlength"
+                                            [language]="'secondary.portal.members.api.400.badParameter.comment'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="hideFieldElementSetting.hoursPerWeek && !isMember">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.hoursPerWeek"]}}</span>
+                                        <span
+                                            *ngIf="!(requiredFields && isRequiredField('hoursPerWeek')) && !isHoursPerWeekMandatory"
+                                            class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            [(ngModel)]="salary"
+                                            formControlName="hoursPerWeek"
+                                            matInput
+                                            class="mon-input"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.hoursPerWeek']}}"
+                                            empoweredNumberValidation
+                                            allowDecimals="true"
+                                            (input)="isFormValueChange=true;validateNumber($event.target)"
+                                            (blur)="hoursPerWeekChanges()"
+                                            (focusout)="updateValueValidity($event.target)"
+                                            [readonly]="readOnlyFieldElementSetting.hoursPerWeek"
+                                        />
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','hoursPerWeek')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="hoursPerWeekControl.errors?.pattern && !hoursPerWeekControl.errors?.min && !hoursPerWeekControl.errors?.max"
+                                            [language]="'secondary.portal.common.work.errHoursPerWeekDecimal'"
+                                        >
+                                        </mat-error>
+                                        <mat-error *ngIf="hoursPerWeekControl.errors?.max" [language]="hoursPerWeekMoreThanMaxErrorMsg">
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="hoursPerWeekControl.errors?.min"
+                                            [language]="hoursPerWeekMoreThanMinErrorMsg"
+                                        ></mat-error>
+                                        <mat-error *ngIf="hoursPerWeekControl.errors?.salaryLessThanMin">
+                                            <span class="sr-only">Error: </span>
+                                            {{"primary.portal.members.minAnnualSalary" | replaceTag: {"##annualsalarymin##" :
+                                            annualSalaryMin} }}</mat-error
+                                        >
+                                        <mat-error *ngIf="hoursPerWeekControl.errors?.salaryMoreThanMax">
+                                            <span class="sr-only">Error: </span>
+                                            {{"primary.portal.members.maxAnnualSalary" | replaceTag: {"##annualsalarymax##" :
+                                            annualSalaryMax} }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.organizationId && userIsProducerAdmin">
+                                <div class="flex-item" *ngIf="!isAccountRatingCodePEO">
+                                    <mat-label class="mat-label" for="org-code">
+                                        <span>{{departmentLabel}}</span>
+                                        <span *ngIf="!isOrganizationFieldRequired" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                        <a
+                                            id="department-id"
+                                            href="javascript:void(0)"
+                                            [richTooltip]="displayTooltipMsg"
+                                            matTooltipClass="pos-above"
+                                            matTooltipPosition="above"
+                                            *ngIf="userIsProducerAdmin"
+                                            [attr.aria-label]="displayTooltipMsg"
+                                        >
+                                            <mon-icon
+                                                iconName="Filled-info"
+                                                [iconSize]="15"
+                                                class="infoicon mon-icon icon-primary"
+                                                aria-describedby="department-id"
+                                            ></mon-icon>
+                                        </a>
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="organizationId"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            id="org-code"
+                                            class="mon-input"
+                                            [disableControl]="readOnlyFieldElementSetting.organizationId || disableFormFields"
+                                            [attr.aria-label]="departmentLabel"
+                                            (selectionChange)="departmentChanged($event)"
+                                            disableOptionCentering="true"
+                                        >
+                                            <mat-option *ngIf="isAflacUSer" [value]="ADD_NEW">
+                                                {{languageStrings["primary.portal.members.workLabel.addNewDepartmentID"]}}
+                                            </mat-option>
+                                            <mat-option
+                                                *ngFor="let organization of organizations"
+                                                value="{{ organization.id }}"
+                                                title="{{ organization.id }}"
+                                            >
+                                                {{ organization.name }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','organizationId')"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-item w-250" *ngIf="isAccountRatingCodePEO">
+                                    <mat-label class="mat-label" for="account-peo-org-code">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.departmentPeoRating"]}}</span>
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="organizationId"
+                                            [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                            id="account-peo-org-code"
+                                            class="mon-input"
+                                            [disableControl]="readOnlyFieldElementSetting.organizationId || disableFormFields"
+                                            [attr.aria-label]="languageStrings['primary.portal.members.workLabel.departmentPeoRating']"
+                                            disableOptionCentering="true"
+                                        >
+                                            <mat-option *ngFor="let peoItem of peoDepartments" [value]="peoItem">
+                                                {{peoItem.name}} - {{peoItem.riskClass}}</mat-option
+                                            >
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="organizationIDAliases.errors?.required"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="addNewDepartmentFlag && userIsProducerAdmin">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.newDepartmentID"]}}</span>
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="newDepartmentId"
+                                            [attr.aria-label]="languageStrings['primary.portal.members.workLabel.newDepartmentID']"
+                                            [maxlength]="maxNewDeptIdLength"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-hint> {{languageStrings["primary.portal.members.workLabel.newDepartmentIdHint"]}} </mat-hint>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','newDepartmentId')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].workInformation['controls'].newDepartmentId.errors?.pattern"
+                                            [language]="'secondary.portal.members.workValidationMsg.newDepartmentError'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="isEmployerNameFieldEnabled && !isDirect && isMember">
+                                <div class="flex-item field-wrapper">
+                                    <mat-label class="mat-label" for="employer-name-mmp">
+                                        <span>{{languageStrings["primary.portal.pda.form.employerName"]}}</span>
+                                        <span *ngIf="!isEmployerNameFieldReadOnly" class="optional-text">
+                                            {{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="employerName"
+                                            matInput
+                                            id="employer-name-mmp"
+                                            class="mon-input"
+                                            [attr.aria-label]="languageStrings['primary.portal.direct.addCustomer.employerName']"
+                                            (input)="employerNameInputHandler($event)"
+                                        />
+                                        <mat-error
+                                            *ngIf="memberWorkForm.controls.workInformation['controls'].employerName.errors?.maxlength"
+                                            [language]="'secondary.portal.census.manualEntry.maxlength100'"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.occupation">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" for="job-title">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.jobTitle"]}}</span>
+                                        <span *ngIf="(requiredFields && isOccupationRequired)" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="occupation"
+                                            matInput
+                                            id="Job Title"
+                                            class="mon-input"
+                                            empoweredTrimSpace
+                                            [maxlength]="max_length"
+                                            [readonly]="readOnlyFieldElementSetting.occupation"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.jobTitle']}} {{languageStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','occupation')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].workInformation['controls'].occupation.errors?.pattern as patternError"
+                                        >
+                                            <span
+                                                *ngIf="patternError && !patternError.nameWithHypenApostrophesValidation"
+                                                [language]="'secondary.portal.members.workValidation.jobFields'"
+                                            >
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div *ngIf="isHoursPerWeekMandatory && showHoursPerWeekAlert" class="hours-per-week">
+                            <mon-alert alertType="info" class="hours-per-week-alert">
+                                <span language="primary.portal.members.workLabel.hoursPerWeekRequired"></span>
+                            </mon-alert>
+                        </div>
+                        <ng-container *ngIf="hideFieldElementSetting.occupationDescription">
+                            <div class="d-md-flex flex-wrap">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label" for="job-duties">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.jobDuties"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('jobDuties'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="multiline-input w-500">
+                                        <textarea
+                                            rows="5"
+                                            formControlName="occupationDescription"
+                                            matInput
+                                            id="job-duties"
+                                            class="mon-input"
+                                            empoweredTrimSpace
+                                            [maxlength]="max_length"
+                                            [readonly]="readOnlyFieldElementSetting.occupationDescription"
+                                            attr.aria-label="{{languageStrings['primary.portal.members.workLabel.jobDuties']}} {{languageStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        ></textarea>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','occupationDescription')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="memberWorkForm['controls'].workInformation['controls'].occupationDescription.errors?.pattern as patternError"
+                                        >
+                                            <span
+                                                *ngIf="patternError && !patternError.nameWithHypenApostrophesValidation"
+                                                [language]="'secondary.portal.members.workValidation.jobFields'"
+                                            >
+                                            </span>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <!-- HTML team will be working on error message lasbel -->
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container formGroupName="employeeCustomID">
+                                <ng-container *ngFor="let memberIdentifierType of memberIdentifierTypes$ | async">
+                                    <div class="flex-item">
+                                        <mat-label class="mat-label">
+                                            <span *ngIf="memberIdentifierType.name === employeeIdNumber && !isMember && !isDirect">
+                                                {{memberIdentifierType.name}}</span
+                                            >
+                                            <span *ngIf="memberIdentifierType.name === employeeIdNumber && !isMember && isDirect">
+                                                {{languageStrings["primary.portal.common.custIdNumber"]}}</span
+                                            >
+                                            <span *ngIf="memberIdentifierType.type === cifNumber && hasCifNumber">
+                                                <span *hasPermission="permissionEnum.MEMBER_READ_CIF"> {{memberIdentifierType.name}}</span>
+                                            </span>
+                                            <span
+                                                *ngIf="!(requiredFields && isRequiredField(memberIdentifierType.type)) && memberIdentifierType.type !== 'EMPLOYEE_ID' && !isEmployeeIdMandatory && memberIdentifierType.type !== aflacGuid && memberIdentifierType.type !== cifNumber && memberIdentifierType.type !== 'CUSTOM'"
+                                                class="optional-text"
+                                                >{{languageStrings["primary.portal.common.optional"]}}</span
+                                            >
+                                            <span
+                                                *ngIf="memberIdentifierType.type === 'EMPLOYEE_ID' && !isEmployeeIdFieldRequired  && memberIdentifierType.name === employeeIdNumber && !isMember && !isEmployeeIdMandatory"
+                                                class="optional-text"
+                                                >{{languageStrings["primary.portal.common.optional"]}}</span
+                                            >
+                                            <span *ngIf="memberIdentifierType.type === cifNumber && hasCifNumber">
+                                                <span *hasPermission="permissionEnum.MEMBER_READ_CIF" class="optional-text">
+                                                    {{languageStrings["primary.portal.common.optional"]}}
+                                                </span>
+                                            </span>
+                                        </mat-label>
+                                        <!-- EmployeeID INPUT -->
+                                        <mat-form-field
+                                            class="employee-id-number"
+                                            *ngIf="memberIdentifierType.name === employeeIdNumber && !isMember"
+                                        >
+                                            <input
+                                                matInput
+                                                [formControlName]="memberIdentifierType.type"
+                                                [maxLength]="employeeIdMaxLength"
+                                                attr.aria-label="{{memberIdentifierType.name}} {{languageStrings['primary.portal.common.optional']}}"
+                                                (input)="isFormValueChange = true"
+                                                (blur)="employeeIdChanges()"
+                                                [readonly]="isPartialEdit || isAflacReadOnly || isVestedAgent"
+                                                [disableControl]="disableFormFields"
+                                            />
+                                            <mat-error
+                                                *ngIf="customIDAliases.get(memberIdentifierType.type).errors?.required && !isEmployeeIdMandatory"
+                                                [language]="'secondary.portal.members.requiredField'"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="customIDAliases.get(memberIdentifierType.type).errors?.pattern"
+                                                [language]="'secondary.portal.members.workValidationMsg.customIDPatternMsg'"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <!-- CIF INPUT -->
+                                        <ng-container *hasPermission="permissionEnum.MEMBER_READ_CIF">
+                                            <mat-form-field
+                                                class="employee-id-number"
+                                                *ngIf="memberIdentifierType.type === cifNumber && hasCifNumber"
+                                            >
+                                                <input
+                                                    matInput
+                                                    [formControlName]="memberIdentifierType.type"
+                                                    attr.aria-label="{{memberIdentifierType.name}} {{languageStrings['primary.portal.common.optional']}}"
+                                                    [readonly]="true"
+                                                    [disableControl]="true"
+                                                />
+                                            </mat-form-field>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                        <div *ngIf="showMonAlert && isEmployeeIdMandatory" class="employee-id-alert">
+                            <mon-alert alertType="info">
+                                <span>{{languageStrings["primary.portal.members.workLabel.employeeIdRemoved"]}}</span>
+                                <span class="word-spaces">{{state.memberInfo.name.firstName}}</span>
+                                <span>{{languageStrings["primary.portal.members.workLabel.alreadyEnrollInAPlan"]}}</span>
+                            </mon-alert>
+                        </div>
+                    </div>
+
+                    <div class="flex-form-item mon-pb-40" *ngIf="userIsProducerAdmin || isSelfEnrollment" formGroupName="workInformation">
+                        <ng-container *ngIf="hideFieldElementSetting.payrollFrequencyId && !isSelfEnrollment">
+                            <div class="d-md-flex flex-wrap" *ngIf="!isDirect">
+                                <div class="flex-item w-250">
+                                    <mat-label class="mat-label" id="parollFrequency">
+                                        <span>{{languageStrings["primary.portal.members.workLabel.payrollFrequency"]}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('payrollFrequencyId'))" class="optional-text"
+                                            >{{languageStrings["primary.portal.common.optional"]}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field class="paroll-frequency">
+                                        <mat-select
+                                            formControlName="payrollFrequencyId"
+                                            placeholder="Select"
+                                            aria-labelledby="parollFrequency"
+                                            class="mon-input"
+                                            [disableControl]="(readOnlyFieldElementSetting.payrollFrequencyId && !isDirect) || disableFormFields"
+                                            (selectionChange)="isFormValueChange = true"
+                                        >
+                                            <mat-option *ngFor="let frequency of payrollFrequencies" value="{{ frequency.id }}">
+                                                {{ frequency.name }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="validateMessage('workInformation','payrollFrequencyId')"
+                                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <div class="d-md-flex justify-content-between">
+                            <mat-label class="mat-label" for="actual-salary">
+                                {{languageStrings["primary.portal.members.workLabel.actualSalary"]}}</mat-label
+                            >
+                            <button
+                                class="mon-btn-link"
+                                type="button"
+                                mat-flat-button
+                                (click)="openDialogSalary('actualSalary')"
+                                *ngIf="dataActualSalary.length > 0"
+                                [disabled]="isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                            >
+                                {{languageStrings["primary.portal.members.workLabel.addSalary"]}}
+                            </button>
+                        </div>
+                        <button
+                            class="mon-btn-link"
+                            type="button"
+                            mat-flat-button
+                            (click)="openDialogSalary('actualSalary')"
+                            *ngIf="dataActualSalary.length === 0"
+                            [disabled]="isPartialEdit || isAflacReadOnly || disableFormFields || isVestedAgent"
+                        >
+                            {{languageStrings["primary.portal.members.workLabel.addSalary"]}}
+                        </button>
+                        <mat-error
+                            *ngIf="actualSalaryIsRequiredError"
+                            [language]="'secondary.portal.members.workValidationMsg.requiredAction'"
+                        >
+                        </mat-error>
+                        <table mat-table matSort [dataSource]="dataSourceActualSalary" *ngIf="dataActualSalary.length > 0">
+                            <ng-container matColumnDef="annualSalary">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.quickQuote.missingInfo.SALARY"></th>
+                                <td mat-cell *matCellDef="let element; let i = index">
+                                    <span *ngIf="!element.unmaskedAnnualSalary || element.masked"
+                                        >$&bull;&bull;&bull;&bull;&bull;&bull;</span
+                                    >
+                                    <span *ngIf="element.unmaskedAnnualSalary && !element.masked">${{element.unmaskedAnnualSalary}}</span>
+                                    <span>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="element.masked"
+                                            (click)="salaryMaskingToggler(i, actualSalary, element)"
+                                            >{{languageStrings["primary.portal.common.show"]}}</a
+                                        >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="!element.masked"
+                                            (click)="salaryMaskingToggler(i, actualSalary, element)"
+                                            >{{languageStrings["primary.portal.common.hide"]}}</a
+                                        >
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="hoursPerYear">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.members.workLabel.hoursPerWeek"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="!element.hourlyWage else weeksHours"> &ndash;</span>
+                                    <ng-template #weeksHours>
+                                        <span>{{ element.annualSalary / (totalWeeksInYear * element.hourlyWage) | number: '1.0-2' }}</span>
+                                    </ng-template>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="type">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.type"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.hourlyWage"
+                                        >{{languageStrings["primary.portal.members.workLabel.hourlySalary"]}}</span
+                                    >
+                                    <span *ngIf="!element.hourlyWage"
+                                        >{{languageStrings["primary.portal.members.workLabel.annualSalary"]}}</span
+                                    >
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="validity.effectiveStarting">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.startDate"]}}</th>
+                                <td mat-cell *matCellDef="let element">{{ element.validity.effectiveStarting | date: 'MM/dd/yyyy'}}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="validity.expiresAfter">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.endDate"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.validity.expiresAfter"
+                                        >{{ element.validity.expiresAfter | date: 'MM/dd/yyyy' }}</span
+                                    >
+                                    <span *ngIf="!element.validity.expiresAfter"
+                                        >{{languageStrings["primary.portal.members.workLabel.ongoing"]}}</span
+                                    >
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="manage">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.manage"]}}</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    <span *ngIf="!isPartialEdit || !isAflacReadOnly || !isVestedAgent">
+                                        <a
+                                            *ngIf="!disableFormFields && element.ongoing"
+                                            href="javascript:void(0)"
+                                            (click)="openDialogSalary('actualSalary', element)"
+                                            language="primary.portal.common.edit"
+                                        >
+                                        </a>
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsSalary"></tr>
+                            <tr
+                                (mouseover)="getRowFromActualSalaryTableShow(row)"
+                                (mouseout)="getRowFromActualSalaryTableHide(row)"
+                                mat-row
+                                *matRowDef="let row; columns: displayedColumnsSalary"
+                            ></tr>
+                        </table>
+
+                        <div class="d-md-flex justify-content-between mon-mt-20" *ngIf="hideFieldElementSetting.benefitSalaryTable">
+                            <mat-label class="mat-label" for="benefit-salary">
+                                <span>{{languageStrings["primary.portal.members.workLabel.benefitSalary"]}}</span>
+                                <a
+                                    id="benefit-salary"
+                                    href="javascript:void(0)"
+                                    [richTooltip]="languageStrings['primary.portal.members.workLabel.benefitSalaryTooltipMessage']"
+                                    matTooltipClass="pos-above"
+                                    matTooltipPosition="above"
+                                    [attr.aria-label]="languageStrings['primary.portal.members.workLabel.benefitSalary']"
+                                >
+                                    <mon-icon
+                                        iconName="Filled-info"
+                                        [iconSize]="15"
+                                        class="infoicon mon-icon icon-primary"
+                                        aria-describedby="benefit-salary"
+                                    >
+                                    </mon-icon>
+                                </a>
+                            </mat-label>
+                            <button
+                                class="mon-btn-link"
+                                type="button"
+                                mat-flat-button
+                                (click)="openDialogSalary('benefitSalary')"
+                                *ngIf="dataBenefitSalary.length > 0"
+                            >
+                                {{languageStrings["primary.portal.members.workLabel.addBenefitSalary"]}}
+                            </button>
+                        </div>
+                        <button
+                            class="mon-btn-link"
+                            type="button"
+                            mat-flat-button
+                            (click)="openDialogSalary('benefitSalary')"
+                            *ngIf="dataBenefitSalary.length === 0 && hideFieldElementSetting.benefitSalaryTable"
+                        >
+                            {{languageStrings["primary.portal.members.workLabel.addBenefitSalary"]}}
+                        </button>
+                        <mat-error
+                            *ngIf="benefitSalaryIsRequiredError && hideFieldElementSetting.benefitSalaryTable"
+                            [language]="'secondary.portal.members.workValidationMsg.required'"
+                        >
+                        </mat-error>
+                        <table
+                            mat-table
+                            [dataSource]="dataSourceBenefitSalary"
+                            *ngIf="dataBenefitSalary.length > 0 && hideFieldElementSetting.benefitSalaryTable"
+                        >
+                            <ng-container matColumnDef="annualSalary">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.quickQuote.missingInfo.SALARY"></th>
+                                <td mat-cell *matCellDef="let element; let i = index">
+                                    <span *ngIf="!element.unmaskedAnnualSalary || element.masked"
+                                        >$&bull;&bull;&bull;&bull;&bull;&bull;</span
+                                    >
+                                    <span *ngIf="element.unmaskedAnnualSalary && !element.masked">${{element.unmaskedAnnualSalary}}</span>
+                                    <span>
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="element.masked"
+                                            (click)="salaryMaskingToggler(i, benefitSalary, element)"
+                                            >{{languageStrings["primary.portal.common.show"]}}</a
+                                        >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="!element.masked"
+                                            (click)="salaryMaskingToggler(i, benefitSalary, element)"
+                                            >{{languageStrings["primary.portal.common.hide"]}}</a
+                                        >
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="hoursPerYear">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.members.workLabel.hoursPerWeek"></th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="!element.hourlyWage else weeksHours"> &ndash;</span>
+                                    <ng-template #weeksHours>
+                                        <span>{{ element.annualSalary / (totalWeeksInYear * element.hourlyWage) | number: '1.0-2' }}</span>
+                                    </ng-template>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="type">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.type"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.hourlyWage"
+                                        >{{languageStrings["primary.portal.members.workLabel.hourlySalary"]}}</span
+                                    >
+                                    <span *ngIf="!element.hourlyWage"
+                                        >{{languageStrings["primary.portal.members.workLabel.annualSalary"]}}</span
+                                    >
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="validity.effectiveStarting">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.startDate"]}}</th>
+                                <td mat-cell *matCellDef="let element">{{ element.validity.effectiveStarting | date: 'MM/dd/yyyy' }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="validity.expiresAfter">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.endDate"]}}</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span *ngIf="element.validity.expiresAfter"
+                                        >{{ element.validity.expiresAfter | date: 'MM/dd/yyyy'}}</span
+                                    >
+                                    <span *ngIf="!element.validity.expiresAfter"
+                                        >{{languageStrings["primary.portal.members.workLabel.ongoing"]}}</span
+                                    >
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="manage">
+                                <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.members.workLabel.manage"]}}</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    <span>
+                                        <a
+                                            *ngIf="!disableFormFields && element.ongoing"
+                                            href="javascript:void(0)"
+                                            (click)="openDialogSalary('benefitSalary', element)"
+                                            language="primary.portal.common.edit"
+                                        >
+                                        </a>
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsSalary"></tr>
+                            <tr
+                                (mouseover)="getRowFromBenefitSalaryTableShow(row)"
+                                (mouseout)="getRowFromBenefitSalaryTableHide(row)"
+                                mat-row
+                                *matRowDef="let row; columns: displayedColumnsSalary"
+                            ></tr>
+                        </table>
+                    </div>
+
+                    <div class="flex-form-item mon-pb-40" *ngIf="userIsProducerAdmin && !isDirect">
+                        <div *ngFor="let type of classTypes">
+                            <div class="d-md-flex justify-content-between mon-mt-20">
+                                <mat-label class="mat-label" for="actual-salary">
+                                    <span>{{languageStrings["primary.portal.members.workLabel.classType"]}}</span>
+                                    <span>: {{ type.name }}</span></mat-label
+                                >
+                                <button
+                                    class="mon-btn-link"
+                                    type="button"
+                                    mat-flat-button
+                                    (click)="getDropdownDataClassNames(type.name, type.id)"
+                                    *ngIf="type?.classDetails && type?.classDetails.value && type?.classDetails.value.length > 0"
+                                    [attr.aria-label]="languageStrings['primary.portal.members.workLabel.classType']"
+                                >
+                                    {{languageStrings["primary.portal.members.workLabel.addClassLabel"]}}
+                                </button>
+                            </div>
+                            <button
+                                class="mon-btn-link"
+                                type="button"
+                                mat-flat-button
+                                (click)="getDropdownDataClassNames(type.name, type.id)"
+                                *ngIf="type?.classDetails && type?.classDetails.value && type?.classDetails.value.length === 0"
+                            >
+                                {{languageStrings["primary.portal.members.workLabel.addClassLabel"]}}
+                            </button>
+                            <table
+                                #classTables
+                                mat-table
+                                id="{{ type.id }}"
+                                [dataSource]="type?.classDetails"
+                                *ngIf="type?.classDetails && type?.classDetails.value && type?.classDetails.value.length > 0"
+                            >
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{languageStrings["primary.portal.members.workLabel.className"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="validity.effectiveStarting">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{languageStrings["primary.portal.members.workLabel.startDate"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{ element.validity.effectiveStarting | date: 'MM/dd/yyyy'}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="validity.expiresAfter">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{languageStrings["primary.portal.members.workLabel.endDate"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="element.validity.expiresAfter"
+                                            >{{ element.validity.expiresAfter | date: 'MM/dd/yyyy'}}</span
+                                        >
+                                        <span *ngIf="!element.validity.expiresAfter"
+                                            >{{languageStrings["primary.portal.members.workLabel.ongoing"]}}</span
+                                        >
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="manage">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{languageStrings["primary.portal.members.workLabel.manage"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        <button
+                                            *ngIf="!disableFormFields"
+                                            mat-icon-button
+                                            type="button"
+                                            [matMenuTriggerFor]="menu"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                                        >
+                                            <mon-icon iconName="ellipsis" class="more-option icon-primary" aria-label="menu"> </mon-icon>
+                                        </button>
+                                        <mat-menu #menu="matMenu">
+                                            <button
+                                                mat-menu-item
+                                                mat-row
+                                                type="button"
+                                                (click)="getDropdownDataClassNames(type.name, type.id, element)"
+                                            >
+                                                {{languageStrings["primary.portal.common.edit"]}}
+                                            </button>
+                                        </mat-menu>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumnsClass"></tr>
+                                <tr
+                                    (mouseover)="getRowFromClassTableShow(row)"
+                                    (mouseout)="getRowFromClassTableHide(row)"
+                                    mat-row
+                                    *matRowDef="let row; columns: displayedColumnsClass"
+                                ></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="flex-form-item mon-pb-40" *ngIf="userIsProducerAdmin && !isDirect">
+                        <div *ngFor="let type of regionTypes">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" for="region">
+                                    <span>{{languageStrings["primary.portal.members.workLabel.region"]}}</span>: {{type.name}}</mat-label
+                                >
+                                <table mat-table id="{{type.id}}" [dataSource]="type.sourceData">
+                                    <ng-container matColumnDef="name">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings["primary.portal.members.workLabel.regionName"]}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="validity.effectiveStarting">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings["primary.portal.members.workLabel.startDate"]}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            {{ element.validity.effectiveStarting | date: 'MM/dd/yyyy'}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="validity.expiresAfter">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{languageStrings["primary.portal.members.workLabel.endDate"]}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span *ngIf="element.validity.expiresAfter"
+                                                >{{ element.validity.expiresAfter | date: 'MM/dd/yyyy'}}</span
+                                            >
+                                            <span *ngIf="!element.validity.expiresAfter"
+                                                >{{languageStrings["primary.portal.members.workLabel.ongoing"]}}</span
+                                            >
+                                        </td>
+                                    </ng-container>
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsRegion"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsRegion"></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="flex-form-footer fixed-position">
+                    <button
+                        mat-flat-button
+                        class="mon-btn-secondary mon-mr-30"
+                        type="button"
+                        *ngIf="(memberWorkForm.dirty || isFormValueChange) && formInitialized"
+                        (click)="revertForm()"
+                    >
+                        {{languageStrings["primary.portal.common.undoChanges"]}}
+                    </button>
+                    <button *ngIf="isSaved && !isFormValueChange" type="button" mat-flat-button class="mon-btn-success">
+                        <span>
+                            <mon-icon class="check-icon" iconName="check" aria-label="check" [iconSize]="19"></mon-icon>
+                        </span>
+                        <span>{{languageStrings["primary.portal.common.saved"]}}</span>
+                    </button>
+                    <ng-container *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                        <button
+                            mat-flat-button
+                            *ngIf="!isSaved || isFormValueChange"
+                            class="mon-btn-primary"
+                            [disabled]="!(memberWorkForm.dirty || isFormValueChange) || !formInitialized"
+                            type="submit"
+                        >
+                            {{ languageStrings["primary.portal.common.save"] }}
+                        </button>
+                    </ng-container>
+                </footer>
+            </fieldset>
+        </form>
+    </div>
+</div>

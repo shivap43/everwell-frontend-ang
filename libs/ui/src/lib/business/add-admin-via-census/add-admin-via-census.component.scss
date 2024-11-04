@@ -1,0 +1,40 @@
+@import "shared";
+
+:host ::ng-deep {
+    .mat-stepper-horizontal {
+        width: 600px;
+    }
+
+    .mat-table {
+        .mat-header-row {
+            height: 0;
+        }
+    }
+
+    td.mat-column-select {
+        text-align: right;
+    }
+}
+
+.last-name-search-wrapper {
+    background-color: get("color.gray.200");
+    padding: convert-unit(16px, "rem") convert-unit(15px, "rem");
+
+    span {
+        color: get("color.gray.600");
+        margin-left: convert-unit(5px, "rem");
+    }
+}
+
+.census-container {
+    max-height: calc(100vh - 400px);
+    padding: 0;
+    overflow-y: auto;
+}
+
+.mon-btn-search {
+    margin-top: convert-unit(22px, "rem");
+    .mon-icon-search ::ng-deep .mat-icon {
+        vertical-align: text-top;
+    }
+}

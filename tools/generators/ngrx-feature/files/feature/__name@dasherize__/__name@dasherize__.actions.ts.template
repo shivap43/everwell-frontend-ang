@@ -1,0 +1,27 @@
+import { createAction, props, union } from "@ngrx/store";
+import { <%= classify(name) %>Entity } from "./<%= dasherize(name) %>.model";
+
+import { ApiError } from "@empowered/shared";
+
+export const init = createAction("[<%= classify(name) %>] Init");
+
+export const setSelected<%= classify(name) %> = createAction(
+    "[<%= classify(name) %>] Set Selected <%= classify(name) %>",
+    props<{ selectedId: string | number }>()
+);
+
+export const load<%= classify(name) %>Success = createAction(
+    "[<%= classify(name) %>/API] Load <%= classify(name) %> Success",
+    props<{ <%= camelize(name) %>: <%= classify(name) %>Entity[] }>()
+);
+
+export const load<%= classify(name) %>Failure = createAction("[<%= classify(name) %>/API] Load <%= classify(name) %> Failure", props<{ error: ApiError }>());
+
+const actions = union({
+    init,
+    setSelected<%= classify(name) %>,
+    load<%= classify(name) %>Success,
+    load<%= classify(name) %>Failure,
+});
+
+export type ActionsUnion = typeof actions;

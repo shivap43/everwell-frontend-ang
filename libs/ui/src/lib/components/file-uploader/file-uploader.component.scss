@@ -1,0 +1,26 @@
+@import "shared";
+
+:host > div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+ngx-dropzone {
+    width: 100%;
+    height: convert-unit(50px, "rem");
+    color: get("color.gray.700");
+    border: convert-unit(1px, "rem") dashed get("color.primary.500");
+}
+
+.test-image {
+    height: convert-unit(0px, "rem");
+    width: convert-unit(0px, "rem");
+    overflow: hidden;
+    visibility: hidden;
+}
+
+mat-hint {
+    flex-grow: 1;
+    border-bottom: solid get("color.gray.700") convert-unit(1px, "rem");
+}

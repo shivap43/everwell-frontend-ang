@@ -1,0 +1,88 @@
+@import "shared";
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.benefit-offering-container {
+    overflow: hidden;
+    padding: map-get($spacers, 0) map-get($spacers, 20);
+}
+.benefit-offering-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: map-get($spacers, 5);
+}
+.benefits-container {
+    border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+.settings-content {
+    border-left: convert-unit(1px, "rem") solid get("color.gray.500");
+    flex-grow: 1;
+    height: 100%;
+
+    ::ng-deep {
+        h2 {
+            color: get("color.black");
+            margin-top: convert-unit(25px, "rem");
+            margin-bottom: convert-unit(10px, "rem");
+            font-weight: normal;
+        }
+        h3 {
+            color: get("color.black");
+            margin-top: convert-unit(30px, "rem");
+            font-weight: normal;
+            margin-bottom: convert-unit(10px, "rem");
+            // color: rgb(64, 64, 64);
+        }
+    }
+}
+.left-stepper-content {
+    width: convert-unit(240px, "rem");
+}
+
+/****** New styles ******/
+.set-regions-wrapper {
+    margin-left: convert-unit(30px, "rem");
+    margin-right: convert-unit(30px, "rem");
+    h3 {
+        color: get("color.black");
+        margin-top: convert-unit(25px, "rem");
+        margin-bottom: convert-unit(11px, "rem");
+    }
+    .choose-Eligibles {
+        padding-bottom: 30px;
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    }
+    .select-region-btn {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: convert-unit(36px, "rem");
+    }
+}
+
+//CSS to target only IE-11 browser
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    .benefit-offering-container {
+        overflow: auto;
+    }
+    .benefits-container {
+        ::ng-deep {
+            .settings-content {
+                width: 100%;
+            }
+
+            .mat-chip-list {
+                .mat-chip-list-wrapper {
+                    display: block;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,47 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-25" role="form">
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title language="primary.portal.forgotPassword.verifyCodeTitle"> </mat-card-title>
+            <p class="mon-my-15">
+                <span language="primary.portal.forgotPassword.verifyCodeSubTitle"></span>
+            </p>
+            <mon-alert *ngIf="error" alertType="danger" role="alert">
+                <span [language]="errorMessage"></span>
+            </mon-alert>
+            <mat-label
+                class="mat-label mon-mt-30"
+                language="primary.portal.forgotPassword.authenticationCode"
+            ></mat-label>
+
+            <mat-form-field>
+                <input formControlName="authCode" matInput type="Verify" [attr.aria-label]="languageStrings.authCode" />
+                <mat-error language="primary.portal.forgotPassword.required"></mat-error>
+            </mat-form-field>
+        </mat-card-content>
+        <mat-card-footer class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-btn-primary mon-mb-30"
+                mat-flat-button
+                type="submit"
+                [attr.aria-label]="languageStrings.buttonSubmit"
+            >
+                {{languageStrings.buttonSubmit}}
+            </button>
+            <p class="mon-m-0">
+                <!-- TODO:need to make a change in the below anchor tag post conformation from BA team -->
+                <a
+                    href="javascript:void(0)"
+                    (click)="regenerateAuthCode()"
+                    [attr.aria-label]="languageStrings.didtReceiveCode"
+                    >{{languageStrings.didtReceiveCode}}</a
+                >
+            </p>
+            <mat-divider class="mon-my-20"></mat-divider>
+            <p>
+                <a href=" javascript:void(0)" (click)="navigateBack()" [attr.aria-label]="languageStrings.buttonBack"
+                    >{{languageStrings.buttonBack}}</a
+                >
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

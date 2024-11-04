@@ -1,0 +1,8 @@
+<form [formGroup]="form">
+    <empowered-checkbox-list ngDefaultControl formControlName="genders" [options]="(genders$ | async)" [showSelectAll]="false"
+        ><mat-error
+            *ngIf="form.controls.genders.touched && form.controls.genders.errors?.required"
+            language="primary.portal.common.selectionRequired"
+        ></mat-error
+    ></empowered-checkbox-list>
+</form>

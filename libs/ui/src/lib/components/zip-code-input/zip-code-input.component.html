@@ -1,0 +1,19 @@
+<mat-label class="mat-label" for="zip" [attr.id]="inputLabelElementId" [language]="inputLabel"></mat-label>
+<mat-form-field>
+    <input
+        matInput
+        empoweredNumberValidation
+        [allowDashes]="true"
+        empoweredZipCodeFormat
+        class="mon-input"
+        [formControl]="zipCodeControl"
+        [attr.minlength]="zipMinimumLength$ | async"
+        [attr.maxlength]="zipMaximumLength$ | async"
+        [readonly]="readonly"
+        (blur)="onTouched"
+        [attr.aria-label]="ariaLabel"
+    />
+    <mat-error *ngIf="zipCodeControl.errors?.pattern" [language]="patternError"></mat-error>
+    <mat-error *ngIf="zipCodeControl.errors?.mismatch" [language]="stateMismatchError"></mat-error>
+    <mat-error *ngIf="zipCodeControl.errors?.parentError"><ng-content></ng-content></mat-error>
+</mat-form-field>

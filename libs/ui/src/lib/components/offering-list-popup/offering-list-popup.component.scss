@@ -1,0 +1,48 @@
+@import "shared";
+
+.info-modal {
+    .mat-dialog-content {
+        padding: 0;
+        .header {
+            padding: convert-unit(50px, "rem") convert-unit(50px, "rem") convert-unit(30px, "rem");
+        }
+        .mat-dialog-title {
+            margin: 0;
+        }
+    }
+    .scroll-content {
+        padding: 0 convert-unit(50px, "rem") convert-unit(30px, "rem");
+        overflow-y: auto;
+        max-height: 57vh;
+    }
+    .offering-wrapper {
+        border: convert-unit(1px, "rem") solid get("color.gray.600");
+        display: flex;
+        padding: convert-unit(30px, "rem") convert-unit(10px, "rem");
+        align-items: stretch;
+        margin-bottom: convert-unit(20px, "rem");
+        .offering-amount {
+            width: convert-unit(150px, "rem");
+            border-right: convert-unit(1px, "rem") dotted get("color.gray.600");
+            margin-right: convert-unit(30px, "rem");
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            h2 {
+                color: get("color.black");
+                margin: 0;
+            }
+        }
+        .offering-description {
+            h4 {
+                margin: 0 0 convert-unit(5px, "rem");
+                @include fontFace("primary.bold");
+            }
+        }
+
+        .offering-name::after {
+            content: "\a";
+            white-space: pre;
+        }
+    }
+}

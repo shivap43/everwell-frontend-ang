@@ -1,0 +1,103 @@
+<div class="date-range-control">
+    <mat-label class="mat-label"> {{labelKey}} </mat-label>
+    <div class="date-range-wrapper">
+        <mat-form-field>
+            <input
+                matInput
+                #startDate
+                [formControl]="startDateControl"
+                (keypress)="validateNumber($event)"
+                (input)="maskDate($event)"
+                (blur)="onBlur(startDateControl); updateValueValidity()"
+                maxlength="10"
+            />
+            <mat-error>
+                <span
+                    *ngIf="startDateControl.hasError('required') && !startDateControl.hasError('requirements') && !startDateControl.hasError('invalid')"
+                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                >
+                <span *ngIf="startDateControl.hasError('requirements')"
+                    >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                >
+                <span *ngIf="startDateControl.hasError('invalid')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                >
+                <span *ngIf="startDateControl.hasError('contiguous')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.startDate.overlapping']}}</span
+                >
+                <span *ngIf="startDateControl.hasError('pastDate')">{{languageStrings['primary.portal.coverage.cannotBePast']}}</span>
+                <span *ngIf="startDateControl.hasError('invalidStartDate') && !startDateControl.hasError('required')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidstartdate']}}</span
+                >
+                <span *ngIf="shouldBeFirstDateOfMonth">
+                    {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.firstDateOfMonth']}}</span
+                >
+                <span *ngIf="shouldBe90DaysFromToday">
+                    {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.threeMonths']}}</span
+                >
+                <span *ngIf="shouldBe180DaysFromToday">
+                    {{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.sixMonths']}}</span
+                >
+            </mat-error>
+            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+        </mat-form-field>
+        <span class="hifen">&mdash;</span>
+        <mat-form-field>
+            <input
+                matInput
+                #endDate
+                [formControl]="endDateControl"
+                (keypress)="validateNumber($event)"
+                (input)="maskDate($event)"
+                (blur)="onBlur(endDateControl)"
+                maxlength="10"
+            />
+            <mat-error>
+                <span
+                    *ngIf="endDateControl.hasError('required') &&
+            !endDateControl.hasError('requirements') && !endDateControl.hasError('invalid')"
+                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                >
+                <span *ngIf="endDateControl.hasError('requirements') && !endDateControl.hasError('invalid')"
+                    >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                >
+                <span *ngIf="endDateControl.hasError('invalid') && !endDateControl.hasError('required')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                >
+                <span
+                    *ngIf="endDateControl.hasError('pastDate') && !endDateControl.hasError('required') && !endDateControl.hasError('invalidEndDate')"
+                    >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                >
+                <span *ngIf="endDateControl.hasError('invalidEndDate') && !endDateControl.hasError('required')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidenddate']}}</span
+                >
+                <span *ngIf="endDateControl.hasError('contiguous')"
+                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.endDate.overlapping'].replace("#effectivedays",
+                    this.isCoverageDatesContiguous.validity)}}</span
+                >
+            </mat-error>
+            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+        </mat-form-field>
+
+        <button
+            ngxDaterangepickerMd
+            [startDateRef]="startDateInput"
+            [endDateRef]="endDateInput"
+            [startDateControl]="startDateControl"
+            [endDateControl]="endDateControl"
+            autoApply="true"
+            [minDate]="minDate"
+            [maxDate]="maxDate"
+            closeOnAutoApply="true"
+            id="el"
+            type="button"
+            class="date-icon-wrapper"
+            opens="left"
+            mat-flat-button
+            (datesUpdated)="updateValueValidity()"
+            [disabled]="isDatePickerDisabled"
+        >
+            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon class="icon-white"> </mon-icon>
+        </button>
+    </div>
+</div>

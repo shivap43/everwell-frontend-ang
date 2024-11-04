@@ -1,0 +1,20 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeModal()">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <p>
+            {{ "primary.portal.cartLock.cartLockText" | replaceTag: { "#lockedbydata": data.lockedBy } }}
+            <!-- This cart is currently locked because {{data.lockedBy}} is making updates. Once they exit the cart
+            application, you can regain access. -->
+        </p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button mat-flat-button class="mon-btn-primary" aria-label="Got it" (click)="closeModal()">
+            {{languageStrings['primary.portal.common.gotIt']}}
+        </button>
+    </mat-dialog-actions>
+</div>

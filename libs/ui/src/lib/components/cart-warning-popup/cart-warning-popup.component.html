@@ -1,0 +1,136 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <ng-container *ngIf="data.isQleDuringOE">
+            <span *ngIf="data.selectedShop === ShopEnum.QLE_SHOP"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startLifeEventEnrollment']}}</span
+            >
+            <span *ngIf="data.selectedShop === ShopEnum.OE_SHOP"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startOpenEnrollment']}}</span
+            >
+        </ng-container>
+        <ng-container *ngIf="!data.memberPortal && data.isQleAfterOE">
+            <span *ngIf="data.selectedShop === ShopEnum.QLE_SHOP && !newHireQle.length"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startCurrentCoverageUpdates']}}</span
+            >
+            <span *ngIf="data.selectedShop === ShopEnum.QLE_SHOP  && newHireQle.length"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleStartCurrentCoverageUpdates']}}</span
+            >
+            <span *ngIf="data.selectedShop === ShopEnum.OE_SHOP && !newHireQle.length"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startFutureCoverageUpdates']}}</span
+            >
+            <span *ngIf="data.selectedShop === ShopEnum.OE_SHOP && newHireQle.length"
+                >{{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleStartFutureCoverageUpdates']}}</span
+            >
+        </ng-container>
+        <ng-container *ngIf="data.memberPortal && data.isQleAfterOE">
+            <span *ngIf="data.selectedShop === ShopEnum.QLE_SHOP">
+                {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.startCurrentCoverageUpdates"] }}
+            </span>
+            <span *ngIf="data.selectedShop === ShopEnum.NEW_PY_QLE_SHOP">
+                {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.startFutureCoverageUpdates"] }}
+            </span>
+        </ng-container>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div *ngIf="data.isQleDuringOE">
+            <button mat-flat-button *ngIf="data.selectedShop === ShopEnum.QLE_SHOP" class="mon-btn-primary" (click)="clearCart()">
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartEnrollLifeEvent']}}
+            </button>
+            <button mat-flat-button *ngIf="data.selectedShop === ShopEnum.OE_SHOP" class="mon-btn-primary" (click)="clearCart()">
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartEnrollOpen']}}
+            </button>
+        </div>
+
+        <div *ngIf="(!data.memberPortal && data.isQleAfterOE)">
+            <button
+                mat-flat-button
+                *ngIf="data.selectedShop === ShopEnum.QLE_SHOP && !newHireQle.length"
+                class="mon-btn-primary"
+                (click)="clearCart()"
+            >
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartUpdates.current']}}
+            </button>
+            <button
+                mat-flat-button
+                *ngIf="data.selectedShop === ShopEnum.QLE_SHOP && newHireQle.length"
+                class="mon-btn-primary"
+                (click)="clearCart()"
+            >
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleClearStartUpdates.current']}}
+            </button>
+            <button
+                mat-flat-button
+                *ngIf="data.selectedShop === ShopEnum.OE_SHOP && !newHireQle.length"
+                class="mon-btn-primary"
+                (click)="clearCart()"
+            >
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartUpdates.future']}}
+            </button>
+            <button
+                mat-flat-button
+                *ngIf="data.selectedShop === ShopEnum.OE_SHOP && newHireQle.length"
+                class="mon-btn-primary"
+                (click)="clearCart()"
+            >
+                {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleClearStartUpdates.future']}}
+            </button>
+        </div>
+
+        <div *ngIf="data.memberPortal && data.isQleAfterOE">
+            <button mat-flat-button *ngIf="data.selectedShop === ShopEnum.QLE_SHOP" class="mon-btn-primary" (click)="clearCart()">
+                {{ languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartUpdates.current'] }}
+            </button>
+            <button mat-flat-button *ngIf="data.selectedShop === ShopEnum.NEW_PY_QLE_SHOP" class="mon-btn-primary" (click)="clearCart()">
+                {{ languageStrings['primary.portal.shop.cartWarning.dualPlanYear.clearStartUpdates.future'] }}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <ng-container *ngIf="!data.memberPortal">
+            <ng-container *ngIf="data.isQleDuringOE">
+                <div *ngIf="data.selectedShop === ShopEnum.QLE_SHOP">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startLifeEventEnrollmentContent']}}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.OE_SHOP">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startOpenEnrollmentContent']}}
+                </div>
+            </ng-container>
+            <ng-container *ngIf="data.isQleAfterOE">
+                <div *ngIf="data.selectedShop === ShopEnum.QLE_SHOP && !newHireQle.length">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startLifeEventEnrollmentContentTwo'] | replaceTag: {
+                    "##employeename##": this.data.memberName } }}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.QLE_SHOP && newHireQle.length">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleStartLifeEventEnrollmentContentTwo'] |
+                    replaceTag: { "##employeename##": this.data.memberName } }}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.OE_SHOP && !newHireQle.length">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.startOpenEnrollmentContentTwo'] | replaceTag: {
+                    "##employeename##": this.data.memberName } }}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.OE_SHOP && newHireQle.length">
+                    {{languageStrings['primary.portal.shop.cartWarning.dualPlanYear.newHireQleStartOpenEnrollmentContentTwo'] | replaceTag:
+                    { "##employeename##": this.data.memberName } }}
+                </div>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="data.memberPortal">
+            <ng-container *ngIf="data.isQleDuringOE">
+                <div *ngIf="data.selectedShop === ShopEnum.QLE_SHOP">
+                    {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.qleCartWarning"] }}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.OE_SHOP">
+                    {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.oeCartWarning"] }}
+                </div>
+            </ng-container>
+            <ng-container *ngIf="data.isQleAfterOE">
+                <div *ngIf="data.selectedShop === ShopEnum.QLE_SHOP">
+                    {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.startAnotherYearContent.current"] }}
+                </div>
+                <div *ngIf="data.selectedShop === ShopEnum.NEW_PY_QLE_SHOP">
+                    {{languageStrings["primary.portal.shop.cartWarning.dualPlanYear.startAnotherYearContent.future"] }}
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+</empowered-modal>

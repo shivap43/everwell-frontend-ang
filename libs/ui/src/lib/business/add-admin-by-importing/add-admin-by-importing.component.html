@@ -1,0 +1,87 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="addByImportingForm">
+        <div mat-dialog-content>
+            <h2 mat-dialog-title *ngIf="!isOffering">{{languageStrings['primary.portal.administrators.searchForAdmin']}}</h2>
+            <h2 mat-dialog-title *ngIf="isOffering">{{languageStrings['primary.portal.administrators.addAdministrator']}}</h2>
+            <empowered-mon-spinner [enableSpinner]="true" *ngIf="isLoading"> </empowered-mon-spinner>
+            <div class="w-200 d-flex">
+                <div>
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.searchByEmailAddress']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            #email
+                            formControlName="emailAddress"
+                            [attr.aria-label]="languageStrings['primary.portal.administrators.searchByEmailAddress']"
+                        />
+                        <mat-error>
+                            <span *ngIf="addByImportingForm.controls['emailAddress'].hasError('required')"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</span
+                            >
+                            <span *ngIf="addByImportingForm.controls['emailAddress'].hasError('pattern')"
+                                >{{languageStrings['primary.portal.administrators.enterValidEmail']}}</span
+                            >
+                            <span *ngIf="addByImportingForm.controls['emailAddress'].hasError('invalid')"
+                                >{{languageStrings['primary.portal.administrators.emailNotFound']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <button
+                        type="submit"
+                        mat-flat-button
+                        class="mon-btn-search mon-btn-primary mon-mt-20"
+                        (click)="onSearch(email)"
+                        [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                    >
+                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="import-admin-details">
+                <div class="last-name-search-wrapper" *ngIf="adminFoundFlag">
+                    <div>
+                        {{searchedAdmin.name}}
+                        <span>{{searchedAdmin.emailAddress}}</span>
+                        <div>{{languageStrings['primary.portal.administrators.importAdmin.role']}} {{searchedAdmin.role}}</div>
+                        <div>{{languageStrings['primary.portal.administrators.currentlyAssignedTo']}}</div>
+                    </div>
+
+                    <p *ngFor="let adminAccount of adminAccounts">{{adminAccount.name}}</p>
+                </div>
+            </div>
+            <mon-alert *ngIf="errorFlag || searchErrorFlag" alertType="danger">
+                <span>{{errorMessage}}</span>
+            </mon-alert>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" class="mon-btn-link mon-px-0" mat-button mat-dialog-close (click)="closeForm()"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <div>
+                <button
+                    *ngIf="isOffering"
+                    type="button"
+                    class="mon-btn-secondary mon-mr-15"
+                    mat-flat-button
+                    (click)="onBack()"
+                    [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                >
+                    <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                    <span>{{languageStrings['primary.portal.common.back']}}</span>
+                </button>
+                <button class="mon-btn-primary mon-dialog-button mon-px-30" (click)="onImport()" mat-flat-button type="submit">
+                    <span>{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</div>

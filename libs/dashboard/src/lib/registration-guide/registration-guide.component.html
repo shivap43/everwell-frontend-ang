@@ -1,0 +1,28 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="false">
+    <empowered-modal-header>
+        <h2 language="primary.portal.helpfulLinks.guide.header" class="header-content"></h2>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" mat-flat-button [mat-dialog-close]="true">
+            <span>{{languageStrings['primary.portal.common.close']}}</span>
+        </button>
+    </empowered-modal-footer>
+
+    <form>
+        <p language="primary.portal.helpfulLinks.guide.statement"></p>
+        <div class="guide-details">
+            <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+            <div>
+                <p class="file-name" language="primary.portal.helpfulLinks.guide.header"></p>
+                <a target="_blank" href="{{registrationGuide$| async}}" language="primary.portal.reportList.download.pdf"> </a>
+            </div>
+        </div>
+        <div class="guide-details">
+            <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+            <div>
+                <p class="file-name" language="primary.portal.registrationGuide.hrEmail.doc"></p>
+                <a target="_blank" href="{{emailTemplateFile$| async}}" language="primary.portal.reportList.download.pdf"> </a>
+            </div>
+        </div>
+    </form>
+</empowered-modal>

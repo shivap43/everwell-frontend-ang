@@ -1,0 +1,180 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="dialog-content">
+    <div class="review-submit-wrapper">
+        <h3 class="mon-mb-20">
+            {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.reviewSubmit']}}
+        </h3>
+        <p>
+            {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.submittedChangesMessage']}}
+        </p>
+        <table mat-table [dataSource]="changeDataArray" class="mon-mt-20">
+            <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="changetype">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.changeType']}}
+                </th>
+                <ng-container>
+                    <td mat-cell *matCellDef="let element">{{element.transactionForm}}</td>
+                </ng-container>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="change">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.change']}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div *ngFor="let changeValue of element.changedData; let i = index">
+                        <mon-icon
+                            class="icon-warning"
+                            iconName="Filled-warning"
+                            *ngIf="!changeValue.id && changeValue.name"
+                            [iconSize]="20"
+                        ></mon-icon>
+                        <ng-container>
+                            <span *ngIf="changeValue.id">{{ toTitleCase(changeValue?.id)}}:</span>
+                            <span *ngIf="changeValue.name"> {{changeValue?.name }}</span>
+                            <ng-container
+                                *ngIf="element.transactionForm===CHANGE_IN_BENEFICIARY_INFO; else otherDetails"
+                            >
+                                <span *ngIf="changeValue.firstName && changeValue.lastName && changeValue.relationship">
+                                    {{changeValue.firstName | titlecase}} {{changeValue.lastName | titlecase}} -
+                                    {{changeValue.relationship}}
+                                </span>
+                                <span *ngIf="changeValue.allocation && changeValue.allocationType">
+                                    ({{ changeValue.allocationType.toLowerCase() }}) - {{changeValue.allocation}}%</span
+                                >
+                            </ng-container>
+                            <ng-template #otherDetails>
+                                <span
+                                    *ngIf="element.transactionForm !== CHANGE_NAME && i !== element.changedData.length-1"
+                                    >,&nbsp;</span
+                                >
+                                <ng-container *ngIf="element.transactionForm === CHANGE_NAME">
+                                    <p *ngIf="checkForNextLine(element.changedData, i)"></p>
+                                    <span
+                                        *ngIf="i !== element.changedData.length-1 && !checkForNextLine(element.changedData, i)"
+                                        >,&nbsp;</span
+                                    >
+                                </ng-container>
+                            </ng-template>
+                        </ng-container>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.manage']}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <button
+                        mat-icon-button
+                        [matMenuTriggerFor]="beforeMenu"
+                        [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                    >
+                        <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary"></mon-icon>
+                    </button>
+
+                    <mat-menu #beforeMenu="matMenu" xPosition="before">
+                        <button mat-menu-item (click)="editTransaction(element)">
+                            {{languageStrings['primary.portal.common.edit']}}
+                        </button>
+                        <div class="seperator"></div>
+                        <button mat-menu-item class="text-danger" (click)="removeTransaction(element)">
+                            {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.remove']}}
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="producerId">
+            <h3 class="mon-mt-45">
+                {{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.signature']}}
+            </h3>
+            <div *ngIf="!isAdmin" class="signature flex-form-wrapper">
+                <div class="d-md-flex">
+                    <mat-label class="mat-label signature-property flex-item"
+                        >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.agentSignature']}}</mat-label
+                    >
+
+                    <span class="flex-item"> {{agentName}} </span>
+                </div>
+                <div class="d-md-flex">
+                    <mat-label class="mat-label signature-property flex-item"
+                        >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.electronicallySignedOn']}}</mat-label
+                    >
+
+                    <span class="flex-item"> {{electronicallySignedOnDate}} </span>
+                </div>
+            </div>
+        </div>
+        <p class="acknowledgement">
+            <span class="ack-label"
+                >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.acknowledgement']}}</span
+            >
+            <span
+                >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.disclaimer']}}</span
+            >
+        </p>
+
+        <form [formGroup]="reviewAndSubmitForm">
+            <div class="w-200">
+                <mat-label class="mat-label">
+                    <span
+                        >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.customerSignature']}}</span
+                    >
+                    <span class="optional-text"></span>
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.reviewAndSubmit.customerSignature']"
+                        class="mon-input"
+                        formControlName="signature"
+                        matInput
+                    />
+                    <mat-error
+                        *ngIf="reviewAndSubmitForm.get('signature').hasError('required')"
+                        language="{{PCRLanguagePath}}.signatureRequired"
+                    ></mat-error>
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+
+    <div class="pcralert-section">
+        <mon-alert alertType="danger" *ngIf="showErrorMessage" class="showErrorMessage">
+            <span>{{ errorMessage }}</span>
+        </mon-alert>
+
+        <mon-alert alertType="warning" *ngIf="warningMessage" class="showErrorMessage">
+            <span language="{{PCRLanguagePath}}.warningMessage"></span>
+        </mon-alert>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <div>
+        <button class="mon-btn-link" aria-label="Cancel" (click)="onCancel()" mat-flat-button>
+            <span>{{languageStrings['primary.portal.common.cancel']}}</span>
+        </button>
+    </div>
+    <div>
+        <button type="button" class="mon-btn-secondary" mat-flat-button (click)="onBack()">
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+        <button type="submit" class="mon-btn-primary mon-ml-20" (click)="onSubmit()" mat-flat-button>
+            <span>{{languageStrings['primary.portal.common.submit']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

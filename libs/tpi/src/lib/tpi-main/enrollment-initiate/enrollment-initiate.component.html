@@ -1,0 +1,82 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<empowered-tpi-secondary-header>{{secondaryHeaderInfo}}</empowered-tpi-secondary-header>
+<div class="tpi-content">
+    <div *ngIf="stepId === stepperOne">
+        <mat-radio-group [formControl]="selectedOption" (change)="chooseOption($event.value)">
+            <div class="radio-btn">
+                <mat-radio-button value="selfService"
+                    >{{languageStrings['primary.portal.tpiEnrollment.enrollingMyself']}}</mat-radio-button
+                >
+            </div>
+            <div class="radio-btn">
+                <mat-radio-button value="agentAssisted"
+                    >{{languageStrings['primary.portal.tpiEnrollment.enrollingAnEmployee']}}</mat-radio-button
+                >
+            </div>
+        </mat-radio-group>
+        <mat-error *ngIf="selectedOption.hasError('require')">
+            {{languageStrings["primary.portal.common.selectionRequired"]}}
+        </mat-error>
+    </div>
+
+    <div class="slide-seven" *ngIf="stepId === stepperTwo">
+        {{languageStrings['primary.portal.tpiEnrollment.helpEnrollment']}} {{subHeading}}
+    </div>
+
+    <div *ngIf="stepId === stepperThree">
+        <div class="slide-eight">
+            {{helpProducts}} {{subHeading}}
+        </div>
+        <ul>
+            <li *ngFor="let agentAssisted of agentAssistedProductArray">
+                {{agentAssisted}}
+            </li>
+        </ul>
+        <div>
+            {{enrollProducts}}
+        </div>
+        <div class="tpi-enroll-wrapper">
+            <ul>
+                <li *ngFor="let selfAssist of selfAssistedProductArray">
+                    {{selfAssist}}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<empowered-tpi-footer class="tpi-footer">
+    <div *ngIf="!tpiLnlMode">
+        <a
+            *ngIf="stepId === stepperOne || stepId === stepperThree || existingCoverageSummaryFlag"
+            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+            (click)="onExit()"
+            class="mon-btn-link"
+            mat-flat-button
+        >
+            {{languageStrings['primary.portal.tpiEnrollment.exit']}}
+        </a>
+    </div>
+    <div [ngClass]="{'lnl-enroll-footer' : tpiLnlMode}">
+        <button
+            *ngIf="stepId === stepperThree || stepId === stepperTwo"
+            mat-button
+            class="mon-btn-secondary"
+            (click)="onBack()"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            {{languageStrings['primary.portal.tpiEnrollment.back']}}
+        </button>
+        <button *ngIf="stepId === stepperTwo" mat-button class="mon-btn-primary" (click)="onExit()">
+            {{covergaeSummaryButtonText}}
+        </button>
+        <button
+            *ngIf="stepId === stepperThree || stepId === stepperOne"
+            mat-button
+            class="mon-btn-primary"
+            (click)="proceedFurther()"
+        >
+            {{languageStrings['primary.portal.common.continue']}}
+        </button>
+    </div>
+</empowered-tpi-footer>

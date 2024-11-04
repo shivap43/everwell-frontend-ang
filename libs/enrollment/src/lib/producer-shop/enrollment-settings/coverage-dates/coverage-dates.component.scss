@@ -1,0 +1,50 @@
+@import "shared";
+
+$input-width-px: 145px;
+$datepicker-padding: map-get($spacers, 10);
+$label-bottom-padding: map-get($spacers, 5);
+$checkbox-padding: map-get($spacers, 20);
+
+:host {
+    display: block;
+}
+
+mat-checkbox {
+    margin-bottom: $checkbox-padding;
+}
+
+.datepickers {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -$datepicker-padding;
+}
+
+mat-label {
+    width: 50%;
+    padding: $datepicker-padding $datepicker-padding 0;
+
+    display: flex;
+    align-items: flex-end;
+}
+
+.datepicker {
+    width: 50%;
+    padding: 0 $datepicker-padding $datepicker-padding;
+}
+.expand-to-full-row {
+    width: 100%;
+}
+
+mat-form-field {
+    width: convert-unit($input-width-px, "rem");
+}
+
+mat-form-field:last-child {
+    margin: 0;
+}
+
+.message {
+    font-size: convert-unit(14px, "rem");
+    line-height: convert-unit(18px, "rem");
+    padding-top: map-get($spacers, 20);
+}

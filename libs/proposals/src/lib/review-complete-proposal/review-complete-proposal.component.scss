@@ -1,0 +1,137 @@
+@import "shared";
+
+.review-complete-container {
+    padding: convert-unit(30px, "rem") convert-unit(30px, "rem") convert-unit(30px, "rem") convert-unit(25px, "rem");
+
+    h2 + p {
+        margin: convert-unit(8px, "rem") convert-unit(0px, "rem") convert-unit(36px, "rem");
+    }
+
+    h2,
+    h3,
+    h4 {
+        color: get("color.black");
+        margin: convert-unit(0px, "rem");
+    }
+
+    .review-settings-container {
+        padding: convert-unit(30px, "rem") convert-unit(0px, "rem");
+        border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+
+            a {
+                font-size: convert-unit(14px, "rem");
+            }
+        }
+    }
+
+    .mat-table {
+        margin: convert-unit(20px, "rem") convert-unit(0px, "rem");
+
+        th {
+            width: convert-unit(200px, "rem");
+
+            &:first-child {
+                width: convert-unit(450px, "rem");
+            }
+        }
+    }
+
+    .mat-accordion {
+        display: block;
+        margin-top: convert-unit(25px, "rem");
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+
+        .mat-accordion-wrapper {
+            ::ng-deep .mat-expanded span.mat-expansion-indicator {
+                top: convert-unit(20px, "rem");
+            }
+
+            .mat-expansion-panel {
+                border: convert-unit(0px, "rem");
+
+                .mat-expansion-panel-header {
+                    cursor: pointer;
+                    background-color: get("color.gray.200");
+                    border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+                    position: relative;
+                    padding: convert-unit(20px, "rem") convert-unit(30px, "rem") convert-unit(20px, "rem") convert-unit(40px, "rem");
+
+                    &.mat-expanded {
+                        background: get("color.white");
+                    }
+
+                    .mat-expansion-panel-header-title {
+                        align-items: center;
+                    }
+                }
+            }
+
+            .mat-content,
+            .mat-expanded,
+            .mat-expansion-panel-content {
+                background-color: get("color.white");
+            }
+
+            .mat-expansion-panel-header-description {
+                justify-content: flex-end;
+                margin-right: convert-unit(0px, "rem");
+
+                .plan-count {
+                    width: 60px;
+                    text-align: right;
+                }
+            }
+
+            .mat-expansion-panel-body {
+                background-color: get("color.white");
+                padding: convert-unit(0px, "rem") convert-unit(25px, "rem") convert-unit(5px, "rem") convert-unit(40px, "rem");
+                border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+                border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+            }
+
+            ::ng-deep span.mat-expansion-indicator {
+                position: absolute;
+                left: convert-unit(15px, "rem");
+                top: convert-unit(14px, "rem");
+            }
+
+            ::ng-deep .mon-icon.infoicon {
+                margin: convert-unit(5px, "rem") convert-unit(5px, "rem") convert-unit(0px, "rem");
+            }
+
+            .mat-expansion-panel-spacing {
+                margin-bottom: convert-unit(0px, "rem");
+                border-top: 1px solid get("color.gray.700");
+                border-bottom: 1px solid get("color.gray.700");
+            }
+        }
+    }
+
+    .review-footer {
+        display: flex;
+        justify-content: flex-end;
+        border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+        padding-top: convert-unit(30px, "rem");
+
+        .mon-btn-secondary {
+            margin-right: convert-unit(20px, "rem");
+        }
+    }
+
+    .warning {
+        margin-top: convert-unit(10px, "rem");
+    }
+
+    .missingEmployerFlyer {
+        width: 100%;
+    }
+
+    :host ::ng-deep .mat-menu-panel {
+        width: convert-unit(180px, "rem");
+        margin-top: convert-unit(7px, "rem");
+    }
+}

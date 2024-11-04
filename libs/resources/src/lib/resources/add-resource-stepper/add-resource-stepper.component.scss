@@ -1,0 +1,144 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+}
+
+::ng-deep .add-resource-stepper {
+    .mat-dialog-container {
+        overflow: auto;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+
+    h2 {
+        margin: 0;
+    }
+}
+
+:host ::ng-deep .mat-vertical-stepper-header.mat-step-header {
+    padding-left: convert-unit(43px, "rem");
+}
+
+:host ::ng-deep .mat-stepper-vertical .mat-vertical-content-container {
+    margin-left: convert-unit(50px, "rem");
+    margin-bottom: 0;
+
+    &:before {
+        height: convert-unit(18px, "rem");
+    }
+}
+
+.content-wrapper {
+    flex-grow: 1;
+    height: calc(100vh - 294px) !important;
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: convert-unit(30px, "rem");
+        color: get("color.black");
+    }
+    .resource-rules,
+    .date-input {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .field-wrapper {
+        width: convert-unit(200px, "rem");
+        margin-right: convert-unit(15px, "rem");
+
+        &.field-wrapper-email {
+            width: convert-unit(250px, "rem");
+        }
+    }
+
+    .field-wrapper-dropdown {
+        width: convert-unit(95px, "rem");
+        margin-right: convert-unit(10px, "rem");
+    }
+
+    .field-wrapper-check {
+        margin-top: convert-unit(25px, "rem");
+    }
+
+    .divider {
+        margin-bottom: convert-unit(10px, "rem");
+    }
+
+    .seperator {
+        margin: convert-unit(40px, "rem") 0;
+    }
+
+    .mat-button.mat-primary {
+        padding: 0;
+    }
+
+    .mat-warn {
+        margin: convert-unit(20px, "rem");
+    }
+}
+
+.dialog-footer {
+    border-top: convert-unit(1px, "rem") solid;
+
+    .mon-btn-regular {
+        padding: 0;
+    }
+
+    button {
+        ::ng-deep .mon-icon {
+            margin: 0 convert-unit(5px, "rem");
+
+            .mat-icon .cls-1 {
+                fill: get("color.white");
+            }
+        }
+    }
+
+    .mon-btn-secondary {
+        margin-right: convert-unit(20px, "rem");
+
+        ::ng-deep .mon-icon {
+            margin: 0 convert-unit(5px, "rem");
+
+            .mat-icon .cls-1 {
+                fill: get("color.primary.500");
+            }
+        }
+    }
+}
+
+.mat-form-field {
+    ::ng-deep .mat-form-field-prefix {
+        top: 0;
+        color: get("color.gray.400");
+    }
+}
+
+.mat-dialog-actions {
+    padding: 0;
+    align-items: baseline;
+    margin: 0;
+}
+
+:host ::ng-deep label.mat-radio-label {
+    margin: convert-unit(8px, "rem") convert-unit(20px, "rem") 0 0;
+}
+
+:host ::ng-deep .mon-alert {
+    margin: convert-unit(20px, "rem") 0;
+    width: convert-unit(415px, "rem");
+}
+
+.content {
+    overflow: hidden !important;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}

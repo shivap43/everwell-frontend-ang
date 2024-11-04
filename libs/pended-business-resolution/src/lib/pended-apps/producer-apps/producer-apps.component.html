@@ -1,0 +1,133 @@
+<div class="pended-producer">
+    <empowered-pbr-sub-header
+        [showCompanyCodeSelect]="dataSource?.data?.length > 0"
+        (companyCodeSelectionChange)="onCompanyCodeSelectionChange($event)"
+    >
+        <h2>
+            {{getTitle()}}
+            <span class="application-count">({{ dataSource?.data?.length }})</span>
+        </h2>
+    </empowered-pbr-sub-header>
+    <div class="table-mask-wrapper" [hidden]="dataSource?.data?.length === 0">
+        <div class="results-grid table-mask-wrapper">
+            <table mat-table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+                <!-- Transmittal Number Column -->
+                <ng-container matColumnDef="writingNumber">
+                    <th *matHeaderCellDef id="writingNumber" mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.producerApps.writing"]}}</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'writingNumber'}">
+                        <a href="javascript:void(0)" (click)="onWritingNumberClick(element)">
+                            {{ element.writingNumber }}
+                        </a>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="associateName">
+                    <th *matHeaderCellDef id="associateName" mat-sort-header mat-header-cell>
+                        <span *ngIf="level === SearchLevel.DSC"
+                            >{{languageStrings["primary.portal.pendedBusiness.producerApps.dscName"]}}</span
+                        >
+                        <span *ngIf="level === SearchLevel.RSC"
+                            >{{languageStrings["primary.portal.pendedBusiness.producerApps.rscName"]}}</span
+                        >
+                        <span *ngIf="level === SearchLevel.PRODUCER"
+                            >{{languageStrings["primary.portal.pendedBusiness.producerApps.producerName"]}}</span
+                        >
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'associateName'}">
+                        <span *ngIf="element.associateName?.split(' ') as names">
+                            {{ (names[1] + ', ' + names[0]) | titlecase}}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="totalAPPendedNewBusiness">
+                    <th *matHeaderCellDef id="totalAPPendedNewBusiness" mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.producerApps.totalAp"]}}</span>
+                    </th>
+                    <td
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'totalAPPendedNewBusiness'}"
+                        class="text-right"
+                    >
+                        <span>
+                            {{ element.totalAPPendedNewBusiness | currency}}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="totalAPPendedConversion">
+                    <th *matHeaderCellDef id="totalAPPendedConversion" mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.producerApps.pendedConversion"]}}</span>
+                    </th>
+                    <td
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'totalAPPendedConversion'}"
+                        class="text-right"
+                    >
+                        <span>
+                            {{ element.totalAPPendedConversion | currency}}
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="newBusinessIssuedToday">
+                    <th *matHeaderCellDef id="newBusinessIssuedToday" mat-sort-header mat-header-cell>
+                        <span>{{languageStrings["primary.portal.pendedBusiness.producerApps.newBusiness"]}}</span>
+                    </th>
+                    <td
+                        mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{'sorted-column': activeCol === 'newBusinessIssuedToday'}"
+                        class="text-right"
+                    >
+                        <span>
+                            {{ element.newBusinessIssuedToday | currency}}
+                        </span>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+        <div
+            class="min-range-label"
+            [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1 || dataSource?.filteredData?.length === 0"
+        >
+            <span>
+                {{ "primary.portal.commission.producer.showingItems" | replaceTag: { "##length##":
+                dataSource?.data?.length } }}
+            </span>
+        </div>
+        <div
+            class="paginator-wrapper"
+            [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() === 1 || dataSource?.filteredData?.length === 0"
+            [ngClass]="{'range-actions-hide': dataSource?.paginator?.getNumberOfPages() === 1}"
+        >
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                {{languageStrings["primary.portal.common.page"]}}
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ dataSource.paginator.getNumberOfPages() }}"
+                    [attr.aria-label]="languageStrings['primary.portal.common.page']"
+                />
+                <span
+                    >{{ languageStrings["primary.portal.reportList.paginator.of"] + " " +
+                    dataSource?.paginator?.getNumberOfPages() }}</span
+                >
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="no-results" *ngIf="dataSource?.filteredData?.length === 0 && dataSource?.data?.length !== 0">
+        {{languageStrings["primary.portal.pendedBusiness.allPendedApps.noResults"].replace("#companyCode",
+        selectedCompanyCode)}}
+    </div>
+    <div class="no-results" *ngIf="dataSource?.data?.length === 0">
+        {{languageStrings["primary.portal.pendedBusiness.zeroState"]}}
+    </div>
+</div>

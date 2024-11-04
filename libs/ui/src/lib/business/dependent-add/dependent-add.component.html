@@ -1,0 +1,42 @@
+<div>
+    <div>
+        <div [ngClass]="{'header-wrapper' : !isTpi}">
+            <a
+                href="javascript:void(0)"
+                (click)="backClick()"
+                class="mon-btn-link"
+                *ngIf="!isTpi"
+                [attr.aria-label]="languageStrings.ariaBack"
+            >
+                {{languageStrings.ariaBack}}</a
+            >
+            <h1>{{dependentFirstName}} {{dependentLastName}}</h1>
+        </div>
+        <mat-tab-group #tabs [@.disabled]="true" (selectedIndexChange)="isTabChange($event)" [ngClass]="{'dependent-add' : !isTpi}">
+            <mat-tab [label]="languageStrings.personal">
+                <ng-template matTabContent>
+                    <empowered-dependents-personal-info
+                        [routeMemberId]="memberId"
+                        [routeDependentId]="dependentId"
+                        [tpiSSODetails]="tpiSSODetails"
+                        (updateFirstName)="updateFirstName($event)"
+                        (updateLastName)="updateLastName($event)"
+                        (dependentSaved)="enableContactTab($event)"
+                        [tabIndex]="tabs.selectedIndex"
+                    >
+                    </empowered-dependents-personal-info>
+                </ng-template>
+            </mat-tab>
+            <mat-tab [label]="languageStrings.contact" [disabled]="!isDependentSaved">
+                <ng-template matTabContent>
+                    <empowered-dependents-contact-info
+                        [isContactTab]="isContactTab"
+                        [tpiSSODetails]="tpiSSODetails"
+                        [tabIndex]="tabs.selectedIndex"
+                    >
+                    </empowered-dependents-contact-info>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</div>

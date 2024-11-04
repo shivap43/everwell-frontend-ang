@@ -1,0 +1,17 @@
+<ng-container *ngIf="customBranding$ | async as customBranding; else defaultBranding">
+    <ng-container *ngIf="brandingSize$ | async as brandingSize">
+        <empowered-branding-logo [brandingInput]="customBranding" [sizeInput]="brandingSize" (click)="onLogoClicked()">
+        </empowered-branding-logo>
+    </ng-container>
+</ng-container>
+<ng-template #defaultBranding>
+    <a
+        class="branding-link"
+        [ngStyle]="{ 'background-color': color }"
+        [ngClass]="{'side-nav-branding': sideNavOpen}"
+        href="javascript:;"
+        [attr.aria-label]="languageStrings['primary.portal.branding.logo']"
+    >
+        <img [src]="logo" [alt]="languageStrings['primary.portal.branding.logo']" class="branding-logo" (click)="onLogoClicked()" />
+    </a>
+</ng-template>

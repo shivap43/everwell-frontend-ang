@@ -1,0 +1,77 @@
+@import "shared";
+
+:host {
+    min-height: 100vh;
+}
+
+.plan-and-products-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.shop-body {
+    width: 100%;
+    padding: 0 map-get($spacers, 30);
+    .margin-top-50 {
+        margin-top: map-get($spacers, 50);
+    }
+
+    .shop-button-group {
+        margin-top: map-get($spacers, 20);
+    }
+}
+
+.shop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: map-get($spacers, 15) map-get($spacers, 30);
+    border-bottom: convert-unit(1.5px, "rem") solid get("color.gray.800");
+}
+
+.shop-title {
+    font-size: convert-unit(36px, "rem");
+    line-height: convert-unit(42px, "rem");
+    color: get("color.gray.700");
+    @include fontFace("primary.light");
+}
+
+.vertical-border {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    border-right: convert-unit(1px, "rem") solid get("color.gray.600");
+    margin-left: convert-unit(-1px, "rem");
+    height: auto;
+    min-height: 100vh;
+    @include media-max("m") {
+        display: none;
+    }
+
+    //media queries for vertical border to hide between screen sizes 768px and 830px
+    @media only screen and (max-width: 835px) and (min-width: 768px) {
+        display: none;
+    }
+}
+
+// .empowered .stepper-overlay from _stepper.scss uses width: 100% !important
+.stepper-overlay.shown {
+    width: auto !important;
+}
+
+.stepperTrigger {
+    padding: map-get($spacers, 30) 0 map-get($spacers, 10) 0;
+    border-bottom: none;
+    ::ng-deep .mat-button-wrapper {
+        .selected-tab-label {
+            vertical-align: top;
+        }
+        .mon-icon {
+            vertical-align: top;
+        }
+    }
+    .selected-tab-label {
+        font-size: convert-unit(28px, "rem");
+    }
+}

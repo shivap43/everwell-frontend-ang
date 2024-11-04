@@ -1,0 +1,282 @@
+@import "shared";
+
+.policy-table {
+    margin-bottom: map-get($spacers, 20);
+
+    @include media-min("l") {
+        width: 80vw;
+    }
+
+    table {
+        @include fontFace("primary.regular");
+
+        mat-label {
+            @include fontFace("primary.regular");
+            margin-bottom: map-get($spacers, 0);
+            width: convert-unit(130px, "rem");
+
+            @include media-max("l") {
+                width: convert-unit(100px, "rem");
+            }
+        }
+
+        .mat-form-field {
+            margin: map-get($spacers, 0);
+            width: convert-unit(130px, "rem");
+
+            @include media-max("l") {
+                width: convert-unit(100px, "rem");
+            }
+        }
+
+        .error-message {
+            bottom: map-get($spacers, 0);
+            position: absolute;
+            text-align: left;
+            width: convert-unit(200px, "rem");
+        }
+
+        .mat-header-row {
+            .mat-header-cell {
+                padding: map-get($spacers, 10);
+                text-align: center;
+
+                .mat-form-field {
+                    text-align: center;
+                    @include fontFace("primary.regular");
+                }
+
+                &:first-child {
+                    text-align: left;
+
+                    .mat-form-field {
+                        text-align: left;
+                    }
+                }
+
+                &:last-child {
+                    border-bottom: map-get($spacers, 0);
+                }
+
+                &:nth-last-child(2) {
+                    background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                }
+            }
+
+            &:first-child {
+                .mat-header-cell {
+                    border: map-get($spacers, 0);
+                    color: get("color.black");
+                    @include fontFace("primary.bold");
+
+                    &:last-child {
+                        text-align: center;
+                    }
+                }
+            }
+
+            &:last-child {
+                .mat-header-cell {
+                    &:nth-last-child(3) {
+                        background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                    }
+                }
+            }
+        }
+
+        .mat-row {
+            .mat-cell {
+                border-bottom-color: get("color.gray.600");
+                border-bottom-width: convert-unit(1px, "rem");
+                @include fontFace("primary.regular");
+                padding: map-get($spacers, 15) map-get($spacers, 10);
+                position: relative;
+                text-align: center;
+
+                .mat-form-field {
+                    text-align: center;
+                    @include fontFace("primary.regular");
+                }
+
+                &:first-child {
+                    text-align: left;
+
+                    .mat-form-field {
+                        text-align: left;
+                    }
+                }
+
+                &:last-child {
+                    background-color: get("color.white");
+                    border-bottom: map-get($spacers, 0);
+                    text-align: left;
+
+                    a {
+                        color: get("color.info.danger.500") !important;
+                        text-decoration: none !important;
+                    }
+                }
+
+                &:nth-last-child(2),
+                &:nth-last-child(3) {
+                    background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                }
+            }
+
+            &.life,
+            &.employee {
+                .mat-cell {
+                    border-bottom: map-get($spacers, 0);
+                }
+            }
+
+            &.dependent,
+            &.employee {
+                .mat-cell {
+                    &:first-child {
+                        text-align: center;
+                    }
+                }
+            }
+
+            &:hover {
+                outline: none;
+                outline-offset: 0;
+            }
+        }
+
+        .mat-footer-row {
+            .mat-footer-cell {
+                color: get("color.black");
+                padding: map-get($spacers, 15) map-get($spacers, 10);
+                text-align: center;
+
+                .currency {
+                    width: convert-unit(100px, "rem");
+
+                    @include media-min("l") {
+                        width: convert-unit(130px, "rem");
+                    }
+                }
+
+                &:first-child {
+                    text-align: left;
+                }
+
+                &:last-child {
+                    border-bottom: map-get($spacers, 0);
+                }
+
+                &:nth-last-child(2) {
+                    background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                }
+            }
+
+            &:first-child {
+                .mat-footer-cell {
+                    &:nth-last-child(3) {
+                        background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                    }
+                }
+            }
+
+            &:last-child {
+                .mat-footer-cell {
+                    &:last-child {
+                        background-color: rgba($color: get("color.black"), $alpha: 0.02);
+                    }
+
+                    border: map-get($spacers, 0);
+                    padding: map-get($spacers, 10);
+                }
+            }
+
+            &.odd-footer {
+                background-color: get("color.gray.200");
+
+                .mat-footer-cell {
+                    &:last-child {
+                        background-color: get("color.white");
+                    }
+                }
+
+                &:hover {
+                    background-color: get("color.primary.50");
+                }
+            }
+
+            &.even-footer {
+                background-color: get("color.white");
+
+                .mat-footer-cell {
+                    &:last-child {
+                        background-color: get("color.white");
+                    }
+                }
+
+                &:hover {
+                    background-color: get("color.primary.50");
+                }
+            }
+        }
+
+        &.odd-length {
+            .mat-row {
+                &:nth-child(odd) {
+                    background-color: get("color.gray.200");
+
+                    &:hover {
+                        background-color: get("color.primary.50");
+                    }
+                }
+
+                &:nth-child(even) {
+                    background-color: get("color.white");
+
+                    &:hover {
+                        background-color: get("color.primary.50");
+                    }
+                }
+            }
+        }
+    }
+}
+
+.tpi-content-wrapper {
+    .producer-info {
+        .info-container {
+            display: flex;
+            align-items: center;
+            margin: map-get($spacers, 10) map-get($spacers, 0);
+
+            mat-label {
+                width: convert-unit(150px, "rem");
+                font-size: convert-unit(16px, "rem");
+                margin-bottom: map-get($spacers, 0);
+            }
+        }
+    }
+
+    ::ng-deep {
+        .mat-form-field.tax-value-req {
+            .mat-form-field-flex {
+                .mat-form-field-outline-end,
+                .mat-form-field-outline-start {
+                    border-color: get("color.info.danger.500");
+                }
+            }
+        }
+
+        .waiver-participation {
+            .mat-radio-button {
+                .mat-radio-label {
+                    white-space: normal;
+                }
+            }
+        }
+    }
+
+    & .tpi-content.pda-form {
+        max-height: calc(100vh - 188px) !important;
+    }
+}

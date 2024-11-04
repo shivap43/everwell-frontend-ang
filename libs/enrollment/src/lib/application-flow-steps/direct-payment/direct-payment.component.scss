@@ -1,0 +1,141 @@
+@import "shared";
+
+.section-container {
+    .header {
+        padding: 0;
+        h2 {
+            margin: 0 0 convert-unit(30px, "rem") 0;
+        }
+    }
+    .section-header {
+        p {
+            margin-top: map-get($spacers, 15);
+            margin-bottom: map-get($spacers, 15);
+        }
+    }
+}
+
+.radiowrapper {
+    .mat-radio-group {
+        display: flex;
+        flex-flow: column wrap;
+        margin-bottom: convert-unit(20px, "rem");
+        .mat-radio-button {
+            &:first-child {
+                margin-top: convert-unit(5px, "rem");
+            }
+            margin-top: convert-unit(10px, "rem");
+        }
+    }
+}
+
+.alert-message {
+    width: fit-content;
+}
+
+.vsp-wrapper {
+    .vsp-title {
+        margin-bottom: convert-unit(30px, "rem");
+    }
+    .vsp-description {
+        display: flex;
+        .vsp-label {
+            min-width: convert-unit(200px, "rem");
+            max-width: convert-unit(200px, "rem");
+            width: 100%;
+        }
+        .vsp-desc {
+            width: 100%;
+        }
+    }
+}
+.card-expiration-error {
+    color: get("color.info.danger.500");
+    position: relative;
+    top: 1px;
+}
+
+.card-expired-block {
+    width: convert-unit(654px, "rem");
+    height: convert-unit(44px, "rem");
+    margin-bottom: map-get($spacers, 20);
+}
+
+.card-expired-message {
+    font-size: convert-unit(14px, "rem");
+}
+
+.debit-card-msg {
+    margin-bottom: map-get($spacers, 25);
+}
+
+.authorized-agreement {
+    margin-top: map-get($spacers, 25);
+    margin-bottom: map-get($spacers, 25);
+}
+
+.section {
+    ::ng-deep {
+        .mat-form-field-flex {
+            max-width: convert-unit(200px, "rem");
+        }
+    }
+
+    margin-bottom: convert-unit(20px, "rem");
+}
+
+::ng-deep .directPayment-select.mat-select-panel {
+    min-width: calc(100% + 22px) !important;
+}
+.payment-date-hint {
+    display: block;
+    line-height: convert-unit(16px, "rem");
+}
+.view-details {
+    margin-bottom: map-get($spacers, 20);
+    .draft,
+    .credit-card,
+    .debit-card {
+        display: flex;
+        align-items: baseline;
+        padding-bottom: map-get($spacers, 10);
+        .label {
+            font-size: convert-unit(14px, "rem");
+            width: convert-unit(120px, "rem");
+            color: get("color.black");
+            @include fontFace("primary.bold");
+            line-height: convert-unit(17px, "rem");
+        }
+    }
+    .edit-account {
+        margin-top: map-get($spacers, 10);
+        margin-bottom: map-get($spacers, 15);
+    }
+    .delete-account {
+        color: get("color.info.danger.500");
+    }
+    .section-container {
+        .header {
+            h2 {
+                line-height: map-get($spacers, 35);
+            }
+        }
+    }
+}
+.icon-danger {
+    position: relative;
+    top: 2px;
+}
+.ach-information-alert {
+    width: convert-unit(530px, "rem");
+    margin-bottom: convert-unit(16px, "rem");
+}
+.ach-edit-retire-warning {
+    width: convert-unit(560px, "rem");
+}
+.radio-wrapper {
+    .mat-radio-group {
+        display: flex;
+        flex-direction: row;
+    }
+}

@@ -1,0 +1,20 @@
+@import "shared";
+.flex-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    .proposal-details {
+        padding: map-get($spacers, 30);
+        .header-text {
+            margin: 0 0 map-get($spacers, 30) 0;
+        }
+        @include media-min("m") {
+            .flex-item {
+                width: convert-unit(300px, "rem");
+            }
+        }
+    }
+}
+.edit-button {
+    margin-left: map-get($spacers, 10);
+    @include fontFace("primary.regular");
+}

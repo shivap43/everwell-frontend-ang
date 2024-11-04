@@ -1,0 +1,195 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="customer-wrapper">
+    <div class="alert-msg" *ngIf="!hasPermissionToAccount">
+        <mon-alert alertType="danger">
+            <span>{{ errorMessage }}</span>
+        </mon-alert>
+    </div>
+    <div *ngIf="!isSpinnerLoading && addCustomerScreenFlag && hasPermissionToAccount">
+        <h2>{{languageStrings["primary.portal.customer.title"]}}</h2>
+        <p>{{languageStrings["primary.portal.customer.zeroStateMsg"]}}</p>
+        <div class="mon-my-20">
+            <button (click)="addCustomer()" mat-flat-button class="mon-btn-secondary mon-mr-20" type="button">
+                {{languageStrings["primary.portal.customer.addCustomer"]}}
+            </button>
+            <!-- TODO : uncomment after generic shop quote page is implemented -->
+            <!-- <button mat-flat-button class="mon-btn-secondary mon-mr-20" type="button">
+                {{languageStrings["primary.portal.customer.quote"]}}
+            </button> -->
+        </div>
+    </div>
+    <div *ngIf="!isSpinnerLoading && !addCustomerScreenFlag && hasPermissionToAccount">
+        <h1>
+            {{languageStrings["primary.portal.customer.title"]}}
+            <span class="account-count">({{allCustomersResponse?.totalElements}})</span>
+        </h1>
+        <div class="search-filter-wraper">
+            <div autocomplete="off">
+                <div class="search-wrapper">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.customer.searchCustomers']}}</mat-label
+                    >
+                    <div>
+                        <mat-form-field>
+                            <input
+                                [formControl]="searchControl"
+                                class="mon-input"
+                                matInput
+                                type="text"
+                                autocomplete="off"
+                            />
+                            <mat-hint>{{languageStrings['primary.portal.customer.customerSearchHint']}}</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="customerCoverageProducts.length > 0 || customerNotifications.length > 0" class="filter-wrapper">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.customer.filters']}}</mat-label>
+                <div class="filter-sub-wrapper">
+                    <!-- Coverage -->
+                    <mat-form-field *ngIf="customerCoverageProducts.length > 0">
+                        <label class="filter-label">{{languageStrings['primary.portal.customer.coverage']}} </label>
+                        <mat-select
+                            #CoverageFilter
+                            multiple
+                            disableOptionCentering="true"
+                            [panelClass]="filterClassNames.coverage"
+                            [(value)]="selectedCoverageFilterOptions"
+                            (selectionChange)="coverageOptionSelect()"
+                        >
+                            <mat-select-trigger></mat-select-trigger>
+                            <div class="filter-options">
+                                <mat-option
+                                    *ngIf="customerCoverageProducts.length > 10"
+                                    value="All"
+                                    class="mat-option mon-mt-0"
+                                >
+                                    {{languageStrings['primary.portal.customer.allBenefits']}}
+                                </mat-option>
+                                <mat-divider *ngIf="customerCoverageProducts.length > 10"></mat-divider>
+                                <mat-option
+                                    *ngFor="let product of customerCoverageProducts"
+                                    [value]="product"
+                                    [disabled]="disableCoverageProducts"
+                                >
+                                    {{product}}
+                                </mat-option>
+                                <mat-divider></mat-divider>
+                                <mat-option
+                                    value="None"
+                                    class="mat-option mon-mt-0"
+                                    [disabled]="disableOptionNoBenefits"
+                                >
+                                    {{languageStrings['primary.portal.customer.noBenefits']}}
+                                </mat-option>
+                            </div>
+                            <div class="mon-clear">
+                                <div>
+                                    <a
+                                        *ngIf="selectedCoverageFilterOptions && selectedCoverageFilterOptions.length>0"
+                                        href="javascript:void(0)"
+                                        (click)="onReset(coverageConst)"
+                                        language="primary.portal.common.clear"
+                                    ></a>
+                                </div>
+                                <div>
+                                    <a
+                                        href="javascript:void(0)"
+                                        class="mon-apply"
+                                        (click)="onFilterApply(coverageConst)"
+                                        language="primary.portal.common.apply"
+                                    ></a>
+                                </div>
+                            </div>
+                        </mat-select>
+                        <label class="filter-label">
+                            <span
+                                *ngIf="coverageFilterStatusDisplayOptions && coverageFilterStatusDisplayOptions.length > 0 "
+                                >:
+                                <span *ngIf="coverageFilterStatusDisplayOptions.indexOf('All') >= 0"
+                                    >{{languageStrings['primary.portal.customer.all']}}</span
+                                >
+                                <span *ngIf="coverageFilterStatusDisplayOptions.indexOf('None') >= 0">None</span>
+                                <span
+                                    *ngIf="coverageFilterStatusDisplayOptions.length ===1 && !(coverageFilterStatusDisplayOptions.indexOf('All') >= 0) && !(coverageFilterStatusDisplayOptions.indexOf('None') >= 0) "
+                                >
+                                    {{coverageFilterStatusDisplayOptions[0]}}
+                                </span>
+                                <span
+                                    *ngIf="coverageFilterStatusDisplayOptions.length>1  && !(coverageFilterStatusDisplayOptions.indexOf('All') >= 0) && !(coverageFilterStatusDisplayOptions.indexOf('None') >= 0)"
+                                >
+                                    {{coverageFilterStatusDisplayOptions.length}}
+                                </span>
+                            </span></label
+                        >
+                    </mat-form-field>
+                    <!-- Coverage -->
+                    <!-- Notifications : need to un comment after business clarifications -->
+                    <mat-form-field *ngIf="customerNotifications.length > 0">
+                        <label class="filter-label">{{languageStrings['primary.portal.customer.notifications']}}</label>
+                        <mat-select
+                            #NotificationsFilter
+                            disableOptionCentering="true"
+                            multiple
+                            disableOptionCentering="true"
+                            [panelClass]="filterClassNames.notification"
+                            [(value)]="selectedNotificationFilterOptions"
+                        >
+                            <mat-select-trigger></mat-select-trigger>
+                            <div class="filter-options">
+                                <mat-option *ngFor="let notification of customerNotifications" [value]="notification">
+                                    {{notification.displayText}}
+                                </mat-option>
+                            </div>
+                            <div class="mon-clear">
+                                <div>
+                                    <a
+                                        href="javascript:void(0)"
+                                        language="primary.portal.common.clear"
+                                        (click)="onReset(notificationsConst)"
+                                    ></a>
+                                </div>
+                                <div>
+                                    <a
+                                        href="javascript:void(0)"
+                                        class="mon-apply"
+                                        (click)="onFilterApply(notificationsConst)"
+                                        language="primary.portal.common.apply"
+                                    ></a>
+                                </div>
+                            </div>
+                        </mat-select>
+                        <label class="filter-label">
+                            <span
+                                *ngIf="notificationsFilterStatusDisplayOptions && notificationsFilterStatusDisplayOptions.length > 0 "
+                                >:
+                                <span *ngIf="notificationsFilterStatusDisplayOptions.length <=2">
+                                    <span
+                                        *ngFor="let notificationsFilterStatusDisplayOption of notificationsFilterStatusDisplayOptions "
+                                    >
+                                        {{notificationsFilterStatusDisplayOption.displayText}}</span
+                                    >
+                                </span>
+                                <span *ngIf="notificationsFilterStatusDisplayOptions.length>2">
+                                    {{notificationsFilterStatusDisplayOptions.length}}
+                                </span>
+                            </span></label
+                        >
+                    </mat-form-field>
+                    <!-- Notifications -->
+                </div>
+            </div>
+            <div class="addCustomer">
+                <button (click)="addCustomer()" mat-flat-button class="mon-btn-secondary btn-sm" type="button">
+                    {{languageStrings['primary.portal.customer.addCustomer']}}
+                </button>
+            </div>
+        </div>
+
+        <empowered-customer-list
+            (removeCustomer)="removeCustomerAndUpdateCustomerList($event)"
+            [customers]="customersToDisplay"
+            [countExceedsMaximum]="allCustomersResponse?.totalElements > maxNumberOfRowsToBeShown"
+        ></empowered-customer-list>
+    </div>
+</div>

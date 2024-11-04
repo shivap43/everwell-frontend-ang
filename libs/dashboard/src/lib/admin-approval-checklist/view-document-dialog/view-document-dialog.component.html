@@ -1,0 +1,155 @@
+<div class="info-modal">
+    <div *ngIf="!aflacApproval" class="modal-header">
+        <button
+            mat-icon-button
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            (click)="close()"
+            tabindex="-1"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-horizontal-stepper class="dialog-horizontal-stepper mon-pt-30">
+        <mat-step>
+            <form [formGroup]="signatureForm" (ngSubmit)="signatureForm.valid && submit('save')">
+                <mat-dialog-content>
+                    <h1 mat-dialog-title>
+                        {{documentTitle}}
+                    </h1>
+                    <div *ngIf="!data.isVAS && htmlContentViewer" class="pdf-viewer">
+                        <div class="pdf-previewer">
+                            <div id="documentFrame" [innerHTML]="htmlContentViewer" class="form"></div>
+                        </div>
+                    </div>
+                    <div *ngIf="data.isVAS" [innerHTML]="htmlContent" class="pdf-viewer"></div>
+                    <div *ngIf="data.isVAS" class="admin-info">
+                        <div class="info-wrapper" *ngIf="data.dateSigned && data.documentViewed">
+                            <span
+                                >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.planChoicesConfirmedOn"]}}</span
+                            >
+                            <span>{{data.dateSigned}}</span>
+                        </div>
+                    </div>
+                    <div *ngIf="!data.viewOnly">
+                        <div class="signature" *ngIf="data.signatureRequired">
+                            <mat-label class="mat-label"
+                                >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.eSignature"]}}</mat-label
+                            >
+                            <mat-form-field>
+                                <input
+                                    [attr.aria-label]="languageStrings['primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.eSignature']"
+                                    matInput
+                                    type="text"
+                                    formControlName="signature"
+                                />
+                                <mat-hint
+                                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.fullname"]}}</mat-hint
+                                >
+                                <mat-error *ngIf="signatureForm.controls.signature.errors"
+                                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.signRequired"]}}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+                        <div class="admin-info" *ngIf="!data.signatureRequired">
+                            <div class="info-wrapper" *ngIf="data.signingAdmin">
+                                <span
+                                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.signingAdmin"]}}</span
+                                >
+                                <span>{{data.signingAdmin}}</span>
+                            </div>
+                            <div class="info-wrapper" *ngIf="data.dateSigned">
+                                <span
+                                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.dateSigned"]}}</span
+                                >
+                                <span>{{data.dateSigned}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-dialog-content>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="close()" *ngIf="data.signatureRequired">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <button
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        type="button"
+                        (click)="goToStep(1)"
+                        *ngIf="data.signatureRequired && data.isQ60"
+                    >
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                            iconSize="12"
+                            iconName="right"
+                        ></mon-icon>
+                    </button>
+                    <a
+                        href="javascript:void(0)"
+                        class="mon-btn-link"
+                        (click)="close()"
+                        *ngIf="defaultPlan && !data.documentViewed"
+                    >
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <button
+                        mat-button
+                        type="button"
+                        class="mon-btn-primary"
+                        *ngIf="defaultPlan && data.documentViewed"
+                        (click)="close()"
+                    >
+                        {{languageStrings["primary.portal.common.close"]}}
+                    </button>
+                    <button
+                        mat-button
+                        type="button"
+                        class="mon-btn-primary"
+                        *ngIf="defaultPlan && !data.documentViewed"
+                        (click)="submit('close')"
+                    >
+                        {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDocumentDialog.confirmPlanChoices"]}}
+                    </button>
+                    <button
+                        mat-button
+                        type="button"
+                        class="mon-btn-primary"
+                        *ngIf="!data.signatureRequired && !defaultPlan"
+                        (click)="submit('close')"
+                    >
+                        {{languageStrings["primary.portal.common.close"]}}
+                    </button>
+                    <button
+                        mat-button
+                        class="mon-btn-primary"
+                        type="submit"
+                        *ngIf="data.signatureRequired && !data.isQ60"
+                    >
+                        {{languageStrings["primary.portal.common.save"]}}
+                    </button>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+        <mat-step>
+            <div mat-dialog-content>
+                <h1 mat-dialog-title>
+                    {{languageStrings['primary.portal.admin.checklist.stepTwo']}}
+                </h1>
+                <div>
+                    {{languageStrings['primary.portal.admin.checklist.stepTwo.content']}}
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex">
+                <div class="d-flex">
+                    <button class="mon-btn-primary" mat-flat-button (click)="submit('save')">
+                        <span>{{languageStrings['primary.portal.admin.send']}}</span>
+                    </button>
+                </div>
+            </mat-dialog-actions>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+    <ng-template [ngIf]="isLoading">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+</div>

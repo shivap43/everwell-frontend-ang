@@ -1,0 +1,136 @@
+<ng-container *ngIf="(areBrandingConfigsEnabled$|async)">
+    <h2 language="primary.portal.brandingLogoForm.header"></h2>
+    <p language="primary.portal.brandingLogoForm.content"></p>
+</ng-container>
+
+<div class="branding_form-logo_radio_form">
+    <form [formGroup]="logoTypeForm">
+        <mat-radio-group formControlName="logoType" [attr.aria-label]="languageStrings['primary.portal.branding.select.logo.type']">
+            <!--Standard upload-->
+            <ng-container *configEnabled="'general.branding.standard.setUp_flag'">
+                <p class="branding_form-logo_radio" *configEnabled="'general.branding.custom.setUp_flag'">
+                    <mat-radio-button
+                        [value]="'STANDARD'"
+                        [attr.aria-label]="languageStrings['primary.portal.branding.Standard.text.logo']"
+                    >
+                        <p language="primary.portal.brandingLogoForm.labelStadard"></p>
+                    </mat-radio-button>
+                </p>
+                <div
+                    [ngClass]="{'branding_form-file_upload_hide': logoTypeForm.controls['logoType'].value === 'CUSTOM'&&(areBrandingConfigsEnabled$|async)}"
+                >
+                    <ng-container *ngIf="(areBrandingConfigsEnabled$|async)===false">
+                        <h2 language="primary.portal.brandingLogoForm.headerPreviewLogo"></h2>
+                        <p class="branding_title_description" language="primary.portal.brandingLogoForm.previewDescription"></p>
+                    </ng-container>
+                    <div class="branding-form-custom-logo-container">
+                        <ng-container *ngIf="standardBrandingModel$ | async as standardBrandingModel">
+                            <div *ngIf="largeLogoSize$ | async as largeLogoSize">
+                                <empowered-branding-logo
+                                    [brandingInput]="standardBrandingModel"
+                                    [sizeInput]="largeLogoSize"
+                                    [attr.aria-label]="languageStrings['primary.portal.branding.standard.account.logo.sample']"
+                                >
+                                </empowered-branding-logo>
+                                <p language="primary.portal.brandingLogoForm.labelWhiteBackground" #employeePortalLabel></p>
+                            </div>
+
+                            <div *ngIf="smallLogoSize$ | async as smallLogoSize">
+                                <empowered-branding-logo
+                                    [brandingInput]="standardBrandingModel"
+                                    [sizeInput]="smallLogoSize"
+                                    [attr.aria-label]="languageStrings['primary.portal.branding.standard.account.logo.sample']"
+                                >
+                                </empowered-branding-logo>
+                                <p language="primary.portal.brandingLogoForm.labelSolidBackground" #adminPortalLabel></p>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+            <!--Custom upload-->
+            <ng-container *configEnabled="'general.branding.custom.setUp_flag'">
+                <p class="branding_form-logo_radio" *configEnabled="'general.branding.standard.setUp_flag'">
+                    <mat-radio-button [value]="'CUSTOM'" [attr.aria-label]="languageStrings['primary.portal.branding.custom.image.logo']">
+                        <p language="primary.portal.brandingLogoForm.labelCustom"></p>
+                    </mat-radio-button>
+                </p>
+                <ng-container *ngIf="(areBrandingConfigsEnabled$|async)===false">
+                    <h2 language="primary.portal.brandingLogoForm.headerUploadLogo"></h2>
+                    <p class="branding_title_description" language="primary.portal.brandingLogoForm.uploadDescription"></p>
+                </ng-container>
+                <div
+                    class="branding-form-logo-container custom-logos"
+                    [ngClass]="{'branding_form-file_upload_hide': (logoTypeForm.controls['logoType'].value === 'STANDARD')&&(areBrandingConfigsEnabled$|async)}"
+                >
+                    <div>
+                        <ngx-dropzone
+                            [attr.aria-label]="languageStrings['primary.portal.branding.custom.logo.file.upload']"
+                            class="branding_form-logo_dropzone"
+                            [multiple]="false"
+                            [accept]="'image/png,image/jpeg'"
+                            (change)="onFileUpload($event);"
+                        >
+                            <ngx-dropzone-label>
+                                <p language="primary.portal.brandingLogoForm.labelDropzone"></p>
+                            </ngx-dropzone-label>
+                        </ngx-dropzone>
+                    </div>
+
+                    <p language="primary.portal.brandingLogoForm.labelUploadRequirements"></p>
+                    <mat-error *ngIf="errorMessageUpload" aria-live="true"> {{ errorMessageUpload }} </mat-error>
+                    <mat-error *ngIf="(errorMsg$|async)" aria-live="true"> {{errorMsg$|async}} </mat-error>
+
+                    <div class="branding-form-custom-logo-container">
+                        <ng-container *ngIf="customBrandingModel$ | async as customBrandingModel">
+                            <div>
+                                <div class="logoBorder">
+                                    <ng-container *ngIf="(hasCustomBrandingLogo$ | async) ; else noLogoMMP">
+                                        <ng-container *ngIf="largeLogoSize$ | async as largeLogoSize">
+                                            <empowered-branding-logo
+                                                [brandingInput]="customBrandingModel"
+                                                [sizeInput]="largeLogoSize"
+                                                [attr.aria-label]="languageStrings['primary.portal.branding.custom.account.logo.employee.portal']"
+                                                aria-labelledby="employeePortalLabel"
+                                            >
+                                            </empowered-branding-logo>
+                                        </ng-container>
+                                    </ng-container>
+                                    <ng-template #noLogoMMP>
+                                        <div class="noLogoOuter mmp" aria-hidden="true" aria-labelledby="employeePortalLabel">
+                                            No logo selected
+                                        </div>
+                                    </ng-template>
+                                </div>
+                                <p language="primary.portal.brandingLogoForm.labelWhiteBackground" #employeePortalLabel></p>
+                            </div>
+                            <div>
+                                <div class="logoBorder">
+                                    <ng-container *ngIf="hasCustomBrandingLogo$ | async; else noLogo">
+                                        <ng-container *ngIf="smallLogoSize$ | async as smallLogoSize">
+                                            <empowered-branding-logo
+                                                [brandingInput]="customBrandingModel"
+                                                [sizeInput]="smallLogoSize"
+                                                [attr.aria-label]="languageStrings['primary.portal.branding.custom.account.logo.admin.portal']"
+                                                aria-labelledby="adminPortalLabel"
+                                            >
+                                            </empowered-branding-logo>
+                                        </ng-container>
+                                    </ng-container>
+                                    <ng-template #noLogo aria-labelledby="adminPortalLabel">
+                                        <div class="noLogoOuter generic" aria-hidden="true">No logo selected</div>
+                                    </ng-template>
+                                </div>
+                                <p language="primary.portal.brandingLogoForm.labelSolidBackground" #adminPortalLabel></p>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+        </mat-radio-group>
+    </form>
+
+    <span class="branding_form-test_image" aria-hidden="true">
+        <img aria-hidden="true" alt="test upload" #testImage [src]="customLogoData$ | async" />
+    </span>
+</div>

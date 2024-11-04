@@ -1,0 +1,26 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span [language]="MessageCenterLanguage.STATUS_MODAL_HEADER"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            mat-raised-button
+            class="mon-btn-primary"
+            color="primary"
+            [mat-dialog-close]="statusForm.controls['statusFormControl'].value"
+            [disabled]="!statusForm.valid"
+            [language]="MessageCenterLanguage.STATUS_MODAL_BUTTON"
+        >
+        </button>
+    </empowered-modal-footer>
+
+    <form [formGroup]="statusForm">
+        <mat-label [language]="MessageCenterLanguage.STATUS_MODAL_LABEL"></mat-label>
+        <mat-form-field>
+            <mat-select formControlName="statusFormControl" [disableOptionCentering]="true">
+                <mat-option *ngFor="let status of statuses" [value]="status">{{ status | dereferenceStatus | async }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</empowered-modal>

@@ -1,0 +1,849 @@
+@import "shared";
+
+.coverage-state {
+    padding: 0 map-get($spacers, 50) map-get($spacers, 20);
+    position: relative;
+
+    .empty-state-header {
+        font-size: convert-unit(36px, "rem");
+        @include fontFace("primary.light");
+        color: get("color.gray.600");
+    }
+
+    .coverage-utilities-wrapper {
+        font-size: convert-unit(14px, "rem");
+
+        .coverage-utilities {
+            @include media-max("l") {
+                background: none;
+            }
+
+            display: flex;
+            align-items: center;
+            height: convert-unit(75px, "rem");
+
+            .filter-sub-wrapper {
+                ::ng-deep {
+                    .mat-form-field {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .filter-sub-wrapper {
+        display: flex;
+    }
+
+    .zero-state-section {
+        border-top: map-get($spacers, 5) solid get("color.accent.500");
+        box-shadow: 0 0 convert-unit(6px, "rem") 0 rgba(0, 0, 0, 0.25);
+        padding: 0 map-get($spacers, 25) map-get($spacers, 25) map-get($spacers, 25);
+        display: flex;
+        margin: 0 0 map-get($spacers, 40) 0;
+        flex-direction: column;
+
+        &-summary {
+            width: convert-unit(435px, "rem");
+            margin: 0;
+        }
+
+        .flex-item {
+            p {
+                margin: map-get($spacers, 15) 0 map-get($spacers, 15) 0;
+            }
+        }
+    }
+
+    .empty-state-section {
+        margin: 0 0 map-get($spacers, 40) 0;
+
+        p {
+            margin: map-get($spacers, 20) 0 map-get($spacers, 10) 0;
+        }
+    }
+
+    .available-state-section {
+        margin: 0 0 map-get($spacers, 40) 0;
+        padding: 0 map-get($spacers, 25) map-get($spacers, 25) map-get($spacers, 15);
+        display: flex;
+
+        span {
+            color: get("color.black");
+            font-size: convert-unit(16px, "rem");
+        }
+
+        .enroll {
+            color: get("color.gray.700");
+            font-size: convert-unit(12px, "rem");
+            margin-top: map-get($spacers, 20);
+        }
+
+        .dotted-border-right {
+            margin-bottom: map-get($spacers, 40);
+            width: map-get($spacers, 10);
+        }
+
+        .mon-btn-primary {
+            margin: map-get($spacers, 10) 0 0 0;
+
+            span {
+                color: get("color.white");
+            }
+        }
+    }
+
+    .coverage-utilities-icon {
+        margin: 0 map-get($spacers, 10);
+
+        ::ng-deep {
+            .mat-icon {
+                .cls-1 {
+                    fill: get("color.primary.500");
+                }
+            }
+        }
+    }
+
+    .filter-applied {
+        ::ng-deep {
+            .mat-form-field-flex {
+                background-color: get("color.gray.800");
+                color: get("color.white");
+                @include fontFace("primary.bold");
+            }
+        }
+    }
+
+    .product-list {
+        margin-bottom: map-get($spacers, 5);
+    }
+
+    .dotted-border-bottom {
+        height: convert-unit(1px, "rem");
+        margin: map-get($spacers, 10) 0;
+    }
+
+    .expansion-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .final-cost {
+        border-top: convert-unit(1px, "rem") solid get("color.divider");
+        padding-top: map-get($spacers, 10);
+        margin-top: map-get($spacers, 10);
+        display: flex;
+        @include fontFace("primary.bold");
+
+        span {
+            text-align: right;
+        }
+
+        .payfrequency {
+            display: flex;
+            flex-direction: row-reverse;
+            @include fontFace("primary.regular");
+        }
+    }
+
+    .has-star-right:after {
+        content: "*";
+    }
+
+    .has-star-left:before {
+        content: "*";
+    }
+
+    .icon-warning {
+        ::ng-deep.mat-icon.mat-primary {
+            color: get("color.info.warn");
+
+            .cls-1 {
+                fill: get("color.info.warn");
+            }
+        }
+    }
+
+    .your-selection {
+        margin: map-get($spacers, 30) convert-unit(-25px, "rem") convert-unit(-15px, "rem") convert-unit(55px, "rem");
+    }
+
+    .content-column {
+        > div {
+            display: flex;
+            font-size: convert-unit(16px, "rem");
+            justify-content: space-between;
+
+            > span {
+                padding-bottom: convert-unit(8px, "rem");
+            }
+
+            > span.content-label {
+                text-align: left !important;
+                color: get("color.black");
+
+                &.base-adjustment-cost {
+                    @include fontFace("primary.regular");
+                }
+            }
+
+            > div.content-label {
+                color: get("color.black");
+            }
+        }
+
+        .final-cost-currency {
+            display: flex;
+            flex-direction: column;
+
+            .currency {
+                color: get("color.black");
+                font-size: convert-unit(22px, "rem");
+            }
+        }
+
+        &.align-right {
+            margin-left: convert-unit(100px, "rem");
+        }
+
+        .content-action {
+            flex-direction: column;
+
+            button {
+                margin-top: map-get($spacers, 20);
+            }
+
+            .link {
+                margin-top: map-get($spacers, 20);
+                display: flex;
+                flex-direction: column;
+
+                a {
+                    width: auto;
+                    font-size: convert-unit(16px, "rem");
+                    display: flex;
+                }
+            }
+
+            .withdraw-application {
+                margin-top: map-get($spacers, 10);
+
+                .danger-text {
+                    color: get("color.info.danger.500");
+                }
+            }
+        }
+
+        .cost-calculation {
+            flex-direction: column;
+
+            div {
+                justify-content: space-between;
+            }
+
+            .content-label {
+                @include fontFace("primary.regular", sans-serif, true);
+            }
+        }
+
+        .edit {
+            margin-left: map-get($spacers, 10);
+        }
+    }
+
+    ::ng-deep {
+        .coverage-wrapper {
+            .card-list {
+                &.mat-accordion {
+                    .mat-expansion-indicator {
+                        opacity: 1;
+                    }
+
+                    .mat-expansion-panel {
+                        &.panel-disabled {
+                            &:hover {
+                                border: convert-unit(1px, "rem") solid get("color.gray.300");
+                                background: get("color.white");
+                                border-left: map-get($spacers, 10) solid get("color.gray.300");
+                                box-shadow: none;
+                            }
+                        }
+
+                        border-left-width: 10px;
+
+                        &:hover {
+                            box-shadow: none;
+                        }
+
+                        .mat-expansion-panel-header-description {
+                            justify-content: space-between;
+                            max-width: convert-unit(500px, "rem");
+
+                            .plan-rates {
+                                text-align: right;
+                                @include fontFace("primary.regular");
+
+                                font-size: convert-unit(16px, "rem");
+
+                                .plan-rate {
+                                    @include fontFace("primary.bold");
+
+                                    font-size: convert-unit(22px, "rem");
+                                }
+                            }
+                        }
+
+                        .mat-expansion-panel-header {
+                            min-height: convert-unit(120px, "rem") !important;
+                            margin: 0 map-get($spacers, 15) 0;
+                            padding: convert-unit(27px, "rem") 0 convert-unit(27px, "rem") convert-unit(65px, "rem");
+
+                            .plan-name {
+                                @include fontFace("primary.bold");
+                            }
+
+                            &-title {
+                                @include fontFace("primary.regular");
+                                align-items: flex-start;
+                            }
+
+                            &[aria-disabled="true"] {
+                                .mat-expansion-panel-header-description {
+                                    color: get("color.gray.600");
+                                }
+                            }
+                        }
+
+                        &.mat-expanded {
+                            box-shadow: none;
+                            border-left-width: map-get($spacers, 10);
+
+                            ::ng-deep {
+                                .mat-expansion-indicator {
+                                    bottom: 0;
+
+                                    &::after {
+                                        border-color: get("color.info.success");
+                                    }
+                                }
+                            }
+
+                            &.Accident {
+                                border-color: get("color.product.teal");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.teal");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Cancer {
+                                border-color: get("color.product.darkorchid");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.darkorchid");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Critical {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Dental {
+                                border-color: get("color.product.yellow");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.yellow");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Disability {
+                                border-color: get("color.product.sandybrown");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.sandybrown");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Deduction {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Assistance {
+                                border-color: get("color.product.black");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.black");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Hospital {
+                                border-color: get("color.product.purple");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.purple");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Life {
+                                border-color: get("color.info.danger.500");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.info.danger.500");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Medical {
+                                border-color: get("color.product.crimson");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.product.crimson");
+                                        }
+                                    }
+                                }
+                            }
+
+                            &.Vision {
+                                border-color: get("color.info.success");
+
+                                ::ng-deep {
+                                    .mat-expansion-indicator {
+                                        &::after {
+                                            border-color: get("color.info.success");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .content-label {
+                @include fontFace("primary.bold");
+                width: convert-unit(150px, "rem");
+                margin-right: map-get($spacers, 20);
+            }
+
+            .align-left {
+                div {
+                    justify-content: flex-start !important;
+
+                    .covered-values {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                }
+            }
+
+            .content-column {
+                &.align-right {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+.status {
+    display: flex;
+    flex-direction: row;
+
+    .status-icon {
+        position: static !important;
+
+        .mon-icon {
+            margin: 0 map-get($spacers, 5) 0 0;
+        }
+    }
+}
+
+::ng-deep {
+    .filter-covergeprice {
+        .filter-options {
+            padding: 0 !important;
+        }
+    }
+
+    .filter-covergedate {
+        .daterange {
+            display: flex;
+
+            .mat-radio-label {
+                align-items: flex-start;
+
+                mat-label,
+                .mat-label {
+                    @include fontFace("primary.regular", sans-serif, true);
+                }
+            }
+
+            .startDateBlock {
+                margin: 0 map-get($spacers, 10) 0 0;
+                max-width: convert-unit(150px, "rem");
+
+                mat-label,
+                .mat-label {
+                    @include fontFace("primary.bold");
+                }
+            }
+
+            .endDateBlock {
+                max-width: convert-unit(150px, "rem");
+
+                mat-label,
+                .mat-label {
+                    @include fontFace("primary.bold");
+                }
+            }
+        }
+
+        .viewcoverage {
+            padding-left: map-get($spacers, 20);
+        }
+
+        .filter-options {
+            overflow-y: visible;
+            padding: 0 !important;
+        }
+    }
+}
+
+.riders-list {
+    display: flex;
+    flex-direction: column;
+    min-width: convert-unit(216px, "rem");
+}
+
+.flex-form-wrapper {
+    border: convert-unit(1px, "rem") solid get("color.gray.400");
+    border-top: map-get($spacers, 5) solid get("color.accent.500");
+    padding: 0 map-get($spacers, 20) map-get($spacers, 20) map-get($spacers, 20);
+    width: convert-unit(600px, "rem");
+    margin-bottom: map-get($spacers, 20);
+}
+
+.contact-form {
+    margin-bottom: map-get($spacers, 20);
+
+    .contacts {
+        display: flex;
+        flex-direction: column;
+        line-height: map-get($spacers, 40);
+        color: get("color.gray.900");
+        .mat-radio-button {
+            margin-bottom: map-get($spacers, 10);
+        }
+    }
+
+    ::ng-deep {
+        .mon-btn-success {
+            .mat-button-wrapper {
+                .tick-icon {
+                    margin: 0;
+                }
+            }
+        }
+    }
+}
+
+//Member portal
+::ng-deep {
+    .member-portal {
+        .coverage-state {
+            .utilities {
+                padding: convert-unit(36px, "rem") 0 map-get($spacers, 20) map-get($spacers, 20);
+                position: absolute;
+                right: map-get($spacers, 40);
+                top: map-get($spacers, 10);
+                background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                background-position: left;
+                background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                background-repeat: repeat-y;
+            }
+
+            .empty-state-header {
+                margin: map-get($spacers, 30) 0;
+            }
+
+            .coverage-utilities-wrapper {
+                position: absolute;
+                right: convert-unit(160px, "rem");
+                top: map-get($spacers, 20);
+                padding: 0;
+
+                .coverage-utilities {
+                    background: none;
+                }
+            }
+        }
+    }
+}
+
+//Producer portal
+
+::ng-deep {
+    .producer-portal {
+        .coverage-state {
+            padding: 0 map-get($spacers, 20);
+
+            .deduction-wrapper {
+                .card-list {
+                    &.mat-accordion {
+                        .mat-expansion-panel {
+                            &:hover {
+                                border-left-width: 1px;
+                                box-shadow: none;
+
+                                .mat-expansion-panel-header {
+                                    padding: map-get($spacers, 20);
+                                    margin: 0;
+                                }
+                            }
+
+                            &:last-of-type {
+                                border-radius: 0.2rem;
+                                box-shadow: none;
+                            }
+
+                            border: convert-unit(1px, "rem") solid get("color.gray.600");
+                            box-shadow: none;
+
+                            &-header {
+                                padding: map-get($spacers, 20);
+                                margin: 0;
+                                height: convert-unit(95px, "rem") !important;
+
+                                .title {
+                                    margin: 0 0 map-get($spacers, 10) 0;
+                                    color: get("color.gray.600");
+                                    @include fontFace("primary.regular");
+                                }
+
+                                .sub-title {
+                                    margin: 0 0 map-get($spacers, 10) 0;
+                                    font-size: convert-unit(28px, "rem");
+                                }
+
+                                .subtitle-section {
+                                    display: flex;
+                                    flex-direction: column;
+                                    text-align: right;
+
+                                    .view {
+                                        text-align: right;
+
+                                        .icon-down {
+                                            position: relative;
+                                            top: convert-unit(3px, "rem");
+                                            margin: 0 0 0 map-get($spacers, 5);
+
+                                            ::ng-deep {
+                                                .cls-1 {
+                                                    fill: get("color.primary.500");
+                                                }
+                                            }
+                                        }
+
+                                        .icon-up {
+                                            position: relative;
+                                            top: 0;
+                                            margin: 0;
+                                            transform: rotate(180deg);
+
+                                            ::ng-deep {
+                                                .cls-1 {
+                                                    fill: get("color.primary.500");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                &-title {
+                                    @include fontFace("primary.regular");
+                                    justify-content: space-between;
+                                    flex-direction: row;
+                                    margin: 0;
+
+                                    span {
+                                        color: get("color.gray.900");
+                                        @include fontFace("primary.regular");
+                                    }
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-panel-body {
+                                    padding: 0;
+                                }
+                            }
+
+                            .tax-section-wrapper {
+                                .tax-section {
+                                    display: flex;
+                                }
+                            }
+
+                            ::ng-deep {
+                                .mat-expansion-indicator {
+                                    display: none;
+                                }
+                            }
+
+                            &.mat-expanded {
+                                &:last-of-type {
+                                    border: convert-unit(1px, "rem") solid get("color.gray.600");
+                                    box-shadow: none;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .final-cost {
+                    border-top: 0;
+                    @include fontFace("primary.regular");
+
+                    .payfrequency {
+                        color: get("color.gray.500");
+                        margin-top: convert-unit(5px, "rem");
+                    }
+                }
+
+                .content-column {
+                    min-width: convert-unit(220px, "rem");
+
+                    > div {
+                        > span {
+                            color: get("color.gray.600");
+
+                            &.content-label {
+                                color: get("color.black");
+                            }
+                        }
+                    }
+                }
+
+                .header {
+                    color: get("color.black");
+                }
+            }
+
+            .coverage-utilities-wrapper {
+                @include media-max("l") {
+                    position: absolute;
+                    left: 0;
+                    top: convert-unit(50px, "rem");
+                    padding: 0;
+                }
+
+                position: absolute;
+                right: convert-unit(160px, "rem");
+                top: 0;
+
+                .coverage-utilities {
+                    @include media-max("l") {
+                        background: none;
+                    }
+
+                    background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                    background-position: left;
+                    background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                    background-repeat: repeat-y;
+                }
+            }
+
+            .utilities {
+                @include media-max("l") {
+                    background: none;
+                }
+
+                padding: map-get($spacers, 30) 0 map-get($spacers, 20) map-get($spacers, 20);
+                position: absolute;
+                right: convert-unit(16px, "rem");
+                top: 0;
+                background-image: linear-gradient(to bottom, get("color.gray.600") 20%, get("color.white") 0%);
+                background-position: left;
+                background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                background-repeat: repeat-y;
+            }
+
+            .empty-state-header {
+                @include media-max("l") {
+                    min-height: convert-unit(140px, "rem");
+                }
+
+                min-height: convert-unit(100px, "rem");
+                margin: 0;
+            }
+        }
+    }
+}
+
+.shop {
+    @include fontFace("primary.bold");
+}
+
+.btn-shop {
+    margin: map-get($spacers, 20) 0;
+}
+
+.btn-view {
+    margin: map-get($spacers, 20) 0;
+}
+.beneficiary-block {
+    display: flex;
+    flex-direction: column;
+
+    span {
+        margin-bottom: map-get($spacers, 5);
+    }
+}

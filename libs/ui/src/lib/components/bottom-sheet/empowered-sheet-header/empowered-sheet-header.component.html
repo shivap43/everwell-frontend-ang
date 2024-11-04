@@ -1,0 +1,13 @@
+<div>
+    <div empoweredFocusInitial tabindex="-1">
+        <mat-label class="mat-label" *ngIf="optionalLabel">{{ optionalLabel }}</mat-label>
+        <h2 [ngClass]="{'label-reset' : optionalLabel}"><ng-content></ng-content></h2>
+    </div>
+
+    <button mat-icon-button (click)="close()" type="button">
+        <mon-icon class="mon-icon-close" iconSize="25" iconName="close" aria-hidden="true"></mon-icon>
+        <span class="cdk-visually-hidden">Close Navigation</span>
+    </button>
+</div>
+
+<mat-divider></mat-divider>

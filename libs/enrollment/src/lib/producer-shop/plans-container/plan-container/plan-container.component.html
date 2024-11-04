@@ -1,0 +1,109 @@
+<div *ngIf="planContainerData$ | async as planContainerData" class="eb-plan">
+    <ng-container *ngIf="{expanded: isExpandedPanel$ | async} as expandedData">
+        <mat-expansion-panel
+            (opened)="onPlanSelection(planPanel)"
+            [expanded]="expandedData.expanded && !planContainerData.disablePlanPanel"
+            [disabled]="planContainerData.disablePlanPanel"
+        >
+            <mat-expansion-panel-header>
+                <span class="mat-expansion-indicator" *ngIf="planContainerData.disablePlanPanel"></span>
+                <mat-panel-title><div [innerHTML]="planPanel.planOffering.plan.name"></div></mat-panel-title>
+                <mat-panel-description>
+                    <ng-container
+                        *ngIf="!productHasMissingInfo && planPanel.planOffering.missingInformation === missingInfoType.CARRIER_APPOINTMENT"
+                        ><span>{{ languageStrings['primary.portal.quoteShop.plansDisplay.licensingRequired'] }}</span>
+                        <button
+                            mat-icon-button
+                            matTooltipPosition="above"
+                            [richTooltip]="languageStrings['primary.portal.shopQuote.planStatusInfo'].replace('##carrierName##', planPanel.planOffering.plan.carrierNameOverride)"
+                        >
+                            <mon-icon iconName="Filled-info" iconSize="20" class="infoicon icon-primary"></mon-icon>
+                        </button>
+                    </ng-container>
+                    <span
+                        *ngIf="planPanel.enrollment && !planPanel.cartItemInfo && (endCoverageQleEventData$ | async) === false"
+                        class="cart-status"
+                    >
+                        <mon-icon
+                            [iconName]="planContainerData.enrollmentStatusIconData?.name"
+                            [class]="planContainerData.enrollmentStatusIconData?.class"
+                            [iconSize]="20"
+                        ></mon-icon>
+                        <span> {{planContainerData.enrollmentStatus}} </span>
+                        <ng-container *ngIf="(enrollmentsWithExpirationDate$ | async)">
+                            <p language="primary.portal.coverage.policyEnds">
+                                <span> {{ planPanel.enrollment?.validity?.expiresAfter | date:"MM/dd/yyyy" }}</span>
+                            </p>
+                        </ng-container>
+                    </span>
+                    <span *ngIf="planPanel.enrollment && (endCoverageQleEventData$ | async) as qleEventData">
+                        <mon-icon
+                            [iconName]="qleEventData.iconData?.name"
+                            [class]="qleEventData.iconData?.class"
+                            [iconSize]="20"
+                        ></mon-icon>
+                        <span>{{qleEventData.endCoverageStatus}}</span>
+                        <div *ngIf="qleEventData.endCoverageStatus === endCoverageStatus.ACTIVE">
+                            <span language="primary.portal.coverage.policyEnds"></span>
+                            {{qleEventData.requestedCoverageEndDate}}
+                        </div>
+                    </span>
+                </mat-panel-description>
+                <span *ngIf="planPanel.cartItemInfo" class="application-status">
+                    <mon-icon iconName="cart" [iconSize]="20" class="icon-primary"> </mon-icon>
+                    <span language="primary.portal.shoppingCart.planOfferings.inCart"></span>
+                </span>
+                <ng-container *ngIf="planContainerData.knockoutEligibility?.knockoutType === knockoutType.KNOCKOUT">
+                    <span class="plan-ineligible-text">{{languageStrings['primary.portal.quoteShop.plansDisplay.memberIneligible']}}</span>
+                    <button
+                        *ngIf="memberInfo$ | async as memberInfo"
+                        mat-icon-button
+                        matTooltipPosition="above"
+                        [richTooltip]="languageStrings['primary.portal.shopPage.knockoutQuestions.qualify'] | replaceTag: { '##firstname##' : memberInfo.name.firstName | titlecase}"
+                        matTooltipClass="pos-above"
+                        class="mon-icon-button"
+                    >
+                        <mon-icon iconName="Filled-info" iconSize="16"></mon-icon>
+                    </button>
+                    <a href="javascript:void(0)" class="plan-response-update" (click)="updatePlanResponses(planPanel)"
+                        ><span>{{languageStrings['primary.portal.quoteShop.plansDisplay.updateResponses']}}</span></a
+                    >
+                </ng-container>
+                <ng-container *ngIf="planContainerData.inValidEnrollmentRequirement">
+                    <span class="plan-ineligible-text"> {{languageStrings['primary.portal.quoteShop.dependency.planDependency']}}</span>
+                    <button
+                        mat-icon-button
+                        class="mon-icon-button"
+                        [richTooltip]="planContainerData.inValidEnrollmentRequirement.failureMessage"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings['primary.portal.quoteShop.dependency.planDependency']"
+                    >
+                        <mon-icon iconName="Filled-info" iconSize="16"></mon-icon>
+                    </button>
+                </ng-container>
+                <ng-container *ngIf="planContainerData.isOtherPanelMandatoryReinstate">
+                    {{languageStrings["primary.portal.quoteShop.plansDisplay.reinstateMandatory"]}}
+                </ng-container>
+                <span class="tax-title" *ngIf="taxStatus$ | async as taxStatus">{{ taxStatus }}</span>
+            </mat-expansion-panel-header>
+
+            <empowered-enrollment-plan
+                *ngIf="planPanel.enrollment && !planPanel.cartItemInfo; else standardPlans"
+                [editable]="planContainerData.enrollmentEditable && (isEnrolledPlanInPlanOfferings$ | async)"
+                [planPanel]="planPanel"
+            ></empowered-enrollment-plan>
+
+            <ng-template #standardPlans>
+                <ng-container *ngIf="planType$ | async as planTypeValue">
+                    <empowered-standard-plan *ngIf="planTypeValue === planType.STANDARD" [planPanel]="planPanel"></empowered-standard-plan>
+
+                    <empowered-bucket-plan *ngIf="planTypeValue === planType.BUCKET" [planPanel]="planPanel"></empowered-bucket-plan>
+
+                    <empowered-redirect-plan *ngIf="planTypeValue === planType.REDIRECT" [planOffering]="planPanel.planOffering">
+                    </empowered-redirect-plan>
+                </ng-container>
+            </ng-template>
+        </mat-expansion-panel>
+    </ng-container>
+</div>

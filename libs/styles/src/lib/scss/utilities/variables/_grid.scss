@@ -1,0 +1,25 @@
+@import "../../vendors/bootstrap/mixins/breakpoints";
+@import "../../vendors/bootstrap/functions";
+
+// Quickly modify global styling by enabling or disabling optional features.
+$enable-grid-classes: true !default;
+
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+$grid-breakpoints: (
+    xs: 0,
+    md: 768px,
+) !default;
+
+@include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
+@include _assert-starts-at-zero($grid-breakpoints);
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns: 12 !default;
+$grid-gutter-width: 20px !default;

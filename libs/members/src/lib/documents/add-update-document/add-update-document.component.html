@@ -1,0 +1,220 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+
+<form [formGroup]="AddDocumentForm" class="quasi-modal">
+    <div class="modal-header">
+        <h2 mat-dialog-title>{{title}}</h2>
+        <button [attr.aria-label]="langStrings['primary.portal.common.close']" mat-icon-button (click)="closePopup()">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content>
+        <div class="flex-form-wrapper">
+            <mon-alert class="mon-mt-0 mon-mb-20" alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+            <div>
+                <mat-label class="mat-label"
+                    ><span>{{langStrings["primary.portal.members.document.addUpdate.documents"]}}</span>
+                    <span class="optional-text" language="primary.portal.common.optional"></span
+                ></mat-label>
+                <!-- Start -->
+                <div class="upload">
+                    <div
+                        (drop)="drop($event)"
+                        (dragover)="allowDrop($event)"
+                        (dragleave)="drag($event)"
+                        (click)="fileInput.click()"
+                        [ngClass]="{'file-dragged': isFileDragged, 'file-not-dragged': !isFileDragged}"
+                    >
+                        <button
+                            class="mon-btn-upload"
+                            [attr.aria-label]="langStrings['primary.portal.shared.ui.monUpload.uploadLabel']"
+                            [ngClass]="{'file-selected': !fileBrowsed , 'file-not-selected': fileBrowsed}"
+                        >
+                            <span language="primary.portal.shared.ui.monUpload.uploadLabel"></span>
+                            <a [attr.aria-label]="langStrings['primary.portal.shared.ui.monUpload.uploadLabel']" href="javascript:void(0)">
+                                <span class="sr-only">{{langStrings['primary.portal.shared.ui.monUpload.filesForUpload']}} </span>
+                                <span>{{langStrings['primary.portal.shared.ui.monUpload.uploadLabel.browse']}}</span>
+                            </a>
+                        </button>
+                        <input
+                            hidden
+                            type="file"
+                            [attr.aria-label]="langStrings['primary.portal.shared.ui.monUpload.uploadLabel']"
+                            #fileInput
+                            (change)="validateFileAndUpload($event.target.files[0])"
+                            (click)="fileInput.value = null"
+                            value=""
+                        />
+                    </div>
+                    <div class="hint-text">
+                        <mat-hint>{{ hintText }}</mat-hint>
+                    </div>
+                    <div *ngIf="formInfo" class="file-list-wrapper pda-list">
+                        <div class="files-list">
+                            <div class="file-item">
+                                <p>
+                                    <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+                                    <a
+                                        href="javascript:void(0)"
+                                        [attr.aria-label]="langStrings['primary.portal.common.remove']"
+                                        class="file-name"
+                                        (click)="downloadForm(formInfo.type, formInfo.id)"
+                                        >{{ formInfo.type }}</a
+                                    >
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="files!=[]">
+                        <div *ngFor="let file of files;let i=index" class="file-list-wrapper" [ngClass]="{'first-file-list' : formInfo}">
+                            <div class="files-list" *ngIf="file!=null">
+                                <div class="file-item">
+                                    <span *ngIf="file.canDownload">
+                                        <span
+                                            *ngIf="file.name.length > 24"
+                                            richTooltip="{{file.name}}"
+                                            matTooltipPosition="above"
+                                            matTooltipClass="pos-above"
+                                        >
+                                            <p>
+                                                <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    class="file-name"
+                                                    [attr.aria-label]="langStrings['primary.portal.common.update']"
+                                                    (click)="downloadFile(file)"
+                                                    >{{file.modifiedName}}</a
+                                                >
+                                            </p>
+                                        </span>
+                                        <span *ngIf="!(file.name.length > 24)">
+                                            <p>
+                                                <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    class="file-name"
+                                                    [attr.aria-label]="langStrings['primary.portal.common.update']"
+                                                    (click)="downloadFile(file)"
+                                                    >{{file.modifiedName}}</a
+                                                >
+                                            </p>
+                                        </span>
+                                    </span>
+                                    <span *ngIf="!file.canDownload">
+                                        <span
+                                            *ngIf="file.name.length > 24"
+                                            richTooltip="{{file.name}}"
+                                            matTooltipPosition="above"
+                                            matTooltipClass="pos-above"
+                                        >
+                                            <p>
+                                                <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon
+                                                >{{file.modifiedName}}
+                                            </p>
+                                        </span>
+                                        <span *ngIf="!(file.name.length > 24)">
+                                            <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>{{file.modifiedName}}
+                                        </span>
+                                    </span>
+                                    <div class="file-status">
+                                        <span *ngIf="file.isSuccess">
+                                            <mon-icon
+                                                class="icon-success"
+                                                iconName="check"
+                                                [iconSize]="15"
+                                                *ngIf="!file.alreadyUploaded"
+                                            ></mon-icon>
+                                            <span>{{file.successStatus}}</span>
+                                        </span>
+                                        <span *ngIf="file.isError">
+                                            <mon-icon iconName="Filled-error" [iconSize]="16" class="icon-danger"></mon-icon>
+                                            <span>{{file.errorStatus}}</span>
+                                        </span>
+                                        <span
+                                            class="upload-percentage mon-mr-10"
+                                            *ngIf="(!file.isSuccess && !file.isError && file.isProgressBarEnabled && file.isUploadingStarted)"
+                                            >{{fileUploadPercentage}} %</span
+                                        >
+                                        <span class="close-button">
+                                            <a
+                                                href="javascript:void(0)"
+                                                [attr.aria-label]="langStrings['primary.portal.common.remove']"
+                                                (click)="removeDocument(i)"
+                                            >
+                                                <span>
+                                                    <mon-icon [iconSize]="10" iconName="close" class="icon-gray"></mon-icon>
+                                                </span>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div *ngIf="(!file.isSuccess && !file.isError && file.isProgressBarEnabled && file.isUploadingStarted)">
+                                    <mat-progress-bar mode="{{modeProgress}}" value="{{fileUploadPercentage}}"></mat-progress-bar>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end -->
+            </div>
+            <div class="notes-wrapper">
+                <mat-label class="mat-label"
+                    >{{langStrings["primary.portal.members.document.addUpdate.notes"]}}
+                    <span class="optional-text" language="primary.portal.common.optional"></span
+                ></mat-label>
+                <mat-form-field>
+                    <textarea
+                        formControlName="note"
+                        matInput
+                        class="mon-input"
+                        [attr.aria-label]="langStrings['primary.portal.common.optional']"
+                        rows="5"
+                        maxlength="{{maxNoteLength}}"
+                    ></textarea>
+                    <mat-hint
+                        ><span>{{maxCharText}}</span
+                        ><span class="last-updated" *ngIf="mode==='EDIT'">{{lastUpdatedNoteText}}</span></mat-hint
+                    >
+                </mat-form-field>
+            </div>
+            <mon-alert alertType="danger" *ngIf="showNoDocumentError"
+                ><span>{{langStrings["primary.portal.members.document.addUpdate.noDocumentError"]}}</span></mon-alert
+            >
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link mon-px-0"
+            [attr.aria-label]="langStrings['primary.portal.common.cancel']"
+            mat-button
+            (click)="closePopup()"
+        >
+            {{langStrings['primary.portal.common.cancel']}}
+        </a>
+        <button
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            mat-flat-button
+            [attr.aria-label]="langStrings['primary.portal.common.add']"
+            type="submit"
+            *ngIf="mode === 'ADD'"
+            (click)="addupdateDocumentNotes(true)"
+            [disabled]="files[0]?.isProgressBarEnabled && files[0]?.isUploadingStarted && !files[0]?.successStatus || addButtonClicked"
+        >
+            {{langStrings['primary.portal.common.add']}}
+        </button>
+        <button
+            class="mon-btn-primary mon-dialog-button mon-px-30"
+            mat-flat-button
+            [attr.aria-label]="langStrings['primary.portal.common.update']"
+            type="submit"
+            *ngIf="mode === 'EDIT'"
+            (click)="addupdateDocumentNotes(false)"
+        >
+            {{langStrings['primary.portal.common.update']}}
+        </button>
+    </mat-dialog-actions>
+</form>

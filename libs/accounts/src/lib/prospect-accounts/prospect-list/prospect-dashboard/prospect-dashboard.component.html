@@ -1,0 +1,152 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="content-header">
+    <button mat-icon-button *ngIf="mobileQuery.matches" class="openSideNavBtn" (click)="genSideNav.dashboardSideNav.open()">
+        <mat-icon svgIcon="hamburgerMenu" aria-hidden="true"></mat-icon>
+        <span class="cdk-visually-hidden">{{languageStrings['primary.portal.common.openNavigation']}}</span>
+    </button>
+    <div class="account-labels">
+        <span class="account-name mon-mr-20">{{accountDetails ? accountName : ""}}</span>
+        <span class="account-holder-location"
+            >{{accountDetails ? accountDetails.situs.state.name : ""}}, {{accountDetails ? accountDetails.situs.state.abbreviation :
+            ""}}</span
+        >
+    </div>
+    <div class="search-action-buttons" *hasPermission="'core.account.update.prospect'">
+        <button mat-button class="mon-btn-primary" [disabled]="!validZip" (click)="openConvertProspectPopUp()">
+            {{languageStrings['primary.portal.prospects.converttoAccount']}}
+        </button>
+    </div>
+</div>
+
+<div class="mat-side-nav">
+    <empowered-generic-sidenav
+        #genSideNav
+        [navigationOptions]="navOptions"
+        [enableBackToPreviousListing]="true"
+        previousListName="Prospects"
+        (optionSelectedOutput)="navitageToSelectedOption($event)"
+    >
+        <div class="alert-wrapper">
+            <div class="alert-msg" *ngIf="!validZip && showDashboard">
+                <mon-alert alertType="warning">
+                    <span> {{ languageStrings["primary.portal.prospectdashboard.invalidZipCode"] }} </span>
+                </mon-alert>
+            </div>
+        </div>
+        <router-outlet (activate)="showDashboard = false" (deactivate)="showDashboard = true"></router-outlet>
+        <div *ngIf="showDashboard" class="prospect-dashboard">
+            <!-- FIX Me Uncomment after business clarifications -->
+            <!-- <div class="widget-wrapper">
+                <div class="widget">
+                    <a class="prospect-link" href="javascript:void(0)">
+                        <mon-icon
+                            iconName="clipboard"
+                            [iconSize]="60"
+                            matDatepickerToggleIcon
+                            class="coverage-utilities-icon widget-icon"
+                        >
+                        </mon-icon>
+                        <span>Complete AAOD</span>
+                    </a>
+                    <p>Get your new account set up through Account Activation On Demand</p>
+                </div>
+            </div> -->
+            <div class="widget-wrapper">
+                <div class="widget">
+                    <a class="prospect-link" href="javascript:void(0)" (click)=" goToProfileAccountInfo()">
+                        <mon-icon iconName="building" [iconSize]="60" matDatepickerToggleIcon class="coverage-utilities-icon widget-icon">
+                        </mon-icon>
+                        <span>Update profile</span>
+                    </a>
+                    <p>Add profile info now and you'll save some steps during benefits offering setup</p>
+                </div>
+            </div>
+            <ng-container *configEnabled="'portal.producer.payroll_tab.prospects.proposals.enabled'">
+                <div class="widget-wrapper" *hasPermission="'core.proposal.read'">
+                    <div class="widget">
+                        <a class="prospect-link" href="javascript:void(0)" (click)="goToProposals()">
+                            <mon-icon
+                                iconName="heart-plus"
+                                [iconSize]="60"
+                                matDatepickerToggleIcon
+                                class="coverage-utilities-icon widget-icon"
+                            >
+                            </mon-icon>
+                            <span
+                                >{{hasCreateProposalPermission$ && (hasCreateProposalPermission$ | async) === false ?
+                                languageStrings['primary.portal.prospectdashboard.dashboard.proposals.header.viewOnly'] :
+                                languageStrings['primary.portal.prospectdashboard.dashboard.proposals.header']}}</span
+                            >
+                        </a>
+                        <p>
+                            {{hasCreateProposalPermission$ && (hasCreateProposalPermission$ | async) === false ?
+                            languageStrings['primary.portal.prospectdashboard.dashboard.proposals.content.viewOnly'] :
+                            languageStrings['primary.portal.prospectdashboard.dashboard.proposals.content']}}
+                        </p>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="widget-wrapper">
+                <div class="widget">
+                    <a class="prospect-link" href="javascript:void(0)" (click)="goToEmployees()">
+                        <mon-icon
+                            iconName="people-group"
+                            [iconSize]="60"
+                            matDatepickerToggleIcon
+                            class="coverage-utilities-icon widget-icon"
+                        >
+                        </mon-icon>
+                        <span>{{languageStrings['primary.portal.prospectdashboard.addEmployees']}}</span>
+                    </a>
+                    <p>{{languageStrings['primary.portal.prospectdashboard.employeeInfo']}}</p>
+                </div>
+            </div>
+            <div class="widget-wrapper">
+                <div class="widget">
+                    <a class="prospect-link" href="javascript:void(0)" (click)="goToCommissions()">
+                        <mon-icon
+                            iconName="percentage-arrow"
+                            [iconSize]="60"
+                            matDatepickerToggleIcon
+                            class="coverage-utilities-icon widget-icon"
+                        >
+                        </mon-icon>
+                        <span>{{ languageStrings['primary.portal.prospectdashboard.inviteCoenrollers']}}</span></a
+                    >
+                    <p>{{languageStrings['primary.portal.prospectdashboard.addingCoenrollers']}}</p>
+                </div>
+            </div>
+            <div class="widget-wrapper">
+                <div class="widget resource-list">
+                    <h3>{{languageStrings['primary.portal.prospectdashboard.helpfulLinks']}}</h3>
+                    <ul>
+                        <li>
+                            <a target="_blank" href="{{myAflacLink$ | async}}">
+                                <mon-icon iconName="right" [iconSize]="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                {{ languageStrings['primary.portal.prospectdashboard.myAflac']}}</a
+                            >
+                        </li>
+                        <li>
+                            <a *ngIf="showWellthieLink$ | async" target="_blank" href="{{welthieLink$|async}}">
+                                <mon-icon iconName="right" [iconSize]="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                {{languageStrings['primary.portal.prospectdashboard.welthie']}}</a
+                            >
+                        </li>
+                        <li>
+                            <a target="_blank" href="{{employeeDiscoverAssistLink$ | async}}">
+                                <mon-icon iconName="right" [iconSize]="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                {{languageStrings['primary.portal.prospectdashboard.aflacEmployee']}}</a
+                            >
+                        </li>
+                        <li>
+                            <a target="_blank" href="{{rpmLink$ | async}}">
+                                <mon-icon iconName="right" [iconSize]="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                {{languageStrings['primary.portal.prospectdashboard.rpm']}}</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </empowered-generic-sidenav>
+</div>

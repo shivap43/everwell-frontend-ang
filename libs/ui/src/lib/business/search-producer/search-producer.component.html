@@ -1,0 +1,301 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="info-modal size-large">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            mat-dialog-close
+            [attr.aria-label]='languageStrings["primary.portal.addSingleProducer.closeModal"]'
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="search-producer-wrapper">
+        <div class="header">
+            <div>
+                <p>{{dialogData.dialogTitle}}</p>
+            </div>
+            <div>
+                <h2 mat-dialog-title>{{dialogData.dialogSubtitle}}</h2>
+            </div>
+        </div>
+        <div class="flex-form-wrapper">
+            <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+            <mat-tab-group #tabs animationDuration="0ms" class="tab-wrapper" (selectedTabChange)="showTab($event)">
+                <mat-tab [label]="navLinks[0].label">
+                    <form (ngSubmit)="search(searchProducerForm.valid)" [formGroup]="searchProducerForm">
+                        <div *ngIf="isAccountRole20" class="producers-section">
+                            <mat-label class="mat-label" for="search">
+                                {{languageStrings['primary.portal.formRepository.searchType']}}
+                            </mat-label>
+                            <mat-radio-group formControlName="searchType" (change)="changeSearchType($event)">
+                                <mat-radio-button value="byProducer" [checked]="true" class="form-radio-button"
+                                    ><span>{{languageStrings['primary.portal.accounts.byProducer']}}</span></mat-radio-button
+                                >
+                                <mat-radio-button value="byProducerAccount" class="form-radio-button"
+                                    ><span language="primary.portal.accounts.byProducerAccounts"></span
+                                ></mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <div formGroupName="producerData" class="flex-form-wrapper mon-mt-20">
+                            <div>
+                                <mat-label class="mat-label" for="search">
+                                    <mat-hint *ngIf="byProducerHint">
+                                        {{languageStrings['primary.portal.commission.producer.single.search']}}
+                                    </mat-hint>
+                                    <mat-hint *ngIf="!byProducerHint"
+                                        >{{languageStrings['primary.portal.commission.producer.account.search']}}</mat-hint
+                                    >
+                                </mat-label>
+                                <div class="d-flex">
+                                    <mat-form-field>
+                                        <input
+                                            id="search"
+                                            formControlName="serachProd"
+                                            type="text"
+                                            matInput
+                                            autocomplete="off"
+                                            [attr.aria-label]='languageStrings["primary.portal.commission.producer.single.search"]'
+                                        />
+                                        <mat-hint *ngIf="byProducerHint">
+                                            {{languageStrings['primary.portal.commission.producer.single.hint']}}
+                                        </mat-hint>
+                                        <mat-hint *ngIf="!byProducerHint"
+                                            >{{languageStrings['primary.portal.accounts.accountList.accountNameId']}}</mat-hint
+                                        >
+                                    </mat-form-field>
+                                    <button
+                                        mat-flat-button
+                                        [disabled]="disableSearch"
+                                        [attr.aria-label]="languageStrings['primary.portal.commission.producer.single.tab.search']"
+                                        type="submit"
+                                        class="mon-btn-primary search-icon-wrapper"
+                                    >
+                                        <mon-icon iconName="search" class="icon-white" iconSize="25"></mon-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div *ngIf="dataSource && showProducer">
+                        <div class="mon-table-wraper">
+                            <table mat-table [dataSource]="dataSource">
+                                <ng-container matColumnDef="name">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings['primary.portal.commission.producer.single.table.name']}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{element.fullName}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="states">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span>{{languageStrings['primary.portal.commission.producer.single.table.licensedStates']}}</span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="element.intersectedState && element.intersectedState.length > 0">
+                                            <span *ngIf="element.intersectedState.length === 1"
+                                                >{{ element.intersectedState.length }}
+                                                <span> {{languageStrings['primary.portal.commission.producer.single.state']}}</span></span
+                                            >
+                                            <span *ngIf="element.intersectedState.length > 1"
+                                                >{{ element.intersectedState.length }}
+                                                <span> {{languageStrings['primary.portal.commission.producer.single.states']}}</span></span
+                                            >
+                                        </span>
+                                        <span
+                                            *ngIf="element.intersectedState && element.intersectedState.length === 0"
+                                            class="warning-triangle-icon"
+                                        >
+                                            <button
+                                                mat-icon-button
+                                                [attr.aria-label]='languageStrings["primary.portal.commission.producer.single.noState"]'
+                                            >
+                                                <mon-icon iconName="Filled-warning" iconSize="18" class="icon-warning"></mon-icon>
+                                            </button>
+                                            <span> {{languageStrings['primary.portal.commission.producer.single.noState']}} </span>
+                                        </span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="npn">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings['primary.portal.commission.producer.single.table.npn']}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="!element.npn"> &ndash;</span>
+                                        <span *ngIf="element.npn">{{ element.npn }}</span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="manage">
+                                    <th *matHeaderCellDef mat-header-cell></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div>
+                                            <button
+                                                mat-flat-button
+                                                class="mon-btn-primary btn-sm btn-right"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.view']"
+                                                (click)="goToDirect(element, searchTypeEnum.BY_PRODUCER)"
+                                            >
+                                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                                                <span> {{languageStrings['primary.portal.common.view']}}</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="noResults">
+                                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                                        {{ getNoDataOnFilterErrorMessage()}}
+                                    </th>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+                                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource?.data.length != 0"></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div *ngIf="producerAccountData && showAccounts">
+                        <div class="mon-table-wraper">
+                            <table mat-table [dataSource]="producerAccountData">
+                                <ng-container matColumnDef="accountName">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings["primary.portal.accounts.accountList.accountNameColumn"]}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="primaryProducer">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings["primary.portal.accounts.accountList.primaryProducerColumn"]}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{element.primaryProducer}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="manage">
+                                    <th *matHeaderCellDef mat-header-cell></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div>
+                                            <button
+                                                mat-flat-button
+                                                class="mon-btn-primary btn-sm btn-right"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.view']"
+                                                (click)="redirectToAccount(element, searchTypeEnum.BY_PRODUCER_ACC)"
+                                            >
+                                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                                                <span> {{languageStrings['primary.portal.common.view']}}</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="noResults">
+                                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center resultnotfound">
+                                        {{languageStrings['primary.portal.search.producer.noResult']|replaceTag:{ "##selectedfilter##":
+                                        searchProducerForm.value.producerData.serachProd} }}
+                                    </th>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="producerAccountData?.data.length != 0"></tr>
+
+                                <tr *matRowDef="let row; columns: displayColumns" mat-row></tr>
+                            </table>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab [label]="navLinks[1].label">
+                    <div class="producer-list">
+                        <p *ngIf="(!recentProducersList || recentProducersList.length === 0) && isDirect">
+                            {{languageStrings['primary.portal.direct.producer.direct.noRecentProd']}}
+                        </p>
+                        <p *ngIf="(!recentProducersList || recentProducersList.length === 0) && !isDirect">
+                            {{languageStrings['primary.portal.direct.producer.pendedbusiness.noRecentProd']}}
+                        </p>
+                        <p *ngIf="recentProducersList && recentProducersList.length > 0">
+                            {{languageStrings['primary.portal.direct.producer.single.recentProd']}}
+                        </p>
+                    </div>
+                    <div *ngIf="recentProducersList">
+                        <div class="mon-table-wraper">
+                            <table mat-table [dataSource]="recentProducersList">
+                                <ng-container matColumnDef="name">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings['primary.portal.commission.producer.single.table.name']}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">{{element.fullName}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="states">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span>{{languageStrings['primary.portal.commission.producer.single.table.licensedStates']}}</span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="element.intersectedState && element.intersectedState.length > 0">
+                                            <span *ngIf="element.intersectedState.length === 1"
+                                                >{{ element.intersectedState.length }}
+                                                <span> {{languageStrings['primary.portal.commission.producer.single.state']}}</span></span
+                                            >
+                                            <span *ngIf="element.intersectedState.length > 1"
+                                                >{{ element.intersectedState.length }}
+                                                <span> {{languageStrings['primary.portal.commission.producer.single.states']}}</span></span
+                                            >
+                                        </span>
+                                        <span
+                                            *ngIf="element.intersectedState && element.intersectedState.length === 0"
+                                            class="warning-triangle-icon"
+                                        >
+                                            <button
+                                                mat-icon-button
+                                                [attr.aria-label]='languageStrings["primary.portal.commission.producer.single.noState"]'
+                                            >
+                                                <mon-icon iconName="Filled-warning" iconSize="18" class="icon-warning"></mon-icon>
+                                            </button>
+                                            <span> {{languageStrings['primary.portal.commission.producer.single.noState']}} </span>
+                                        </span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="npn">
+                                    <th *matHeaderCellDef mat-header-cell>
+                                        <span> {{languageStrings['primary.portal.commission.producer.single.table.npn']}} </span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="!element.npn"> &ndash;</span>
+                                        <span *ngIf="element.npn">{{ element.npn }}</span>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="manage">
+                                    <th *matHeaderCellDef mat-header-cell></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div>
+                                            <button
+                                                mat-flat-button
+                                                class="mon-btn-primary btn-sm btn-right"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.view']"
+                                                (click)="goToDirect(element, searchTypeEnum.BY_PRODUCER)"
+                                            >
+                                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                                                <span language="primary.portal.common.view"></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="noResults">
+                                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                                        {{ getNoDataOnFilterErrorMessage()}}
+                                    </th>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+                                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource?.data.length != 0"></tr>
+                            </table>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            (click)="onCancelClick()"
+            aria-label="languageStrings['primary.portal.common.cancel']"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+    </mat-dialog-actions>
+</div>

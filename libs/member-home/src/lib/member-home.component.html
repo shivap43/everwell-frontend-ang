@@ -1,0 +1,337 @@
+<ng-template [ngIf]="isLoading" [ngIfElse]="dashBoardTemplate">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<!-- Home page for MMP-735-->
+<ng-template #dashBoardTemplate>
+    <div class="widget-wrapper" *ngIf="!isLoading">
+        <div class="hero-widget">
+            <div class="hero-content">
+                <h3 *ngIf="!isDualPlanYear">
+                    {{languageStrings['primary.portal.members.memberDashboard.welcomeText']}}
+                    {{languageStrings['primary.portal.platformName']}}, {{userData.name.firstName}}
+                </h3>
+                <h3 *ngIf="isDualPlanYear">
+                    {{ "primary.portal.members.home.memberLifeEnrollment" | replaceTag: { "##employeename##":
+                    this.userData.name.firstName} }}
+                </h3>
+
+                <div class="description">
+                    <p *ngIf="isEnrollmentOpenFlag && !isDualPlanYear" class="enroll">
+                        {{enrollmentNotificationMessage}}
+                    </p>
+
+                    <p *ngIf="!isDualPlanYear">
+                        {{languageStrings['primary.portal.members.memberDashboard.welcomeDescription']}}
+                    </p>
+                    <p *ngIf="isDualPlanYear && isQleDuringOeEnrollment">
+                        {{languageStrings['primary.portal.members.home.nextYearCoverage']}}
+                    </p>
+                    <p *ngIf="isDualPlanYear && isQleAfterOeEnrollment">
+                        {{languageStrings['primary.portal.members.home.newYearCoverage']}}
+                    </p>
+                </div>
+
+                <button
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    type="button"
+                    (click)="seeOptions()"
+                    *ngIf="!isDualPlanYear"
+                >
+                    {{languageStrings['primary.portal.members.memberDashboard.seeMyOptionButton']}}
+                </button>
+                <button
+                    *ngIf="isDualPlanYear"
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    type="button"
+                    (click)="updateQleCoverage()"
+                >
+                    {{languageStrings['primary.portal.memberHome.dualPlanYear.updateCoverage.current']}}
+                </button>
+                <button
+                    *ngIf="isDualPlanYear && isQleDuringOeEnrollment"
+                    class="mon-btn-secondary"
+                    mat-flat-button
+                    type="button"
+                    (click)="shopNextPlanYearCoverage()"
+                >
+                    {{languageStrings['primary.portal.memberHome.dualPlanYear.shopCoverage']}}
+                </button>
+                <button
+                    *ngIf="isDualPlanYear && isQleAfterOeEnrollment"
+                    class="mon-btn-secondary"
+                    mat-flat-button
+                    type="button"
+                    (click)="shopNextPlanYearCoverage()"
+                >
+                    {{languageStrings['primary.portal.memberHome.dualPlanYear.updateCoverage.future']}}
+                </button>
+            </div>
+            <div class="hero-img">
+                <img
+                    alt="{{languageStrings['primary.portal.members.memberDashboard.heroImg']}}"
+                    src="assets/images/hero-image.jpg"
+                />
+            </div>
+        </div>
+        <div class="secondary-widget">
+            <ng-container *ngIf="(isOldWidgetTemplate$ | async)  === false">
+                <div class="widget-50">
+                    <div class="widget-content">
+                        <h3>
+                            <mon-icon [iconSize]="18" iconName="my-coverage" class="icon-gray"></mon-icon
+                            >{{languageStrings['primary.portal.members.memberDashboard.myCoverageWidget.header']}}
+                        </h3>
+                        <p>
+                            {{languageStrings['primary.portal.members.memberDashboard.myCoverageWidget.description']}}
+                        </p>
+                        <button (click)="seeCoverage()" mat-flat-button class="mon-btn-secondary">
+                            {{languageStrings['primary.portal.members.memberDashboard.seeMyCoverageButton']}}
+                        </button>
+                    </div>
+                </div>
+                <div class="widget-50">
+                    <div class="widget-content">
+                        <h3>
+                            <mon-icon [iconSize]="18" iconName="my-household" class="icon-gray"></mon-icon
+                            >{{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.header']}}
+                        </h3>
+                        <p>
+                            {{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.description']}}
+                        </p>
+                        <button (click)="seeInfo()" mat-flat-button class="mon-btn-secondary">
+                            {{languageStrings['primary.portal.members.memberDashboard.seeMyInfoButton']}}
+                        </button>
+                    </div>
+                </div>
+                <div class="widgets-configured">
+                    <div class="widget-33">
+                        <div class="widget-content">
+                            <mon-icon [iconSize]="20" iconName="my-messages" class="icon-gray"></mon-icon>
+                            <h3>
+                                {{languageStrings['primary.portal.members.memberDashboard.messagesWidget.header']}}
+                            </h3>
+                            <p>
+                                {{languageStrings['primary.portal.members.memberDashboard.messagesWidget.description']}}
+                            </p>
+                            <button (click)="openNotificationPanel()" mat-flat-button class="mon-btn-secondary">
+                                {{languageStrings['primary.portal.members.memberDashboard.goToInboxButton']}}
+                            </button>
+                        </div>
+                    </div>
+                    <ng-container *configEnabled="'portal.resources_config.enabled'">
+                        <div class="widget-33" *hasPermission="'core.account.read.resource'">
+                            <div class="widget-content">
+                                <mon-icon [iconSize]="20" iconName="my-resources" class="icon-gray"></mon-icon>
+                                <h3>
+                                    {{languageStrings['primary.portal.members.memberDashboard.resourcesWidget.header']}}
+                                </h3>
+                                <p>
+                                    {{languageStrings['primary.portal.members.memberDashboard.resourcesWidget.description']}}
+                                </p>
+                                <button (click)="seeResources()" mat-flat-button class="mon-btn-secondary">
+                                    {{languageStrings['primary.portal.members.memberDashboard.seeResourcesButton']}}
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="widget-33">
+                        <div class="widget-content">
+                            <mon-icon [iconSize]="20" iconName="my-support" class="icon-gray"></mon-icon>
+                            <h3>{{languageStrings['primary.portal.members.memberDashboard.supportWidget.header']}}</h3>
+                            <p>
+                                {{languageStrings['primary.portal.members.memberDashboard.supportWidget.description']}}
+                            </p>
+                            <button (click)="getSupport()" mat-flat-button class="mon-btn-secondary">
+                                {{languageStrings['primary.portal.members.memberDashboard.getSupportButton']}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="!isOldWidgetTemplate">
+                <div class="widgets-container-wrapper">
+                    <div class="widget-50">
+                        <div class="widget-content">
+                            <h3>
+                                <mon-icon [iconSize]="30" iconName="coverage-shield" class="icon-gray"></mon-icon>
+                                {{languageStrings['primary.portal.members.memberDashboard.myCoverageWidget.header']}}
+                            </h3>
+                            <div class="plan">
+                                <empowered-mon-spinner
+                                    [enableSpinner]="true"
+                                    backdrop="false"
+                                    fullScreen="false"
+                                    *ngIf="isCoverageWidgetLoading"
+                                ></empowered-mon-spinner>
+                            </div>
+                            <div class="widget-content-wrapper" *ngIf="!isCoverageWidgetLoading">
+                                <div class="widget-content-left">
+                                    <div class="count">{{enrollmentData?.length }}</div>
+                                    <div class="count-description">
+                                        {{enrollmentData?.length ===
+                                        1?languageStrings['primary.portal.members.memberDashboard.policy']:
+                                        languageStrings['primary.portal.members.memberDashboard.policies']}}
+                                    </div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-content-right-wrapper">
+                                        <div>
+                                            <ng-container *ngIf="enrollmentData.length === 0">
+                                                {{languageStrings['primary.portal.members.memberDashboard.dontHaveCoverage']}}
+                                            </ng-container>
+                                        </div>
+                                        <div>
+                                            <ng-container *ngIf="enrollmentData.length !== 0">
+                                                {{payrollDeductionAmount | currency}} {{payFrequncy?.name }}
+                                            </ng-container>
+                                        </div>
+
+                                        <div *ngIf="enrollmentData?.length > 0">
+                                            {{productList}}
+                                        </div>
+
+                                        <div *ngFor="let ongoingEnrollment of ongoingEnrollments">
+                                            {{languageStrings['primary.portal.members.memberDashboard.openEnrollment']}}
+                                            <p *ngIf="ongoingEnrollments.length === 1" class="member-group-info">
+                                                {{languageStrings["primary.portal.memberHome.coverageDate.widget"] |
+                                                replaceTag: { "##startdate##" :
+                                                ongoingEnrollment.enrollmentPeriod.effectiveStarting | date: dateFormat,
+                                                "##enddate##" : ongoingEnrollment.enrollmentPeriod.expiresAfter | date:
+                                                dateFormat } }}
+                                            </p>
+                                            <span *ngIf="ongoingEnrollments.length > 1" class="member-group-info">
+                                                {{languageStrings["primary.portal.memberHome.coverageDate.widget"] |
+                                                replaceTag: { "##startdate##" :
+                                                ongoingEnrollment.enrollmentPeriod.effectiveStarting | date: dateFormat,
+                                                "##enddate##" : ongoingEnrollment.enrollmentPeriod.expiresAfter | date:
+                                                dateFormat } }}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <ng-container *ngIf="enrollmentData.length > 0">
+                                                <button
+                                                    (click)="seeCoverage()"
+                                                    mat-flat-button
+                                                    class="mon-btn-secondary"
+                                                >
+                                                    {{languageStrings['primary.portal.members.memberDashboard.viewCoverageButton']}}
+                                                </button>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-50">
+                        <div class="widget-content">
+                            <h3>
+                                <mon-icon [iconSize]="30" iconName="people-family-circle" class="icon-gray"></mon-icon>
+                                {{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.header']}}
+                            </h3>
+
+                            <div class="widget-content-wrapper" *ngIf="!isCoverageWidgetLoading">
+                                <div class="widget-content-left">
+                                    <div class="count">{{memberCount}}</div>
+                                    <div class="count-description">
+                                        {{memberCount > 1
+                                        ?languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.members']:languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.memberLabel']}}
+                                    </div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-content-right-wrapper">
+                                        <div>
+                                            <p class="member-group-info">
+                                                {{userData.name.firstName + " " + userData.name.lastName }}
+                                            </p>
+                                            <p class="member-group-info" *ngIf="memberContact?.address">
+                                                <ng-container *ngIf="memberContact.address.city!==undefined">
+                                                    {{memberContact.address.city + "," }}
+                                                </ng-container>
+                                                <ng-container *ngIf="memberContact.address.state!==undefined">
+                                                    {{memberContact.address.state + ","}}
+                                                </ng-container>
+                                                <ng-container *ngIf="memberContact.address.zip!==undefined">
+                                                    {{memberContact.address.zip }}
+                                                </ng-container>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p class="member-group-info" *ngIf="dependentCount > 0">
+                                                {{dependentCount}}
+                                                {{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.dependents']}}
+                                            </p>
+                                            <p class="member-group-info" *ngIf="beneficiaryCount > 0">
+                                                {{beneficiaryCount}}
+                                                {{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.allocatedBeneficiaries']}}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <button (click)="seeInfo()" mat-flat-button class="mon-btn-secondary">
+                                                {{languageStrings['primary.portal.members.memberDashboard.myHouseholdWidget.reviewMyProfileButton']}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widgets-configured">
+                    <ng-container *configEnabled="'general.feature.notifications.enable'">
+                        <div class="widget-33">
+                            <div class="widget-content">
+                                <mon-icon [iconSize]="30" iconName="bell" class="icon-gray"></mon-icon>
+                                <h3>
+                                    {{languageStrings['primary.portal.members.memberDashboard.notificationsWidget.header']}}
+                                </h3>
+                                <p>
+                                    {{languageStrings['primary.portal.members.memberDashboard.notificationsWidget.description']}}
+                                </p>
+                                <button (click)="openNotificationPanel()" mat-flat-button class="mon-btn-secondary">
+                                    {{languageStrings['primary.portal.members.memberDashboard.openNotificationsButton']}}
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *configEnabled="'portal.resources_config.enabled'">
+                        <div class="widget-33" *hasPermission="'core.account.read.resource'">
+                            <div class="widget-content">
+                                <mon-icon [iconSize]="30" iconName="folder" class="icon-gray"></mon-icon>
+                                <h3>
+                                    {{languageStrings['primary.portal.members.memberDashboard.resourcesWidget.header']}}
+                                </h3>
+                                <p>
+                                    {{languageStrings['primary.portal.members.memberDashboard.resourcesWidget.description']}}
+                                </p>
+                                <button (click)="seeResources()" mat-flat-button class="mon-btn-secondary">
+                                    {{languageStrings['primary.portal.members.memberDashboard.seeResourcesButton']}}
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="widget-33">
+                        <div class="widget-content">
+                            <mon-icon [iconSize]="30" iconName="help" class="icon-gray"></mon-icon>
+                            <h3>
+                                {{languageStrings['primary.portal.members.memberDashboard.supportWidget.header']}}
+                            </h3>
+                            <p>
+                                {{languageStrings['primary.portal.members.memberDashboard.supportWidget.description']}}
+                            </p>
+                            <button (click)="getSupport()" mat-flat-button class="mon-btn-secondary">
+                                {{languageStrings['primary.portal.members.memberDashboard.getSupportButton']}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>

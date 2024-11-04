@@ -1,0 +1,51 @@
+<ng-container *ngIf="combinedOfferingsWithCartAndEnrollment$ | async as combinedOfferings; else loadingIndicator">
+    <mat-tab-group
+        class="vertical-tab eb-products-tab"
+        data-test="eb-products-tab-group"
+        *ngIf="(selectedProductIndex$ | async) >= 0; else loadingIndicator"
+        (selectedTabChange)="onProductSelection($event.index,combinedOfferings)"
+        [selectedIndex]="selectedProductIndex$ | async"
+    >
+        <mat-tab *ngFor="let product of productDetails$ | async as ProductDetails; trackBy: trackByProductId">
+            <ng-template mat-tab-label>
+                <div class="products-nav">
+                    <span class="product-label">{{product.name}}</span>
+                    <mon-icon *ngIf="product.isDeclined" class="icon-danger icon-decline" iconName="In-cart-decline" [iconSize]="16">
+                    </mon-icon>
+                    <mon-icon *ngIf="product.productInCart" iconName="cart" class="plan-in-cart" [iconSize]="16"> </mon-icon>
+                    <ng-container *ngIf="product.enrollmentStatus && !product.productInCart">
+                        <mon-icon
+                            *ngIf="product.enrollmentStatus === applicationStatus.Enrolled"
+                            iconName="circle-check"
+                            class="icon-success"
+                            [iconSize]="16"
+                        ></mon-icon>
+                        <mon-icon
+                            *ngIf="product.enrollmentStatus === applicationStatus.Active"
+                            iconName="circle-check"
+                            class="mon-icon-status icon-success"
+                            [iconSize]="16"
+                        >
+                        </mon-icon>
+                        <mon-icon
+                            *ngIf="product.enrollmentStatus === applicationStatus.Lapsed"
+                            iconName="Filled-warning"
+                            [iconSize]="16"
+                            class="mon-icon-close icon-warning"
+                        ></mon-icon>
+                        <mon-icon
+                            *ngIf="product.enrollmentStatus === applicationStatus.Ended"
+                            iconName="Filled-check"
+                            [iconSize]="16"
+                            class="mon-icon-status"
+                        ></mon-icon>
+                    </ng-container>
+                </div>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</ng-container>
+
+<ng-template #loadingIndicator>
+    <empowered-mon-spinner [enableSpinner]="true" [backdrop]="true"></empowered-mon-spinner>
+</ng-template>

@@ -1,0 +1,106 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button>
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close" (click)="closePopup()"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="switchEnrollmentForm" (ngSubmit)="quoteShop()">
+        <mat-dialog-content>
+            <h2 mat-dialog-title *ngIf="isHeadset" language="primary.portal.shoppingExperience.switchHeader"></h2>
+            <h2 mat-dialog-title *ngIf="!isHeadset">
+                {{ "primary.portal.shoppingExperience.headerSwitching" | replaceTag: { "#enrollmenttype": replaceUnderscore(enrollmentType)
+                | lowercase } }}
+            </h2>
+            <p class="mon-mb-15" language="primary.portal.shoppingExperience.switchParagraph"></p>
+            <div class="d-flex">
+                <div>
+                    <mat-label class="mat-label" language="primary.portal.accounts.state"></mat-label>
+                    <mat-form-field class="select-state-enrollment">
+                        <input
+                            type="text"
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollmentMethod.number']"
+                            matInput
+                            #stateinput
+                            formControlName="state"
+                            [formControl]="filterState"
+                            [matAutocomplete]="auto"
+                            required
+                            (blur)="removeStateText()"
+                            (keyup)="removeCity()"
+                            (input)=" disableAutoComplete()"
+                            autocomplete="off"
+                        />
+                        <mon-icon class="select-arrow" iconSize="10" iconName="down"></mon-icon>
+                        <mat-autocomplete
+                            #auto="matAutocomplete"
+                            (optionSelected)="getStateOptionSelected($event.option.value)"
+                            autoActiveFirstOption
+                        >
+                            <mat-option *ngFor="let state of filteredStateOptions | async" [value]="state"> {{state}} </mat-option>
+                        </mat-autocomplete>
+
+                        <mat-hint *ngIf="!isHeadset" language="primary.portal.selectEnrollment.hintStateEnrollment"></mat-hint>
+                        <mat-hint *ngIf="isHeadset" language="primary.portal.selectEnrollment.hintEnrollee"></mat-hint>
+
+                        <mat-error language="primary.portal.common.selectionRequired"> </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="mon-pl-20" *ngIf="!isHeadset">
+                    <mat-label class="mat-label" language="primary.portal.accounts.city"></mat-label>
+                    <mat-form-field class="w-200">
+                        <!-- TODO Language implementation need to be done for aria-labels -->
+                        <input
+                            type="text"
+                            aria-label="Number"
+                            matInput
+                            #cityinput
+                            required
+                            formControlName="city"
+                            [formControl]="filterCity"
+                            [matAutocomplete]="auto1"
+                            (blur)="removeCityText()"
+                            (input)="captureTypedCity()"
+                            autocomplete="off"
+                        />
+
+                        <mat-autocomplete
+                            #auto1="matAutocomplete"
+                            (optionSelected)="getCityOptionSelected($event.option.value)"
+                            autoActiveFirstOption
+                        >
+                            <mat-option *ngFor="let city of filteredCityOptions | async" [value]="city"> {{city}} </mat-option>
+                        </mat-autocomplete>
+                        <mat-error language="primary.portal.common.selectionRequired"> </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <mon-alert *ngIf="nyAcc">
+                <span> {{languageStrings['primary.portal.situsState.nyenroll']}} </span>
+            </mon-alert>
+            <mon-alert *ngIf="nonnyAcc">
+                <span> {{languageStrings['primary.portal.situsState.non-nyenroll']}} </span>
+            </mon-alert>
+            <mon-alert *ngIf="eaaResponse?.isMissingEAAError" alertType="danger">
+                <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.crossBorderRestriction']}}</span>
+            </mon-alert>
+            <mon-alert *ngIf="eaaResponse?.isMissingEAAWarning" alertType="warning">
+                <span>{{languageStrings['primary.portal.enrollmentMethod.missingEAAWarning']}}</span>
+            </mon-alert>
+        </mat-dialog-content>
+
+        <mat-dialog-actions class="dialog-footer d-flex justify-content-between mon-py-25">
+            <a class="mon-btn-link mon-px-0" language="primary.portal.common.cancel" mat-button mat-dialog-close (click)="closePopup()"></a>
+            <button
+                class="mon-btn-primary mon-dialog-button mon-px-30"
+                language="primary.portal.common.save"
+                mat-flat-button
+                type="submit"
+                [disabled]="isInvalidCity"
+            ></button>
+        </mat-dialog-actions>
+    </form>
+</div>

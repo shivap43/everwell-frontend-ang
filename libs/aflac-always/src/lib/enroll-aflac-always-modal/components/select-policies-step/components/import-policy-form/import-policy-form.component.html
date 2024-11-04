@@ -1,0 +1,95 @@
+<form [formGroup]="formGroup" class="import-policy-form">
+    <empowered-mon-spinner enableSpinner="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+    <div class="row import-policy-header">
+        <div class="col">
+            <p class="sub-title" [attr.aria-label]="languageStrings[languageKeys.importPolicyHeader]">
+                {{ languageStrings[languageKeys.importPolicyHeader] }}
+            </p>
+        </div>
+    </div>
+    <div class="mat-dialog-title" *ngIf="apiResponseStatus">
+        <mon-alert alertType="success" closeButton="true">
+            <span>{{ languageStrings[languageKeys.importPolicySuccessLabel] }}</span>
+        </mon-alert>
+    </div>
+    <div class="row d-flex flex-wrap">
+        <div class="col-auto">
+            <mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.firstNameLabel]">
+                {{ languageStrings[languageKeys.firstNameLabel] }}</mat-label
+            >
+            <mat-form-field class="mat-form-field-readonly">
+                <input
+                    matInput
+                    type="text"
+                    class="mon-input"
+                    [formControlName]="formKeys.firstName"
+                    readonly
+                    [attr.aria-label]="languageStrings[languageKeys.firstNameLabel]"
+                />
+            </mat-form-field>
+        </div>
+        <div class="col-auto">
+            <mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.lastNameLabel]"
+                >{{ languageStrings[languageKeys.lastNameLabel] }}
+            </mat-label>
+            <mat-form-field class="mat-form-field-readonly">
+                <input
+                    matInput
+                    type="text"
+                    class="mon-input"
+                    [formControlName]="formKeys.lastName"
+                    readonly
+                    [attr.aria-label]="languageStrings[languageKeys.lastNameLabel]"
+                />
+            </mat-form-field>
+        </div>
+        <div class="col-auto">
+            <mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.birthDateLabel]"
+                >{{ languageStrings[languageKeys.birthDateLabel] }}
+            </mat-label>
+
+            <mat-form-field class="mon-date-field mat-form-field-readonly">
+                <input
+                    matInput
+                    [formControlName]="formKeys.birthDate"
+                    readonly
+                    [attr.aria-label]="languageStrings[languageKeys.birthDateLabel]"
+                />
+                <mat-datepicker-toggle matSuffix>
+                    <mon-icon iconName="calendar-date" matDatepickerToggleIcon></mon-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-auto">
+            <mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.policyNumberLabel]"
+                >{{ languageStrings[languageKeys.policyNumberLabel] }}
+            </mat-label>
+            <mat-form-field class="aflac-form-field">
+                <input
+                    matInput
+                    type="text"
+                    class="mon-input"
+                    [formControlName]="formKeys.policyNumber"
+                    [attr.aria-label]="languageStrings[languageKeys.policyNumberLabel]"
+                />
+                <mat-error *ngIf="formGroup.controls?.policyNumber.hasError('required')">
+                    <span>{{ languageStrings[languageKeys.requiredFieldLabel] }}</span>
+                </mat-error>
+                <mat-error *ngIf="formGroup.controls?.policyNumber.hasError('pattern')">
+                    <span>{{ languageStrings[languageKeys.alphaNumericLabel] }}</span>
+                </mat-error>
+                <mat-error *ngIf="formGroup.controls?.policyNumber.hasError('policyNumberInvalid')">
+                    <span>{{errorMessage}}</span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row last-row-padding">
+        <div class="col">
+            <button mat-stroked-button color="primary" class="mon-btn-secondary" (click)="onImportPolicy()">
+                {{ languageStrings[languageKeys.importButtonLabel] }}
+            </button>
+        </div>
+    </div>
+</form>

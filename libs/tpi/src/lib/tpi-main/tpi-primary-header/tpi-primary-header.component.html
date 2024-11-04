@@ -1,0 +1,78 @@
+<div *ngIf="!tpiModalMode" class="tpi-header">
+    <div class="d-flex">
+        <div class="logo">
+            <img [src]="AFLAC_LOGO" alt="logo" class="aflac-logo" />
+        </div>
+        <nav *ngIf="!primaryHeader && !headerContent && isTpiShopEnabled$ | async " class="tpi-menu" role="navigation">
+            <a
+                class="tpi-menu-link"
+                *ngIf="!employeeTerminated"
+                tabindex="0"
+                (click)="routeToShop()"
+                [ngClass]="{'active-link' : currentRoute === SHOP_TAB || (currentRoute === aflac_always && isFlowFromTpiShopPage)}"
+                >{{languageStrings['primary.portal.tpiEnrollment.shop']}}
+            </a>
+            <a
+                class="tpi-menu-link"
+                tabindex="0"
+                (click)="setRoute()"
+                routerLink="/tpi/coverage-summary"
+                [ngClass]="{'active-link' : currentRoute === COVERAGE_SUMMARY || (currentRoute === aflac_always && !isFlowFromTpiShopPage)}"
+                >{{languageStrings['primary.portal.tpiEnrollment.coverageSummary']}}</a
+            >
+            <a
+                class="tpi-menu-link"
+                tabindex="0"
+                (click)="setRoute()"
+                routerLink="/tpi/pda/view"
+                routerLinkActive="active"
+                [ngClass]="{'active-link' : currentRoute === PDA_TAB}"
+                >{{languageStrings['primary.portal.tpiEnrollment.pdaForms']}}</a
+            >
+        </nav>
+    </div>
+    <div class="close-wrapper">
+        <button mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']" (click)="onClose()">
+            <mon-icon class="icon-gray" iconSize="15" iconName="close" alt="Close modal"></mon-icon>
+        </button>
+    </div>
+</div>
+<!-- LNL primary header || START -->
+<div *ngIf="tpiModalMode" class="lnl-header">
+    <div>
+        <div class="logo">
+            <img [src]="LOGO" alt="logo" class="aflac-lnl-logo" />
+        </div>
+    </div>
+    <nav *ngIf="!primaryHeader && !headerContent && isTpiShopEnabled$ | async" class="lnl-menu" role="navigation">
+        <a
+            class="lnl-menu-link"
+            tabindex="0"
+            *ngIf="!employeeTerminated"
+            (click)="routeToShop()"
+            [ngClass]="{'active-link' : currentRoute === SHOP_TAB}"
+        >
+            {{languageStrings['primary.portal.tpiEnrollment.shop']}}
+        </a>
+        <a
+            class="lnl-menu-link"
+            tabindex="0"
+            (click)="setRoute()"
+            routerLink="/tpi/coverage-summary"
+            [ngClass]="{'active-link' : currentRoute === COVERAGE_SUMMARY}"
+        >
+            {{languageStrings['primary.portal.tpiEnrollment.coverageSummary']}}
+        </a>
+        <a
+            class="lnl-menu-link"
+            tabindex="0"
+            (click)="setRoute()"
+            [routerLink]="'/tpi/pda/view'"
+            routerLinkActive="active"
+            [ngClass]="{'active-link' : currentRoute === PDA_TAB}"
+            >{{languageStrings['primary.portal.tpiEnrollment.pdaForms']}}</a
+        >
+    </nav>
+</div>
+
+<!-- LNL primary header || END -->

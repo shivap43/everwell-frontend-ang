@@ -1,0 +1,71 @@
+<empowered-mon-spinner
+    [enableSpinner]="true"
+    backdrop="true"
+    *ngIf="showSpinnerOnResume$ | async"
+></empowered-mon-spinner>
+<empowered-stepper-sheet>
+    <empowered-sheet-header>
+        <span
+            >{{proposal?.id ? languageStrings['primary.portal.proposals.edit.header'] :
+            languageStrings['primary.portal.proposals.create.header']}}</span
+        >
+    </empowered-sheet-header>
+    <empowered-sheet-footer>
+        <button
+            mat-flat-button
+            class="mon-btn-secondary"
+            [attr.aria-label]="languageStrings['primary.portal.proposals.create.back']"
+            (click)="onClickPrevious()"
+            *ngIf="doDisplayPrevious"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon
+            >{{languageStrings['primary.portal.proposals.create.back']}}
+        </button>
+        <button
+            mat-flat-button
+            class="mon-btn-secondary mon-ml-20"
+            [attr.aria-label]="languageStrings['primary.portal.proposals.create.saveClose']"
+            (click)="saveAndClose()"
+        >
+            {{languageStrings['primary.portal.proposals.create.saveClose']}}
+        </button>
+        <button
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.proposals.create.next']"
+            color="primary"
+            class="mon-btn-primary mon-ml-20"
+            (click)="onClickNext()"
+            *ngIf="doDisplayNext"
+        >
+            {{languageStrings['primary.portal.proposals.create.next']}}<mon-icon
+                class="icon-right"
+                iconName="right"
+                [iconSize]="10"
+            ></mon-icon>
+        </button>
+        <button
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.proposals.create.complete']"
+            color="primary"
+            class="mon-btn-primary mon-ml-20"
+            (click)="completeProposal()"
+            *ngIf="doDisplayComplete"
+        >
+            {{languageStrings['primary.portal.proposals.create.complete']}}
+        </button>
+    </empowered-sheet-footer>
+    <empowered-tab-bar
+        *ngIf="initialize"
+        [tabs$]="tabs$.asObservable()"
+        [enabledTabIds$]="enabledTabIdsSubject$.asObservable()"
+    ></empowered-tab-bar>
+    <empowered-emp-stepper
+        *ngIf="initialize"
+        [tabs$]="tabs$.asObservable()"
+        [steps$]="steps$.asObservable()"
+        class="create-proposal-form"
+        (isTouched)="isTouchedAction($event)"
+        (currentStep)="determineStepPosition($event)"
+        (savedStepId)="saveLastCompletedStep($event)"
+    ></empowered-emp-stepper>
+</empowered-stepper-sheet>

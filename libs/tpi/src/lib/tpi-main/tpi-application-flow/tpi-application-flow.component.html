@@ -1,0 +1,50 @@
+<empowered-tpi-secondary-header *ngIf="isTpi && !tpiLnlMode">
+    <div class="header">
+        <div>{{languageStrings['primary.portal.tpiEnrollment.shopCoverage']}}</div>
+        <div>
+            <a *ngIf="(isSsoToPlan || isSsoToProduct) && !hideBackButton" mat-flat-button class="mon-btn-link" (click)="backToShop()">
+                {{languageStrings["primary.portal.applicationFlow.backToShop" ]}}
+            </a>
+            <a *ngIf="isSsoToShop && !hideBackButton" mat-flat-button class="mon-btn-link" (click)="backToReview()">
+                {{languageStrings['primary.portal.tpi.appFlow.backToReview']}}
+            </a>
+        </div>
+    </div>
+</empowered-tpi-secondary-header>
+<empowered-application-flow [ngClass]="tpiLnlMode ? 'lnl-app-content' : 'tpi-app-content tpi-mode-page-view'"></empowered-application-flow>
+<empowered-tpi-footer
+    class="tpi-footer justify-content-end"
+    *ngIf="!tpiLnlMode && (displayBackButton || showNextProductButton || displayExitButton)"
+>
+    <div>
+        <button *ngIf="displayBackButton" class="mon-btn-secondary mon-ml-20" (click)="onBackClickEvent()" mat-flat-button>
+            <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+            {{this.languageStrings["primary.portal.applicationFlow.backReview"]}}
+        </button>
+        <button
+            *ngIf="showNextProductButton"
+            [ngClass]="displayExitButton ? 'mon-btn-secondary mon-ml-20' : 'mon-btn-primary mon-ml-20'"
+            (click)="onClickEvent()"
+            mat-flat-button
+        >
+            <span *ngIf="displayProductButton && (hidePreliminaryStatement || !showPreliminaryStatement)">
+                {{languageStrings['primary.portal.tpi.appFlow.nextProduct'].replace('##product##', displayButtonName)}}
+            </span>
+            <span *ngIf="!displayProductButton && (hidePreliminaryStatement || !showPreliminaryStatement)"> {{displayButtonName}} </span>
+            <span *ngIf="showPreliminaryStatement && !hidePreliminaryStatement">
+                {{languageStrings['primary.portal.applicationFlow.nextPreliminaryStatement']}}
+            </span>
+
+            <mon-icon *ngIf="!displayExitButton" class="icon-right" iconSize="12" iconName="right"></mon-icon>
+        </button>
+        <button
+            *ngIf="displayExitButton"
+            [attr.aria-label]="languageStrings['primary.portal.brandingModalExit.buttonExit']"
+            class="mon-btn-primary mon-ml-20"
+            mat-flat-button
+            (click)="backToTPP()"
+        >
+            {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+        </button>
+    </div>
+</empowered-tpi-footer>

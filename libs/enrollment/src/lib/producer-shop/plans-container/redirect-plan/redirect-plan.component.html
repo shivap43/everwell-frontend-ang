@@ -1,0 +1,13 @@
+<div class="redirect-plan-text" *ngIf="selectedPlanOfferingWithCartAndEnrollment$ | async as selectedPlanOfferingData">
+    <div [innerHTML]="selectedPlanOfferingData.planOffering.text"></div>
+    <div class="redirect-button">
+        <button
+            (click)="redirect(selectedPlanOfferingData.planOffering)"
+            class="mon-btn-primary"
+            mat-flat-button
+            data-test="eb-redirect-plan__button--redirect-confirmation-modal"
+        >
+            <span *ngIf="setRedirectButtonLabel$ | async as redirectButtonLabel">{{redirectButtonLabel}}</span>
+        </button>
+    </div>
+</div>

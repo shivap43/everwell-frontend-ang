@@ -1,0 +1,248 @@
+<div class="dialog-content">
+    <div class="d-flex">
+        <h3 class="transaction-header">
+            {{languageStrings["primary.portal.policyChangeRequest.transactions.downgradeCancer.title"]}}
+        </h3>
+    </div>
+    <form [formGroup]="downgradeForm">
+        <ng-container>
+            <div class="flex-form-wrapper">
+                <div>
+                    <span language="primary.portal.policyChangeRequest.transactions.downgradeCancer.description"></span>
+                </div>
+                <div class="container" formGroupName="decreaseInitialDiagnosisBenefitAmount">
+                    <div class="d-flex">
+                        <mat-checkbox
+                            type="checkbox"
+                            formControlName="isChecked"
+                            (change)="showFromAndToControls($event.checked, 'decreaseInitialDiagnosisBenefitAmount')"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.initialDignosis']}}</span
+                            >
+                        </mat-checkbox>
+                    </div>
+
+                    <div class="d-flex">
+                        <div
+                            class="flex-item"
+                            *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount'].controls['from']"
+                        >
+                            <mat-label class="mat-label">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.from']}}
+                                </span>
+                            </mat-label>
+                            <div>
+                                <mat-form-field class="cancer-form-filed">
+                                    <input
+                                        formControlName="from"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.from']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['from']?.errors?.required && isSubmitted"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.fromValidation']}}</span
+                                    >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}}
+                                    </span>
+                                </mat-error>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex-item"
+                            *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount'].controls['to']"
+                        >
+                            <mat-label class="mat-label">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.to']}}
+                                </span>
+                            </mat-label>
+                            <mat-form-field class="cancer-form-filed">
+                                <input
+                                    formControlName="to"
+                                    class="mon-input"
+                                    matInput
+                                    [maxlength]="fromValueMaxLength"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.to']"
+                                />
+                            </mat-form-field>
+                            <mat-error
+                                *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['to']?.errors?.required && isSubmitted"
+                            >
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                                </span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['to']?.errors?.pattern"
+                            >
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.toValidation']}}</span
+                                >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['decreaseInitialDiagnosisBenefitAmount']?.controls['to']?.errors?.pattern"
+                            >
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}}
+                                </span>
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container>
+            <div class="flex-form-wrapper">
+                <div class="container" formGroupName="decreaseCancerScreeningBenefitAmount">
+                    <div class="d-flex">
+                        <mat-checkbox
+                            type="checkbox"
+                            formControlName="isChecked"
+                            (change)="showFromAndToControls($event.checked, 'decreaseCancerScreeningBenefitAmount')"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.specifiedDisease']}}</span
+                            >
+                        </mat-checkbox>
+                    </div>
+
+                    <div class="d-flex">
+                        <div
+                            class="flex-item"
+                            *ngIf="formControl['decreaseCancerScreeningBenefitAmount'].controls['from']"
+                        >
+                            <mat-label class="mat-label">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.from']}}
+                                </span>
+                            </mat-label>
+                            <div>
+                                <mat-form-field class="cancer-form-filed">
+                                    <input
+                                        formControlName="from"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="fromValueMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.from']"
+                                    />
+                                </mat-form-field>
+                                <mat-error
+                                    *ngIf="formControl['decreaseCancerScreeningBenefitAmount']?.controls['from']?.errors?.required && isSubmitted"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                                    </span>
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseCancerScreeningBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseCancerScreeningBenefitAmount']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span
+                                        >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.fromValidation']}}</span
+                                    >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="formControl['decreaseCancerScreeningBenefitAmount']?.controls['from']?.errors?.pattern"
+                                >
+                                    <span>
+                                        {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}}
+                                    </span>
+                                </mat-error>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex-item"
+                            *ngIf="formControl['decreaseCancerScreeningBenefitAmount'].controls['to']"
+                        >
+                            <mat-label class="mat-label">
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.to']}}
+                                </span>
+                            </mat-label>
+                            <mat-form-field class="cancer-form-filed">
+                                <input
+                                    formControlName="to"
+                                    class="mon-input"
+                                    matInput
+                                    [maxlength]="fromValueMaxLength"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.to']"
+                                />
+                            </mat-form-field>
+                            <mat-error
+                                *ngIf="formControl['decreaseCancerScreeningBenefitAmount']?.controls['to']?.errors?.required && isSubmitted"
+                            >
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}
+                                </span>
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['decreaseCancerScreeningBenefitAmount'].errors?.isToValueIsGreater && !formControl['decreaseCancerScreeningBenefitAmount']?.controls['to']?.errors?.pattern"
+                            >
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.downgradeCancer.toValidation']}}</span
+                                >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="formControl['decreaseCancerScreeningBenefitAmount']?.controls['to']?.errors?.pattern"
+                            >
+                                <span>
+                                    {{languageStrings['primary.portal.policyChangeRequest.transactions.positiveNumber']}}
+                                </span>
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </form>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="submit"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="submitDowngradeCancerRequest()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

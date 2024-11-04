@@ -1,0 +1,372 @@
+<!--TODO Hardcoded text will come from language directive once UI changes implemented. -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div
+    empoweredPermissions
+    permissions="[core.account.update.deactivate,core.account.update.reactivate,aflac.account.update.refresh.own,core.account.read.account.any]"
+    (perdirEmit)="checkuserPermissions($event)"
+></div>
+<div class="content-header" *ngIf="userService.credential$ | async as userLogin">
+    <div class="group-label">
+        <button
+            mat-icon-button
+            *ngIf="mobileQuery.matches"
+            [attr.aria-label]="languageStrings['primary.portal.common.openNavigation']"
+            class="openSideNavBtn"
+            (click)="genSideNav.dashboardSideNav.open()"
+        >
+            <mat-icon svgIcon="hamburgerMenu" aria-hidden="true"></mat-icon>
+            <span class="cdk-visually-hidden">{{languageStrings['primary.portal.common.openNavigation']}}</span>
+        </button>
+        <div class="account-labels">
+            <span class="account-name mon-mr-20" *ngIf="accountName"
+                >{{ accountName }}
+                <span *ngIf="accountStatus">{{accountStatus}}</span>
+                <span
+                    *ngIf="currentAccountDetails?.checkedOut"
+                    language="primary.portal.accounts.accountList.account.checkedOutSuffix"
+                ></span>
+                <span class="account-number" *ngIf="accountNumberDisplay">{{accountNumberDisplay}}</span>
+            </span>
+            <span *ngIf="accountHolderLocation" class="account-holder-location">{{ accountHolderLocation }}</span>
+        </div>
+    </div>
+    <div
+        *ngIf="((userLogin.producerId && !userLogin.callCenterId) || (userLogin.producerId && userLogin.callCenterId === 11))"
+        class="search-action-buttons"
+    >
+        <button
+            class="mon-btn-secondary btn-sm pull-down-sm"
+            mat-flat-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="languageStrings['primary.portal.dashboard.manageAccount']"
+            *ngIf="userLogin.producerId && manageAccountButtonFlag && resultsLoaded"
+        >
+            <span language="primary.portal.dashboard.manageAccount"></span>
+            <mon-icon iconSize="8" iconName="down" class="icon-right"></mon-icon>
+        </button>
+        <button
+            class="mon-btn-secondary btn-sm"
+            [attr.aria-label]="languageStrings['primary.portal.dashboard.reactivateAccount']"
+            mat-button
+            *ngIf="inactiveAccountFlag && canReactivateAccount"
+        >
+            <span language="primary.portal.dashboard.reactivateAccount"></span>
+        </button>
+    </div>
+    <div
+        *ngIf="(userLogin.callCenterId && userLogin.callCenterId === SOUTHERLAND_CALL_CENTER) &&
+    (accountCallCenters && accountCallCenters.length && specialInstructions)"
+    >
+        <a href="javascript:void(0)" (click)="showAccountInstructions()"
+            >{{ languageStrings["primary.portal.dashboard.accountInstructions"] }}</a
+        >
+    </div>
+</div>
+<mat-menu #menu="matMenu" xPosition="before" class="manage-account-menu">
+    <button
+        *ngIf="canRefreshAccount && currentAccountDetails?.importType===accountImportType?.AFLAC_INDIVIDUAL"
+        mat-menu-item
+        mat-row
+        [attr.aria-label]="languageStrings['primary.portal.dashboard.refreshAccountInfo']"
+        type="button"
+        (click)="refreshAccount()"
+        language="primary.portal.dashboard.refreshAccountInfo"
+    ></button>
+    <ng-container *configEnabled="refreshConfig">
+        <button
+            *ngIf="((agRefreshStatus$ | async) && currentAccountDetails?.importType===accountImportType?.AFLAC_GROUP) || (((agRefreshStatus$ | async) ||canRefreshAccount) && currentAccountDetails?.importType===accountImportType?.SHARED_CASE)"
+            mat-menu-item
+            mat-row
+            type="button"
+            (click)="refreshAflacGroup()"
+            language="primary.portal.dashboard.refreshAccountInfo"
+        ></button>
+    </ng-container>
+    <span matTooltipPosition="above" [richTooltip]="toolTipContent">
+        <button
+            *ngIf="isRole20Producer || (canDeactivateAccount && producerRole === primaryProducer)"
+            mat-menu-item
+            mat-row
+            [attr.aria-label]="languageStrings['primary.portal.dashboard.deactivateAccount']"
+            type="button"
+            (click)="deactivateAccountDialog()"
+            [disabled]="currentAccountDetails?.checkedOut"
+            language="primary.portal.dashboard.deactivateAccount"
+        ></button
+    ></span>
+    <button
+        *ngIf="showApptakerOptions && currentAccountDetails?.checkedOut && !isMaintananceLockFlag"
+        mat-menu-item
+        (click)="setAllowAccessWhileUnplugged()"
+        [attr.aria-label]="languageStrings['primary.portal.dashboard.unpluggedAccount.allowAccess']"
+    >
+        {{ languageStrings["primary.portal.dashboard.unpluggedAccount.allowAccess"] }}
+    </button>
+    <button
+        *ngIf="showApptakerOptions"
+        mat-menu-item
+        [attr.aria-label]="languageStrings['primary.portal.dashboard.unpluggedAccount.blockCheckout']"
+        (click)="setCheckOutToUnpluggedFlag(!checkoutEnableFlag)"
+    >
+        {{ checkoutEnableFlag ? languageStrings["primary.portal.dashboard.unpluggedAccount.blockCheckout"] :
+        languageStrings["primary.portal.dashboard.unpluggedAccount.enableCheckout"] }}
+    </button>
+    <button
+        *ngIf="showApptakerOptions && currentAccountDetails?.checkedOut"
+        mat-menu-item
+        [attr.aria-label]="languageStrings['primary.portal.dashboard.unpluggedAccount.viewAuthorizationCode']"
+        (click)="openAuthorizationCodePopUp()"
+    >
+        {{ languageStrings["primary.portal.dashboard.unpluggedAccount.viewAuthorizationCode"] }}
+    </button>
+</mat-menu>
+<div class="mat-side-nav">
+    <empowered-generic-sidenav
+        #genSideNav
+        [navigationOptions]="navOptions"
+        [enableBackToPreviousListing]="true"
+        [previousListName]="previousListName"
+        (optionSelectedOutput)="navitageToSelectedOption($event)"
+        [brandingColor$]="brandingColor$"
+    >
+        <div *ngIf="showAlerts || isDashboard" class="alert-wrapper">
+            <div class="alert-msg" *ngIf="isDashboard">
+                <mon-alert alertType="danger" *ngIf="isRepairRequiredCommissionSplit$ | async">
+                    <span
+                        >{{ languageStrings["primary.portal.commissionSplit.repairRequires.error"] }}.
+                        <a href="javascript:void(0)" (click)="navigateToCommissionSplitTab()">
+                            {{ languageStrings["primary.portal.commissionSplit.repairRequires.goToCommission"] }}</a
+                        ></span
+                    >
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="showErrorMessage && isDashboard">
+                <mon-alert alertType="danger">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="inactiveAccountFlag && isDashboard">
+                <mon-alert alertType="info">
+                    <span>{{ inactiveAccountmsg }}</span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="conditionOneFlag && isDashboard">
+                <mon-alert
+                    ><span>{{"primary.portal.dashboard.ownerAccount" | replaceTag: { "##fullname##": this.fullName } }}</span></mon-alert
+                >
+            </div>
+            <div class="alert-msg" *ngIf="conditionTwoFlag && isDashboard">
+                <mon-alert>
+                    <span>
+                        {{"primary.portal.dashboard.accountTypeAndName" | replaceTag: { "##producerrole##": this.producerRole,
+                        "##fullname##": this.fullName } }}
+                    </span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="conditionThreeFlag && isDashboard">
+                <mon-alert
+                    ><span
+                        >{{"primary.portal.dashboard.accountType" | replaceTag: { "##producerrole##": this.producerRole } }}</span
+                    ></mon-alert
+                >
+            </div>
+            <div class="alert-msg" *ngIf="conditionFourFlag && isDashboard">
+                <mon-alert>
+                    <span>{{"primary.portal.dashboard.singleCoproducer" | replaceTag: { "##fullname##": this.fullName} }}</span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="conditionFiveFlag && isDashboard">
+                <mon-alert *ngIf="fullNameList.length>1">
+                    <span> {{ languageStrings["primary.portal.dashboard.multipleCoproducer"] }}</span>
+                    <span *ngFor="let name of fullNameList; let i = index"
+                        >{{name}}
+                        <span *ngIf="i<fullNameList.length-1">,</span>
+                    </span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="refreshAccountSuccessAlertFlag && isDashboard">
+                <mon-alert alertType="success" closeButton="true">
+                    <div *ngIf="!(refreshAccountSuccessData && refreshAccountSuccessData.length) && isDashboard">
+                        <span> {{ languageStrings["primary.portal.dashboard.refreshAccount.successDefaultMessage"] }} </span>
+                    </div>
+                    <div *ngIf="refreshAccountSuccessData && refreshAccountSuccessData.length && isDashboard">
+                        <span> {{ languageStrings["primary.portal.dashboard.refreshAccount.successHeaderMessage"] }} </span>
+                        <ul>
+                            <li *ngFor="let item of refreshAccountSuccessData">{{item}}</li>
+                        </ul>
+                    </div>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="refreshAccountErrorAlertFlag && isDashboard">
+                <mon-alert alertType="danger" closeButton="true" class="danger-alert">
+                    <span>{{ languageStrings["primary.portal.dashboard.refreshAccount.errorMessage"] }}</span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="currentAccountDetails?.checkedOut && isDashboard && !isMaintananceLockFlag">
+                <mon-alert alertType="info">
+                    <span> {{ languageStrings["primary.portal.dashboard.unpluggedAccount.checkedOutToUnplugged"] }} </span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="alertType && alertType == alertTypes.BLOCKCHECKOUT && !checkoutEnableFlag">
+                <mon-alert alertType="warning" closeButton="true">
+                    <span> {{ languageStrings["primary.portal.dashboard.unpluggedAccount.ineligibleForCheckout"] }} </span>
+                </mon-alert>
+            </div>
+            <div class="alert-msg" *ngIf="!validZip && isDashboard">
+                <mon-alert alertType="warning">
+                    <span> {{ languageStrings["primary.portal.dashboard.invalidZipCode"] }} </span>
+                </mon-alert>
+            </div>
+
+            <div class="alert-msg" *ngIf="alertTypeAccess && alertTypeAccess === alertTypes.ALLOWACCESS && isMaintananceLockFlag">
+                <mon-alert alertType="warning" closeButton="true">
+                    <span>
+                        {{languageStrings["primary.portal.dashboard.unpluggedAccount.benefitOfferingLock"] .replace("#phone", aflacSupport )
+                        }}
+                    </span>
+                </mon-alert>
+            </div>
+            <div
+                *ngIf="(!isAccountRefreshedError && refreshAccountData.length && isDashboard) || (refreshAccountDataBO?.length && isBenefitOffering)"
+            >
+                <mon-alert alertType="success" closeButton="true">
+                    <div>
+                        <span language="primary.portal.dashboard.refreshAccount.automatic.successMessage"></span>
+                        <ul *ngIf="refreshAccountData.length && isDashboard">
+                            <li *ngFor="let item of refreshAccountData">{{item}}</li>
+                        </ul>
+                        <ul *ngIf="refreshAccountDataBO.length && isBenefitOffering">
+                            <li *ngFor="let item of refreshAccountDataBO">{{item}}</li>
+                        </ul>
+                    </div>
+                </mon-alert>
+            </div>
+            <div *ngIf="isAccountRefreshedError && isDashboard">
+                <mon-alert alertType="warning" closeButton="true">
+                    <span language="primary.portal.dashboard.refreshAccount.automatic.errorMessage"></span>
+                </mon-alert>
+            </div>
+            <div *ngIf="isQ60 && isDashboard">
+                <mon-alert alertType="warning" closeButton="true">
+                    <span language="primary.portal.dashboard.giEnrollmentDates.staticMessage"></span>
+                </mon-alert>
+            </div>
+        </div>
+        <router-outlet (activate)="showAlerts = true" (deactivate)="showAlerts = false"></router-outlet>
+        <div *ngIf="isDashboard && hasPermissionToAccount" class="dashboard-wrapper">
+            <div class="account-dashboard">
+                <div class="widget-wrapper">
+                    <div class="widget">
+                        <a href="javascript:void(0)" (click)="widgetNavigation(dashboardWidget.ACCOUNT_PROFILE_WIDGET)">
+                            <mon-icon class="widget-icon" iconName="building" iconSize="60" matDatepickerToggleIcon> </mon-icon>
+                            <span>{{ languageStrings["primary.portal.dashboard.manageAccountProfile"] }}</span>
+                        </a>
+                        <p>{{ languageStrings["primary.portal.dashboard.manageAccountProfileBrief"] }}</p>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *empoweredTpiRestrictedPermission="{ requiredPermission: permissionBuildOffering }">
+                    <div class="widget">
+                        <a href="javascript:void(0)" (click)="widgetNavigation(dashboardWidget.BENEFITS_OFFERING_WIDGET)">
+                            <mon-icon iconName="heart-plus" class="widget-icon" iconSize="60" matDatepickerToggleIcon> </mon-icon>
+                            <span>{{ languageStrings["primary.portal.dashboard.buildBenefitsOffering"] }}</span>
+                        </a>
+                        <p>{{ languageStrings["primary.portal.dashboard.buildBenefitsOfferingBrief"] }}</p>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *ngIf="hasPrivilege$ | async">
+                    <div class="widget">
+                        <a href="javascript:void(0)" (click)="widgetNavigation(dashboardWidget.EMPLOYEE_WIDGET)">
+                            <mon-icon iconName="people-group" iconSize="60" matDatepickerToggleIcon class="widget-icon"> </mon-icon>
+                            <span>{{ languageStrings["primary.portal.dashboard.addEmployees"] }}</span>
+                        </a>
+                        <p>{{ languageStrings["primary.portal.dashboard.addEmployeesBrief"] }}</p>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *ngIf="!memberInfo?.adminId">
+                    <div class="widget">
+                        <a href="javascript:void(0)" (click)="widgetNavigation(dashboardWidget.INVITE_CO_ENROLLERS_WIDGET)">
+                            <mon-icon iconName="percentage-arrow" class="widget-icon" iconSize="60" matDatepickerToggleIcon> </mon-icon>
+                            <span>{{ languageStrings["primary.portal.dashboard.inviteCoenrollers"] }}</span>
+                        </a>
+                        <p>{{ languageStrings["primary.portal.dashboard.inviteCoenrollersBrief"] }}</p>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *ngIf="!memberInfo?.adminId">
+                    <div class="widget" *isRestricted="'core.account.restrict.navigation.pendingEnrollment'">
+                        <a href="javascript:void(0)" (click)="widgetNavigation(dashboardWidget.SEND_BUSINESS_WIDGET)">
+                            <mon-icon iconName="file-dollar" iconSize="60" matDatepickerToggleIcon class="widget-icon"> </mon-icon>
+                            <span>{{ languageStrings["primary.portal.dashboard.sendBusiness"] }}</span>
+                        </a>
+                        <p>{{ languageStrings["primary.portal.dashboard.sendBusinessBrief"] }}</p>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *ngIf="!memberInfo?.adminId">
+                    <div class="widget resource-list" *isRestricted="'core.account.restrict.navigation.helpfulLinks'">
+                        <h3>{{ languageStrings["primary.portal.dashboard.helpfulLinks"] }}</h3>
+                        <ul>
+                            <ng-container *ngIf="producerRole===primaryProducer && allowedPartnerAccountType">
+                                <li *configEnabled="mircositeConfig.MICROSITE_ACCOUNT_LANDING_PAGE_ENABLE">
+                                    <a href="{{accountLandingPageUrl$|async}}" target="_blank" *hasPermission="micrositePermission">
+                                        <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                        {{ languageStrings["primary.portal.primaryNav.accountLandingPages"] }}
+                                    </a>
+                                </li>
+                            </ng-container>
+                            <li *configEnabled="'broker.group_details.display.employer_discover_assist_link'">
+                                <a
+                                    href="{{discoveryAssistLink}}"
+                                    target="_blank"
+                                    *hasPermission="'core.producer.display.employer_discover_assist_link'"
+                                >
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{ languageStrings["primary.portal.dashboard.aflacEmployerDiscoveryAssist"] }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" (click)="openEverwellRegistrationGuidePopup()">
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{languageStrings['primary.portal.helpfulLinks.guide.header']}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{fieldForceServiceUrl}}">
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{ languageStrings["primary.portal.dashboard.fieldForceServices"] }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{rpmNavigationUrl}}">
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{ languageStrings["primary.portal.dashboard.rpm"] }}
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="javascript:void(0)"
+                                    (click)="openWellthiePopup()"
+                                    *ngIf="(agentLevel===AGENT_LEVEL_TWO||agentLevel===AGENT_LEVEL_THREE) && (showWellthieLink$ | async)"
+                                >
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{ languageStrings["primary.portal.totalcost.wellthieSupport"] }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-wrapper" *ngIf="memberInfo?.adminId">
+                    <div class="widget resource-list">
+                        <h3>{{ languageStrings["primary.portal.dashboard.helpfulLinks"] }}</h3>
+                        <ul>
+                            <li>
+                                <a href="javascript:void(0)" (click)="openEverwellRegistrationGuidePopup()">
+                                    <mon-icon iconName="right" iconSize="10" matDatepickerToggleIcon class="resource-icon"></mon-icon>
+                                    {{languageStrings['primary.portal.helpfulLinks.guide.header']}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </empowered-generic-sidenav>
+</div>

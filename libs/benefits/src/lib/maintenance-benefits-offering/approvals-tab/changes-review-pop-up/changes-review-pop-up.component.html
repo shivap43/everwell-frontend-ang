@@ -1,0 +1,33 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalTitle']}}
+    </empowered-modal-header>
+    <ng-container *ngIf="approvalRequest?.hqAdminResponseDate">
+        <p>
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.changesReviewPopUp.resubmitOfferingReview']}}
+        </p>
+    </ng-container>
+    <ng-container *ngIf="approvalRequest.hrAdminResponseDate">
+        <p *ngIf="!isAdmin">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalDesc']}}
+        </p>
+        <p *ngIf="isAdmin">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approval.requestedChanges']}}
+        </p>
+    </ng-container>
+    <div class="review-update-container">
+        <div class="w-200">
+            <mat-label
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalUpdates']}}</mat-label
+            >
+        </div>
+        <div>
+            {{approvalRequest?.requestedChanges}}
+        </div>
+    </div>
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" mat-button [mat-dialog-close]="true">
+            {{languageStrings['primary.portal.common.gotIt']}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

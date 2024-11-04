@@ -1,0 +1,256 @@
+<div class="quasi-modal">
+    <form [formGroup]="censusForm" [empoweredFocusOnFirstInvalidField]="queryString">
+        <div class="modal-header">
+            <div>
+                <mat-label class="mat-label" language="primary.portal.census.uploadcensus.uploadSubtitle"></mat-label>
+                <h2>{{langStrings['primary.portal.census.uploadcensus.addEmployeetitle']}}</h2>
+            </div>
+            <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings.ariaClose">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="false" *ngIf="isLoading"></empowered-mon-spinner>
+        <mat-dialog-content [hidden]="isLoading">
+            <div class="existing-doc-container" [hidden]="!isExistingDoc">
+                <div *ngIf="!onlyUpdate">
+                    <mat-label class="mat-label" language="primary.portal.census.uploadcensus.uploadMethodTitle"></mat-label>
+                    <mat-radio-group [(value)]="uploadMethod" (change)="replaceOrUpdate($event.value)">
+                        <mat-radio-button value="update">
+                            <span language="primary.portal.census.uploadcensus.updateExistingCensus"></span>
+                        </mat-radio-button>
+                        <mat-radio-button [disabled]="isDisable" value="replace">
+                            <span language="primary.portal.census.uploadcensus.replaceExistingCensus"></span>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div *ngIf="onlyUpdate">
+                    <p language="primary.portal.census.uploadcensus.updateOnly"></p>
+                </div>
+            </div>
+            <mat-label class="mat-label" language="primary.portal.census.uploadcensus.uploadTitle"></mat-label>
+            <empowered-mon-upload
+                [accept]="acceptableFormats"
+                [isFileSelected]="isFileSelected"
+                [hasError]="hasError"
+                [isSucess]="isSucess"
+                [modeProgress]="modeProgress"
+                [fileUploadPercentage]="fileUploadPercentage"
+                [isUploadingStarted]="isUploadingStarted"
+                (uploadFile)="uploadFile($event)"
+                (cancelUpload)="cancelUpload($event)"
+                [isFileSelected]="isFileSelected"
+                [files]="files"
+                [uploadErrorStatus]="uploadErrorStatus"
+                [uploadSucessStatus]="uploadSuccessStatus"
+                [isProgressBarEnabled]="isProgressBarEnabled"
+                [fileBrowsed]="selectForUpload"
+                [isFileViewable]="this.isFileViewable"
+                [hasWarning]="hasWarning"
+                [isExistingDoc]="this.isExistingDoc"
+                [lastUploadedFileDate]="this.lastUploadedFileDate"
+                [lastUploadFileName]="this.lastUploadFileName"
+                [uploadedAdminName]="this.uploadedAdminName"
+            ></empowered-mon-upload>
+            <mon-alert alertType="warning" *ngIf="isMappingRequired">
+                <span language="primary.portal.census.uploadcensus.uploadWarningMsg"></span>
+            </mon-alert>
+            <mon-alert alertType="danger" *ngIf="alertErrorMessageKey?.includes('errorNonPEOClass')">
+                <span [language]="alertErrorMessageKey"></span>
+            </mon-alert>
+            <mon-alert alertType="danger" *ngIf="fileUploadFailedMsg">
+                <span>{{fileUploadFailedMsg}}</span>
+            </mon-alert>
+            <p class="census-msg">
+                <span *ngIf="!isExistingDoc">
+                    <span language="primary.portal.census.noCensusMsg"></span>
+                    <a
+                        target="_blank"
+                        [href]="templateURL"
+                        class="mon-btn-link"
+                        [attr.aria-label]="languageStrings.downloadCensusTemplateMsg"
+                        >{{langStrings['primary.portal.census.downloadCensusTemplateMsg']}}</a
+                    >
+                </span>
+
+                <span *ngIf="isExistingDoc">
+                    <span language="primary.portal.census.uploadcensus.download"></span>
+                    <a class="mon-btn-link" (click)="getCurrentEmployeeList()"
+                        >{{langStrings['primary.portal.census.uploadcensus.currentEmployeeList']}} </a
+                    >&nbsp;<span language="primary.portal.census.uploadcensus.or"></span>&nbsp;<a
+                        target="_blank"
+                        [href]="templateURL"
+                        [attr.aria-label]="languageStrings.censusTemplateMsg"
+                    >
+                        {{langStrings['primary.portal.census.censusTemplateMsg']}}</a
+                    >
+                </span>
+                <span richTooltip="{{this.aflacDocumentInfo}}" matTooltipClass="pos-below w-200">
+                    <mon-icon iconName="Filled-info" [iconSize]="16" class="infoicon icon-primary"></mon-icon>
+                </span>
+            </p>
+            <div [hidden]="!isErrorLog">
+                <mon-alert alertType="danger">
+                    <div>
+                        <span *ngIf="alertErrorMessageKey?.includes('errorInvalidPEOClassName')">
+                            {{langStrings["primary.portal.census.errorMessage.errorInvalidPEOClassName1"]}}
+                            <a
+                                (click)="dialogRef.close()"
+                                [routerLink]="['producer', 'payroll', mpGroupId, 'dashboard', 'profile', 'structure']"
+                                >{{langStrings["primary.portal.census.errorMessage.errorInvalidPEOClassName.link"]}}</a
+                            >
+                            {{langStrings["primary.portal.census.errorMessage.errorInvalidPEOClassName2"]}}
+                        </span>
+                    </div>
+
+                    <span> {{ "primary.portal.uploadCensus.errorAlert" | replaceTag: {"#errorcount": errorLogLength} }} </span
+                    ><a (click)="downloadError()" class="mon-btn-link" [attr.aria-label]="languageStrings.downloadErrorLog">
+                        {{languageStrings.downloadErrorLog}}</a
+                    >
+                </mon-alert>
+                <div>
+                    <table mat-table matSort (matSortChange)="sortData($event)" [dataSource]="errorLogDataSource">
+                        <ng-container matColumnDef="errorRow">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <span language="primary.portal.census.uploadcensus.rowNumber"></span>
+                            </th>
+                            <td mat-cell [ngClass]="{'sorted-column': activeCol === displayedColumnsErrorlog[0]}" *matCellDef="let element">
+                                {{element.errorRow}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="errorColumn">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <span language="primary.portal.census.uploadcensus.columnName"></span>
+                            </th>
+                            <td mat-cell [ngClass]="{'sorted-column': activeCol === displayedColumnsErrorlog[1]}" *matCellDef="let element">
+                                {{element.errorColumn}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="errorMessage">
+                            <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                <span language="primary.portal.census.uploadcensus.errorMessage"></span>
+                            </th>
+                            <td
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === displayedColumnsErrorlog[2]}"
+                                *matCellDef="let element"
+                                class="mon-py-10"
+                            >
+                                {{element.errorMessage}}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsErrorlog"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsErrorlog;"></tr>
+                    </table>
+
+                    <div
+                        class="paginator-wrapper"
+                        [hidden]="errorLogDataSource.data.length === 0 || this.matPaginator.getNumberOfPages() === 1"
+                    >
+                        <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+                        <mat-form-field class="paginator-input-wrapper">
+                            <span language="primary.portal.members.membersList.page"></span>
+                            <input
+                                class="paginator-input"
+                                (input)="pageInputChanged($event.target.value)"
+                                formControlName="pageNumberControl"
+                                matInput
+                                type="number"
+                                [attr.aria-label]="langStrings['primary.portal.census.uploadcensus.pageNumberControl']"
+                                min="1"
+                                max="{{ this.matPaginator.getNumberOfPages() }}"
+                            />
+                            of {{ this.matPaginator.getNumberOfPages() }}
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isMappingRequired">
+                <h3>{{langStrings['primary.portal.census.uploadcensus.mappingTool']}}</h3>
+                <p language="primary.portal.census.uploadcensus.uploadInfo"></p>
+                <div *ngIf="isSavedMappings" class="saved-map-container">
+                    <mat-label class="mat-label" language="primary.portal.census.uploadcensus.savedMaps"></mat-label>
+                    <mat-form-field>
+                        <mat-select [(value)]="this.selectedSavedMapping" (selectionChange)="savedMapping($event)">
+                            <mat-option value="select" language="primary.portal.common.select"></mat-option>
+                            <mat-option *ngFor="let mapping of savedCensusMappings" [value]="mapping.name"> {{mapping.name}} </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <table mat-table [dataSource]="data">
+                    <ng-container matColumnDef="icon">
+                        <th mat-header-cell *matHeaderCellDef class="icon-column"></th>
+                        <td mat-cell *matCellDef="let element; let i=index;" class="icon-column">
+                            <mon-icon *ngIf="isIcon(i, element.fileRow1)" iconName="check" [iconSize]="24"></mon-icon>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="defaultCategories">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.census.uploadcensus.categories"></th>
+                        <td mat-cell *matCellDef="let element; let i = index;">
+                            <mat-form-field>
+                                <mat-select [(value)]="this.preSelectedData[i].name" (valueChange)="changeDefaultMapping()">
+                                    <mat-option value="skipColumn" language="primary.portal.common.select"></mat-option>
+                                    <mat-optgroup *ngFor="let group of element.mappingFieldsGroup" [label]="group.name">
+                                        <mat-option *ngFor="let mappingField of group.mappingFields" [value]="mappingField.name">
+                                            {{mappingField.value}}
+                                        </mat-option>
+                                    </mat-optgroup>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="fileRow1">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.census.uploadcensus.file1"></th>
+                        <td mat-cell *matCellDef="let element">{{element.fileRow1}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="fileRow2">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.census.uploadcensus.file2"></th>
+                        <td mat-cell *matCellDef="let element">{{element.fileRow2}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="fileRow3">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.census.uploadcensus.file3"></th>
+                        <td mat-cell *matCellDef="let element">{{element.fileRow3}}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+
+                <mon-alert alertType="danger" *ngIf="errorRequiredFieldMissing">
+                    <span language="primary.portal.census.uploadcensus.alertErrorCensus"> </span>
+                    <p *ngFor="let field of errorRequiredFields" [language]="mappingLanguage.concat(field)"></p>
+                </mon-alert>
+
+                <mat-label class="mat-label" language="primary.portal.census.uploadcensus.filemapName" class="filemap-label"></mat-label>
+                <mat-form-field>
+                    <input matInput formControlName="censusMapping" matInput [attr.aria-label]="languageStrings.filemapName" />
+                    <mat-error
+                        *ngIf="censusForm.controls['censusMapping'].hasError('isMappingNameError') || censusForm.controls['censusMapping'].hasError('required')"
+                        class="mon-pt-6 mon-mat-hint"
+                        >{{validationError}}</mat-error
+                    >
+                </mat-form-field>
+                <div class="saved-map-container">
+                    <mat-checkbox formControlName="isContainsHeader" (change)="isInputBoxEnabled()"
+                        ><span language="primary.portal.census.uploadcensus.uploadSkip"></span
+                    ></mat-checkbox>
+                </div>
+            </div>
+        </mat-dialog-content>
+    </form>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            language="primary.portal.common.cancel"
+            mat-dialog-close
+            (click)="onNoClick()"
+            cdkFocusInitial
+            [attr.aria-label]="languageStrings.ariaCancel"
+        ></a>
+        <button mat-button class="mon-btn-primary" (click)="onSave()" [attr.aria-label]="languageStrings.ariaSave">
+            {{languageStrings.ariaSave}}
+        </button>
+    </mat-dialog-actions>
+</div>

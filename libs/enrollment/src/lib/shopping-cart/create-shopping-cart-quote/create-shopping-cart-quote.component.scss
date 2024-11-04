@@ -1,0 +1,162 @@
+@import "shared";
+
+.mat-form-field .mat-form-field-infix {
+    padding: map-get($spacers, 0);
+}
+
+.mat-divider {
+    color: get("color.gray.300");
+    border-style: dotted;
+}
+
+.quote-div {
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    max-width: convert-unit(700px, "rem");
+    padding: map-get($spacers, 30);
+}
+
+.edit-details {
+    padding: convert-unit(0px, "rem") convert-unit(18px, "rem");
+}
+
+.products-accordion-table-wrapper {
+    .mat-table {
+        .mat-header-row {
+            border-bottom: convert-unit(2px, "rem") solid get("color.gray.600");
+
+            .mat-header-cell {
+                &:nth-child(3) {
+                    line-height: convert-unit(14px, "rem") !important;
+                    margin-bottom: map-get($spacers, 5);
+
+                    @include media-min("l") {
+                        padding-left: map-get($spacers, 30) !important;
+                    }
+                }
+
+                text-align: end;
+                margin-left: convert-unit(12px, "rem");
+                justify-content: center;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+        }
+
+        .mat-row {
+            &:not(:last-child) {
+                .mat-cell {
+                    &:first-of-type {
+                        @include fontFace("primary.regular");
+                    }
+                }
+            }
+
+            &:last-child {
+                .mat-cell {
+                    border-bottom-color: get("color.gray.200");
+                    @include fontFace("primary.bold");
+                    vertical-align: top;
+                }
+            }
+
+            &:nth-child(even) {
+                background-color: get("color.white");
+            }
+
+            .mat-cell {
+                font-weight: normal !important;
+            }
+
+            .sub-header {
+                font-size: convert-unit(12px, "rem");
+                @include fontFace("primary.regular");
+                color: get("color.gray.600");
+                line-height: normal;
+            }
+        }
+    }
+}
+
+.plan-details-section {
+    padding: map-get($spacers, 10);
+}
+
+.quasi-modal {
+    .modal-header {
+        h2 {
+            margin: map-get($spacers, 0);
+        }
+    }
+
+    .mat-dialog-content {
+        @include media-max("m") {
+            padding-right: map-get($spacers, 30);
+        }
+
+        .content-wrapper {
+            .quote-edit-wrapper {
+                display: flex;
+                align-items: center;
+                margin-bottom: 30px;
+
+                .mat-form-field {
+                    margin: 0;
+                }
+            }
+
+            .selected-plans {
+                &:last-child {
+                    .mat-divider {
+                        display: none;
+                    }
+                }
+            }
+
+            .product-description {
+                display: flex;
+                margin-top: map-get($spacers, 15);
+
+                .product-logo {
+                    margin-right: map-get($spacers, 10);
+                }
+
+                .product-title {
+                    h3 {
+                        margin-bottom: map-get($spacers, 0);
+                        margin-top: map-get($spacers, 0);
+                    }
+
+                    h4 {
+                        margin-top: map-get($spacers, 0);
+                        margin-bottom: map-get($spacers, 0);
+                    }
+
+                    .text-fade {
+                        color: get("color.gray.600");
+                    }
+                }
+            }
+        }
+    }
+
+    .mat-dialog-actions {
+        .footer-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1 1 auto;
+        }
+    }
+}
+
+.carrier-logo {
+    display: flex;
+
+    .aflac-img {
+        height: convert-unit(72px, "rem");
+        margin-right: map-get($spacers, 15);
+    }
+}
+.mat-column-manage {
+    direction: ltr !important;
+}

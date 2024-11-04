@@ -1,0 +1,269 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="new-benefits-offering">
+    <div class="d-flex">
+        <h1 class="heading">{{languageStrings['primary.portal.maintenanceBenefitsOffering.title']}}</h1>
+    </div>
+    <div class="mon-mb-20" *ngIf="showErrorMessage">
+        <mon-alert alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div class="alert-msg" *ngIf="!validZip">
+        <mon-alert alertType="warning">
+            <span> {{ languageStrings["primary.portal.maintenanceBenefitsOffering.invalidZipCode"] }} </span>
+        </mon-alert>
+    </div>
+    <div class="alert-status" *ngIf="countPlanYearEnding > 0">
+        <mon-alert alertType="info">
+            <div class="content">
+                <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.planYearEnding']}}</h4>
+                <div class="description">
+                    <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.planYearEndingDesc']}}</p>
+                    <p class="plan-affected">
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlans']
+                        .replace("#unapprovedOfferingCount", countPlanYearEnding ) }}
+                    </p>
+                </div>
+            </div>
+        </mon-alert>
+    </div>
+    <div *ngIf="!isAdmin">
+        <!-- benefit tab alert -->
+        <div class="alert-status" *ngIf="unApprovedOfferingCount > 0 && step===benefitDollarsStep && isRequestPending">
+            <mon-alert alertType="warning">
+                <div class="content">
+                    <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalPending']}}</h4>
+                    <div class="description">
+                        <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalDescription']}}</p>
+                        <p class="plan-affected">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlans']
+                            .replace("#unapprovedOfferingCount", unApprovedOfferingCount ) }}
+                        </p>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+        <!-- Approval pending alert -->
+        <div class="alert-status" *ngIf="isPending">
+            <mon-alert alertType="warning">
+                <div class="content">
+                    <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalPending']}}</h4>
+                    <div class="description">
+                        <p *ngIf="pendingStatus===approvalStatusType?.SUBMITTED_TO_HR">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalDescription']}}
+                        </p>
+                        <p *ngIf="pendingStatus===approvalStatusType?.SUBMITTED_TO_HQ">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.hqIntegrationAdminApproval']}}
+                        </p>
+                        <p class="plan-affected">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlans']
+                            .replace("#unapprovedOfferingCount", unapprovedOfferingCount ) }}
+                        </p>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+        <!-- Approval needed alert -->
+        <div class="alert-status" *ngIf="isApprovalRequired || (unApprovedOfferingCount > 0 && !isPending)">
+            <mon-alert alertType="danger">
+                <div class="content">
+                    <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalNeeded']}}</h4>
+                    <div class="description">
+                        <p *ngIf="unapprovedOfferingCount + unApprovedOfferingCount  === 1 else planChanges">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCount']
+                            .replace("#unapprovedcount",unapprovedOfferingCount + unApprovedOfferingCount)}}<ng-container
+                                *ngIf="isAGPlansRequiresApproval"
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.agApprovalRequiredChangesText']}}
+                            </ng-container>
+                            <ng-container *ngIf="isNonAGPlansRequiresApproval && isAGPlansRequiresApproval">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalRequiredChangesTextAgAi']}}
+                            </ng-container>
+                        </p>
+                        <ng-template #planChanges>
+                            <p class="description">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.adminApprovalChanges']
+                                .replace("#unapprovedcount",unapprovedOfferingCount + unApprovedOfferingCount )}}<ng-container
+                                    *ngIf="isAGPlansRequiresApproval"
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.agApprovalRequiredChangesText']}}
+                                </ng-container>
+                                <ng-container *ngIf="isNonAGPlansRequiresApproval && isAGPlansRequiresApproval">
+                                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalRequiredChangesTextAgAi']}}
+                                </ng-container>
+                            </p>
+                        </ng-template>
+                        <p class="plan-affected" *ngIf="unapprovedOfferingCount  === 1 else planAffected">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlan']
+                            .replace("#unapprovedOfferingCount",unapprovedOfferingCount) }}
+                        </p>
+                        <ng-template #planAffected>
+                            <p class="plan-affected">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlans']
+                                .replace("#unapprovedOfferingCount", unapprovedOfferingCount ) }}
+                            </p>
+                        </ng-template>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+        <!-- Admin has requested changes Alert -->
+        <div class="alert-status" *ngIf="changesRequired">
+            <mon-alert alertType="danger">
+                <div class="content">
+                    <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.adminApproval']}}</h4>
+                    <div class="description">
+                        <a href="javascript:void(0)" (click)="navigateToApprovalTab()">
+                            <!-- Review / update offering -->
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.reviewOffering']}}
+                        </a>
+                        <p class="plan-affected">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.unapprovedOfferingCountPlans']
+                            .replace("#unapprovedOfferingCount", unapprovedOfferingCount ) }}
+                        </p>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+        <div class="alert-status" *ngIf="checkedOut && !maintenanceLock && !unpluggedAccessAllowed">
+            <mon-alert alertType="info">
+                <div class="content">
+                    <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitsOfferingCantBeUpdated']}}</h4>
+                    <div class="description">
+                        <p>{{languageStrings['primary.portal.dashboard.unpluggedAccount.checkedOutToUnpluggedNew'] }}</p>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+
+        <mat-tab-group animationDuration="0ms" (selectedTabChange)="onTabChange($event)" #matTab>
+            <mat-tab class="product-tab">
+                <ng-template mat-tab-label>
+                    <mon-icon iconSize="16" iconName="Filled-error" class="icon-danger" *ngIf="highAlertProducts"></mon-icon>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.products']}}
+                </ng-template>
+                <empowered-products
+                    *ngIf="step===maintenanceBOTabs.PRODUCTS"
+                    (emitUnApprovedProducts)="onUnApprovedProducts($event)"
+                    (productHighAlert)="applyHighAlertProducts($event)"
+                    (planYearEnding)="checkPlanYearEndingSoon($event)"
+                    [zipStatus]="validZip"
+                ></empowered-products>
+            </mat-tab>
+
+            <mat-tab *ngIf="maintenanceBOTabs['CARRIER_FORMS']">
+                <ng-template mat-tab-label>
+                    <mon-icon iconSize="16" iconName="Filled-error" class="icon-danger" *ngIf="(hasIncompleteForms$ | async)"></mon-icon>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.carrier']}}
+                </ng-template>
+                <empowered-carrier-form-manage
+                    *ngIf="step===maintenanceBOTabs.CARRIER_FORMS"
+                    (emitUnApprovedCarriers)="onUnApprovedCarriers($event)"
+                ></empowered-carrier-form-manage>
+            </mat-tab>
+
+            <mat-tab>
+                <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.settings']}} </ng-template>
+                <empowered-settings-tab
+                    *ngIf="step===maintenanceBOTabs.SETTINGS"
+                    (emitUnApprovedSettings)="onUnApprovedSettings($event)"
+                    (planYearEnding)="checkPlanYearEndingSoon($event)"
+                ></empowered-settings-tab>
+            </mat-tab>
+            <mat-tab *ngIf="maintenanceBOTabs['BENEFIT_DOLLARS']">
+                <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollars']}} </ng-template>
+                <empowered-benefit-dollars
+                    *ngIf="step===maintenanceBOTabs.BENEFIT_DOLLARS"
+                    (emitUnApprovedOfferings)="onUnApprovedOfferings($event)"
+                >
+                </empowered-benefit-dollars>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mon-icon
+                        iconSize="16"
+                        iconName="Filled-error"
+                        class="icon-danger"
+                        *ngIf="unApprovedApprovalsAlert>0 || unApprovedOfferingCount > 0"
+                    ></mon-icon>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvals']}}
+                </ng-template>
+                <empowered-approvals-tab
+                    *ngIf="step===maintenanceBOTabs.APPROVALS"
+                    (emitUnApprovedApprovals)="onUnApprovedApprovals($event)"
+                ></empowered-approvals-tab>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <!-- HR Admin view of Maintenance of Benefits-Offering -->
+    <div *ngIf="isAdmin">
+        <!-- Declined View of HR Admin -->
+        <div
+            class="mon-mb-20"
+            *ngIf="approvalRequestes && approvalRequestes.length &&
+            approvalRequestes[approvalRequestes.length-1].status==='DECLINED'"
+        >
+            <mon-alert alertType="warning">
+                <div class="content">
+                    <h3>{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.updateInProgress']}}</h3>
+                    <div class="description">
+                        <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.products.reviewInProgress']}}</p>
+                    </div>
+                </div>
+            </mon-alert>
+        </div>
+        <!-- Submitted View of HR Admin -->
+        <div
+            *ngIf="(approvalRequestes && approvalRequestes.length &&
+            (approvalRequestes[approvalRequestes.length-1].status==='SUBMITTED_TO_HR' ||
+            this.approvalRequestes[approvalRequestes.length-1].status==='SUBMITTED_TO_HQ')) || !approvalRequestes.length"
+        >
+            <p class="mon-mx-20">{{languageStrings['primary.portal.maintenanceBenefitsOffering.zeroState']}}</p>
+        </div>
+        <!-- Approved / Declined with more requests View of HR Admin -->
+        <div
+            *ngIf="approvalRequestes && approvalRequestes.length &&
+            (this.approvalRequestes[approvalRequestes.length-1].status === 'APPROVED' ||
+            (approvalRequestes.length>1 && approvalRequestes[approvalRequestes.length-1].status==='DECLINED'))"
+        >
+            <div class="alert-status" *ngIf="checkedOut && !maintenanceLock && !unpluggedAccessAllowed">
+                <mon-alert alertType="info">
+                    <div class="content">
+                        <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitsOfferingCantBeUpdated']}}</h4>
+                        <div class="description">
+                            <p>{{languageStrings['primary.portal.dashboard.unpluggedAccount.checkedOutToUnpluggedNew'] }}</p>
+                        </div>
+                    </div>
+                </mon-alert>
+            </div>
+            <mat-tab-group animationDuration="0ms" (selectedTabChange)="onTabChange($event)" #matTabHR>
+                <mat-tab class="product-tab">
+                    <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.products']}} </ng-template>
+                    <empowered-products *ngIf="this.step===maintenanceBOTabs.PRODUCTS"></empowered-products>
+                </mat-tab>
+
+                <mat-tab *ngIf="maintenanceBOTabs['CARRIER_FORMS']">
+                    <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.carrier']}} </ng-template>
+                    <empowered-carrier-form-manage *ngIf="step===maintenanceBOTabs.CARRIER_FORMS"></empowered-carrier-form-manage>
+                </mat-tab>
+
+                <mat-tab>
+                    <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.settings']}} </ng-template>
+                    <empowered-settings-tab *ngIf="step===maintenanceBOTabs.SETTINGS"></empowered-settings-tab>
+                </mat-tab>
+
+                <mat-tab *ngIf="maintenanceBOTabs['BENEFIT_DOLLARS']">
+                    <ng-template mat-tab-label>
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollars']}}
+                    </ng-template>
+                    <empowered-benefit-dollars *ngIf="step===maintenanceBOTabs.BENEFIT_DOLLARS"> </empowered-benefit-dollars>
+                </mat-tab>
+
+                <mat-tab>
+                    <ng-template mat-tab-label> {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvals']}} </ng-template>
+                    <empowered-approvals-tab *ngIf="step===maintenanceBOTabs.APPROVALS"></empowered-approvals-tab>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+    <!-- HR Admin view of Maintenance of Benefits-Offering -->
+</div>

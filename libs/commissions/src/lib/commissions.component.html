@@ -1,0 +1,27 @@
+<div class="commission-wrapper">
+    <div class="commission-header">
+        <h2 class="mon-my-0">{{languageStrings["primary.portal.commission.title"]}}</h2>
+    </div>
+    <div class="columns" *ngIf="!selfEnrollmentFlag">
+        <div class="content-area">
+            <mat-tab-group [selectedIndex]="selectedIndex" animationDuration="0ms">
+                <mat-tab [label]="languageStrings['primary.portal.commission.tab.producer']">
+                    <ng-template matTabContent>
+                        <empowered-producers></empowered-producers>
+                    </ng-template>
+                </mat-tab>
+                <ng-container *isRestricted="permissionEnum.ACCOUNT_COMMISSIONS_RESTRICT_COMMISSIONS_SPLITS">
+                    <mat-tab
+                        *hasPermission="permissionEnum.COMMISSION_READ"
+                        [label]="languageStrings['primary.portal.commission.tab.commissionSplit']"
+                    >
+                        <ng-template matTabContent>
+                            <empowered-commission-splits></empowered-commission-splits>
+                        </ng-template>
+                    </mat-tab>
+                </ng-container>
+            </mat-tab-group>
+        </div>
+    </div>
+    <empowered-commission-splits *ngIf="selfEnrollmentFlag"></empowered-commission-splits>
+</div>

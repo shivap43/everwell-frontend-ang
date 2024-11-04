@@ -1,0 +1,228 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="approval-tab">
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+    <div class="mon-my-30" *ngIf="isOfferingReady && !approvalRequiredData.length && !isAdmin && !agApprovalRequiredData.length">
+        <mon-alert alertType="success">
+            <span language="secondary.portal.maintenanceBenefitsOffering.approvalsTab.isOfferingReady"></span>
+        </mon-alert>
+    </div>
+    <div
+        class="mon-my-30"
+        *ngIf="fromInitial &&  approvalToastDisplay.length && approvalToastDisplay[0].hasToasterAppeared && isRequestPending && !isAdmin"
+    >
+        <mon-alert alertType="success" closeButton="true" (click)="closeToast()">
+            <span language="secondary.portal.maintenanceBenefitsOffering.approvalsTab.isOfferingSubmitted"></span>
+        </mon-alert>
+    </div>
+    <div class="mon-mt-30" *ngIf="isSubmitApprovalToasterClosed">
+        <mon-alert alertType="success" closeButton="true" (click)="closeToast(true)">
+            <span language="secondary.portal.maintenanceBenefitsOffering.approvalsTab.isSettingUpdated"></span
+        ></mon-alert>
+    </div>
+    <div *ngIf="missingRequiredInfo.length>0 && !isRequestPending && !isAdmin">
+        <h3>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approval.infoMissing']}}</h3>
+        <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approval.submitYourChanges']}}</p>
+        <ul>
+            <li *ngFor="let info of missingRequiredInfo">{{info}}</li>
+        </ul>
+    </div>
+    <div *ngIf="(approvalRequiredData.length || agApprovalRequiredData.length) && !isSettingUpdated && !isAdmin">
+        <ng-container *ngIf="agApprovalRequiredData.length">
+            <h3 class="sub-title">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.hqIntegrationAdminApproval']}}
+            </h3>
+            <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.availableForEnrollment']}}</p>
+            <ul>
+                <li *ngFor="let eachData of agApprovalRequiredData">{{eachData}}</li>
+            </ul>
+        </ng-container>
+        <ng-container *ngIf="approvalRequiredData.length">
+            <h3 class="sub-title">
+                <ng-container *ngIf="accountDetails?.importType!==accountImportTypes?.SHARED_CASE">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.requireAdminApproval']}}
+                </ng-container>
+                <ng-container *ngIf="accountDetails?.importType===accountImportTypes?.SHARED_CASE">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.hrAdminApproval']}}
+                </ng-container>
+            </h3>
+            <ul>
+                <li *ngFor="let eachData of approvalRequiredData">{{eachData}}</li>
+            </ul>
+        </ng-container>
+        <ng-container *isRestricted="permissionEnum.ACCOUNT_BO_RESTRICT_APPROVAL">
+            <button
+                class="mon-btn-primary mon-mb-10"
+                mat-flat-button
+                (click)="checkBillingContact()"
+                [disabled]="unPluggedAccount || missingRequiredInfo.length>0 || isVestedAgent || disableSubmitButton"
+            >
+                <ng-container *ngIf="approvalRequiredData.length && !agApprovalRequiredData.length">
+                    {{ languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.submitToAdmin'] }}
+                </ng-container>
+                <ng-container *ngIf="approvalRequiredData.length && agApprovalRequiredData.length">
+                    {{ languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.submitChanges'] }}
+                </ng-container>
+                <ng-container *ngIf="!approvalRequiredData.length && agApprovalRequiredData.length">
+                    {{ languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.submitToHQAdmin'] }}
+                </ng-container>
+            </button>
+        </ng-container>
+    </div>
+    <h3 class="sub-title" id="table-header" *ngIf="approvalRequest.length || approvalItemsData.length">
+        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.title']}}
+    </h3>
+    <p *ngIf="!approvalItemsData.length && (!approvalRequiredData.length && !agApprovalRequiredData.length)">
+        <span *ngIf="!isAdmin"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.approvalRequiredData']}} </span>
+        <span *ngIf="isAdmin"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.zeroState']}} </span>
+    </p>
+    <!-- The below table is used to display all approval requests -->
+    <table
+        mat-table
+        [hidden]="!approvalRequest.length || (!approvalItemsData.length && !approvalRequiredData.length && !agApprovalRequiredData.length)"
+        [dataSource]="approvalRequest"
+        aria-describedby="#table-header"
+    >
+        <!-- Date submitted Column -->
+        <ng-container matColumnDef="dateSubmitted">
+            <th mat-header-cell *matHeaderCellDef>
+                <span *ngIf="!isAdmin"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.dateSubmitted']}} </span>
+                <span *ngIf="isAdmin"> {{languageStrings['primary.portal.maintenanceBenefitsOffering.approval.dateReceived']}} </span>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <span *ngIf="element.status===APPROVED && !element.submittedDate">{{element.hrAdminResponseDate | date: dateFormat}}</span>
+                <span *ngIf="(element.status===APPROVED || element.status===AUTO_APPROVED) && element.submittedDate"
+                    >{{element.submittedDate | date: dateFormat}}</span
+                >
+                <span *ngIf="element.status===SUBMITTED || element.status===SUBMITTED_TO_HR"
+                    >{{element.submittedDate | date: dateFormat }}</span
+                >
+                <span *ngIf="element.status===DECLINED">{{element.submittedDate | date: dateFormat }}</span>
+            </td>
+        </ng-container>
+
+        <!-- Response Column -->
+        <ng-container matColumnDef="response">
+            <th mat-header-cell *matHeaderCellDef>
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.response']}}
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <ng-container *ngIf="element.status===APPROVED && element.hrAdminResponseDate && !element.hqAdminResponseDate">
+                    <ng-container
+                        *ngIf="accountDetails?.importType===accountImportTypes?.SHARED_CASE && element.approvalItems.length; else autoApproved"
+                    >
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.adminResponseDate']|
+                        replaceTag:{"##responsedate##": element.hrAdminResponseDate | date: dateFormat} }}
+                    </ng-container>
+                    <ng-template #autoApproved>
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.approvedDate']| replaceTag:
+                        {"##responsedate##": element.hrAdminResponseDate | date: dateFormat} }}
+                    </ng-template>
+                </ng-container>
+                <span *ngIf="element.status===APPROVED && element.hqAdminResponseDate && !element.hrAdminResponseDate">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.approvedByHQAdminOn']}}
+                    {{element.hqAdminResponseDate | date: dateFormat}}</span
+                >
+                <ng-container *ngIf="element?.status===AUTO_APPROVED && element?.submittedDate">
+                    {{autoApproved}} on {{element.submittedDate | date: dateFormat}}
+                </ng-container>
+                <ng-container *ngIf="element.status===APPROVED && element.hqAdminResponseDate && element.hrAdminResponseDate">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.approvedByHQAdminIntegration'] |
+                    replaceTag:{"##hqresponsedate##":element.hqAdminResponseDate | date: dateFormat,
+                    "##hrresponsedate##":element.hrAdminResponseDate | date: dateFormat } }}</ng-container
+                >
+                <span *ngIf="element.status===SUBMITTED">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.pendingHQAdminApproval']}}</span
+                >
+                <ng-container *ngIf="element.status===SUBMITTED_TO_HR">
+                    <ng-container *ngIf="element.hqAdminResponseDate; else hrAdminText">
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.responsePendingApproval'] |
+                        replaceTag:{"##hrresponsedate##":element.hqAdminResponseDate | date: dateFormat } }}
+                    </ng-container>
+                    <ng-template #hrAdminText>
+                        <ng-container *ngIf="accountDetails?.importType===accountImportTypes?.SHARED_CASE">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.pendingApproval']}}
+                        </ng-container>
+                        <ng-container *ngIf="accountDetails?.importType!==accountImportTypes?.SHARED_CASE">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.hqPending']}}
+                        </ng-container>
+                    </ng-template> </ng-container
+                ><span *ngIf="element.status===DECLINED && element.hrAdminResponseDate"
+                    >{{languageStrings["primary.portal.maintenanceBenefitsOffering.approvalsTab.updatesRequestedOn"]
+                    .replace("#updatesRequestedOn", element.hrAdminResponseDate | date: dateFormat) }}</span
+                ><span *ngIf="element.status===DECLINED  && element.hqAdminResponseDate"
+                    >{{languageStrings["primary.portal.maintenanceBenefitsOffering.approvalsTab.updatesRequestedOn"]
+                    .replace("#updatesRequestedOn", element.hqAdminResponseDate | date: dateFormat) }}
+                </span>
+                <ng-container *ngIf="!isAdmin">
+                    <ng-container *isRestricted="permissionEnum.ACCOUNT_BO_RESTRICT_APPROVAL">
+                        <button mat-icon-button class="mon-btn-link" *ngIf="element.status===DECLINED" (click)="reviewComments(element)">
+                            {{ languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.review'] }}
+                        </button>
+                        <button
+                            mat-icon-button
+                            class="mon-btn-link"
+                            *ngIf="(element.status===SUBMITTED || element.status === SUBMITTED_TO_HR)"
+                            (click)="cancelApprovalRequest(element)"
+                            [disabled]="isVestedAgent"
+                        >
+                            {{ languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.cancelApprovalRequest'] }}
+                        </button>
+                    </ng-container>
+                </ng-container>
+            </td>
+        </ng-container>
+
+        <!-- Manage Column -->
+        <ng-container matColumnDef="manage">
+            <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.manage']}}</th>
+            <td mat-cell *matCellDef="let element"></td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="approvalssDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: approvalssDisplayedColumns;"></tr>
+    </table>
+
+    <!-- pop - up -->
+    <div>
+        <ng-template #reviewModal>
+            <div class="info-modal">
+                <div class="modal-header">
+                    <button mat-icon-button (click)="closeModal()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                        <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                    </button>
+                </div>
+
+                <div mat-dialog-content>
+                    <h2 mat-dialog-title>
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalTitle']}}
+                    </h2>
+                    <p class="mon-mb-30">
+                        <span *ngIf="!isAdmin">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalDesc']}}
+                        </span>
+                        <span *ngIf="isAdmin">
+                            {{languageStrings['primary.portal.maintenanceBenefitsOffering.approval.requestedChanges']}}
+                        </span>
+                    </p>
+                    <div class="d-flex">
+                        <div class="w-200">
+                            <strong
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.approvalsTab.reviewModalUpdates']}}</strong
+                            >
+                        </div>
+                        <div>{{reviewCommentData}}</div>
+                    </div>
+                </div>
+                <div mat-dialog-actions class="dialog-footer justify-content-end">
+                    <button class="mon-btn-primary" mat-flat-button (click)="closeModal()">
+                        {{languageStrings['primary.portal.common.gotIt']}}
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- pop - up -->
+</div>

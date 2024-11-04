@@ -1,0 +1,35 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header *ngIf="isUpdate">
+        <span [language]="MessageCenterLanguage.ASSIGN_ADMIN_MODAL_HEADER_UPDATE"></span>
+    </empowered-modal-header>
+    <empowered-modal-header *ngIf="!isUpdate">
+        <span [language]="MessageCenterLanguage.ASSIGN_ADMIN_MODAL_HEADER_SAVE"></span>
+    </empowered-modal-header>
+
+    <empowered-modal-footer>
+        <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            class="mon-btn-primary"
+            [mat-dialog-close]="adminForm.controls['adminFormControl'].value"
+            [disabled]="!adminForm.valid"
+            [language]="MessageCenterLanguage.ASSIGN_ADMIN_MODAL_BUTTON_SAVE"
+        >
+        </button>
+    </empowered-modal-footer>
+
+    <form [formGroup]="adminForm">
+        <mat-label [language]="MessageCenterLanguage.ASSIGN_ADMIN_MODAL_LABEL_ADMIN"></mat-label>
+        <mat-form-field>
+            <label></label>
+            <mat-select formControlName="adminFormControl" [disableOptionCentering]="true" [attr.aria-label]="aria">
+                <ng-container *ngIf="admins$ | async as admins">
+                    <mat-option *ngFor="let admin of admins" [value]="admin.id"
+                        >{{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}</mat-option
+                    >
+                </ng-container>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</empowered-modal>

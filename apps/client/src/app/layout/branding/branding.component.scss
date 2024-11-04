@@ -1,0 +1,29 @@
+@import "shared";
+
+.branding {
+    &-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: map-get($spacers, 0) map-get($spacers, 20);
+    }
+
+    &-logo {
+        height: map-get($spacers, 30);
+    }
+}
+::ng-deep .app-sideNav-branding {
+    .branding {
+        &-link {
+            padding: map-get($spacers, 0);
+        }
+        &-logo {
+            height: auto;
+            width: convert-unit(240px, "rem");
+        }
+    }
+}
+.side-nav-branding {
+    height: map-get($spacers, 50) !important;
+}

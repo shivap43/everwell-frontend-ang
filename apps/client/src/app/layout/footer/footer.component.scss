@@ -1,0 +1,88 @@
+@import "shared";
+
+.primary-footer {
+    display: flex;
+    flex-direction: column;
+
+    padding: convert-unit(13px, "rem") map-get($map: $spacers, $key: 15);
+    border-top-style: solid;
+    border-top-color: get("color.accent.500");
+    border-top-width: map-get($map: $spacers, $key: 15);
+    background-color: get("color.gray.800");
+
+    font-size: convert-unit(12px, "rem");
+    color: get("color.white");
+
+    &-link {
+        color: get("color.white");
+        text-decoration: none;
+        display: inline-flex;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        .footer-icon {
+            margin-top: map-get($spacers, 0);
+            margin-bottom: map-get($spacers, 0);
+        }
+    }
+
+    .email {
+        a {
+            color: get("color.white");
+        }
+    }
+
+    &-nav {
+        a,
+        p + p:before {
+            color: get("color.gray.500");
+        }
+    }
+
+    @include media-min("m") {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        p {
+            margin: map-get($map: $spacers, $key: 0);
+            line-height: convert-unit(14px, "rem");
+
+            &.email {
+                border-left: convert-unit(1px, "rem") solid get("color.white");
+                margin-left: map-get($map: $spacers, $key: 10);
+                padding-left: map-get($map: $spacers, $key: 10);
+            }
+        }
+
+        &-nav {
+            display: flex;
+
+            p + p {
+                &:before {
+                    content: "\2002|\2002";
+                }
+            }
+        }
+    }
+
+    &-content {
+        display: flex;
+    }
+}
+
+.branding {
+    &-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: map-get($spacers, 0) map-get($spacers, 20);
+    }
+
+    &-logo {
+        height: map-get($spacers, 30);
+    }
+}

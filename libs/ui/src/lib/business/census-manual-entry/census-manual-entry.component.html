@@ -1,0 +1,986 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="false" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="quasi-modal content-scroll add-employee-modal">
+    <div class="modal-header">
+        <div>
+            <mat-label class="mat-label" language="primary.portal.census.manualEntry.label.title"></mat-label>
+            <div *ngIf="changeStepper === 1">
+                <h2>{{languageStringsArray["primary.portal.census.manualEntry.licensedModal.title"]}}</h2>
+            </div>
+            <div *ngIf="changeStepper != 1">
+                <h2><span language="primary.portal.census.manualEntry.addEmployee"></span>{{changedName}}</h2>
+            </div>
+        </div>
+        <button mat-icon-button (click)="closeForm()" attr.aria-label="{{languageStrings.ariaClose}}">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div>
+        <a matButton class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+            <span class="selected-step-index"></span>
+            <span class="selected-step-label"></span>
+            <mon-icon class="icon-right" iconName="down" [iconSize]="10"></mon-icon>
+        </a>
+    </div>
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div app-Overlaystepper="stepperTrigger" stepperId="manualEntryStepper" class="stepper-sidebar" [ngClass]="{'shown': !display}">
+                <mat-vertical-stepper
+                    #progressIndicator
+                    class="side-nav-stepper employee-stepper"
+                    linear="true"
+                    id="manualEntryStepper"
+                    (selectionChange)="stepChanged($event)"
+                    [selectedIndex]="(changeStepper - 1)"
+                >
+                    <mat-step [stepControl]="employeeForm" [completed]="this.stepPosition>0">
+                        <!-- stepPosition>0 -->
+                        <ng-template matStepLabel>
+                            <p language="primary.portal.census.manualEntry.stepperTitle.personalInfo"></p>
+                        </ng-template>
+                    </mat-step>
+                    <mat-step [stepControl]="dependentsForm" [completed]="this.stepPosition>1" *ngIf="!isTpiAccount || showAddDependents">
+                        <ng-template matStepLabel>
+                            <p language="primary.portal.census.manualEntry.stepperTitle.dependents"></p>
+                        </ng-template>
+                    </mat-step>
+                    <mat-step [completed]="this.stepPosition>2">
+                        <ng-template matStepLabel>
+                            <p language="primary.portal.census.manualEntry.stepperTitle.workInfo"></p>
+                        </ng-template>
+                    </mat-step>
+
+                    <!-- Icon overrides -->
+                    <ng-template matStepperIcon="done">
+                        <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                    </ng-template>
+                </mat-vertical-stepper>
+            </div>
+            <div class="stepper-content">
+                <div class="content-wrapper">
+                    <!-- ****** Personal info container ***** -->
+                    <form [formGroup]="employeeForm" class="personal-info-container" *ngIf="changeStepper === 1" #empForm="ngForm">
+                        <h2 [ngClass]="{'mon-mb-10':  isProducer }">{{languageStringsArray["primary.portal.census.manualEntry.title"]}}</h2>
+                        <p *ngIf="isProducer" class="mon-mb-30">
+                            <span>{{languageStringsArray['primary.portal.census.manualEntry.newHire'] + " "}}</span>
+                            <a
+                                href="javascript:void(0)"
+                                class="mon-btn-link"
+                                language="primary.portal.dashboard.rules"
+                                (click)="goToRules()"
+                            ></a>
+                            <span>{{" " + languageStringsArray['primary.portal.census.manualEntry.accountProfile']}}</span>
+                        </p>
+                        <mon-alert *ngIf="errorResponse" alertType="danger">
+                            <span>{{errorMessage}}</span>
+                        </mon-alert>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.firstName"></mat-label>
+                                <mat-form-field>
+                                    <input matInput formControlName="firstName" [attr.aria-label]="languageStrings.firstName" />
+                                    <mat-error [language]="getNameErrorMessages('employeeForm', 'firstName')"></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.lastName"></mat-label>
+                                <mat-form-field>
+                                    <input matInput formControlName="lastName" [attr.aria-label]="languageStrings.lastName" />
+                                    <mat-error [language]="getNameErrorMessages('employeeForm', 'lastName')"></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.birthdate"></mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        empoweredDateTransform
+                                        matInput
+                                        #birthDatePickerInput
+                                        formControlName="birthDate"
+                                        [max]="this.today"
+                                        maxlength="{{maxLength}}"
+                                        [attr.aria-label]="languageStrings.birthdate"
+                                        (blur)="birthDatePickerInput.value = formatDate($event.value)"
+                                    />
+                                    <input
+                                        type="hidden"
+                                        [matDatepicker]="picker"
+                                        #hiddenDatepicker
+                                        formControlName="birthDate"
+                                        empoweredDateTransform
+                                        (blur)="hiddenDatepicker.value = formatDate($event.value)"
+                                        (dateInput)="birthDatePickerInput.value = formatDate($event.value); hiddenDatepicker.value = formatDate($event.value)"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()" aria-haspopup="dialog">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isEmpDOBInvalid"
+                                        >{{validateDate('birthDate', 'employeeForm',birthDatePickerInput.value)}}</mat-error
+                                    >
+                                    <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper">
+                                <mat-label
+                                    class="mat-label"
+                                    language="primary.portal.census.manualEntry.gender"
+                                    id="memberGender"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                        disableOptionCentering="true"
+                                        formControlName="genderName"
+                                        aria-labelledby="memberGender"
+                                        aria-controls="employeeGenders"
+                                    >
+                                        <mat-option *ngFor="let item of employeeGenders" value="{{item.value}}" title="{{item.for}}">
+                                            {{item.for}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="isEmployeeFormSubmit || employeeForm.controls['genderName'].touched"
+                                        [language]="getEmployeeFormErrorMessage('genderName')"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper-dropdown">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.state"></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        type="text"
+                                        [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                        matInput
+                                        [formControlName]="'state'"
+                                        [matAutocomplete]="auto"
+                                        [attr.aria-label]="languageStrings.state"
+                                    />
+                                    <mon-icon class="icon-gray" iconSize="10" iconName="down" matSuffix></mon-icon>
+                                    <mat-autocomplete
+                                        #auto="matAutocomplete"
+                                        (optionSelected)="employeeZipFlag = true; checkZipCode(zip.value, employeeForm)"
+                                        autoActiveFirstOption
+                                    >
+                                        <mat-option *ngFor="let state of employeeStateOptions | async" [value]="state.abbreviation">
+                                            {{ state.abbreviation }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-error
+                                        *ngIf="isEmployeeFormSubmit || employeeForm.controls['state'].touched"
+                                        [language]="getEmployeeFormErrorMessage('state')"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper-dropdown">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.zip"></mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        maxlength="9"
+                                        minlength="5"
+                                        empoweredNumberValidation
+                                        formControlName="zip"
+                                        #zip
+                                        [attr.aria-label]="languageStrings.zip"
+                                        (keyup)="checkZipCode($event.target.value, employeeForm)"
+                                        (paste)="checkZipCode($event.clipboardData.getData('Text'), employeeForm)"
+                                    />
+                                    <mat-error
+                                        *ngIf="(isEmployeeFormSubmit || employeeForm.controls['zip'].touched) && !employeeForm.controls.zip.value"
+                                        [language]="getEmployeeFormErrorMessage('zip')"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="employeeForm.controls['zip'].hasError('pattern')"
+                                        language="secondary.portal.census.manualEntry.validZip"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="employeeForm.controls['zip'].hasError('zipMismatch') && !employeeForm.controls['zip'].hasError('pattern')"
+                                        language="primary.portal.census.manualEntry.zipErrorMsg"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div>
+                                <mat-label class="mat-label email-label">
+                                    <span language="primary.portal.census.manualEntry.emailAddress"></span>
+                                    <span *ngIf="!isQuoteShopPage || (isQuoteShopPage && isEmailOptional)">
+                                        <span class="optional-text"> {{additionalEmailLabel}}</span>
+                                        <a
+                                            href="javascript:void(0)"
+                                            [richTooltip]="emailToolTip"
+                                            matTooltipPosition="above"
+                                            matTooltipClass="email-tooltip"
+                                            [attr.aria-label]="emailToolTip"
+                                            aria-describedby="email"
+                                        >
+                                            <mon-icon
+                                                iconName="Filled-info"
+                                                class="info-icon icon-primary email-tooltip-icon"
+                                                [iconSize]="13"
+                                                [attr.aria-label]="emailToolTip"
+                                            ></mon-icon>
+                                        </a>
+                                    </span>
+                                </mat-label>
+                                <mat-form-field class="field-wrapper-email">
+                                    <input
+                                        id="email"
+                                        matInput
+                                        formControlName="emailAddress"
+                                        attr.aria-label="{{languageStrings.emailAddress}} {{languageStringsArray['primary.portal.common.optional']}}"
+                                    />
+                                    <mat-error
+                                        *ngIf="employeeForm.controls.emailAddress.errors?.pattern"
+                                        language="secondary.portal.census.manualEntry.validemailAddress"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="employeeForm.controls.emailAddress.errors?.domain && !employeeForm.controls.emailAddress.errors?.pattern"
+                                        >{{ emailDomainError }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper field-wrapper-phone">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.census.manualEntry.phoneNumber" maxlength="10"></span>
+                                    <span class="optional-text" language="primary.portal.common.optional"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="phoneNumber"
+                                        (blur)="phoneNumberValid()"
+                                        [maxlength]="phoneMaxLength"
+                                        type="text"
+                                        empoweredNumberValidation
+                                        [allowDashes]="true"
+                                        empoweredPhoneNumberFormat
+                                        attr.aria-label="{{languageStrings.phoneNumber}} {{languageStringsArray['primary.portal.common.optional']}}"
+                                    />
+                                    <mat-error
+                                        *ngIf="employeeForm.controls['phoneNumber'].hasError('pattern')"
+                                        language="secondary.portal.census.manualEntry.validphoneNumber"
+                                    ></mat-error>
+                                    <mat-error></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper-dropdown">
+                                <mat-label
+                                    class="mat-label"
+                                    language="primary.portal.census.manualEntry.phoneType"
+                                    id="memberPhoneType"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        placeholder="HOME"
+                                        disableOptionCentering="true"
+                                        formControlName="phoneType"
+                                        aria-labelledby="memberPhoneType"
+                                        aria-controls="phoneNumberTypes"
+                                    >
+                                        <mat-option *ngFor="let phoneTypeItem of phoneNumberTypes" value="{{phoneTypeItem}}"
+                                            >{{phoneTypeItem}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error language=""> </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="mon-mt-30 mobile-number">
+                                <mat-checkbox formControlName="cellType" (change)="cellType($event)">
+                                    <span language="primary.portal.census.manualEntry.isMobilenumber"></span>
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="field-wrapper">
+                                <mat-label
+                                    class="mat-label"
+                                    language="primary.portal.census.manualEntry.preferredLanguage"
+                                    id="memberPreferredLanguage"
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                        aria-labelledby="memberPreferredLanguage"
+                                        formControlName="languagePreference"
+                                        disableOptionCentering="true"
+                                        aria-controls="preferredLangOptions"
+                                    >
+                                        <mat-option *ngFor="let item of preferredLangOptions" value="{{item}}"> {{item}} </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="isQuoteShopPage">
+                            <div class="flex-item mon-mr-20">
+                                <mat-label class="mat-label" language="primary.portal.direct.addCustomer.planInfo"> </mat-label>
+                                <mat-radio-group
+                                    aria-label="Select an option"
+                                    formControlName="deliveryPreferance"
+                                    (change)="onPreferenceChange($event)"
+                                    class="mon-mb-0"
+                                >
+                                    <mat-radio-button [value]="ELECTRONIC" class="mon-mr-10">
+                                        <span language="primary.portal.direct.addCustomer.electronic"></span>
+                                    </mat-radio-button>
+                                    <mat-radio-button [value]="PAPER">
+                                        <span language="primary.portal.direct.addCustomer.paper"></span>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <div
+                                    *ngIf="employeeForm.get('deliveryPreferance').value == ELECTRONIC && employeeForm.controls.firstName.value"
+                                >
+                                    <p class="policy-delivery-hint">
+                                        {{languageStringsArray['primary.portal.members.mappPolicyDeliveryMsgElectronic'].replace('##memberFirstName##',
+                                        employeeForm.controls.firstName.value.trim())}}
+                                    </p>
+                                </div>
+                                <div *ngIf="employeeForm.get('deliveryPreferance').value == PAPER && employeeForm.controls.firstName.value">
+                                    <p class="policy-delivery-hint">
+                                        {{languageStringsArray['primary.portal.members.mappPolicyDeliveryMsgPaper'].replace('##memberFirstName##',
+                                        employeeForm.controls.firstName.value.trim())}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="canCreateTestMember && !isQuoteShopPage">
+                            <div class="field-wrapper-check">
+                                <div *ngIf="!canOnlyCreateTestMember">
+                                    <mat-checkbox formControlName="testEmployee" [disableControl]="updateMemberFlag">
+                                        <span language="primary.portal.census.manualEntry.istestEmployee"></span>
+                                    </mat-checkbox>
+                                    <button
+                                        mat-icon-button
+                                        class="tooltip-button"
+                                        [richTooltip]="langStrings['primary.portal.census.manualEntry.createTestTooltip']"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        *ngIf="!canOnlyCreateTestMember"
+                                        [attr.aria-label]="languageStrings.isTestEmp"
+                                    >
+                                        <mon-icon iconName="Filled-info" class="info-icon icon-primary" [iconSize]="20"></mon-icon>
+                                    </button>
+                                </div>
+                                <div *ngIf="canOnlyCreateTestMember">
+                                    <button
+                                        mat-icon-button
+                                        [richTooltip]="langStrings['primary.portal.census.manualEntry.onlyCreateTestTooltip']"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        *ngIf="canOnlyCreateTestMember"
+                                        [attr.aria-label]="langStrings['primary.portal.census.manualEntry.onlyCreateTestTooltip']"
+                                    >
+                                        <mat-checkbox formControlName="testEmployee" [disableControl]="canOnlyCreateTestMember">
+                                            <span language="primary.portal.census.manualEntry.istestEmployee"></span>
+                                        </mat-checkbox>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--- ****** End Personal info container ****** --->
+
+                    <!--- ****** Dependents container ****** --->
+                    <div>
+                        <h2 *ngIf="changeStepper === 2 && (!isTpiAccount || showAddDependents)">
+                            {{languageStringsArray["primary.portal.census.manualEntry.dependentsTitle"]}}
+                        </h2>
+                        <a
+                            href="javascript:void(0)"
+                            type="text"
+                            (click)="enableDependent()"
+                            *ngIf="dependentsCount <= 0 && changeStepper === 2 && (!isTpiAccount || showAddDependents)"
+                            language="primary.portal.census.manualEntry.addDependent"
+                            [attr.aria-label]="languageStrings.addDependent"
+                        >
+                        </a>
+                    </div>
+                    <form
+                        [formGroup]="dependentsForm"
+                        class="dependents-container"
+                        *ngIf="changeStepper === 2 && enableDependentFlag && (!isTpiAccount || showAddDependents)"
+                        #deptForm="ngForm"
+                    >
+                        <mon-alert *ngIf="zipError" alertType="danger">
+                            <span language="primary.portal.census.manualEntry.zipErrorMsg"></span>
+                        </mon-alert>
+                        <mon-alert *ngIf="dependentResponse" alertType="danger">
+                            <span>{{dependentErr}}</span>
+                        </mon-alert>
+                        <mon-alert *ngIf="duplicateDependentError" alertType="danger">
+                            <span>{{secondaryLanguageStrings["secondary.portal.census.manualEntry.duplicateDependentError"]}}</span>
+                        </mon-alert>
+                        <div *ngFor="let iteration of dependentsFormMap; let i = index">
+                            <div [formGroupName]="iteration">
+                                <div class="d-md-flex">
+                                    <div class="field-wrapper">
+                                        <mat-label class="mat-label" language="primary.portal.census.manualEntry.firstName"></mat-label>
+                                        <mat-form-field>
+                                            <input matInput formControlName="firstName" [attr.aria-label]="languageStrings.firstName" />
+                                            <mat-error
+                                                [language]="getNameErrorMessages('dependentsForm', 'firstName', iteration)"
+                                            ></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="field-wrapper">
+                                        <mat-label class="mat-label" language="primary.portal.census.manualEntry.lastName"></mat-label>
+                                        <mat-form-field>
+                                            <input matInput formControlName="lastName" [attr.aria-label]="languageStrings.lastName" />
+                                            <mat-error
+                                                [language]="getNameErrorMessages('dependentsForm', 'lastName', iteration)"
+                                            ></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="d-md-flex">
+                                    <div class="field-wrapper">
+                                        <mat-label class="mat-label" language="primary.portal.census.manualEntry.birthdate"></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="picker"
+                                                matInput
+                                                formControlName="birthDate"
+                                                maxlength="{{maxLength}}"
+                                                [max]="this.today"
+                                                [min]="minDate"
+                                                #datePickerInput
+                                                empoweredDateTransform
+                                                [attr.aria-label]="languageStrings.birthdate"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()" aria-haspopup="dialog">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                            <mat-error *ngIf="dependentDOB">
+                                                {{validateDate('birthDate', 'dependentsForm',datePickerInput.value, iteration)}}
+                                            </mat-error>
+                                            <!-- language="secondary.portal.manualEntry.birth_date.invalid" -->
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <mat-label
+                                                class="mat-label"
+                                                language="primary.portal.census.manualEntry.gender"
+                                                id="dependentGender"
+                                            ></mat-label>
+                                            <mat-form-field>
+                                                <mat-select
+                                                    matNativeControl
+                                                    [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                                    disableOptionCentering="true"
+                                                    formControlName="gender"
+                                                    aria-labelledby="dependentGender"
+                                                    aria-controls="employeeGenders"
+                                                >
+                                                    <mat-option
+                                                        *ngFor="let item of employeeGenders"
+                                                        value="{{item.value}}"
+                                                        title="{{item.for}}"
+                                                    >
+                                                        {{item.for}}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error
+                                                    class="mon-mt-10"
+                                                    *ngIf="isDependentFormInvalid && genderError && !dependentsForm.controls[iteration]['controls']['gender'].value"
+                                                    [language]="getDependentsFormErrorMessage(iteration, 'gender')"
+                                                ></mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-md-flex">
+                                    <div class="field-wrapper-dropdown">
+                                        <mat-label
+                                            class="mat-label"
+                                            language="primary.portal.census.manualEntry.state"
+                                            id="dependentState"
+                                        ></mat-label>
+                                        <mat-form-field>
+                                            <mat-select
+                                                [placeholder]="languageStrings['primary.portal.members.workLabel.select']"
+                                                disableOptionCentering="true"
+                                                formControlName="state"
+                                                aria-labelledby="dependentState"
+                                                (selectionChange)="checkDependentZip(zip.value, i)"
+                                                aria-controls="employeeStates"
+                                            >
+                                                <mat-option language="primary.portal.common.select" disabled></mat-option>
+                                                <mat-option *ngFor="let state of employeeStates" [value]="state.abbreviation">
+                                                    {{ state.abbreviation }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="isDependentFormInvalid"
+                                                [language]="getDependentsFormErrorMessage(iteration, 'state')"
+                                            ></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="field-wrapper-dropdown">
+                                        <mat-label class="mat-label">{{languageStrings.zip}}</mat-label>
+                                        <mat-form-field>
+                                            <input
+                                                matInput
+                                                formControlName="zip"
+                                                [attr.aria-label]="languageStrings.zip"
+                                                empoweredNumberValidation
+                                                minlength="5"
+                                                maxlength="9"
+                                                #zip
+                                                (blur)="checkDependentZip($event.target.value, i)"
+                                            />
+                                            <mat-error
+                                                *ngIf="isDependentFormInvalid && !dependentsForm.controls[iteration]['controls']['zip'].value"
+                                                [language]="getDependentsFormErrorMessage(iteration, 'zip')"
+                                            ></mat-error>
+                                            <mat-error
+                                                *ngIf="dependentsForm.controls[iteration]['controls']['zip'].hasError('zipMismatch')"
+                                                language="primary.portal.census.manualEntry.zipErrorMsg"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="field-wrapper">
+                                        <mat-label
+                                            class="mat-label"
+                                            language="primary.portal.census.manualEntry.employeeRelationship"
+                                            id="dependentEmployeeRelationship"
+                                        ></mat-label>
+                                        <mat-form-field>
+                                            <mat-select
+                                                matNativeControl
+                                                formControlName="dependentRelationId"
+                                                placeholder="Select"
+                                                aria-labelledby="dependentEmployeeRelationship"
+                                                disableOptionCentering="true"
+                                                #relationDropdown
+                                                (focus)="relationDropdown.open()"
+                                                aria-controls="dependentsReleation"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let relation of dependentsReleation | spouseFilter : isSpouseSelected : i"
+                                                    [value]="relation.id"
+                                                    (click)="updateSpouse(i, relation.name, iteration); relationDropdown.close()"
+                                                >
+                                                    {{relation.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="isDependentFormInvalid"
+                                                [language]="getDependentsFormErrorMessage(iteration, 'dependentRelationId')"
+                                            ></mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div>
+                                        <button
+                                            (click)="onClickOnRemove(iteration)"
+                                            mat-button
+                                            class="mat-warn"
+                                            language="primary.portal.common.remove"
+                                            [attr.aria-label]="languageStrings.ariaRemove"
+                                        ></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="seperator"></div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="dependentsCount > 0 && changeStepper==2">
+                            <button
+                                (click)="addAnotherDependent()"
+                                type="button"
+                                mat-button
+                                [attr.aria-label]="languageStrings.addAnotherdependent"
+                                class="mon-btn-link"
+                                language="primary.portal.census.manualEntry.addAnotherdependent"
+                                [disabled]="!dependentsForm.valid"
+                            ></button>
+                        </div>
+                    </form>
+                    <!--- ****** End Dependents container ****** --->
+
+                    <!--- ****** Work info container ****** --->
+                    <form
+                        [formGroup]="workInfoForm"
+                        class="work-info-container"
+                        *ngIf="changeStepper === 3 || (changeStepper === 2 && !(!isTpiAccount || showAddDependents))"
+                    >
+                        <h2>{{languageStringsArray['primary.portal.census.manualEntry.workinfoTitle']}}</h2>
+                        <mon-alert *ngIf="workInfoResponse" alertType="danger">
+                            <span>{{workInfoMsg}}</span>
+                        </mon-alert>
+                        <p language="primary.portal.census.manualEntry.workinfoSubtitle"></p>
+
+                        <ng-container *ngIf="worksiteLocationEnabled$ | async">
+                            <div class="d-md-flex">
+                                <mat-checkbox
+                                    formControlName="worksiteSameAsAccount"
+                                    [checked]="workAddressSameAsAccount"
+                                    (change)="worksiteAddressSelectionChange($event.checked)"
+                                >
+                                    <span>{{ languageStringsArray['primary.portal.census.manualEntry.workStateZipCheckbox'] }}</span>
+                                </mat-checkbox>
+                            </div>
+                            <div class="d-md-flex work-address">
+                                <div class="field-wrapper-dropdown">
+                                    <mat-label class="mat-label" language="primary.portal.census.manualEntry.state"
+                                        ><span class="optional-text" language="primary.portal.common.optional"></span
+                                    ></mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            [placeholder]="'Select'"
+                                            disableOptionCentering="true"
+                                            formControlName="state"
+                                            aria-labelledby="worksiteState"
+                                            #state
+                                            (selectionChange)="checkWorkZipCode(state.value, zip.value)"
+                                            aria-controls="employeeStates"
+                                        >
+                                            <mat-option language="primary.portal.common.select" disabled></mat-option>
+                                            <mat-option *ngFor="let state of employeeStates" [value]="state.abbreviation">
+                                                {{ state.abbreviation }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="workInfoForm.controls.state?.errors?.workStateRequired"
+                                            language="primary.portal.direct.addCustomer.workInfo.error.workStateRequired"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="field-wrapper-dropdown">
+                                    <mat-label class="mat-label" language="primary.portal.census.manualEntry.zip">
+                                        <span class="optional-text" language="primary.portal.common.optional"></span
+                                    ></mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="zip"
+                                            [attr.aria-label]="languageStrings.zip"
+                                            empoweredNumberValidation
+                                            minlength="5"
+                                            maxlength="5"
+                                            #zip
+                                            (blur)="checkWorkZipCode(state.value, zip.value)"
+                                        />
+                                        <mat-error
+                                            *ngIf="workInfoForm.controls.zip?.errors?.length"
+                                            language="primary.portal.direct.addCustomer.workInfo.error.zipLength"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="workInfoForm.controls.zip?.errors?.zipMismatch"
+                                            language="primary.portal.census.manualEntry.zipErrorMsg"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="workInfoForm.controls.zip?.errors?.workZipRequired"
+                                            language="primary.portal.census.manualEntry.workInfo.error.workZipRequired"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div class="d-md-flex">
+                            <!-- Employer Name input -->
+                            <ng-container *ngIf="isEmployerNameFieldEnabled">
+                                <div class="field-wrapper">
+                                    <mat-label for="employer-name-census" class="mat-label" language="primary.portal.pda.form.employerName">
+                                        <span
+                                            *ngIf="!isEmployerNameFieldReadOnly"
+                                            class="optional-text"
+                                            language="primary.portal.common.optional"
+                                        ></span
+                                    ></mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="employerName"
+                                            id="employer-name-census"
+                                            [attr.aria-label]="languageStringsArray['primary.portal.pda.form.employerName']"
+                                        />
+                                        <mat-error
+                                            *ngIf="workInfoForm.controls.employerName.errors?.maxlength"
+                                            language="secondary.portal.census.manualEntry.maxlength100"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <!-- Hire Date input -->
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" language="primary.portal.census.manualEntry.hireDate"></mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="picker"
+                                        matInput
+                                        formControlName="hireDate"
+                                        [max]="this.maxHireDate"
+                                        maxlength="{{maxLength}}"
+                                        #datePickerInput
+                                        empoweredDateTransform
+                                        [attr.aria-label]="languageStrings.hireDate"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()" aria-haspopup="dialog">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isWorkInfoHireDate || isWorkInfoFormInvalid">
+                                        {{validateDate('hireDate', 'workInfoForm',datePickerInput.value)}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- Employee & Department ID inputs -->
+                        <div class="d-md-flex">
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.census.manualEntry.employeeID"></span>
+                                    <span
+                                        *ngIf="!isEmployeeIdRequired"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="employeeId"
+                                        [maxLength]="employeeIdMaxLength"
+                                        attr.aria-label="{{languageStrings.employeeID}} {{languageStringsArray['primary.portal.common.optional']}}"
+                                    />
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls['employeeId'].hasError('pattern')"
+                                        language="secondary.portal.census.manualEntry.validemployeeId"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="isEmployeeIdRequired && workInfoForm.controls['employeeId'].hasError('required') && isWorkInfoFormInvalid"
+                                        language="primary.portal.common.requiredField"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper" *ngIf="isAccountRatingCodePEO">
+                                <mat-label class="mat-label" id="workDepartment"
+                                    >{{languageStringsArray['primary.portal.census.manualEntry.departmentPeoRating']}}
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        disableOptionCentering="true"
+                                        formControlName="department"
+                                        aria-labelledby="workDepartment"
+                                        [placeholder]="languageStringsArray['primary.portal.members.workLabel.select']"
+                                        aria-controls="peoDepartments"
+                                    >
+                                        <mat-option *ngFor="let peoItem of peoDepartments" [value]="peoItem"
+                                            >{{peoItem.name}} - {{peoItem.riskClass}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error *ngIf="isAccountRatingCodePEO && workInfoForm.controls.department.errors?.required"
+                                        >{{languageStringsArray['primary.portal.common.selectionRequired']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper" *ngIf="!isAccountRatingCodePEO">
+                                <mat-label class="mat-label" id="workDepartment"
+                                    >{{departmentLabel}}
+                                    <span
+                                        *ngIf="!isDepartmentRequired"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span
+                                ></mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        matNativeControl
+                                        disableOptionCentering="true"
+                                        formControlName="department"
+                                        (selectionChange)="departmentChanged($event)"
+                                        aria-labelledby="workDepartment"
+                                        [placeholder]="languageStringsArray['primary.portal.members.workLabel.select']"
+                                        aria-controls="employeesDepartments"
+                                    >
+                                        <mat-option *ngIf="isAflacUSer" [value]="ADD_NEW"
+                                            >{{languageStringsArray["primary.portal.census.manualEntry.addNewDepartmentId"]}}</mat-option
+                                        >
+                                        <mat-option *ngFor="let departmentItem of employeesDepartments" [value]="departmentItem.id"
+                                            >{{departmentItem.name}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="isWorkInfoFormInvalid"
+                                        [language]="getWorkInfoFormErrorMessage('department')"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper" *ngIf="addNewDepartmentFlag">
+                                <mat-label class="mat-label"
+                                    >{{languageStringsArray["primary.portal.census.manualEntry.newDepartmentId"]}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="newDepartmentId"
+                                        [attr.aria-label]="languageStringsArray['primary.portal.census.manualEntry.newDepartmentId']"
+                                    />
+                                    <mat-hint>{{languageStringsArray["primary.portal.census.manualEntry.newDepartmentIdHint"]}}</mat-hint>
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls['newDepartmentId'].hasError('pattern') && !workInfoForm.controls['newDepartmentId'].hasError('required')"
+                                        language="secondary.portal.census.manualEntry.newDepartmentIdError"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls['newDepartmentId'].hasError('required') && !workInfoForm.controls['newDepartmentId'].hasError('pattern')"
+                                        language="primary.portal.common.requiredField"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- Hours per week & Annual salary inputs -->
+                        <div class="d-md-flex">
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" id="workHoursPerWeek">
+                                    <span language="primary.portal.census.manualEntry.hoursWeek"></span>
+                                    <span
+                                        *ngIf="hoursPerWeekOptional"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        formControlName="hoursPerWeek"
+                                        aria-labelledby="workHoursPerWeek"
+                                        (change)="validateAnnualSalary()"
+                                        empoweredNumberValidation
+                                        (input)="validateNumber($event.target)"
+                                        allowDecimals="true"
+                                        (focusout)="trimDecimalPoint($event.target)"
+                                    />
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls['hoursPerWeek'].hasError('pattern')  && !workInfoForm.get('hoursPerWeek').hasError('min') && !workInfoForm.get('hoursPerWeek').hasError('max')"
+                                        language="secondary.portal.common.work.errHoursPerWeekDecimal"
+                                    ></mat-error>
+
+                                    <mat-error *ngIf="workInfoForm.get('hoursPerWeek').hasError('max')"
+                                        >{{hoursPerWeekMoreThanMaxErrorMsg}}
+                                    </mat-error>
+                                    <mat-error *ngIf="workInfoForm.get('hoursPerWeek').hasError('min')"
+                                        >{{hoursPerWeekMoreThanMinErrorMsg}}
+                                    </mat-error>
+                                    <mat-error *ngIf="workInfoForm.controls['hoursPerWeek'].hasError('required')"
+                                        >{{hoursPerWeekError}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                            <div class="field-wrapper">
+                                <mat-label class="mat-label" id="workAnnualSalary">
+                                    <span language="primary.portal.census.manualEntry.annualSalary"></span>
+                                    <span
+                                        *ngIf="annualSalaryOptional"
+                                        class="optional-text"
+                                        language="primary.portal.common.optional"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <span matPrefix>$ &nbsp;</span>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        formControlName="annualSalary"
+                                        aria-labelledby="workAnnualSalary"
+                                        (change)="validateHoursPerWeek()"
+                                    />
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls['annualSalary'].hasError('pattern')"
+                                        language="secondary.portal.census.manualEntry.validAnnualSalary"
+                                    ></mat-error>
+                                    <mat-error *ngIf="workInfoForm.controls['annualSalary'].hasError('required')"
+                                        >{{annualSalaryError}}</mat-error
+                                    >
+                                    <mat-error
+                                        *ngIf="workInfoForm.controls.annualSalary.errors?.min || workInfoForm.controls.annualSalary.errors?.max"
+                                        language="secondary.portal.members.workValidationMsg.between"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </form>
+                    <!--- ****** ! Work info container  ****** --->
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <div>
+                        <a
+                            href="javascript:void(0)"
+                            class="mon-btn-link"
+                            language="primary.portal.common.cancel"
+                            mat-dialog-close
+                            (click)="closeForm()"
+                            cdkFocusInitial
+                            [attr.aria-label]="languageStrings.ariaCancel"
+                        ></a>
+                    </div>
+                    <div>
+                        <button
+                            *ngIf="!(this.changeStepper === 1)"
+                            class="mon-btn-secondary"
+                            type="button"
+                            mat-flat-button
+                            (click)="onClickBack()"
+                            [attr.aria-label]="languageStrings.ariaBack"
+                        >
+                            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                            <span language="primary.portal.common.back"></span>
+                        </button>
+                        <ng-container *hasPermission="permissionEnum.SHOP_READ">
+                            <span *ngIf="(this.changeStepper === 3 || (changeStepper === 2 && !(!isTpiAccount || showAddDependents)))">
+                                <button
+                                    class="mon-btn-secondary"
+                                    type="button"
+                                    mat-flat-button
+                                    *ngIf="!unpluggedFeatureFlag && !isFutureDate && !isProspect"
+                                    language="primary.portal.census.manualEntry.stepperSave&shop"
+                                    (click)="onClickSaveAndShop(true)"
+                                    [attr.aria-label]="languageStrings.stepperSaveshop"
+                                ></button>
+                            </span>
+                        </ng-container>
+                        <span *ngIf="this.changeStepper === 1 || (changeStepper === 2 && (!isTpiAccount || showAddDependents))">
+                            <button
+                                (click)="buttonClicked()"
+                                class="mon-btn-primary"
+                                type="button"
+                                mat-flat-button
+                                [attr.aria-label]="languageStrings.ariaNext"
+                            >
+                                <span language="primary.portal.common.next"></span>
+                                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                            </button>
+                        </span>
+                        <span *ngIf="this.changeStepper === 3 || (changeStepper === 2 && !(!isTpiAccount || showAddDependents))">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                language="primary.portal.common.save"
+                                (click)="onClickSaveAndShop(false)"
+                                [attr.aria-label]="languageStrings.ariaSave"
+                            ></button>
+                        </span>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-dialog-content>
+    </div>
+</div>

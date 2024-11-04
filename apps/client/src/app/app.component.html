@@ -1,0 +1,77 @@
+<mat-sidenav-container
+    [hasBackdrop]="notificationSideNavOpened || (appSideNavOpened && mobileQuery.matches) "
+    [ngClass]="notificationSideNavOpened ? 'notification-panel' : 'side-navigation'"
+>
+    <mat-sidenav
+        #sideNav
+        class="app-sideNav"
+        position="start"
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [fixedInViewport]="mobileQuery.matches"
+        [disableClose]="!mobileQuery.matches"
+        [ngClass]="{'visually-hidden': noSideNavRoutes.includes(this.currentRoute) || this.noSideNavRoutes.includes(this.appFlowRoute) || isMemberApplicationFlow() || isExternalPage,
+        'app-sidenav-hidden': noSideNavRoutes.includes(this.currentRoute) || this.noSideNavRoutes.includes(this.appFlowRoute) || isMemberApplicationFlow() || isExternalPage,
+        'app-sidenav-visible': ! (noSideNavRoutes.includes(this.currentRoute) || this.noSideNavRoutes.includes(this.appFlowRoute))}"
+        (opened)="appSideNavOpened = true"
+        (closed)="appSideNavOpened = false"
+    >
+        <button mat-icon-button class="app-sideNav-closeBtn" *ngIf="mobileQuery.matches" (click)="sideNav.close()">
+            <mat-icon svgIcon="close" aria-hidden="true"></mat-icon>
+            <span class="cdk-visually-hidden">Close Navigation</span>
+        </button>
+        <empowered-branding
+            class="app-sideNav-branding"
+            [logo]="logoMember"
+            [color]="colorMember"
+            *ngIf="!noSideNavRoutes.includes(this.currentRoute)"
+            (click)="memberLogoClicked()"
+        ></empowered-branding>
+        <empowered-side-nav
+            *ngIf="!noSideNavRoutes.includes(this.currentRoute) && portalName === 'member' && !isExternalPage"
+        ></empowered-side-nav>
+    </mat-sidenav>
+
+    <mat-sidenav
+        #notificationNav
+        class="app-notification"
+        position="end"
+        mode="over"
+        [disableClose]="false"
+        [ngClass]="{'visually-hidden': noSideNavRoutes.includes(this.currentRoute)}"
+        (closed)="notificationSideNavOpened = false"
+        (openedStart)="notificationSideNavOpened = true"
+        autoFocus="false"
+    >
+        <button mat-icon-button class="app-sideNav-closeBtn" *ngIf="mobileQuery.matches" (click)="notificationNav.close()">
+            <mat-icon svgIcon="close" aria-hidden="true"></mat-icon>
+            <span class="cdk-visually-hidden">Close Navigation</span>
+        </button>
+        <empowered-notification-popup
+            [isAuthenticated]="isAuthenticated"
+            *ngIf="(producerId || adminId) && (portalName === 'producer' || portalName === 'admin')"
+            [notificationFlag]="notificationFlag"
+        ></empowered-notification-popup>
+    </mat-sidenav>
+
+    <mat-sidenav-content
+        [ngClass]="{'side-content-tpi-lnl-container':tpiLnlMode,'side-content-tpi-container': isTpi,
+        'sidenav-content-without-margin' :  isMemberApplicationFlow() || isExternalPage || (noSideNavRoutes.includes(this.currentRoute) && !this.sideNav.opened) ,
+    'sidenav-content-with-margin' : (!noSideNavRoutes.includes(this.currentRoute) && this.sideNav.opened && !mobileQuery.matches) && !isMemberApplicationFlow() && !isExternalPage
+    }"
+    >
+        <empowered-header
+            *ngIf="!isTpiFlow"
+            [user]="user"
+            [isAuthenticated]="isAuthenticated"
+            [sideNavMMP]="sideNav"
+            (notificationFlag)="setNotificationFlag($event)"
+            (click)="notificationClick()"
+        >
+        </empowered-header>
+
+        <main class="app-body" id="layoutwrapper" tabindex="-1">
+            <router-outlet class="router-outlet"></router-outlet>
+        </main>
+        <empowered-footer *ngIf="!isTpiFlow" (click)="notificationClick()"></empowered-footer>
+    </mat-sidenav-content>
+</mat-sidenav-container>

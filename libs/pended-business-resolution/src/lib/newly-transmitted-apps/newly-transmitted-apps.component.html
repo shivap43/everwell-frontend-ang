@@ -1,0 +1,247 @@
+<div class="newly-trans-application">
+    <div class="newly-trans-application-wrapper">
+        <empowered-pbr-sub-header
+            [showCompanyCodeSelect]="dataSource?.data?.length > 0"
+            (companyCodeSelectionChange)="onCompanyCodeSelectionChange($event)"
+        >
+            <h2>
+                {{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.header2"]}}
+                <span class="application-count">({{ dataSource?.data?.length }})</span>
+            </h2>
+        </empowered-pbr-sub-header>
+        <div class="table-mask-wrapper" [hidden]="dataSource?.data?.length === 0">
+            <div class="table-mask-wrapper">
+                <table mat-table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+                    <!-- Transmittal Number Column -->
+                    <ng-container matColumnDef="transmittalNumber">
+                        <th *matHeaderCellDef id="transmittalNumber" mat-sort-header mat-header-cell>
+                            <span>{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.tm"]}}</span>
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'transmittalNumber'}"
+                        >
+                            <span>
+                                {{ element.transmittalNumber }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="pendDate">
+                        <th *matHeaderCellDef id="pendDate" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.pendDate"]}}</span
+                            >
+                        </th>
+                        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'pendDate'}">
+                            <span>
+                                {{ element.pendDate }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="accountNumber">
+                        <th *matHeaderCellDef id="accountNumber" mat-sort-header mat-header-cell>
+                            <span>{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.group"]}}</span>
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'accountNumber'}"
+                        >
+                            <span>
+                                {{ element.accountNumber }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="state">
+                        <th *matHeaderCellDef id="state" mat-sort-header mat-header-cell>
+                            <span>{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.state"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'state'}">
+                            <span>
+                                {{ element.state }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="applicantLastName">
+                        <th *matHeaderCellDef id="applicantLastName" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.applicantName"]}}</span
+                            >
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'applicantLastName'}"
+                        >
+                            <span>
+                                {{ (element.applicantLastName + ', ' + element.applicantFirstName) | titlecase}}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="applicationNumber">
+                        <th *matHeaderCellDef id="applicationNumber" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.application"]}}</span
+                            >
+                        </th>
+                        <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'applicationNumber'}"
+                        >
+                            <span class="warning-icon" *ngIf="showWarningHexagon(element.pendDate)"
+                                ><mon-icon [iconSize]="16" iconName="Filled-error" class="icon-danger"></mon-icon>
+                            </span>
+                            <span class="application-number">
+                                <a href="javascript:void(0)" (click)="openResolvedAppDetailModal(element);"
+                                    >{{ element.applicationNumber }}</a
+                                >
+                            </span>
+                            <span class="copyright-icon" *ngIf="element.appTypeIndicator === AppTypeIndicatorEnum.C"
+                                >{{ AppTypeIndicatorEnum.C }}</span
+                            >
+                            <span
+                                *ngIf="showWarningHexagon(element.pendDate)"
+                                [richTooltip]="applicationTooltip"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                class="info-icon"
+                            >
+                                <mon-icon
+                                    iconName="Filled-info"
+                                    [iconSize]="16"
+                                    class="username-info-icon icon-primary"
+                                >
+                                </mon-icon>
+                            </span>
+                            <p class="invoiced" *ngIf="element.invoiceIndicator === '1'">
+                                {{ languageStrings["primary.portal.pendedBusiness.allPendedApps.invoiced"] }}
+                            </p>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="billForm">
+                        <th class="hidden-max-xl" *matHeaderCellDef id="billForm" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.billform"]}}</span
+                            >
+                        </th>
+                        <td
+                            class="hidden-max-xl"
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'billForm'}"
+                        >
+                            <span>
+                                {{ element.billForm }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="destinationDescription">
+                        <th
+                            class="hidden-max-xl"
+                            *matHeaderCellDef
+                            id="destinationDescription"
+                            mat-sort-header
+                            mat-header-cell
+                        >
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.destinationDesc"]}}</span
+                            >
+                        </th>
+                        <td
+                            class="hidden-max-xl"
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'destinationDescription'}"
+                        >
+                            <span>
+                                {{ element.destinationDescription }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="lobCode">
+                        <th class="hidden-max-xl" *matHeaderCellDef id="lobCode" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.lobCode"]}}</span
+                            >
+                        </th>
+                        <td
+                            class="hidden-max-xl"
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'lobCode'}"
+                        >
+                            <span>
+                                {{ element.lobCode }}
+                            </span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="coproducers">
+                        <th class="hidden-max-xl" *matHeaderCellDef id="coproducers" mat-sort-header mat-header-cell>
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.newlyTransmittedApps.coProducers"]}}</span
+                            >
+                        </th>
+                        <td
+                            class="hidden-max-xl"
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="{'sorted-column': activeCol === 'coproducers'}"
+                        >
+                            <ol class="co-producers-list">
+                                <li *ngFor="let producer of element.coproducers">
+                                    {{producer}}
+                                </li>
+                            </ol>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+            <!-- pagination -->
+            <div
+                class="min-range-label"
+                [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1 || dataSource?.filteredData?.length === 0"
+            >
+                <span>
+                    {{ "primary.portal.commission.producer.showingItems" | replaceTag: { "##length##":
+                    dataSource?.data?.length } }}
+                </span>
+            </div>
+            <div
+                class="paginator-wrapper"
+                [hidden]="dataSource?.data?.length === 0 || dataSource?.paginator?.getNumberOfPages() === 1 || dataSource?.filteredData?.length === 0"
+            >
+                <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons></mat-paginator>
+                <mat-form-field class="paginator-input-wrapper">
+                    {{languageStrings["primary.portal.common.page"]}}
+                    <input
+                        class="paginator-input"
+                        (input)="pageInputChanged($event.target.value)"
+                        [formControl]="pageNumberControl"
+                        matInput
+                        type="number"
+                        min="1"
+                        max="{{ dataSource.paginator?.getNumberOfPages() }}"
+                        [attr.aria-label]="languageStrings['primary.portal.common.page']"
+                    />
+                    <span
+                        >{{ languageStrings["primary.portal.reportList.paginator.of"] + " " +
+                        dataSource?.paginator?.getNumberOfPages() }}</span
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <div class="no-results" *ngIf="dataSource?.filteredData?.length === 0 && dataSource?.data?.length !== 0">
+        {{languageStrings["primary.portal.pendedBusiness.allPendedApps.noResults"].replace("#companyCode",
+        selectedCompanyCode)}}
+    </div>
+    <div class="no-results" *ngIf="dataSource?.data?.length === 0">
+        {{languageStrings["primary.portal.pendedBusiness.zeroState"]}}
+    </div>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

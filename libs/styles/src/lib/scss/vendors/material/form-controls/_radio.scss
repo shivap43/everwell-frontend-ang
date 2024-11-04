@@ -1,0 +1,93 @@
+@import "shared";
+
+.mat-radio-button {
+    line-height: convert-unit(20px, "rem");
+
+    .mat-radio-label {
+        // .mat-radio-label uses display inline-flex
+        // This causes extra margin-top
+        // To override this, we can reset vertical-align to top
+        vertical-align: top;
+        white-space: normal;
+        align-items: flex-start;
+        .mat-radio-container {
+            .mat-radio-outer-circle,
+            .mat-radio-inner-circle {
+                height: get("shapeSize.nonTouch", $radio-config);
+                width: get("shapeSize.nonTouch", $radio-config);
+                z-index: 2;
+            }
+            .mat-radio-outer-circle {
+                border-width: convert-unit(1px, "rem");
+            }
+            .mat-radio-inner-circle {
+                transform: scale(0.5);
+            }
+            .mat-radio-ripple.mat-ripple {
+                height: convert-unit(20px, "rem") !important;
+                width: convert-unit(20px, "rem") !important;
+                border-radius: 50%;
+                background-color: get("color.gray.400");
+                top: 0;
+                left: 0;
+            }
+
+            @include radioCircles("unselected");
+
+            &:hover {
+                @include radioCircles("unselectedHover");
+            }
+            &:active {
+                @include radioCircles("selectedActive");
+            }
+        }
+        .mat-radio-label-content {
+            font-size: convert-unit(16px, "rem");
+            padding-left: map-get($spacers, 10);
+        }
+    }
+    &.cdk-focused {
+        .mat-radio-container {
+            @include radioCircles("unselectedActive");
+        }
+    }
+    &.field-invalid {
+        .mat-radio-container {
+            @include radioCircles("danger");
+
+            &:hover {
+                @include radioCircles("dangerHover");
+            }
+        }
+    }
+    &.mat-radio-disabled {
+        .mat-radio-container {
+            @include radioCircles("unselectedDisabled");
+        }
+    }
+    &.mat-radio-checked {
+        .mat-radio-container {
+            @include radioCircles("selected");
+
+            &:hover {
+                @include radioCircles("selectedHover");
+            }
+        }
+        &.mat-radio-disabled {
+            .mat-radio-container {
+                @include radioCircles("selectedDisabled");
+            }
+        }
+    }
+}
+
+&.is-touch {
+    .mat-radio-button {
+        display: block;
+
+        .mat-radio-label {
+            display: flex;
+            height: auto;
+        }
+    }
+}

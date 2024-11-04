@@ -1,0 +1,154 @@
+<!-- FIX ME: Integrate Language for the below anchorlink and section name -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div *ngIf="this.planObject.application.riders &&  this.planObject.application.riders.length > 0">
+    <div
+        *ngFor="let riderApplication of this.planObject.application.riders; let r= index"
+        class="section-sub-step"
+        [ngClass]="{'active-section': checkFlagToRenderRider(riderApplication) &&  ((!riderSectionBlurFlag || (riderSectionActive &&
+            (r < currentActiveRiderIndex || r<=currentActiveRiderIndex ))
+            ))}"
+    >
+        <ng-container *ngIf="checkFlagToRenderRider(riderApplication)">
+            <div *ngFor="let section of riderApplication.appData.sections; let i= index">
+                <ng-container *ngFor="let step of section.steps; let j = index">
+                    <div
+                        *ngIf="step.showStep && (!riderSectionBlurFlag || (riderSectionActive &&
+                        (r < currentActiveRiderIndex || r<=currentActiveRiderIndex && (i< currentActiveRiderSectionIndex || i<=currentActiveRiderSectionIndex  && j <= currentActiveRiderStepIndex) ))
+                        )"
+                        [id]="getRiderStepId(r,i,j)"
+                        class="section-sub-step level-next"
+                        [ngClass]="{'active-section': (!riderSectionBlurFlag || (riderSectionActive &&
+                        (r < currentActiveRiderIndex || r<=currentActiveRiderIndex && (i< currentActiveRiderSectionIndex || i<=currentActiveRiderSectionIndex  && j <= currentActiveRiderStepIndex) ))
+                        ) }"
+                    >
+                        <section class="section-container">
+                            <mon-alert *ngIf="hasError" alertType="info">
+                                <span aria-label="missing salary">{{errorMessage}}</span> &nbsp;
+                                <a href="javascript:void(0)" (click)="routeToProfile()"> {{ADD_TO_PROFILE}} </a>
+                            </mon-alert>
+                            <div class="section-header" *ngIf="!riderApplication.discard">
+                                <h3>
+                                    {{languageStrings['primary.portal.applicationFlow.riders.rider']}}{{riderApplication.riderAttributeName
+                                    ? riderApplication.riderAttributeName : riderApplication.planName}}
+                                </h3>
+                            </div>
+                            <div *ngIf="pdfLinks[r] && pdfLinks.length">
+                                <div *ngFor="let document of pdfLinks[r].links">
+                                    <div *ngIf="pdfLinks[r].planId === riderApplication.planId" class="pdf-links">
+                                        <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                                        <a href="javascript:void(0)" (click)="openPdf(document.url)"> {{document.pdfName}} </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section
+                            class="section-container"
+                            *ngIf="riderApplication.riderAttributeName !== section.title && pdfLinks.length === this.planObject.application.riders.length"
+                        >
+                            <div class="section-header">
+                                <h3>{{section.title}}</h3>
+                            </div>
+                        </section>
+                        <p *ngIf="hasError">{{COVERAGE_SELECTION}}</p>
+                        <section *ngIf="hasError" class="section-container">
+                            <div class="response-block">
+                                <div class="response-type radio">
+                                    <mat-radio-group class="dependents-section" aria-label="Coverage selection">
+                                        <mat-radio-button [disabled]="true" value="6 Months/0 Days"
+                                            >{{COVERAGE_SELECTION_1}}</mat-radio-button
+                                        >
+                                        <mat-radio-button [disabled]="true" value="6 Months/7 Days"
+                                            >{{COVERAGE_SELECTION_2}}</mat-radio-button
+                                        >
+                                        <mat-radio-button [disabled]="true" value="12 Months/0 Days"
+                                            >{{COVERAGE_SELECTION_3}}</mat-radio-button
+                                        >
+                                        <mat-radio-button [disabled]="true" value="12 Months/0 Days"
+                                            >{{COVERAGE_SELECTION_4}}</mat-radio-button
+                                        >
+                                        <mat-radio-button [checked]="true" value="No Rider"
+                                            >{{DEFAULT_COVERAGE_SELECTION}}</mat-radio-button
+                                        >
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <button
+                                aria-label="Next"
+                                *ngIf="!planObject.lastStep && hasError"
+                                class="mon-btn-primary navigate"
+                                (click)="onNext()"
+                                mat-flat-button
+                            >
+                                <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                            </button>
+                        </section>
+                        <empowered-question
+                            [planObject]="mapData(r,i,j)"
+                            [currentStepIndex]="currentActiveRiderStepIndex"
+                            [currentSectionIndex]="currentActiveRiderSectionIndex"
+                            [riderIndex]="currentActiveRiderIndex"
+                            *ngIf="step && step.step[0] && step.step[0].type && step.step[0].type === stepType.QUESTION && step.showStep"
+                        >
+                        </empowered-question>
+                        <empowered-plan-options
+                            [planObject]="mapData(r,i,j)"
+                            (handleError)="handleError($event)"
+                            *ngIf="step && step.step[0] && step.step[0].type && step.step[0].type === stepType.PLANOPTIONS && step.showStep"
+                        >
+                        </empowered-plan-options>
+                        <empowered-beneficiary
+                            [planObject]="mapData(r,i,j)"
+                            *ngIf="step && step.step[0] && step.step[0].type && step.step[0].type === stepType.BENEFICIARIES && step.showStep"
+                        >
+                        </empowered-beneficiary>
+                        <empowered-tobacco
+                            [planObject]="mapData(r,i,j)"
+                            *ngIf="step && step.step[0] && step.step[0].type && step.step[0].type === stepType.TOBACCO && step.showStep"
+                        >
+                        </empowered-tobacco>
+                        <empowered-conversion
+                            [planObject]="mapData(r,i,j)"
+                            *ngIf="step && step.step[0] && (step.step[0].type === stepType.CONVERSION || step.step[0].type === stepType.ADDITION || step.step[0].type === stepType.DOWNGRADE) && step.showStep"
+                        >
+                        </empowered-conversion>
+                        <empowered-demographic
+                            [planObject]="mapData(r,i,j)"
+                            *ngIf="step && step.step[0] && step.step[0].type && step.step[0].type === stepType.REQUIREDDEMOGRAPHICS && step.showStep"
+                        >
+                        </empowered-demographic>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+    </div>
+    <div *ngIf="!(riderApplications.length > 0)">
+        <p>{{languageStrings['primary.portal.applicationFlow.riders.noridersPlan']}}</p>
+        <div class="action-btns tpi-flow-border" [ngClass]="{'last-step': this.planObject.lastStep}">
+            <button
+                id="submitAppFlowForm"
+                *ngIf="planObject.lastStep"
+                class="mon-btn-primary submit-app-flow-form"
+                (click)="onNext()"
+                mat-flat-button
+            >
+                <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.next']}}{{this.planObject.nextProduct}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextAflacAlways']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextBilling']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextApplications']}}
+                </span>
+            </button>
+            <button *ngIf="!planObject.lastStep" class="mon-btn-primary" (click)="onNext()" mat-flat-button>
+                <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+import { Validity, CoverageLevel, Plan } from "@empowered/constants";
+import { CommissionSplit } from "../../aflac/models/commission-split.model";
+export interface Enrollment {
+    id?: number;
+    planId: number;
+    plan?: Plan;
+    coverageLevelId: number;
+    coverageLevel?: CoverageLevel;
+    status: string;
+    carrierStatus?: string;
+    memberCost: number;
+    memberCostPerPayPeriod?: number;
+    totalCost: number;
+    totalCostPerPayPeriod?: number;
+    benefitAmount?: number;
+    state?: string;
+    validity: Validity;
+    createDate: Date;
+    dependents: any;
+    taxStatus: string;
+    tobaccoStatus: string;
+    salaryMultiplier?: number;
+    policyNumber: string;
+    reinstatement: string;
+    approvedDate?: string;
+    approvedAdminId?: number;
+    changeEffectiveStarting?: string | Date;
+    currentEnrollmentId?: number;
+    currentEnrollment?: any;
+    planOfferingId?: number;
+    riderOfEnrollmentId?: number;
+    pendingReason?: string;
+    type?: string;
+    commissionSplit?: CommissionSplit;
+    city?: string;
+}

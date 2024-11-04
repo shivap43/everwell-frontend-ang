@@ -1,0 +1,96 @@
+@import "shared";
+
+.example-container {
+    height: 100%;
+}
+
+.notification-panel {
+    width: convert-unit(400px, "rem");
+    background-color: get("color.gray.100");
+    border-radius: 0;
+    padding: convert-unit(20px, "rem") 0;
+    height: 100%;
+
+    h3 {
+        margin: 0 0 convert-unit(10px, "rem") convert-unit(20px, "rem");
+    }
+
+    .action-panel {
+        .header-notification {
+            color: get("color.gray.1000");
+            @include fontFace("primary.bold");
+
+            &:focus {
+                outline: convert-unit(0px, "rem");
+            }
+        }
+
+        .notification-action-needed {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: convert-unit(5px, "rem");
+
+            .notification-text-block,
+            .notification-action-block,
+            .notification-info {
+                display: flex;
+                align-items: flex-start;
+            }
+
+            .notification-info {
+                flex-grow: 1;
+                justify-content: space-between;
+                @include fontFace("primary.regular");
+                line-height: normal;
+                margin-left: convert-unit(5px, "rem");
+
+                .notification-action-block {
+                    justify-content: space-between;
+                    @include fontFace("primary.regular");
+                }
+            }
+
+            .notification-text-block {
+                min-width: convert-unit(30px, "rem");
+                justify-content: flex-end;
+            }
+        }
+    }
+}
+
+::ng-deep .notification-tab.mat-tab-group.mat-primary {
+    padding: 0 convert-unit(20px, "rem");
+
+    .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled) {
+        background-color: transparent !important;
+    }
+}
+
+.notification-sub-header {
+    background-image: linear-gradient(to right, get("color.gray.700") 50%, rgba(255, 255, 255, 1) 0%);
+    background-position: bottom;
+    background-size: convert-unit(1px, "rem") convert-unit(1px, "rem");
+    background-repeat: repeat-x;
+    padding: convert-unit(13px, "rem") 0 convert-unit(17px, "rem");
+
+    &:focus {
+        border: none;
+    }
+}
+
+.notification-sub-header:last-child {
+    background-image: none;
+}
+
+.no-message-text {
+    padding-left: convert-unit(35px, "rem");
+    @include fontFace("primary.regular");
+}
+
+.notification-panel-body {
+    padding: 0 convert-unit(20px, "rem");
+}
+
+.total-count {
+    margin-left: convert-unit(5px, "rem");
+}

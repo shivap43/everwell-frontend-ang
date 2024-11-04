@@ -1,0 +1,162 @@
+@import "shared";
+.modal-header {
+    h2 {
+        margin: 0;
+    }
+}
+.content-wrapper {
+    flex-grow: 1;
+    height: calc(100vh - 300px) !important;
+    padding: convert-unit(30px, "rem") convert-unit(50px, "rem") !important;
+    h2 {
+        color: get("color.black");
+        margin-bottom: convert-unit(20px, "rem");
+    }
+    .total-employee {
+        margin-top: convert-unit(20px, "rem");
+        font-weight: bold;
+    }
+    .employee-census {
+        margin-top: convert-unit(20px, "rem");
+        display: flex;
+        .download-wrapper {
+            font-weight: convert-unit(14px, "rem");
+            p {
+                @include fontFace("primary.bold");
+                font-size: convert-unit(14px, "rem");
+            }
+            a {
+                font-size: convert-unit(14px, "rem");
+            }
+        }
+    }
+    .benefit-dollar-container {
+        display: flex;
+        flex-direction: column;
+        min-height: convert-unit(600px, "rem");
+
+        .employer-contributions-wrapper {
+            flex-grow: 1;
+            .message-block {
+                margin-top: map-get($spacers, 20);
+            }
+
+            .benefit-dollars {
+                margin-top: map-get($spacers, 20);
+                margin-bottom: map-get($spacers, 25);
+                .benefit-dollar-item {
+                    display: flex;
+                    max-width: 75%;
+                    margin-bottom: map-get($spacers, 10);
+                    .gray-out {
+                        color: get("color.gray.500");
+                    }
+                    .right-column {
+                        margin-left: auto;
+                        .action-link {
+                            margin: map-get($spacers, 5);
+                        }
+                    }
+                }
+            }
+        }
+        .footer-message {
+            font-size: convert-unit(14px, "rem");
+            align-self: flex-end;
+        }
+    }
+    .agreements {
+        &-title {
+            margin-top: map-get($spacers, 0);
+            margin-bottom: map-get($spacers, 5);
+        }
+        &-subtitle {
+            margin-bottom: map-get($spacers, 30);
+        }
+        &-divider {
+            margin: map-get($spacers, 30) map-get($spacers, 0);
+            border-top-color: get("color.black");
+            border-top-width: convert-unit(2px, "rem");
+        }
+    }
+    .california-requirement {
+        margin-top: map-get($spacers, 20);
+        display: flex;
+        .download-wrapper {
+            font-weight: map-get($spacers, 14);
+            padding-top: 3px;
+            p {
+                @include fontFace("primary.bold");
+                font-size: map-get($spacers, 12);
+                line-height: 1rem;
+            }
+            a {
+                font-size: map-get($spacers, 13);
+            }
+        }
+    }
+}
+:host ::ng-deep .mat-stepper-vertical {
+    background-color: transparent;
+}
+
+.stepper-sidebar {
+    ::ng-deep .mat-step-header {
+        padding: convert-unit(5px, "rem") convert-unit(15px, "rem") convert-unit(5px, "rem") convert-unit(50px, "rem");
+        .mat-step-icon-state-edit {
+            background-color: get("color.info.success");
+            .mat-step-icon-content {
+                opacity: 1;
+            }
+        }
+    }
+    ::ng-deep .mat-vertical-content-container {
+        margin-left: convert-unit(58px, "rem");
+    }
+}
+
+.stepper-content {
+    width: calc(100vw - 220px);
+}
+.documentation-wrapper {
+    padding: convert-unit(20px, "rem");
+    border-top: 1px solid get("color.gray.500");
+    .inner-wraper {
+        display: flex;
+        align-items: center;
+        .image-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 2;
+            .left-wrapper {
+                text-align: center;
+                padding-right: convert-unit(30px, "rem");
+                min-width: convert-unit(200px, "rem");
+                max-width: convert-unit(200px, "rem");
+                img {
+                    max-height: 100%;
+                    max-width: 100%;
+                }
+            }
+            .dotted-border-left {
+                width: convert-unit(1px, "rem");
+                height: convert-unit(66px, "rem");
+            }
+            p {
+                font-size: convert-unit(22px, "rem");
+                padding: 0 convert-unit(30px, "rem");
+            }
+        }
+        .action-wrapper {
+            text-align: right;
+            flex: 1;
+        }
+    }
+    &:last-child {
+        border-bottom: 1px solid get("color.gray.500");
+    }
+}
+
+.dialog-footer {
+    padding: convert-unit(25px, "rem") convert-unit(50px, "rem") !important;
+}

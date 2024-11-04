@@ -1,0 +1,43 @@
+<form [formGroup]="form" (submit)="onApply()" data-test="eb-enrollment-location__form" class="location-content-wrapper">
+    <div class="state-info-text content-heading" role="heading" *ngIf="{isDirectFlow: isDirectFlow$ | async} as flowData">
+        {{ languageStrings[flowData.isDirectFlow ? "primary.portal.location.customerStateInfo" :
+        "primary.portal.location.employeeStateInfo"] }}
+    </div>
+    <div class="label" language="primary.portal.location.state"></div>
+    <mat-form-field *ngIf="enrollmentStates$ | async as states" floatLabel="always">
+        <mat-select
+            formControlName="state"
+            panelClass="select-more"
+            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+            data-test="eb-enrollment-location__mat-select--state"
+            [compareWith]="compareStateValue"
+        >
+            <mat-option *ngFor="let state of states; trackBy: trackByCountryStateName" [value]="state">{{ state.name }}</mat-option>
+        </mat-select>
+        <mat-error> {{ languageStrings["primary.portal.common.requiredField"] }} </mat-error>
+    </mat-form-field>
+    <div class="label" language="primary.portal.location.city"></div>
+    <mat-form-field floatLabel="always" *ngIf="cities$ | async as cities">
+        <input
+            data-test="eb-enrollment-location__input--city"
+            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+            required
+            matInput
+            formControlName="city"
+            [matAutocomplete]="cityAutoComplete"
+            autocomplete="off"
+        />
+        <mat-autocomplete #cityAutoComplete="matAutocomplete" (closed)="removeCityText(cities)" autoActiveFirstOption>
+            <mat-option *ngFor="let city of filteredCityOptions$ | async; trackBy: trackByCity" [value]="city">{{ city }}</mat-option>
+        </mat-autocomplete>
+        <mat-error> {{ languageStrings["primary.portal.common.requiredField"] }} </mat-error>
+    </mat-form-field>
+    <ng-container *ngIf="eaaResponse$ | async as eaaResponse">
+        <mon-alert *ngIf="eaaResponse.isMissingEAAError" alertType="danger">
+            <span>{{ languageStrings['primary.portal.quoteShop.plansDisplay.crossBorderRestriction'] }}</span>
+        </mon-alert>
+        <mon-alert *ngIf="eaaResponse.isMissingEAAWarning" alertType="warning">
+            <span>{{ languageStrings['primary.portal.enrollmentMethod.missingEAAWarning'] }}</span>
+        </mon-alert>
+    </ng-container>
+</form>

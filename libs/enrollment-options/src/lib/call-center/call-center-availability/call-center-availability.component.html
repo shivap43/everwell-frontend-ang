@@ -1,0 +1,121 @@
+<form [formGroup]="callSchedule">
+    <mat-checkbox formControlName="useSameTimesForEachDay" class="mon-mb-20"
+        ><span language="primary.portal.callCenter.8x8.form.section.availability.useSameTimeForEachDay.label"></span
+    ></mat-checkbox>
+    <div class="d-flex mon-mt-20" formGroupName="weeklySchedule" class="d-flex weekly-schedule">
+        <div class="call-center-availability-time" *ngIf="callSchedule.controls.weeklySchedule.get('startTime')">
+            <mat-label
+                ><span language="primary.portal.callCenter.8x8.form.section.availability.startTime.label"></span
+            ></mat-label>
+            <mat-form-field>
+                <mat-select formControlName="startTime">
+                    <mat-option *ngFor="let time of callCenterAvailabilityStartTimes" [value]="time.value"
+                        >{{ time.text }}</mat-option
+                    ></mat-select
+                >
+                <mat-error *ngIf="callSchedule.controls.weeklySchedule.get('startTime').errors?.invalid">
+                    <span language="primary.portal.callCenter.8x8.form.section.availability.startTime.error"></span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="call-center-availability-time" *ngIf="callSchedule.controls.weeklySchedule.get('endTime')">
+            <mat-label
+                ><span language="primary.portal.callCenter.8x8.form.section.availability.endTime.label"></span
+            ></mat-label>
+            <mat-form-field>
+                <mat-select formControlName="endTime">
+                    <mat-option *ngFor="let time of callCenterAvailabilityEndTimes" [value]="time.value"
+                        >{{ time.text }}</mat-option
+                    ></mat-select
+                >
+                <mat-error *ngIf="callSchedule.controls.weeklySchedule.get('endTime').errors?.invalid">
+                    <span language="primary.portal.callCenter.8x8.form.section.availability.endTime.error"></span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="time-zone">
+            <mat-label
+                ><span language="primary.portal.callCenter.8x8.form.section.availability.timeZone.label"></span
+            ></mat-label>
+            <mat-form-field>
+                <mat-select formControlName="timeZone">
+                    <mat-option *ngFor="let timeZone of timeZones" [value]="timeZone"
+                        >{{ timeZone }}</mat-option
+                    ></mat-select
+                >
+            </mat-form-field>
+        </div>
+    </div>
+    <table mat-table [dataSource]="dataSource" formArrayName="dailySchedule">
+        <!-- Selected column -->
+        <ng-container matColumnDef="selected">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                    [formControl]="selectAllDays"
+                    [indeterminate]="indeterminate"
+                    class="mon-mr-10"
+                ></mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                <mat-checkbox formControlName="selected" class="mon-mr-10"></mat-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- Day column -->
+        <ng-container matColumnDef="day">
+            <th mat-header-cell *matHeaderCellDef>
+                <span language="primary.portal.callCenter.8x8.form.section.availability.day.label"></span>
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">{{ row.day }}</td>
+        </ng-container>
+
+        <!-- Start time column -->
+        <ng-container matColumnDef="startTime">
+            <th mat-header-cell *matHeaderCellDef>
+                <span language="primary.portal.callCenter.8x8.form.section.availability.startTime.label"></span>
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                <mat-form-field>
+                    <mat-select formControlName="startTime">
+                        <mat-option *ngFor="let time of callCenterAvailabilityStartTimes" [value]="time.value"
+                            >{{ time.text }}</mat-option
+                        ></mat-select
+                    >
+                    <mat-error
+                        *ngIf="callSchedule.controls.dailySchedule.controls[i].controls.startTime?.errors?.invalid"
+                    >
+                        <span language="primary.portal.callCenter.8x8.form.section.availability.startTime.error"></span>
+                    </mat-error>
+                </mat-form-field>
+            </td>
+        </ng-container>
+
+        <!-- End time column -->
+        <ng-container matColumnDef="endTime">
+            <th mat-header-cell *matHeaderCellDef>
+                <span language="primary.portal.callCenter.8x8.form.section.availability.endTime.label"></span>
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                <mat-form-field>
+                    <mat-select formControlName="endTime">
+                        <mat-option *ngFor="let time of callCenterAvailabilityEndTimes" [value]="time.value"
+                            >{{ time.text }}</mat-option
+                        ></mat-select
+                    >
+                    <mat-error
+                        *ngIf="callSchedule.controls.dailySchedule.controls[i].controls.endTime?.errors?.invalid"
+                    >
+                        <span language="primary.portal.callCenter.8x8.form.section.availability.endTime.error"></span>
+                    </mat-error>
+                </mat-form-field>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-error class="mon-mt-10" *ngIf="callSchedule.controls.dailySchedule.errors?.atLeastOneDayIsRequired">
+        <span language="primary.portal.callCenter.8x8.form.section.availability.schedule.errors.required"></span>
+    </mat-error>
+</form>

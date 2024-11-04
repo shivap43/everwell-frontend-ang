@@ -1,0 +1,199 @@
+<div class="info-modal">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancelClick()" [attr.aria-label]="languageStrings.cancel">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form *ngIf="data.action !== 'Delete'" [formGroup]="contactInfoPopupForm">
+        <mat-dialog-content>
+            <div class="flex-form-wrapper">
+                <h1 mat-dialog-title *ngIf="data.action !== 'Delete'">{{data.title}}</h1>
+                <div class="d-md-flex">
+                    <div class="flex-item w-120" *ngIf="hideFieldElementSetting.dependentContactType">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.dependent.contact.type"></span>
+                            <span
+                                *ngIf="requiredFields && !isRequiredField('type')"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="type"
+                                [placeholder]="languageStrings.select"
+                                disableOptionCentering="true"
+                                [disabled]="readOnlyFieldElementSetting.dependentContactType"
+                            >
+                                <mat-option *ngFor="let type of data.fieldType" value="{{type}}"
+                                    >{{type |  titlecase}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="contactInfoPopupForm.get('type').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="data.isPhone">
+                        <ng-container *ngIf="hideFieldElementSetting.dependentPhoneNumber">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.contact.phoneNumber"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('phoneNumber')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    [readonly]="readOnlyFieldElementSetting.dependentPhoneNumber"
+                                    formControlName="phoneNumber"
+                                    maxlength="{{data.validatorMaxLength}}"
+                                    matInput
+                                    type="text"
+                                    [attr.aria-label]="languageStrings.phoneNumber"
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                />
+                                <mat-error
+                                    *ngIf="contactInfoPopupForm.get('phoneNumber').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="contactInfoPopupForm.get('phoneNumber').hasError('pattern')"
+                                    language="primary.portal.members.dependent.contact.invalidPhone"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </ng-container>
+                    </div>
+                    <div class="flex-item" *ngIf="!data.isPhone">
+                        <ng-container *ngIf="hideFieldElementSetting.dependentEmailAddress">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.dependent.contact.emailAddress"></span>
+                                <span
+                                    *ngIf="requiredFields && !isRequiredField('email')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    [readonly]="readOnlyFieldElementSetting.dependentEmailAddress"
+                                    formControlName="email"
+                                    matInput
+                                    type="text"
+                                    [attr.aria-label]="languageStrings.emailAddress"
+                                />
+                                <mat-error
+                                    *ngIf="contactInfoPopupForm.get('email').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="contactInfoPopupForm.get('email').hasError('pattern')"
+                                    language="primary.portal.members.dependent.contact.invalidEmail"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </ng-container>
+                    </div>
+                    <div
+                        class="flex-item w-120"
+                        *ngIf="data.isPhone && contactInfoPopupForm.get('type').value == 'WORK'"
+                    >
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.dependent.contact.extension"></span>
+                            <span
+                                *ngIf="requiredFields && !isRequiredField('extension')"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="extension"
+                                matInput
+                                type="text"
+                                [attr.aria-label]="languageStrings.extension"
+                            />
+                            <mat-error language="primary.portal.members.dependent.contact.invalidExtension"></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div *ngIf="data.isPhone">
+                    <mat-checkbox formControlName="isMobile"
+                        ><span language="primary.portal.census.manualEntry.isMobilenumber"></span
+                    ></mat-checkbox>
+                </div>
+                <div *ngIf="hideFieldElementSetting.dependentUseAsPrimary">
+                    <mat-checkbox
+                        [checked]="true"
+                        [disabled]="data.contactLength === 0 || this.data.editData.primary || readOnlyFieldElementSetting.dependentUseAsPrimary || !this.primaryContact"
+                        formControlName="primary"
+                        [attr.aria-label]="textCheckbox"
+                        >{{textCheckbox}}</mat-checkbox
+                    >
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="onCancelClick()"
+                [attr.aria-label]="languageStrings.cancel"
+                >{{languageStrings.cancel}}</a
+            >
+            <button
+                *ngIf="data.action == 'Add'"
+                type="submit"
+                (click)="onSubmit()"
+                [attr.aria-label]="languageStrings.add"
+                mat-flat-button
+                class="mon-btn-primary mon-px-30"
+            >
+                {{languageStrings.add}}
+            </button>
+            <button
+                *ngIf="data.action != 'Add'"
+                type="submit"
+                [attr.aria-label]="languageStrings.save"
+                (click)="onSubmit()"
+                mat-flat-button
+                class="mon-btn-primary mon-px-30"
+            >
+                {{languageStrings.save}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+    <div *ngIf="data.action == 'Delete'">
+        <mat-dialog-content>
+            <h1 mat-dialog-title>{{removeContactMsg}}</h1>
+        </mat-dialog-content>
+        <div mat-dialog-actions *ngIf="data.action == 'Delete'" class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                [attr.aria-label]="languageStrings.cancel"
+                mat-flat-button
+                (click)="onCancelClick()"
+                >{{languageStrings.cancel}}</a
+            >
+            <button
+                mat-button
+                mat-flat-button
+                class="mon-btn-danger mon-px-30"
+                (click)="removeContactInfo(data.isPhone,data.rowIndex,data.action)"
+                [attr.aria-label]="languageStrings.remove"
+            >
+                {{languageStrings.remove}}
+            </button>
+        </div>
+    </div>
+</div>

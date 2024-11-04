@@ -1,0 +1,201 @@
+<div class="info-modal" *ngIf="!isResolvedApplication">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <mat-horizontal-stepper labelPosition="bottom" #stepper [@.disabled]="true">
+            <mat-step>
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.step"]}}
+                        {{stepper.selectedIndex + 1}} {{languageStrings["primary.portal.common.of"]}} 2</mat-label
+                    >
+                    <h2>
+                        {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.resolveApplication"]}}
+                        {{data?.applicationDetails?.applicationNumber}}
+                    </h2>
+                </div>
+                <div>
+                    <mat-label class="mat-label for-radio"
+                        >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.chooseMethod"]}}</mat-label
+                    >
+                    <mat-radio-group [(ngModel)]="selectedMethod">
+                        <mat-radio-button value="byEmail">
+                            {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.emailNew"]}}
+                        </mat-radio-button>
+                        <mat-radio-button value="byUpload">
+                            {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.uploadApplication"]}}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </mat-step>
+            <mat-step>
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.step"]}}
+                        {{stepper.selectedIndex + 1}} {{languageStrings["primary.portal.common.of"]}} 2</mat-label
+                    >
+                    <h2>{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.emailNew"]}}</h2>
+                    <p>
+                        {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.applicationRequest1"]}}
+                        {{data?.applicationDetails?.applicationNumber}},
+                        {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.applicationRequest2"]}}
+                    </p>
+                    <div class="policy-details">
+                        <div class="policy-row">
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.from"]}}</span
+                            ><span>{{data?.applicationDetails?.associateInfo[0]?.associateName}}</span>
+                        </div>
+                        <div class="policy-row">
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.policy"]}}</span
+                            ><span>{{data?.applicationDetails?.applicationNumber}}</span>
+                        </div>
+                        <div class="policy-row">
+                            <span
+                                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.applicant"]}}</span
+                            ><span>{{data?.applicationDetails?.applicantName}}</span>
+                        </div>
+                    </div>
+                    <form [formGroup]="resolvedApplicationForm">
+                        <div class="flex-form-wrapper">
+                            <mat-label class="mat-label"
+                                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.phoneNumber"]}}</mat-label
+                            >
+                            <mat-form-field class="number-fields">
+                                <input
+                                    matInput
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                    [value]="resolvedApplicationForm.controls.phoneNumber.value|phone"
+                                    type="text"
+                                    [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                                    formControlName="phoneNumber"
+                                    [attr.aria-label]="languageStrings['primary.portal.pendedBusiness.resolveApplicationModal.phoneNumber']"
+                                />
+                                <mat-error *ngIf="resolvedApplicationForm.get('phoneNumber').hasError('required')">
+                                    {{languageStrings['primary.portal.common.requiredField']}}
+                                </mat-error>
+                                <mat-error *ngIf="resolvedApplicationForm.get('phoneNumber').hasError('pattern')">
+                                    {{languageStrings['primary.portal.members.dependent.contact.invalidPhone']}}
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-label class="mat-label"
+                                ><span
+                                    >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.faxNumber"]}}</span
+                                >
+                                <span class="optional-text"
+                                    >{{languageStrings["primary.portal.common.optional"]}}</span
+                                ></mat-label
+                            >
+                            <mat-form-field class="number-fields">
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="faxNumber"
+                                    [attr.aria-label]="languageStrings['primary.portal.pendedBusiness.resolveApplicationModal.faxNumber']"
+                                />
+                                <mat-error *ngIf="resolvedApplicationForm.get('faxNumber').hasError('required')">
+                                    {{languageStrings['primary.portal.common.requiredField']}}
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-label class="mat-label"
+                                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.comments"]}}</mat-label
+                            >
+                            <mat-form-field>
+                                <textarea
+                                    matInput
+                                    formControlName="comments"
+                                    class="resolved-comment"
+                                    [attr.aria-label]="languageStrings['primary.portal.pendedBusiness.resolveApplicationModal.comments']"
+                                ></textarea>
+                                <mat-error *ngIf="resolvedApplicationForm.get('comments').hasError('required')">
+                                    {{languageStrings["primary.portal.common.requiredField"]}}
+                                </mat-error>
+                            </mat-form-field>
+                            <div>
+                                <mat-checkbox formControlName="emailSendToMe"
+                                    >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.emailMe"]}}</mat-checkbox
+                                >
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-between">
+        <button class="mon-btn-link" (click)="onCancelClick()">
+            {{languageStrings["primary.portal.common.cancel"]}}
+        </button>
+        <div>
+            <button
+                *ngIf="stepper.selectedIndex > 0"
+                class="mon-btn-secondary"
+                type="button"
+                mat-flat-button
+                (click)="stepper.previous();"
+            >
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                <span>{{languageStrings["primary.portal.common.back"]}}</span>
+            </button>
+            <button
+                *ngIf="stepper.selectedIndex == 0"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                (click)="selectedMethod == 'byEmail' ? stepper.next(): openUploadModal()"
+            >
+                <span>{{languageStrings["primary.portal.common.next"]}}</span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+            <button
+                *ngIf="stepper.selectedIndex == 1"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                (click)="onSubmit()"
+            >
+                <span>{{languageStrings["primary.portal.common.submit"]}}</span>
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>
+
+<!-- confirmation modal -->
+<div class="info-modal" *ngIf="isResolvedApplication">
+    <div class="flex-item region-desc">
+        <div class="modal-header">
+            <button
+                mat-icon-button
+                (click)="onCancelClick()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <div>
+            <mat-dialog-content>
+                <!--Replacepipe need work-->
+                <h1 mat-dialog-title>
+                    {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.sentEmail1"]}}
+                    {{data?.applicationDetails?.applicationNumber}}
+                    {{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.sentEmail2"]}}
+                </h1>
+            </mat-dialog-content>
+            <mat-dialog-actions class="dialog-footer justify-content-end">
+                <button mat-flat-button color="primary" mat-dialog-close class="mon-btn-primary">
+                    {{languageStrings["primary.portal.common.gotIt"]}}
+                </button>
+            </mat-dialog-actions>
+        </div>
+    </div>
+</div>
+
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>

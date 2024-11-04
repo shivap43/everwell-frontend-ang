@@ -1,0 +1,83 @@
+<!-- <div class="settings-header">-->
+<h3 class="review-setting-title">
+    {{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.benefitDollars']}}
+</h3>
+
+<div class="new-benefits-offering">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <div class="benefit-dollar">
+        <div class="message-block" *ngIf="stateNYorOH">
+            <mon-alert alertType="warning" *ngIf="invalidStates.length && validStates.length">
+                <span *ngIf="invalidStates.length === INVALID_STATE_COUNT_ONE"
+                    >{{
+                    languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.notAvailableForEnrollments']
+                    | replaceTag: { "##state##" : invalidStates[0] } }}
+                </span>
+                <span *ngIf="invalidStates.length === INVALID_STATE_COUNT_TWO"
+                    >{{
+                    languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.statesNotAvailableForEnrollments']
+                    | replaceTag: { "##state##" : invalidStates[0], "##state1##" : invalidStates[1] } }}
+                </span>
+            </mon-alert>
+            <mon-alert alertType="danger" *ngIf="invalidStates.length && !validStates.length">
+                <span *ngIf="invalidStates.length === INVALID_STATE_COUNT_ONE"
+                    >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.notAllowedInState'] |
+                    replaceTag: { "##state##" : invalidStates[0] } }}
+                </span>
+                <span *ngIf="invalidStates.length === INVALID_STATE_COUNT_TWO"
+                    >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.statesNotAllowed'] |
+                    replaceTag: { "##state##" : invalidStates[0], "##state1##" : invalidStates[1] } }}
+                </span>
+            </mon-alert>
+        </div>
+        <ng-container *ngIf="offeringList.length === 0">
+            <ng-container
+                *hasAnyPermission="['core.account.create.benefitbank','core.account.update.benefitbank','core.account.delete.benefitbank']"
+            >
+                <p class="description">
+                    <span class="no-benefit"
+                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.noBenefitDollars']}}</span
+                    >
+                    <button
+                        (click)="addOffering()"
+                        class="mon-btn-link"
+                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.createNewOffering']"
+                        [disabled]="stateNYorOH && invalidStates.length && !validStates.length"
+                    >
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.createNewOffering']}}
+                    </button>
+                </p>
+            </ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="offeringList.length > 0">
+            <ng-container
+                *hasAnyPermission="['core.account.create.benefitbank','core.account.update.benefitbank','core.account.delete.benefitbank']"
+            >
+                <p class="description">
+                    <button
+                        (click)="addOffering()"
+                        class="mon-btn-link"
+                        [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.createNewOffering']"
+                        [disabled]="stateNYorOH && invalidStates.length && !validStates.length"
+                    >
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.createNewOffering']}}
+                    </button>
+                </p>
+            </ng-container>
+        </ng-container>
+        <empowered-add-edit-offering *ngIf="false" (emitCancelSave)="hideAddEditOffering($event)">
+        </empowered-add-edit-offering>
+        <ng-container>
+            <empowered-offering-dollars-list
+                [offeringList]="categoryIdEvent"
+                [isApprovalPending]="isApprovalPending || isUnplugged || isRequestPending || isAdmin"
+                [payFrequency]="payFrequencyName"
+                [payFrequencies]="payFrequencies"
+                (emitEditAction)="editOffering($event)"
+                (emitRemoveAction)="removeOffering($event)"
+            >
+            </empowered-offering-dollars-list>
+        </ng-container>
+    </div>
+</div>

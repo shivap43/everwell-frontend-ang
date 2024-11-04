@@ -1,0 +1,44 @@
+<div class="region-header">
+    <h2>{{languageStrings['primary.portal.regions.region']}}</h2>
+    <p language="primary.portal.regions.regionsParagraph" class="sub-header"></p>
+</div>
+<mon-alert *ngIf="showErrorMessage" alertType="danger" role="alert">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div class="region-whole-wrapper">
+    <empowered-region-type
+        *ngIf="!isLoading"
+        [addRegionType]="true"
+        [regionTypes]="regionTypesDisplay"
+        [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+    ></empowered-region-type>
+    <div *ngIf="regionTypesDisplay">
+        <div *ngFor="let regionTypeDisplayObj of regionTypesDisplay" class="region-each-wrapper">
+            <empowered-region-type
+                [addRegionType]="false"
+                [regionType]="regionTypeDisplayObj.regionType"
+                [regionTypes]="regionTypesDisplay"
+                [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+            >
+            </empowered-region-type>
+
+            <div *ngFor="let region of regionTypeDisplayObj.regions">
+                <empowered-region
+                    [regionName]="region"
+                    [regionType]="regionTypeDisplayObj.regionType"
+                    [addRegion]="false"
+                    [regionsList]="regionTypeDisplayObj.regions"
+                    [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+                >
+                </empowered-region>
+            </div>
+            <empowered-region
+                [addRegion]="true"
+                [regionType]="regionTypeDisplayObj.regionType"
+                [regionsList]="regionTypeDisplayObj.regions"
+                [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+            ></empowered-region>
+        </div>
+    </div>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>

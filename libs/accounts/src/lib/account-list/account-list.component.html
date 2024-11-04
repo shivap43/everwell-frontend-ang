@@ -1,0 +1,819 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mat-tab-group
+    #matTabGroup
+    animationDuration="0ms"
+    [selectedIndex]="selectedIndex"
+    class="accounts-list-tab"
+    [class.header-less-tabs]="matTabGroup._tabs?.length <= 1"
+    [ngClass]="{'tabs-hidden': isCallCenterAgent}"
+>
+    <mat-tab [label]="languageStrings['primary.portal.accounts.accountList.accounts']">
+        <div class="mon-tab-sub-wrapper">
+            <h1>
+                <span *ngIf="otherProducerData">{{currentProducer}}:</span>
+                {{languageStrings['primary.portal.accounts.accountList.accounts']}}
+                <span class="account-count">({{ totalAccounts }})</span>
+            </h1>
+            <ng-container *ngIf="!totalAccounts && !threshold">
+                <div class="mon-mb-30" *ngIf="!isCallCenterAgent && !isHybridUser">
+                    {{languageStrings['primary.portal.accounts.accountList.accountsMessage']}}
+                </div>
+                <div class="mon-mb-20" *ngIf="isCallCenterAgent && !isHybridUser">
+                    {{languageStrings['primary.portal.accounts.accountList.isCallCenterAgent']}}
+                    <span *ngIf="userCallCenter">{{userCallCenter.name}}.</span>
+                </div>
+                <div *ngIf="isHybridUser && !isCallCenterAgent">
+                    {{languageStrings['primary.portal.accounts.accountList.isHybridUser']}}
+                    <span *ngIf="userCallCenter">{{userCallCenter.name}}.</span>
+                </div>
+            </ng-container>
+            <div class="search-filter-wraper" *ngIf="dataLoaded">
+                <ng-container *ngIf="threshold || totalAccounts">
+                    <empowered-search
+                        [searchTerm]="searchTerm"
+                        [dropdownStatus]="dropdownStatus"
+                        (searchInputEvent)="searchInputEvent($event)"
+                        (filterByIdName)="filterByIdName($event)"
+                        (keyPressEvent)="keyPressEvent($event)"
+                        (clickOutsideElement)="clickOutsideElement($event)"
+                        (applySearchFilter)="applySearchFilter($event)"
+                        [languageName]="'primary.portal.search.accountName'"
+                        [languageId]="'primary.portal.search.accountNumber'"
+                        [languageSearch]="'primary.portal.accounts.accountList.search'"
+                        [languageSearchHint]="'primary.portal.accounts.accountList.accountNameId'"
+                        [filterId]="'groupNumber'"
+                        [filterName]="'name'"
+                        (keyDown)="onKey($event)"
+                        [nameCount]="nameCount"
+                        [groupNumberCount]="groupNumberCount"
+                        [altGroupNumberCount]="altGroupNumberCount"
+                        [entryPoint]="'account'"
+                    ></empowered-search>
+                </ng-container>
+
+                <!-- DO NOT REMOVE - Need to Remove after implementing this shared component in multiple pages
+                  <div [formGroup]="form" autocomplete="off" *ngIf="accountListData.content?.length != 0">
+                    <div class="search-wrapper">
+                        <mat-label language="primary.portal.accounts.accountList.search"></mat-label>
+                        <div (click)="searchInputEvent($event)" (empoweredClickOutside)="clickOutsideElement($event)">
+                            <mat-form-field>
+                                <input
+                                    (keyup)="[applySearchFilter($event), keyPressEvent($event)]"
+                                    (keydown.Tab)="onKey($event)"
+                                    class="mon-input"
+                                    matInput
+                                    type="text"
+                                    formControlName="searchInput"
+                                    [formControl]="searchControl"
+                                    autocomplete="off"
+                                />
+                                <mat-hint language="primary.portal.accounts.accountList.accountNameId"></mat-hint>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngIf="searchTerm && searchTerm?.length >= 3 && dropdownStatus" class="search-box-wrapper">
+                            <div class="search-box-sub-wrapper">
+                                <mat-action-list>
+                                    <div class="search-account-menu">
+                                        <mat-label language="primary.portal.accounts.accountList.name"></mat-label>
+                                        <span class="field-value">
+                                            <a value="name" mat-flat-button (click)="filterByIdName('name')"
+                                                >{{searchTerm}}
+                                            </a>
+                                        </span>
+                                    </div>
+                                    <div class="search-account-menu">
+                                        <mat-label language="primary.portal.accounts.accountList.id" class="field-id">
+                                        </mat-label>
+                                        <span class="field-value">
+                                            <a
+                                                value="groupNumber"
+                                                mat-flat-button
+                                                (click)="filterByIdName('groupNumber')"
+                                                >{{searchTerm}}
+                                            </a>
+                                        </span>
+                                    </div>
+                                </mat-action-list>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="filter-wrapper" *ngIf="totalAccounts || threshold">
+                    <mat-label>{{languageStrings['primary.portal.accounts.accountList.filter']}}</mat-label>
+                    <div (click)="configureFilters()" class="filter-sub-wrapper">
+                        <!-- Status -->
+                        <ng-container *ngIf="!forMobileDevices">
+                            <mat-form-field
+                                *ngIf="statusData && statusData?.length"
+                                [ngClass]="{'filter-selected': statusFilter.value && statusFilter.value?.length > 0, 'filter-applied': !!isDisplayStatus && statusFilter.value && statusFilter.value?.length > 0}"
+                            >
+                                <label class="filter-label" id="status-filter">
+                                    {{languageStrings['primary.portal.accounts.accountList.status']}}
+                                </label>
+                                <mat-select
+                                    #statusFilterDropdown
+                                    multiple
+                                    [formControl]="statusFilter"
+                                    disableOptionCentering
+                                    [panelClass]="filterClassNames.status"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    disableOptionCentering="true"
+                                    (closed)="clickOutside('statusFilter')"
+                                    aria-labelledby="status-filter"
+                                    aria-controls="status-filter-options"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options" id="status-filter-options">
+                                        <mat-checkbox
+                                            class="mat-option mon-mt-0"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate('statusFilter')"
+                                            [checked]="isChecked('statusFilter')"
+                                            (click)="toggleStatusSelectionAll()"
+                                            (change)="toggleSelection($event, 'statusFilter')"
+                                        >
+                                            {{languageStrings['primary.portal.accounts.accountList.allStatuses']}}
+                                        </mat-checkbox>
+                                        <mat-divider></mat-divider>
+                                        <mat-option *ngFor="let status of statusData" [value]="status.value.toLowerCase()">
+                                            {{ status.name }}
+                                        </mat-option>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="statusFilter.value.length > 0"
+                                                href="javascript:void(0)"
+                                                (click)="resetVal('statusFilter')"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="filterApply('statusFilter')"
+                                                class="mon-apply"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceStatus && filterChoiceStatus?.length"
+                                    >{{isDisplayStatus}}</label
+                                >
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Status -->
+                        <!-- Renewal -->
+
+                        <ng-container *ngIf="!forMobileDevices">
+                            <mat-form-field
+                                *ngIf="renewalData && renewalData?.length && isRenewalDisplay && isProducer"
+                                [ngClass]="{'filter-selected': renewalFilter.value && renewalFilter.value.length > 0, 'filter-applied': !!isDisplayRenewal && renewalFilter.value && renewalFilter.value.length > 0}"
+                            >
+                                <label
+                                    class="filter-label"
+                                    id="renewal-filter"
+                                    language="primary.portal.accounts.accountList.renewal"
+                                ></label>
+                                <mat-select
+                                    #renewalFilterDropdown
+                                    multiple
+                                    [formControl]="renewalFilter"
+                                    (selectionChange)="applyRanges($event.value,'renewalFilter')"
+                                    [panelClass]="filterClassNames.renewal"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    disableOptionCentering="true"
+                                    (closed)="clickOutside('renewalFilter')"
+                                    aria-labelledby="renewal-filter"
+                                    aria-controls="renewal-filter-options"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options" id="renewal-filter-options">
+                                        <mat-option *ngFor="let ren of renewalData" [value]="ren.id">{{ ren.name }}</mat-option>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="renewalFilter.value !== ''"
+                                                href="javascript:void(0)"
+                                                (click)="resetVal('renewalFilter')"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0)" (click)="filterApply('renewalFilter')" class="mon-apply"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceRenewal && filterChoiceRenewal?.length"
+                                    >{{isDisplayRenewal}}</label
+                                >
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Renewal -->
+                        <!-- Producer -->
+                        <ng-container *ngIf="subordinateFlag && !forMediumDevices  && !isAdmin">
+                            <button
+                                #producerFilterTrigger
+                                class="producer-btn"
+                                cdk-overlay-origin
+                                #trigger="cdkOverlayOrigin"
+                                (click)="loadProducerFilter()"
+                                [ngClass]="{'button-active': producerDisplay, 'button-color': producerBtn}"
+                                [attr.aria-label]="languageStrings['primary.portal.producerFilter.producer']"
+                            >
+                                {{languageStrings['primary.portal.producerFilter.producer']}}{{producerDisplay}}
+                            </button>
+                        </ng-container>
+                        <!-- Producer -->
+
+                        <ng-container>
+                            <button
+                                class="filter-label state-filter-trigger"
+                                [matMenuTriggerFor]="stateFilterPopup"
+                                (menuOpened)="stateFilterMenuToggle('open')"
+                                (menuClosed)="stateFilterMenuToggle('closed')"
+                                [ngClass]="{
+                                    'filter-selected': stateFilterVal && stateFilterVal?.length > 0,
+                                    'filter-applied': (isDisplayState !== '' || isDisplayState?.length > 0) && (stateFilterVal && stateFilterVal?.length > 0),
+                                    'filter-open': isStateFilterMenuOpen, 'filter-label': !isStateFilterMenuOpen
+                                }"
+                            >
+                                <span>{{languageStrings['primary.portal.accounts.accountList.state']}}</span>
+                                <span *ngIf="isDisplayState !== '' || isDisplayState?.length > 0">{{isDisplayState}}</span>
+                            </button>
+                            <mat-menu
+                                class="state-filter-panel-wrapper"
+                                #stateFilterPopup="matMenu"
+                                panelClass="accountlist-state-filter-panel"
+                            >
+                                <div class="state-filter-panel" (click)="$event.stopPropagation()">
+                                    <empowered-state-filter
+                                        [stateList]="stateData"
+                                        (stateSelectionChange)="applyStateSelection($event)"
+                                    ></empowered-state-filter>
+                                </div>
+                            </mat-menu>
+                        </ng-container>
+                        <!---account type-->
+                        <ng-container>
+                            <mat-form-field
+                                *ngIf="accountTypeData && accountTypeData?.length"
+                                [ngClass]="{'filter-selected': accountTypeFilter.value && accountTypeFilter.value?.length > 0, 'filter-applied': !!isDisplayAccountType && accountTypeFilter.value && accountTypeFilter.value?.length > 0}"
+                            >
+                                <label class="filter-label" id="type-filter">
+                                    {{languageStrings['primary.portal.accounts.accountList.type']}}
+                                </label>
+                                <mat-select
+                                    #accountTypeFilterDropdown
+                                    multiple
+                                    [formControl]="accountTypeFilter"
+                                    disableOptionCentering
+                                    [panelClass]="filterClassNames.detailedPartnerAccountType"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    disableOptionCentering="true"
+                                    (closed)="clickOutside('accountTypeFilter')"
+                                    aria-labelledby="type-filter"
+                                    aria-controls="type-filter-options"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div class="filter-options" id="type-filter-options">
+                                        <mat-checkbox
+                                            class="mat-option mon-mt-0"
+                                            [indeterminate]="isIndeterminate('accountTypeFilter')"
+                                            [checked]="isChecked('accountTypeFilter')"
+                                            (click)="toggleAccountTypeSelectionAll()"
+                                            (change)="toggleSelection($event, 'accountTypeFilter')"
+                                        >
+                                            {{languageStrings['primary.portal.accounts.accountList.allAccountTypes']}}
+                                        </mat-checkbox>
+                                        <mat-divider></mat-divider>
+                                        <mat-option *ngFor="let accountType of accountTypeData" [value]="accountType.value.toLowerCase()">
+                                            {{ accountType.name }}
+                                        </mat-option>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="accountTypeFilter.value.length > 0"
+                                                href="javascript:void(0)"
+                                                (click)="resetVal('accountTypeFilter')"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="filterApply('accountTypeFilter')"
+                                                class="mon-apply"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceAccountType && filterChoiceAccountType?.length"
+                                    >{{isDisplayAccountType}}</label
+                                >
+                            </mat-form-field>
+                        </ng-container>
+                        <!---account type-->
+                        <!-- Co Size -->
+
+                        <ng-container *ngIf="!forMediumDevices && !isAdmin">
+                            <mat-form-field
+                                *ngIf="employeeCountData && employeeCountData?.length"
+                                [ngClass]="{'filter-selected': employeeCountFilter.value && employeeCountFilter.value.length > 0, 'filter-applied': !!isDisplayEmployee &&  employeeCountFilter.value && employeeCountFilter.value.length > 0}"
+                            >
+                                <label class="filter-label" id="company-size-filter"
+                                    >{{languageStrings['primary.portal.accounts.accountList.companySize']}}</label
+                                >
+                                <mat-select
+                                    #employeeCountFilterDropdown
+                                    multiple
+                                    [formControl]="employeeCountFilter"
+                                    (selectionChange)="applyRanges($event.value, 'employeeCountFilter')"
+                                    [panelClass]="filterClassNames.employeeCount"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    disableOptionCentering="true"
+                                    (closed)="clickOutside('employeeCountFilter')"
+                                    aria-labelledby="company-size-filter"
+                                    aria-controls="employee-count-filter-options"
+                                >
+                                    <mat-select-trigger></mat-select-trigger>
+                                    <div id="employee-count-filter-options">
+                                        <div class="filter-options">
+                                            <mat-option *ngFor="let employeeCount of employeeCountData" [value]="employeeCount.id">
+                                                {{ employeeCount.name }}
+                                            </mat-option>
+                                        </div>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a
+                                                    *ngIf="employeeCountFilter.value !== ''"
+                                                    href="javascript:void(0)"
+                                                    (click)="resetVal('employeeCountFilter');showStateOptions = false"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                    >{{languageStrings['primary.portal.common.clear']}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    (click)="filterApply('employeeCountFilter');showStateOptions = false"
+                                                    class="mon-apply"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceEmployeeCount && filterChoiceEmployeeCount?.length"
+                                    >{{isDisplayEmployee}}</label
+                                >
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Co Size  -->
+                        <!-- Notifications-->
+
+                        <ng-container *ngIf="!forMediumDevices">
+                            <mat-form-field
+                                *ngIf="notificationData && notificationData?.length"
+                                [ngClass]="{'filter-selected': notificationFilter.value && notificationFilter.value.length > 0, 'filter-applied': !!isDisplayNotification &&  notificationFilter.value && notificationFilter.value.length > 0}"
+                            >
+                                <label class="filter-label" id="notifications-filter"
+                                    >{{languageStrings['primary.portal.accounts.accountList.notifications']}}</label
+                                >
+                                <mat-select
+                                    #notificationFilterDropdown
+                                    [formControl]="notificationFilter"
+                                    multiple
+                                    disableOptionCentering
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-notification"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    aria-labelledby="notifications-filter"
+                                    aria-controls="notification-filter-options"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div id="notification-filter-options">
+                                        <div class="filter-options">
+                                            <mat-checkbox
+                                                *ngIf="notificationData && notificationData?.length >= 10"
+                                                class="mat-option"
+                                                [disableRipple]="true"
+                                                [indeterminate]="isIndeterminate('notificationFilter')"
+                                                [checked]="isChecked('notificationFilter')"
+                                                (click)="$event.stopPropagation()"
+                                                (change)="toggleSelection($event,'notificationFilter')"
+                                                ><span> {{languageStrings['primary.portal.common.selectAll']}} </span>
+                                            </mat-checkbox>
+                                            <mat-option *ngFor="let notification of notificationData" [value]="notification"
+                                                >{{notification.displayText}}
+                                            </mat-option>
+                                        </div>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a
+                                                    *ngIf="notificationFilter.value?.length !== 0"
+                                                    href="javascript:void(0);"
+                                                    (click)="resetVal('notificationFilter')"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                    >{{languageStrings['primary.portal.common.clear']}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0);"
+                                                    (click)="filterApply('notificationFilter')"
+                                                    class="mon-apply"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                    >{{languageStrings['primary.portal.common.apply']}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceNotification && filterChoiceNotification?.length">
+                                    {{isDisplayNotification}}
+                                </label>
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Notifications-->
+
+                        <!--More Filter-->
+
+                        <ng-container *ngIf="forMediumDevices">
+                            <button #moreFilterOrigin class="more-button" (click)="moreFilterView()">
+                                {{languageStrings['primary.portal.common.moreFilter']}}
+                            </button>
+                        </ng-container>
+
+                        <!--More Filter-->
+                    </div>
+                </div>
+                <!-- Moving "Add account" button to its own component that triggers modal launch with either "Import Account" (MON-75) or "Add account" (MON-74)-->
+                <empowered-new-account-button
+                    *hasAnyPermission="[permissionEnum.AFLAC_ACCOUNT_CREATE, permissionEnum.SHARED_CASE_CREATE_ACCOUNT]"
+                    [haveAccounts]="haveAccounts"
+                    (accountImported)="onImportAccount($event)"
+                ></empowered-new-account-button>
+            </div>
+            <div class="results-grid table-mask-wrapper" [ngClass]="{'grid-overlay' : filterOpen}">
+                <div [hidden]="(!dataLoaded || !totalAccounts) && !threshold">
+                    <table [dataSource]="dataSource" mat-table matSort (matSortChange)="sortData($event)">
+                        <ng-container matColumnDef="name">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountNameColumn']}} </span>
+                            </th>
+                            <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'name'}">
+                                <a
+                                    *ngIf="!element?.pendingInvitation; else accountName"
+                                    href="javascript:void(0)"
+                                    (click)="storeGroupId(element)"
+                                >
+                                    <ng-container *ngTemplateOutlet="accountName"></ng-container>
+                                </a>
+                                <ng-template #accountName>
+                                    <span class="has-status">
+                                        <span class="status-content" [ngClass]="{ 'inactive-name': element?.pendingInvitation }">
+                                            <span>{{ element.name }}</span>
+                                        </span>
+                                        <span class="status-text" *ngIf="element.status === STATUS_INACTIVE">
+                                            {{languageStrings['primary.portal.accounts.accountList.inactiveAlongWithAccountName']}}
+                                        </span>
+                                        <ng-container *ngIf="element.lock">
+                                            &nbsp;{{languageStrings["primary.portal.accounts.accountList.account.checkedOutSuffix"]}}
+                                            <span
+                                                class="status-text"
+                                                href="javascript:void(0)"
+                                                matTooltipPosition="above"
+                                                [richTooltip]="element.unpluggedTooltipContent"
+                                                *ngIf="element.lock"
+                                            >
+                                                <mon-icon iconName="Filled-info" iconSize="20" class="infoicon icon-primary"></mon-icon>
+                                            </span>
+                                        </ng-container>
+                                    </span>
+                                </ng-template>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="groupNumber">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountIdColumn']}} </span>
+                            </th>
+                            <td class="w-140" *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'groupNumber'}">
+                                <p *ngIf="element.groupNumber">{{ element.groupNumber }}</p>
+                                <p *ngIf="element.altGroupNumber">
+                                    {{languageStrings['primary.portal.accounts.accountList.ag']}}{{element.altGroupNumber}}
+                                </p>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="state" *ngIf="isProducer">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold" class="hidden-max-xl">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountStateColumn']}} </span>
+                            </th>
+                            <td
+                                *matCellDef="let element"
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === 'state'}"
+                                class="hidden-max-xl"
+                            >
+                                {{ element.state }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="primaryProducer" *ngIf="isProducer">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.primaryProducerColumn']}} </span>
+                            </th>
+                            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'primaryProducer'}">
+                                {{ element.primaryProducer}}
+                                <span
+                                    [richTooltip]="generateProducerTooltipContent(element)"
+                                    matTooltipPosition="above"
+                                    *ngIf="element.primaryProducer==='Unassigned'"
+                                >
+                                    <mon-icon iconName="Filled-info" iconSize="20" class="infoicon icon-primary"></mon-icon>
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="renewalDate" *ngIf="isProducer">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold" class="hidden-max-xl">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.renewalColumn']}} </span>
+                            </th>
+                            <td
+                                *matCellDef="let element"
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === 'renewalDate'}"
+                                class="hidden-max-xl"
+                            >
+                                {{ element.renewalDate | date:'MM/dd/yy' }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="location" *ngIf="isAdmin">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountLocationColumn']}} </span>
+                            </th>
+                            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'location'}">
+                                <span *ngIf="screenSize === 'large'"
+                                    >{{ element.primaryContactAddress?.address1 }} {{element.primaryContactAddress?.address2}}
+                                </span>
+                                <span *ngIf="screenSize === 'medium' || screenSize === 'large'"
+                                    >{{element.primaryContactAddress?.city}} {{element.primaryContactAddress?.state}}
+                                    {{element.primaryContactAddress?.zip}}
+                                </span>
+                                <span *ngIf="screenSize === 'small'">{{ element.primaryContactAddress?.state }} </span>
+                                <a
+                                    [richTooltip]="generateLocationTooltipContent(element.primaryContactAddress)"
+                                    href="javascript:void(0)"
+                                    matTooltipPosition="above"
+                                    *ngIf="screenSize !== 'large'"
+                                    [attr.aria-label]="generateLocationTooltipContent(element.primaryContactAddress)"
+                                >
+                                    <mon-icon iconName="Filled-info" iconSize="20" class="infoicon icon-primary"></mon-icon>
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="employeeCount">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold" class="hidden-max-xl">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.employeesColumn']}} </span>
+                            </th>
+                            <td
+                                *matCellDef="let element"
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === 'employeeCount'}"
+                                class="hidden-max-xl"
+                            >
+                                {{ element.employeeCount }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="productsCount" *ngIf="isProducer">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold" class="hidden-max-xl">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.productsColumn']}} </span>
+                            </th>
+                            <td
+                                class="hidden-max-xl"
+                                *matCellDef="let element"
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === 'productsCount'}"
+                                [class.zero-products-count]="element.productsCount === 0"
+                            >
+                                <a
+                                    *ngIf="element?.productsCount > 0"
+                                    href="javascript:void(0)"
+                                    richTooltip="{{ element.productsTooltipContent }}"
+                                    matTooltipPosition="above"
+                                    [attr.aria-label]="element.productsTooltipContent"
+                                    class="products-info"
+                                >
+                                    <mon-icon
+                                        iconName="Filled-info"
+                                        iconSize="20"
+                                        class="infoicon icon-primary"
+                                        [ngClass]="{'invisible' : element.productsCount === 0}"
+                                    ></mon-icon>
+                                </a>
+                                {{ element.productsCount }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="status">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="threshold">
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountStatusColumn']}} </span>
+                            </th>
+                            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'status'}">
+                                <span (click)="onClickViewInvitation(element)" *ngIf="element?.pendingInvitation">
+                                    <a class="invitation-link" href="javascript:void(0)">
+                                        {{languageStrings['primary.portal.accounts.accountList.viewInvitation']}}
+                                    </a>
+                                </span>
+                                <span *ngIf="!element?.pendingInvitation">
+                                    {{ convertIntoDisplayCase(element.status) }}
+                                    <ng-container *configEnabled="'portal.admin.account_list.enabled'">
+                                        <a
+                                            href="javascript:void(0)"
+                                            [richTooltip]="generateOEDatesTooltipContent(element.openEnrollmentPeriods)"
+                                            matTooltipPosition="above"
+                                            *ngIf="isAdmin && element.status[0] === 'Open enrollment'"
+                                            [attr.aria-label]="generateOEDatesTooltipContent(element.openEnrollmentPeriods)"
+                                        >
+                                            <mon-icon
+                                                iconName="Filled-info"
+                                                iconSize="20"
+                                                class="infoicon icon-primary"
+                                                [attr.aria-label]="generateOEDatesTooltipContent(element.openEnrollmentPeriods)"
+                                            ></mon-icon>
+                                        </a>
+                                    </ng-container>
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="detailedPartnerAccountType">
+                            <th
+                                *matHeaderCellDef
+                                mat-header-cell
+                                mat-sort-header
+                                disableClear="true"
+                                [disabled]="threshold"
+                                class="hidden-max-xl"
+                            >
+                                <span> {{languageStrings['primary.portal.accounts.accountList.accountType']}} </span>
+                            </th>
+                            <td
+                                *matCellDef="let element"
+                                mat-cell
+                                [ngClass]="{'sorted-column': activeCol === 'detailedPartnerAccountType'}"
+                                class="hidden-max-xl"
+                            >
+                                {{ element.detailedPartnerAccountType }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="notificationSum">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header disableClear="true" [disabled]="threshold">
+                                <span class="sr-only"> {{languageStrings['primary.portal.notification.count']}}</span>
+                                <mon-icon iconSize="14" iconName="bell" class="icon-gray"></mon-icon>
+                            </th>
+                            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'notificationSum'}">
+                                <a
+                                    href="javascript:void(0)"
+                                    [richTooltip]="getNotificationToolTipContent(element.notifications)"
+                                    matTooltipPosition="above"
+                                    class="notification-badge"
+                                    *ngIf="element.notificationSum > 0"
+                                    [attr.aria-label]="languageStrings['primary.portal.accounts.accountList.getNotificationDetails']"
+                                >
+                                    <span
+                                        class="notification-count"
+                                        *ngIf="element.notificationSum > 99"
+                                        [attr.aria-label]="languageStrings['primary.portal.accounts.accountList.getNotificationDetails']"
+                                        >{{languageStrings["primary.portal.notificationCount"]}}</span
+                                    >
+                                    <span
+                                        class="notification-count"
+                                        *ngIf="element.notificationSum < 100"
+                                        [attr.aria-label]="languageStrings['primary.portal.accounts.accountList.getNotificationDetails']"
+                                    >
+                                        {{element.notificationSum}}
+                                    </span>
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="manageFromProducer" *ngIf="isProducer">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <span> {{languageStrings['primary.portal.accounts.accountList.manageColumn']}} </span>
+                            </th>
+                            <td *matCellDef="let element" mat-cell>
+                                <span matTooltipPosition="above" *ngIf="element.primaryProducer !== 'Unassigned'; else elseBlock">
+                                    <button
+                                        *ngIf="isRole93 && element?.status[0]===accountStatusType?.AWAITING_BROCHURES_MODIFIED"
+                                        (click)="reviewBenefitsOffering(element)"
+                                        class="mon-btn-link visible-on-row-hover"
+                                    >
+                                        {{languageStrings['primary.portal.aflacGroup.offering.reviewBenefit']}}
+                                    </button>
+                                </span>
+                                <ng-template #elseBlock>
+                                    <span *ngIf="element.isReportingManager">
+                                        <a href="javascript:void(0)" color="primary" (click)="openSinglePopup(element.id)"
+                                            >{{languageStrings['primary.portal.accounts.accountList.assign']}}</a
+                                        >
+                                    </span>
+                                </ng-template>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="manageFromAdmin" *ngIf="isAdmin">
+                            <th *matHeaderCellDef mat-header-cell>
+                                <span> {{languageStrings['primary.portal.accounts.accountList.manageColumn']}} </span>
+                            </th>
+                            <td *matCellDef="let element" mat-cell></td>
+                        </ng-container>
+                        <!-- FIXME: Add Scss for threshold warning message -->
+                        <ng-container matColumnDef="header-row-first-group">
+                            <th mat-header-cell *matHeaderCellDef [attr.colspan]="11" class="text-center">
+                                {{languageStrings['primary.portal.accounts.accountList.partialListingMessage']}}
+                            </th>
+                        </ng-container>
+                        <ng-container matColumnDef="noResults">
+                            <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                                <ng-container *ngIf="searchTerm && searchTerm?.length >= 3 ">
+                                    <span> {{languageStrings['primary.portal.accountList.zeroState']}} </span>
+                                    {{searchTerm}}
+                                </ng-container>
+                                <ng-container *ngIf="dispError && dispError?.length && !searchTerm">
+                                    <span> {{languageStrings['primary.portal.accounts.accountList.resultNotFound']}} </span>
+                                    {{ dispError}}
+                                </ng-container>
+                            </th>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="isProducer ? displayedColumnsForProducer: displayedColumnsForAdmin"></tr>
+                        <tr mat-header-row *matHeaderRowDef="['header-row-first-group']" [hidden]="!threshold"></tr>
+                        <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource.data?.length !== 0 && dataLoaded"></tr>
+                        <tr
+                            *matRowDef="let row; columns: isProducer ? displayedColumnsForProducer: displayedColumnsForAdmin"
+                            [ngClass]="{'inactive': row.status ==='Inactive' || row?.pendingInvitation}"
+                            mat-row
+                        ></tr>
+                    </table>
+                </div>
+                <div class="min-range-label" *ngIf="dataSource.data?.length!==0 && dataSource.data?.length < 16">
+                    <span role="status">
+                        {{"primary.portal.direct.customerList.showingResults"| replaceTag: { "#no": dataSource.data?.length } }}</span
+                    >
+                </div>
+                <div
+                    class="paginator-wrapper"
+                    [hidden]="dataSource.data?.length === 0 || dataSource.data?.length < 16"
+                    [ngClass]="{'range-actions-hide': dataSource.paginator?.getNumberOfPages() === 1}"
+                >
+                    <mat-paginator [pageSizeOptions]="pageSizeOption" showFirstLastButtons></mat-paginator>
+                    <mat-form-field class="paginator-input-wrapper">
+                        {{languageStrings['primary.portal.accounts.accountList.page']}}
+                        <input
+                            [attr.aria-label]="languageStrings['primary.portal.common.enterPageNumber']"
+                            class="paginator-input"
+                            (input)="pageInputChanged($event.target.value)"
+                            [formControl]="pageNumberControl"
+                            matInput
+                            type="number"
+                            min="1"
+                            max="{{ dataSource.paginator?.getNumberOfPages() }}"
+                        />
+                        of {{ dataSource.paginator?.getNumberOfPages() }}
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+    <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_READ_PROSPECTS">
+        <mat-tab label="Prospects" *ngIf="isProducer">
+            <div class="mon-tab-sub-wrapper">
+                <empowered-prospect-accounts [currentProducer]="currentProducer"></empowered-prospect-accounts>
+            </div>
+        </mat-tab>
+    </ng-container>
+    <mat-tab disabled>
+        <ng-template mat-tab-label>
+            <button
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                *hasPermission="permissionEnum.ACCOUNTLIST_ROLE_20"
+                (click)="findOtherProducersAccount()"
+            >
+                <span language="primary.portal.accounts.openOtherProducersAccount"></span>
+            </button>
+        </ng-template>
+    </mat-tab>
+</mat-tab-group>
+
+<div class="app-overlay-container"></div>

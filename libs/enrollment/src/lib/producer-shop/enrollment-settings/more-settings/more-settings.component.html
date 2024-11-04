@@ -1,0 +1,185 @@
+<form [formGroup]="form" (submit)="onApply()" data-test="eb-more-settings__form">
+    <mon-alert alertType="info" *ngIf="mainForm.disabled" data-test="eb-more-settings__alert" [closeButton]="true">
+        <span>{{ disabledFormMessage }}</span>
+    </mon-alert>
+
+    <div class="flex-row" *ngIf="genderDisplays$ | async as genderDisplays">
+        <div class="column">
+            <section>
+                <div class="content-heading" role="heading" language="primary.portal.shopquote.additionalsettings"></div>
+
+                <div class="label" language="primary.portal.shopQuote.label.payFrequency"></div>
+
+                <mat-form-field *ngIf="payFrequencies$ | async as payFrequencies" floatLabel="always">
+                    <mat-select
+                        [formControl]="payFrequency"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        data-test="eb-more-settings__mat-select--pay-frequency"
+                    >
+                        <mat-option *ngFor="let payFrequency of payFrequencies; trackBy: trackByPayFrequencyName" [value]="payFrequency">
+                            {{ payFrequency.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <div class="label income" language="primary.portal.shopQuote.label.income"></div>
+
+                <mat-radio-group
+                    *ngIf="incomeRate$ | async as incomeRateValuee"
+                    [formControl]="incomeRate"
+                    data-test="eb-more-settings__mat-radio-group--income-rate"
+                >
+                    <section>
+                        <mat-radio-button
+                            [value]="incomeRateEnum.ANNUAL"
+                            data-test="eb-more-settings__mat-radio-button--income-rate-annual"
+                        >
+                            <span language="primary.portal.shopQuote.radioLabel.annual"></span>
+                        </mat-radio-button>
+
+                        <div *ngIf="incomeRateValuee.value === incomeRateEnum.ANNUAL" class="income-mat-form-field-wrapper">
+                            <mat-form-field class="annual-income">
+                                <input matInput [formControl]="annualTotal" data-test="eb-more-settings__input--annual-income" />
+                            </mat-form-field>
+                        </div>
+                    </section>
+
+                    <section>
+                        <mat-radio-button
+                            [value]="incomeRateEnum.HOURLY"
+                            data-test="eb-more-settings__mat-radio-button--income-rate-hourly"
+                        >
+                            <span language="primary.portal.shopQuote.radioLabel.hourly"></span>
+                        </mat-radio-button>
+
+                        <ng-container *ngIf="incomeRateValuee.value === incomeRateEnum.HOURLY">
+                            <div class="income-mat-form-field-wrapper">
+                                <mat-form-field class="per-hour">
+                                    <input matInput [formControl]="hourlyWage" data-test="eb-more-settings__input--income-hourly-wage" />
+                                </mat-form-field>
+                                <span class="inline-text"> {{ symbolOrUnit.PER_HOUR }} </span>
+                            </div>
+                            <div class="income-mat-form-field-wrapper">
+                                <span class="inline-text"> {{ symbolOrUnit.MULTIPLICATION }} </span>
+                                <mat-form-field class="per-week">
+                                    <input
+                                        matInput
+                                        [formControl]="hoursPerWeek"
+                                        data-test="eb-more-settings__input--income-rate-hours-per-week"
+                                    />
+                                </mat-form-field>
+                                <span class="inline-text"> {{ symbolOrUnit.HOURS_PER_WEEK }} </span>
+                            </div>
+                            <div class="income-mat-form-field-wrapper">
+                                <span class="inline-text"> {{ symbolOrUnit.MULTIPLICATION }} </span>
+                                <mat-form-field class="per-year">
+                                    <input
+                                        matInput
+                                        [formControl]="weeksPerYear"
+                                        data-test="eb-more-settings__input--income-rate-weeks-per-year"
+                                    />
+                                </mat-form-field>
+                                <span class="inline-text"> {{ symbolOrUnit.WEEKS_PER_YEAR }} </span>
+                            </div>
+                            <div class="income-mat-form-field-wrapper">
+                                <span class="inline-text"> {{ symbolOrUnit.EQUALS }} </span>
+                                <mat-form-field class="hourly-income">
+                                    <input
+                                        matInput
+                                        [formControl]="hourlyTotal"
+                                        data-test="eb-more-settings__input--income-rate-hourly-total"
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </section>
+                </mat-radio-group>
+            </section>
+        </div>
+
+        <div class="column last right-side">
+            <div *ngIf="(ageRepositionConfigEnabled$ | async) === false">
+                <section>
+                    <div class="content-heading" role="heading" language="primary.portal.shopQuote.header.applicantInfo"></div>
+
+                    <div class="flex-row">
+                        <div class="column form-field-wrapper">
+                            <div class="label" language="primary.portal.shopQuote.label.age"></div>
+
+                            <mat-form-field class="age">
+                                <input matInput [formControl]="memberAge" data-test="eb-more-settings__input--member-age" />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="column form-field-wrapper last">
+                            <div class="label" language="primary.portal.shopQuote.label.gender"></div>
+
+                            <mat-form-field class="gender">
+                                <mat-select [formControl]="memberGender" data-test="eb-more-settings__mat-select--member-gender">
+                                    <mat-option
+                                        *ngFor="let genderDisplay of genderDisplays; trackBy: trackByDisplayGenderDisplay"
+                                        [value]="genderDisplay.gender"
+                                    >
+                                        {{ genderDisplay.display }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <mat-checkbox [formControl]="memberIsTobaccoUser" data-test="eb-more-settings__mat-checkbox--member-is-tobacco-user">
+                        <span language="primary.portal.shopQuote.radioLabel.tobaccoUser"></span>
+                    </mat-checkbox>
+                </section>
+
+                <section>
+                    <div class="content-heading" role="heading" language="primary.portal.quickQuote.spouseInfo"></div>
+
+                    <div class="flex-row">
+                        <div class="column form-field-wrapper">
+                            <div class="label" language="primary.portal.shopQuote.label.age"></div>
+
+                            <mat-form-field class="age">
+                                <input matInput [formControl]="spouseAge" data-test="eb-more-settings__input--spouse-age" />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-row">
+                            <div class="column form-field-wrapper last">
+                                <div class="label" language="primary.portal.shopQuote.label.gender"></div>
+
+                                <mat-form-field class="gender">
+                                    <mat-select [formControl]="spouseGender" data-test="eb-more-settings__mat-select--spouse-gender">
+                                        <mat-option
+                                            *ngFor="let genderDisplay of genderDisplays; trackBy: trackByDisplayGenderDisplay"
+                                            [value]="genderDisplay.gender"
+                                        >
+                                            {{ genderDisplay.display }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                    <mat-checkbox [formControl]="spouseIsTobaccoUser" data-test="eb-more-settings__mat-checkbox--spouse-is-tobacco-user">
+                        <span language="primary.portal.shopQuote.radioLabel.tobaccoUser"></span>
+                    </mat-checkbox>
+                </section>
+            </div>
+
+            <section>
+                <div class="content-heading" role="heading" language="primary.portal.shoppingExperience.dependentInfo"></div>
+                <div class="label" language="primary.portal.shopQuote.title"></div>
+
+                <mat-form-field class="dependents-count">
+                    <input
+                        matInput
+                        [formControl]="numberOfDependentsExcludingSpouse"
+                        data-test="eb-more-settings__input--number-of-dependents-excluding-spouse"
+                    />
+                </mat-form-field>
+            </section>
+        </div>
+    </div>
+</form>

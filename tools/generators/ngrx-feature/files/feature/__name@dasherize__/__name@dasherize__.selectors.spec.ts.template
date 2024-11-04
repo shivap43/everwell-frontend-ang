@@ -1,0 +1,76 @@
+import { <%= classify(name) %>Entity } from "./<%= dasherize(name) %>.model";
+import { <%= camelize(name) %>Adapter, initialState } from "./<%= dasherize(name) %>.state";
+import { <%= classify(name) %>PartialState } from "./<%= dasherize(name) %>.reducer";
+import * as <%= classify(name) %>Selectors from "./<%= dasherize(name) %>.selectors";
+
+describe("<%= classify(name) %> Selectors", () => {
+    const ERROR_MSG = "No Error Available";
+    const get<%= classify(name) %>Id = (it: <%= classify(name) %>Entity) => it.id;
+    const create<%= classify(name) %>Entity = (id: string, name = "") =>
+        ({
+            id,
+            name: name || `name-${id}`,
+        } as <%= classify(name) %>Entity);
+
+    let state: <%= classify(name) %>PartialState;
+
+    beforeEach(() => {
+        state = {
+            <%= camelize(name) %>: <%= camelize(name) %>Adapter.setAll(
+                [
+                    create<%= classify(name) %>Entity("PRODUCT-AAA"),
+                    create<%= classify(name) %>Entity("PRODUCT-BBB"),
+                    create<%= classify(name) %>Entity("PRODUCT-CCC"),
+                ],
+                {
+                    ...initialState,                    selectedId: "PRODUCT-BBB",
+                    error: {
+                        message: ERROR_MSG,
+                    },
+                    loaded: true,
+                }
+            ),
+        };
+    });
+
+    it("getAll<%= classify(name) %>() should return the list of <%= classify(name) %>", () => {
+        const results = <%= classify(name) %>Selectors.getAll<%= classify(name) %>(state);
+        const selId = get<%= classify(name) %>Id(results[1]);
+
+        expect(results.length).toBe(3);
+        expect(selId).toBe("PRODUCT-BBB");
+    });
+
+    describe("getSelected()", () => {
+        it("should return the selected Entity", () => {
+            const result = <%= classify(name) %>Selectors.getSelected(state);
+            const selId = get<%= classify(name) %>Id(result);
+
+            expect(selId).toBe("PRODUCT-BBB");
+        });
+
+        it("should return undefined if selected Entity is not found", () => {
+            const result = <%= classify(name) %>Selectors.getSelected({
+                ...state,
+                <%= camelize(name) %>: {
+                    ...state.<%= camelize(name) %>,
+                    selectedId: undefined,
+                },
+            } as <%= classify(name) %>PartialState);
+
+            expect(result).toBeUndefined();
+        });
+    });
+
+    it('get<%= classify(name) %>Loaded() should return the current "loaded" status', () => {
+        const result = <%= classify(name) %>Selectors.get<%= classify(name) %>Loaded(state);
+
+        expect(result).toBe(true);
+    });
+
+    it('get<%= classify(name) %>Error() should return the current "error" state', () => {
+        const result = <%= classify(name) %>Selectors.get<%= classify(name) %>Error(state);
+
+        expect(result).toStrictEqual({ message: ERROR_MSG});
+    });
+});

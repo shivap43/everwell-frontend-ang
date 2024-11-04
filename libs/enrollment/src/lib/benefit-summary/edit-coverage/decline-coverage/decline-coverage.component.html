@@ -1,0 +1,96 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            (click)="onCancelClick()"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            {{popupHeading.replace("##Product##", data.productName )}}
+        </h2>
+
+        <div *ngIf="isCurrent && PYflag">
+            <p>{{languageStrings['primary.portal.declineCoverage.declinecontent']}}</p>
+            <ul class="decline-content" *ngIf="previewDataExists">
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist1'].replace("##firstName##",
+                    employeeFirstName).replace("##planName##", declineProductPreviewData.planName).replace("##date##",
+                    pyStartDate)}}
+                </li>
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist2'].replace("##fromDate##",
+                    declineDate).replace("##toDate##", pyExpireDate)}}
+                </li>
+            </ul>
+        </div>
+
+        <div *ngIf="isFuture && PYflag">
+            <p>{{languageStrings['primary.portal.declineCoverage.declinecontent']}}</p>
+            <ul class="decline-content" *ngIf="previewDataExists">
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist3'].replace("##firstName##",
+                    employeeFirstName).replace("##planName##", declineProductPreviewData.planName).replace("##year##",
+                    declineProductPreviewData.planYearRange)}}
+                </li>
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist4'].replace("##year##",
+                    declineProductPreviewData.planYearRange)}}
+                </li>
+            </ul>
+        </div>
+
+        <div *ngIf="isCurrent && continousFlag">
+            <p>{{languageStrings['primary.portal.declineCoverage.declinecontent']}}</p>
+            <ul class="decline-content" *ngIf="previewDataExists">
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist1'].replace("##firstName##",
+                    employeeFirstName).replace("##planName##", declineProductPreviewData.planName).replace("##date##",
+                    effectiveDate)}}
+                </li>
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist5'].replace("##date##",
+                    declineDate)}}
+                </li>
+            </ul>
+        </div>
+
+        <div *ngIf="isFuture && continousFlag">
+            <p>{{languageStrings['primary.portal.declineCoverage.declinecontent']}}</p>
+            <ul class="decline-content" *ngIf="previewDataExists">
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist6'].replace("##firstName##",
+                    employeeFirstName).replace("##planName##", declineProductPreviewData.planName).replace("##date##",
+                    effectiveDate)}}
+                </li>
+                <li>
+                    {{languageStrings['primary.portal.declineCoverage.declinecontentlist5'].replace("##date##",
+                    declineDate)}}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            class="mon-btn-link"
+            mat-button
+            (click)="onCancelClick()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button
+            mat-flat-button
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.declineCoverage.declinecoverage']"
+            (click)="onDeclineCoverage()"
+        >
+            {{languageStrings['primary.portal.declineCoverage.declinecoverage']}}
+        </button>
+    </mat-dialog-actions>
+</div>

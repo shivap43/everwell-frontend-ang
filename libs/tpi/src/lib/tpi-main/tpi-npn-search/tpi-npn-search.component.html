@@ -1,0 +1,48 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<empowered-tpi-secondary-header> {{languageStrings['primary.portal.tpiEnrollment.welcomeText']}} </empowered-tpi-secondary-header>
+<div class="tpi-content">
+    <div class="info-text">{{languageStrings['primary.portal.tpiEnrollment.provideAgentNPN']}}</div>
+    <div class="info-text">{{languageStrings['primary.portal.tpiEnrollment.emailRegistration']}}</div>
+    <div class="error-block">
+        <mon-alert alertType="danger" *ngIf="errorMessage">
+            <span> {{errorMessage}} </span>
+        </mon-alert>
+    </div>
+    <div class="agent-npn">
+        <mat-label>{{languageStrings['primary.portal.tpiEnrollment.agentNPN']}}</mat-label>
+        <mat-form-field>
+            <input [formControl]="npn" matInput [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.agentNPN']" name="npn" />
+            <mat-error *ngIf="npn.errors?.invalidNPN || npn.errors?.invalidNPNEmail || npn.errors?.required"></mat-error>
+        </mat-form-field>
+    </div>
+    <div class="agent-mail">
+        <mat-label>{{languageStrings['primary.portal.tpiEnrollment.agentEmail']}}</mat-label>
+        <mat-form-field>
+            <input
+                [formControl]="email"
+                matInput
+                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.agentEmail']"
+                name="email"
+            />
+            <mat-error *ngIf="email.errors?.invalidEmail || email.errors?.invalidNPNEmail || email.errors?.required"></mat-error>
+        </mat-form-field>
+    </div>
+</div>
+<empowered-tpi-footer class="tpi-footer">
+    <div *ngIf="!tpiLnlMode">
+        <a
+            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-flat-button
+            (click)="onExit()"
+        >
+            {{languageStrings['primary.portal.tpiEnrollment.exit']}}
+        </a>
+    </div>
+    <div>
+        <button mat-flat-button class="mon-btn-primary" (click)="onContinue()">
+            {{languageStrings['primary.portal.common.continue']}}
+        </button>
+    </div>
+</empowered-tpi-footer>

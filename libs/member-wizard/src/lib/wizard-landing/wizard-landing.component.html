@@ -1,0 +1,43 @@
+<ng-template [ngIf]="isLoading || isSpinnerLoading" [ngIfElse]="welcomeTabTemplate">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+
+<ng-template #welcomeTabTemplate>
+    <nav mat-tab-nav-bar class="enrollment-nav" *ngIf="showNav">
+        <a
+            mat-tab-link
+            *ngFor="let tab of wizardTabs; let i = index;"
+            routerLinkActive
+            [active]="activeLink == tab.link"
+        >
+            <span
+                class="icon-numeric"
+                *ngIf="activeLink !== tab.link && i > getIndexOfLink(activeLink);else iconTemplate"
+                >{{i + 1}}.
+            </span>
+
+            <ng-template #iconTemplate>
+                <mon-icon
+                    iconName="Filled-check"
+                    [iconSize]="16"
+                    class="icon-done"
+                    *ngIf="activeLink !== tab.link"
+                ></mon-icon>
+                <mon-icon
+                    *ngIf="activeLink == tab.link"
+                    iconName="circle"
+                    [iconSize]="20"
+                    class="icon-active"
+                ></mon-icon>
+            </ng-template>
+
+            {{tab.label}}
+        </a>
+        <div class="member-shopping-cart-wrapper" *ngIf="!isLoading">
+            <div class="member-shopping-cart">
+                <empowered-shopping-cart-display [planOfferings]="planOfferings"></empowered-shopping-cart-display>
+            </div>
+        </div>
+    </nav>
+    <router-outlet></router-outlet>
+</ng-template>

@@ -1,0 +1,152 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<ng-template [ngIf]="!isLoading">
+    <div class="expansion-content your-selection">
+        <div class="content-column">
+            <div *ngIf="isJuvenilePlan">
+                <span class="content-label">{{ languageStrings["primary.portal.members.dependentList.ageColumn"]}}</span>
+                <span *ngIf="planSummary?.childAge">{{planSummary?.childAge}}</span>
+                <span *ngIf="!planSummary?.childAge">{{languageStrings["primary.portal.shoppingExperience.zero"]}}</span>
+            </div>
+            <div *ngIf="planSummary?.benefitAmount">
+                <span class="content-label" language="primary.portal.shoppingExperience.benefitAmount"></span>
+                <span>{{planSummary?.benefitAmount | currency}}</span>
+            </div>
+            <div *ngIf="planSummary?.eliminationPeriod && !isJuvenilePlan">
+                <span class="content-label" language="primary.portal.shoppingExperience.eliminationPeriod"></span>
+                <span>{{planSummary.eliminationPeriod}}</span>
+            </div>
+            <div *ngIf="planSummary?.rider?.length && !isJuvenilePlan">
+                <span class="content-label" language="primary.portal.benefitsOffering.filterRiders"></span>
+                <div class="rider-list">
+                    <span *ngFor="let rider of planSummary.rider">{{rider}}</span>
+                </div>
+            </div>
+            <div *ngIf="planSummary?.taxStatus && !isJuvenilePlan">
+                <span class="content-label" language="primary.portal.shoppingExperience.taxStatus"></span>
+                <span>{{planSummary.taxStatus}}</span>
+            </div>
+            <div *ngIf="planSummary?.coveredIndividuals?.length && !isJuvenilePlan">
+                <span class="content-label" language="primary.portal.shoppingExperience.coveredIndividuals"></span>
+                <div class="rider-list">
+                    <span *ngFor="let dependent of planSummary.coveredIndividuals">{{dependent}}</span>
+                    <div *ngIf="planSummary.isCoverageLevelNameMatch">
+                        <span language="primary.portal.shoppingExperience.allEligibleDependents"></span>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="planSummary?.beneficiaries?.length && !isJuvenilePlan && planOffering?.enrollment">
+                <span class="content-label" language="primary.portal.shoppingExperience.beneficiaries"></span>
+                <div class="rider-list">
+                    <span *ngFor="let beneficiary of planSummary.beneficiaries">{{beneficiary}}</span>
+                </div>
+            </div>
+            <div *ngIf="planSummary?.coverageDate && !isJuvenilePlan">
+                <span class="content-label" language="primary.portal.shoppingExperience.coverageDate"></span>
+                <span *ngIf="planSummary.coverageEndDate"
+                    >{{ "primary.portal.planDetails.coverageStartEndDate" | replaceTag : {"#start" :planSummary.coverageDate, "#end":
+                    planSummary.coverageEndDate} }}</span
+                >
+                <span *ngIf="!planSummary.coverageEndDate">{{planSummary.coverageDate }}</span>
+            </div>
+        </div>
+        <div class="content-column align-right">
+            <div *ngIf="planSummary?.baseCost != null">
+                <span class="content-label base-adjustment-cost" language="primary.portal.shoppingExperience.baseCost"></span>
+                <span>{{planSummary.baseCost | currency}}</span>
+            </div>
+            <div *ngIf="planSummary.adjustments != null && !planFlexDollars.length">
+                <span class="content-label base-adjustment-cost" language="primary.portal.shoppingExperience.adjustments"></span>
+                <span>-{{(planSummary?.adjustments ? planSummary.adjustments : 0 ) | currency}}</span>
+            </div>
+            <div *ngFor="let flex of planFlexDollars">
+                <span class="content-label base-adjustment-cost"
+                    >{{planSummary.companyProvided?languageStrings["primary.portal.shoppingExperience.adjustments"]:languageStrings["primary.portal.expandedShoppingCart.employerContribution"]}}</span
+                >
+                <span *ngIf="this.enrollment; else cartItem">-{{planSummary.adjustments | currency}}</span>
+                <ng-template #cartItem>{{ flex.flexDollarOrIncentiveAmount | currency}}</ng-template>
+            </div>
+            <div *ngIf="planSummary?.contributions">
+                <span class="content-label base-adjustment-cost"
+                    >{{planSummary.contributionYear}} {{languageStrings[' primary.portal.benefitOffering.contribution']}}
+                    ({{planSummary.contributions | currency}})</span
+                >
+                <span>{{planSummary.totalCost| currency}}</span>
+            </div>
+            <div class="final-cost">
+                <span class="content-label"
+                    >{{planSummary.status === status.approved ? languageStrings['primary.portal.shoppingExperience.yourCost'] :
+                    languageStrings['primary.portal.applicationFlow.estimatedCost']}}</span
+                >
+                <span *ngIf="this.enrollment; else cartItem"
+                    >{{ "primary.portal.shoppingExperience.plannedSummary" | replaceTag: { "#plansummary": (planSummary.totalCost -
+                    planSummary.adjustments) | currency } }}</span
+                >
+                <ng-template #cartItem>
+                    {{ "primary.portal.shoppingExperience.plannedSummary" | replaceTag: { "#plansummary": (planSummary.totalCost + flexCost)
+                    | currency } }}
+                </ng-template>
+            </div>
+            <div>
+                <span></span>
+                <span>{{payFrequency?.name}}</span>
+            </div>
+            <div class="content-action">
+                <button mat-button type="button" (click)="editPlan()" *ngIf="displayEditButton()" class="mon-btn-primary">
+                    {{languageStrings['primary.portal.common.edit']}}
+                </button>
+                <button
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    *ngIf="planSummary?.status === status.lapsed && planSummary?.isReinstate && !displayReinstateButton"
+                    (click)="openReinstate()"
+                >
+                    {{languageStrings['primary.portal.common.reinstate']}}
+                </button>
+                <a href="javascript:void(0)" (click)="showPlanDetailsPopup()" language="primary.portal.planDetails.title"></a>
+                <div *configEnabled="'general.feature.enable.aflac.policy.cancellation'">
+                    <div *ngIf="isEndCoverage; else voidCoverage">
+                        <div *ngIf="!isTPI || (tpiEndCoverageEnable$ | async)">
+                            <div
+                                *ngIf="(!hasAdmin && enrollment.taxStatus === PRETAX) || (isTPI && !isTpiEndCoverageAllowed); else defaultEndCoverage"
+                            >
+                                <a
+                                    href="javascript:void(0);"
+                                    class="disable-link"
+                                    richTooltip="{{languageStrings['primary.portal.endCoverage.noAdminTooltip']}}"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                </a>
+                            </div>
+                            <ng-template #defaultEndCoverage>
+                                <a href="javascript:void(0)" (click)="openEndCoveragePopup()" class="end-coverage-link"
+                                    >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                </a>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <ng-template #voidCoverage>
+                        <div *ngIf="isVoidCoverage">
+                            <a
+                                class="withdraw-application"
+                                *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION"
+                                (click)="showVoidCoveragePopup()"
+                            >
+                                {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                            </a>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+        <div
+            *ngIf="planSummary.status !== status.approved && planSummary.status !== status.companyProvided && !isHsaFsa"
+            class="has-star-left"
+            language="primary.portal.shoppingExperience.mayChangeDuringEnrollment"
+        ></div>
+        <div *ngIf="isHsaFsa">
+            <p language="primary.portal.shoppingExperience.hsafsaPara"></p>
+        </div>
+    </div>
+    &nbsp;
+</ng-template>

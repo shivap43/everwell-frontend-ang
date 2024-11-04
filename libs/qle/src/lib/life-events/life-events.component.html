@@ -1,0 +1,164 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<div *ngIf="!isLoading" class="d-flex">
+    <div class="qle-main-section">
+        <div class="section-header">
+            <div *ngIf="this.p">
+                <div class="" *ngIf="isLifeEvents && !isMember">
+                    <h1 class="mon-mb-0 mon-mt-20">{{languageStrings['primary.portal.qle.lifeEvents']}}</h1>
+                    <div class="d-flex justify-content-end mon-mb-20">
+                        <button
+                            *ngIf="hasPrivilege$ | async"
+                            mat-button
+                            class="mon-btn-secondary mon-btn-secondary-sm"
+                            (click)="openQleDialog()"
+                            language="primary.portal.qle.addLifeEvent"
+                            [attr.aria-label]="languageStrings.addLifeEvent"
+                        ></button>
+                    </div>
+                </div>
+                <div class="" *ngIf="!isLifeEvents && !isMember">
+                    <h1 class="mon-my-20">{{languageStrings['primary.portal.qle.lifeEvents']}}</h1>
+                    <p>{{ "primary.portal.qle.producer.noLifeEvent" | replaceTag: { "#name": this.firstName } }}</p>
+                    <div *ngIf="hasPrivilege$ | async">
+                        <button mat-button class="mon-btn-primary btn-sm mon-mt-20" (click)="openQleDialog()">
+                            {{languageStrings['primary.portal.qle.addLifeEvent']}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!this.p && this.isLifeEvents">
+                <h1 class="mon-my-20">{{languageStrings['primary.portal.qle.lifeEvents']}}</h1>
+            </div>
+            <div *ngIf="!this.p && !this.isLifeEvents">
+                <h1 class="mon-my-20">{{languageStrings['primary.portal.qle.lifeEvents']}}</h1>
+                <p>{{languageStrings['primary.portal.qle.member.noLifeEvent']}}</p>
+            </div>
+        </div>
+        <div *ngIf="isLifeEvents" class="results-grid table-mask-wrapper">
+            <div class="">
+                <table mat-table [dataSource]="dataSource">
+                    <!-- QLE Type Column -->
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.qle.eventTypeLabel"></th>
+                        <td mat-cell *matCellDef="let element">{{element.type}}</td>
+                    </ng-container>
+
+                    <!-- Event Date Column -->
+                    <ng-container matColumnDef="eventDate">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.qle.eventDateLabel"></th>
+                        <td mat-cell *matCellDef="let element">
+                            <span *ngIf="element.endPlanRequestStatus; else eventDate"
+                                >{{element.requestedCoverageEndDate | date:'MM/dd/yy'}}</span
+                            >
+                            <ng-template #eventDate>{{element.eventDate}}</ng-template>
+                        </td>
+                    </ng-container>
+
+                    <!-- QLE Added Column -->
+                    <ng-container matColumnDef="qleAdded">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.qle.eventAdded"></th>
+                        <td mat-cell *matCellDef="let element">{{element.createDate}}</td>
+                    </ng-container>
+
+                    <!-- Documents Column -->
+                    <ng-container matColumnDef="documents">
+                        <th
+                            class="text-center"
+                            mat-header-cell
+                            *matHeaderCellDef
+                            language="primary.portal.qle.documentsLabel"
+                        ></th>
+                        <td mat-cell *matCellDef="let element" class="text-center">
+                            <ng-container *ngIf="element.documents.length>0">
+                                <mon-icon iconName="check" [iconSize]="15"></mon-icon>
+                            </ng-container>
+                        </td>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.qle.status"></th>
+                        <td mat-cell *matCellDef="let element">
+                            <mon-icon
+                                class="icon-warning"
+                                iconName="Filled-warning"
+                                *ngIf="element.isPending"
+                                [iconSize]="15"
+                            ></mon-icon
+                            ><span [language]="displayStatusValue(element.status)"></span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Manage Column -->
+                    <ng-container matColumnDef="manage">
+                        <th mat-header-cell *matHeaderCellDef language="primary.portal.qle.manage"></th>
+                        <td mat-cell *matCellDef="let element">
+                            <span *ngIf="element.isStatusInprogress" [attr.aria-label]="element.status">
+                                <button
+                                    *ngIf="hasPrivilege$ | async"
+                                    mat-icon-button
+                                    [matMenuTriggerFor]="beforeMenu"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                                >
+                                    <mon-icon iconName="ellipsis" [iconSize]="20" class="more-option icon-primary">
+                                    </mon-icon>
+                                </button>
+                                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                    <button
+                                        *ngIf="element.type!==NEW_HIRE || !this.isMember"
+                                        mat-menu-item
+                                        (click)="openPendingEnrollmentDialog(element, $event)"
+                                    >
+                                        {{languageStrings['primary.portal.qle.editLifeEvent']}}
+                                    </button>
+                                    <button
+                                        *ngIf="this.p && !isAdmin && showShopMenu && showShopButton && isShopEnabled"
+                                        mat-menu-item
+                                        (click)="openShopPopUp(element.id)"
+                                    >
+                                        {{languageStrings['primary.portal.members.membersList.shop']}}
+                                    </button>
+                                    <button
+                                        *ngIf="!this.p  && !isAdmin && showShopMenu && showShopButton && (!isTpiAccount || isShopEnabled)"
+                                        mat-menu-item
+                                        (click)="openShop(element.id)"
+                                    >
+                                        {{languageStrings['primary.portal.members.membersList.shop']}}
+                                    </button>
+                                    <button (click)="changeStatus(element.id)" mat-menu-item>
+                                        {{languageStrings['primary.portal.qle.closeEnrollmentPeriod']}}
+                                    </button>
+                                </mat-menu>
+                            </span>
+                            <a
+                                href="javascript:void(0)"
+                                class="visible-on-row-hover"
+                                *ngIf="element.isStatusViewDetails"
+                                (click)="openApproveDenialEnrollmentDialog(element, $event)"
+                                >{{languageStrings['primary.portal.qle.viewDetails']}}
+                            </a>
+                            <a
+                                href="javascript:void(0)"
+                                class="visible-on-row-hover"
+                                *ngIf="element.isStatusViewPendingEnrollments"
+                                (click)="openApproveDenialEnrollmentDialog(element, $event)"
+                                >{{languageStrings['primary.portal.qle.viewPendingEnrollments']}}
+                            </a>
+                            <a
+                                href="javascript:void(0)"
+                                class="visible-on-row-hover"
+                                *ngIf="element.isStatusViewPendingCoverage"
+                                (click)="openApproveDenyEndCoverage(element)"
+                            >
+                                {{languageStrings['primary.portal.qle.viewPendingCoverage']}}
+                            </a>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

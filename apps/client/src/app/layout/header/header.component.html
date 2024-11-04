@@ -1,0 +1,227 @@
+<header class="app-header" [ngClass]="{'member-portal' : memberHeader && !pendingEnrollments}">
+    <div id="appFocusResetElement" tabindex="-1" class="sr-only"></div>
+    <p class="skipnav">
+        <a href="javascript:void(0);" (click)='skipToMainContent("layoutwrapper")'
+            >{{languageStrings['primary.portal.common.SkipToMainContent']}}</a
+        >
+    </p>
+    <button
+        mat-icon-button
+        class="app-header-open-sidenav-btn"
+        *ngIf="mobileQuery.matches && isAuthenticated && memberHeader && !nohamburgerMenuRoutes.includes(this.currentRoute) && !pendingEnrollments"
+        (click)="sideNavMMP.open()"
+    >
+        <mat-icon svgIcon="hamburgerMenu" aria-hidden="true"></mat-icon>
+        <span class="cdk-visually-hidden">{{languageStrings["primary.portal.common.openNavigation"]}}</span>
+    </button>
+    <button
+        mat-icon-button
+        *ngIf="isAppFlow || (shopRoutes.includes(this.currentRoute) && !pendingEnrollments)"
+        class="app-header-exitShopBtn"
+        (click)="memberLogoClicked()"
+    >
+        <mon-icon
+            class="app-header-homeIcon"
+            iconName="home"
+            iconSize="18"
+            aria-hidden="true"
+            [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"
+        ></mon-icon>
+        <span class="app-header-exitShopBtn-text hidden-md">{{languageStrings["primary.portal.header.home"]}}</span>
+    </button>
+    <empowered-branding
+        *ngIf="publicHeader && !pendingEnrollments && !externalApp"
+        class="app-header-branding"
+        [logo]="logoPublic"
+        [color]="colorPublic"
+        [ngClass]="{'app-header-loginBranding': publicHeader}"
+        (logoClicked)="publicLogoClicked()"
+    >
+    </empowered-branding>
+    <empowered-branding
+        *ngIf="externalApp"
+        class="app-header-branding"
+        [logo]="logoPublic"
+        [color]="colorPublic"
+        [ngClass]="{'app-header-loginBranding': externalApp}"
+        (logoClicked)="publicLogoClicked()"
+    >
+    </empowered-branding>
+    <empowered-branding
+        *ngIf="memberHeader && !pendingEnrollments && !externalApp"
+        class="app-header-branding"
+        [logo]="logoMember"
+        [color]="colorMember"
+        [ngClass]="{'visually-hidden': !memberLogoRoutes.includes(this.currentRoute) && !mobileQuery.matches && !nohamburgerMenuRoutes.includes(this.currentRoute)}"
+        (click)="memberLogoClicked()"
+    ></empowered-branding>
+    <empowered-branding
+        *ngIf="(producerHeader || shopRoutes.includes(this.currentRoute)) && !pendingEnrollments && !externalApp"
+        class="app-header-branding"
+        [logo]="logoPublic"
+        [color]="colorPublic"
+        (click)="clickOnBranding()"
+    >
+    </empowered-branding>
+    <empowered-branding *ngIf="pendingEnrollments" class="app-header-branding" [logo]="logoPublic" [color]="colorPublic">
+    </empowered-branding>
+    <div *ngIf="isAppFlow || (isAuthenticated && !publicHeader && !pendingEnrollments && !externalApp)" class="app-header-content">
+        <div *ngIf="isAppFlow || shopRoutes.includes(this.currentRoute)" class="app-header-content-shopPage">
+            <!-- TODO: Need to import languge from DB -->
+            <span>{{(headerObject$ | async)?.title}}</span>
+        </div>
+        <empowered-header-nav
+            *ngIf="!mobileSize"
+            class="app-header-menu"
+            [ngClass]="{'visually-hidden': !producerHeader || noHeaderNevRoutes.includes(this.currentRoute)}"
+        >
+        </empowered-header-nav>
+        <a
+            mat-icon-button
+            (click)="onSupportClick()"
+            class="app-header-content-supportbtn"
+            [ngClass]="{'producer-portal': producerHeader,  'app-header-content-supportbtn-active': supportPageRoute.includes(this.currentRoute)}"
+            [attr.aria-label]="languageStrings['primary.portal.requestSupport.pageHeader']"
+            *ngIf="!adminId && (memberHeader || producerHeader || shopRoutes.includes(this.currentRoute))"
+        >
+            <mon-icon
+                iconSize="25"
+                iconName="help"
+                class="app-header-content-supportIcon"
+                [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"
+            ></mon-icon>
+            <span *ngIf="!mobileQuery.matches && !shopRoutes.includes(this.currentRoute) && this.memberHeader"
+                >{{languageStrings['primary.portal.requestSupport.pageHeader']}}</span
+            >
+        </a>
+        <ng-container *configEnabled="'general.feature.notifications.enable'">
+            <a
+                href="javascript:void(0)"
+                class="utilityNav-btn mon-btn-pulldown mon-mr-0"
+                [attr.aria-label]="languageStrings['primary.portal.header.notification']"
+                mat-button
+                *ngIf="(producerId || adminId) && producerHeader && !isWizard"
+                [ngClass]="{'user-icon' : mobileQuery.matches, 'producer-portal': producerHeader}"
+                (click)="openDrawer($event)"
+                ><sup class="notification-badge-header" *ngIf="globalNotificationCount && globalNotificationCount < 100"
+                    >{{ globalNotificationCount }}</sup
+                >
+                <sup class="notification-badge-header" *ngIf="globalNotificationCount >= 100">99+</sup>
+                <mon-icon iconSize="25" iconName="bell" [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"></mon-icon>
+            </a>
+            <a
+                href="javascript:void(0)"
+                class="utilityNav-btn mon-btn-pulldown mon-mr-0"
+                [attr.aria-label]="languageStrings['primary.portal.header.notification']"
+                mat-button
+                *ngIf="memberId && memberHeader && !mobileSize && !isWizard"
+                (click)="openNotifications()"
+                [ngClass]="{'user-icon' : mobileQuery.matches, 'producer-portal': producerHeader}"
+                ><sup class="notification-badge-header" *ngIf="accountNotificationCount && accountNotificationCount < 100"
+                    >{{ accountNotificationCount }}</sup
+                >
+                <sup class="notification-badge-header" *ngIf="accountNotificationCount >= 100">99+</sup>
+                <mon-icon iconSize="25" iconName="bell" [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"></mon-icon
+                ><span class="notification-member"
+                    ><span *ngIf="!mobileQuery.matches" language="primary.portal.notification.member.notification"></span
+                ></span>
+            </a>
+        </ng-container>
+        <div *ngIf="!isAppFlow && !shopRoutes.includes(this.currentRoute)" class="user-section">
+            <ng-container *ngIf="userService.name$ | async as name">
+                <a
+                    class="mon-btn-pulldown utilityNav-btn"
+                    [ngClass]="{'user-icon' : mobileQuery.matches, 'producer-portal': producerHeader}"
+                    mat-button
+                    [matMenuTriggerFor]="menu"
+                    aria-haspopup="true"
+                >
+                    <mon-icon
+                        class="mon-btn-pulldown-icon-right"
+                        iconName="user"
+                        iconSize="25"
+                        [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"
+                    ></mon-icon>
+                    <span *ngIf="!mobileQuery.matches" class="mon-btn-pulldown-wrapper" [ngClass]="{'not-member-portal' : !portalMMP}"
+                        >{{ name.firstName + " " + name.lastName}}
+                        <span *ngIf="portalMMP && isTestEmployee" language="primary.portal.common.test"> </span>
+                    </span>
+                    <mon-icon
+                        class="mon-btn-pulldown-indicator"
+                        iconName="Caret-down"
+                        aria-hidden="true"
+                        iconSize="14"
+                        [ngClass]="{'icon-black': memberHeader, 'icon-white': !memberHeader}"
+                    ></mon-icon>
+                </a>
+            </ng-container>
+
+            <mat-menu #menu="matMenu" xPosition="before">
+                <ng-container *ngIf="userService.portal$ | async as portal">
+                    <a
+                        mat-menu-item
+                        (click)="setBackURL()"
+                        [routerLink]="[portal, 'settings', 'change-password']"
+                        language="primary.portal.utilityNav.changePassword"
+                        [ngClass]="{'app-header-content-supportbtn-active': supportPageRoute.includes(this.currentRoute)}"
+                        *ngIf="!isAgentSelfEnrolled && ( memberHeader || shopRoutes.includes(this.currentRoute) )"
+                    ></a>
+                    <ng-container *configEnabled="'portal.member_communication_preference.enabled'">
+                        <a
+                            mat-menu-item
+                            (click)="setBackURL()"
+                            [routerLink]="[portal, 'settings', 'notificationPreferences']"
+                            language="primary.portal.utilityNav.notificationPreferences"
+                            *ngIf="portalMMP"
+                        ></a>
+                    </ng-container>
+                    <a mat-menu-item *ngIf="producerHeader" disabled language="primary.portal.header.references"></a>
+                    <a mat-menu-item (click)="setBackURL()" [routerLink]="[portal, 'settings']" *ngIf="producerHeader && profileEnabled"
+                        >{{languageStrings['primary.portal.header.profile']}}</a
+                    >
+
+                    <ng-container *hasPermission="'aflac.agent.update.refresh.own'">
+                        <a mat-menu-item (click)="refreshAflacAgent()" *ngIf="producerHeader"
+                            >{{languageStrings['primary.portal.utilityNav.refreshProducerData']}}</a
+                        >
+                    </ng-container>
+                    <a
+                        mat-menu-item
+                        (click)="setBackURL()"
+                        [routerLink]="[portal, 'settings', 'change-password']"
+                        language="primary.portal.utilityNav.changePassword"
+                        *ngIf="producerHeader"
+                    ></a>
+                    <ng-container *hasPermission="'aflac.producer.view.selfEnrollment'">
+                        <ng-container *configEnabled="'aflac.producer.selfEnrollment.enable' ">
+                            <a
+                                mat-menu-item
+                                (click)="openSelfEnrollmentPopup()"
+                                *ngIf="producerHeader"
+                                language="primary.portal.agent.selfEnrollment.link"
+                            ></a>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="areBrandingConfigEnabled$|async">
+                        <ng-container *configEnabled="'general.branding.enabled'">
+                            <ng-container *hasPermission="createBrandingPermission">
+                                <a
+                                    mat-menu-item
+                                    (click)="setBackURL()"
+                                    [routerLink]="[portal, 'settings', 'branding']"
+                                    language="primary.portal.branding.header"
+                                    *ngIf="producerHeader"
+                                ></a>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <a mat-menu-item class="logout" (click)="logout(portal)" language="primary.portal.utilityNav.logout"></a>
+                </ng-container>
+            </mat-menu>
+        </div>
+    </div>
+    <div *ngIf="pendingEnrollments" class="app-header-content-review">
+        {{reviewEnrollmentSummaryFlow? languageStrings['primary.portal.enrollment.summary.header.review.enrollments']:
+        languageStrings['primary.portal.enrollment.header']}}
+    </div>
+</header>

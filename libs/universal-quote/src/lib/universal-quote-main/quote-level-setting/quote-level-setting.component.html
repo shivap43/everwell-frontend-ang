@@ -1,0 +1,200 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<form [formGroup]="settingForm">
+    <div class="">
+        <div class="settings-header-padding">
+            <div class="settings-container">
+                <div class="settings-header">
+                    <span>{{languageStrings['primary.portal.quickQuote.settings']}}</span>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-controls" [empoweredPortalTrigger]="statePanel">
+                        <div class="settings-controls-label">
+                            <span>{{languageStrings['primary.portal.quickQuote.state']}}</span>
+                            <div class="plan-settings">
+                                <mat-label class="mat-label mat-text-settings">{{matSelectPanel.state}} </mat-label>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                        </div>
+                        <empowered-drop-down-portal
+                            #statePanel
+                            [backdropAnchor]="backdropAnchor"
+                            backdropStyle="light"
+                            portalClass="quick-quote"
+                            (shown)="settingsOpened(true,adminPreferenceQuoteSetting.STATE)"
+                            (hidden)="settingsOpened(false,adminPreferenceQuoteSetting.STATE)"
+                            ariaTitle="primary.portal.shoppingCart.quoteLevelSettings.method"
+                        >
+                            <div class="custom-radio job-class-select-block">
+                                <mat-radio-group formControlName="state">
+                                    <div class="radio-element" *ngFor="let state of allStates">
+                                        <mat-radio-button class="custom-radio-option" [value]="state.name"
+                                            >{{state.name}}
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="reset-apply-link">
+                                <div>
+                                    <button
+                                        *ngIf="settingForm.get('state').dirty"
+                                        mat-button
+                                        class="dropDown-anchorLink reset-txt-btn"
+                                        (click)="resetSetting('state')"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.reset']}}
+                                    </button>
+                                </div>
+                                <div>
+                                    <button mat-button class="dropDown-anchorLink" (click)="applySetting('state')">
+                                        {{languageStrings['primary.portal.common.apply']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </empowered-drop-down-portal>
+                    </div>
+                    <div class="settings-controls" [empoweredPortalTrigger]="channelPanel">
+                        <div class="settings-controls-label">
+                            <span>{{languageStrings['primary.portal.quickQuote.Channel']}}</span>
+                            <div class="plan-settings">
+                                <mat-label class="mat-label mat-text-settings">{{matSelectPanel.channel | titlecase}}</mat-label>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                        </div>
+                        <empowered-drop-down-portal
+                            #channelPanel
+                            [backdropAnchor]="backdropAnchor"
+                            backdropStyle="light"
+                            portalClass="quick-quote"
+                            (shown)="settingsOpened(true,adminPreferenceQuoteSetting.CHANNEL)"
+                            (hidden)="settingsOpened(false,adminPreferenceQuoteSetting.CHANNEL)"
+                            ariaTitle="primary.portal.shoppingCart.quoteLevelSettings.method"
+                        >
+                            <div class="custom-radio job-class-select-block">
+                                <mat-radio-group formControlName="channel">
+                                    <div class="radio-element" *ngFor="let channel of channels">
+                                        <mat-radio-button class="custom-radio-option" [value]="channel"
+                                            >{{channel | titlecase}}</mat-radio-button
+                                        >
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+
+                            <div class="reset-apply-link">
+                                <div>
+                                    <button
+                                        *ngIf="settingForm.get('channel').dirty"
+                                        mat-button
+                                        class="dropDown-anchorLink reset-txt-btn"
+                                        (click)="resetSetting('channel')"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.reset']}}
+                                    </button>
+                                </div>
+                                <div>
+                                    <button mat-button class="dropDown-anchorLink" (click)="applySetting('channel')">
+                                        {{languageStrings['primary.portal.common.apply']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </empowered-drop-down-portal>
+                    </div>
+                    <div class="settings-controls" [empoweredPortalTrigger]="frequencyPanel">
+                        <div class="settings-controls-label">
+                            <span>{{languageStrings['primary.portal.quickQuote.payFrequency']}}</span>
+                            <div class="plan-settings">
+                                <mat-label class="mat-label mat-text-settings">{{matSelectPanel.payFrequency}}</mat-label>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                        </div>
+                        <empowered-drop-down-portal
+                            #frequencyPanel
+                            [backdropAnchor]="backdropAnchor"
+                            backdropStyle="light"
+                            portalClass="quick-quote"
+                            (shown)="settingsOpened(true,adminPreferenceQuoteSetting.PAY_FREQUENCY)"
+                            (hidden)="settingsOpened(false,adminPreferenceQuoteSetting.PAY_FREQUENCY)"
+                            ariaTitle="primary.portal.shoppingCart.quoteLevelSettings.method"
+                        >
+                            <mat-option style="display: none"></mat-option>
+                            <div class="custom-radio select-state-options">
+                                <mat-radio-group formControlName="payFrequency">
+                                    <div class="radio-element" *ngFor="let freq of paymentFrequency">
+                                        <mat-radio-button class="custom-radio-option" [value]="freq.name">{{freq.name}}</mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="reset-apply-link">
+                                <div>
+                                    <button
+                                        *ngIf="settingForm.get('payFrequency').dirty"
+                                        mat-button
+                                        class="dropDown-anchorLink reset-txt-btn"
+                                        (click)="resetSetting('payFrequency')"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.reset']}}
+                                    </button>
+                                </div>
+                                <div>
+                                    <button mat-button class="dropDown-anchorLink" (click)="applySetting('payFrequency')">
+                                        {{languageStrings['primary.portal.common.apply']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </empowered-drop-down-portal>
+                    </div>
+                    <div class="settings-controls" [empoweredPortalTrigger]="riskClassPanel">
+                        <div class="settings-controls-label">
+                            <span>{{languageStrings['primary.portal.quickQuote.jobClass']}}</span>
+                            <div class="plan-settings">
+                                <mat-label class="mat-label mat-text-settings">{{matSelectPanel.riskClass}}</mat-label>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                        </div>
+                        <empowered-drop-down-portal
+                            #riskClassPanel
+                            [backdropAnchor]="backdropAnchor"
+                            backdropStyle="light"
+                            portalClass="quick-quote"
+                            (shown)="settingsOpened(true,adminPreferenceQuoteSetting.JOB_CLASS)"
+                            (hidden)="settingsOpened(false,adminPreferenceQuoteSetting.JOB_CLASS)"
+                        >
+                            <div class="custom-radio job-class-select-block">
+                                <mat-radio-group formControlName="riskClass">
+                                    <div class="radio-element" *ngFor="let risk of riskClasses">
+                                        <mat-radio-button class="custom-radio-option" [value]="risk.name">{{risk.name}}</mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="reset-apply-link">
+                                <div>
+                                    <button
+                                        *ngIf="settingForm.get('riskClass').dirty"
+                                        mat-button
+                                        class="dropDown-anchorLink reset-txt-btn"
+                                        (click)="resetSetting('riskClass')"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.reset']}}
+                                    </button>
+                                </div>
+                                <div>
+                                    <button mat-button class="dropDown-anchorLink" (click)="applySetting('riskClass')">
+                                        {{languageStrings['primary.portal.common.apply']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </empowered-drop-down-portal>
+                    </div>
+                    <div class="settings-controls">
+                        <div #expandedViewOrigin class="settings-controls-label" (click)="openMoreSetting()">
+                            <span class="mat-text-settings"> {{languageStrings['primary.portal.quickQuote.more']}} </span>
+                            <span class="dropdown-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-footer">
+                    <button class="mon-btn-link" (click)="resetButton()">{{languageStrings['primary.portal.quickQuote.reset']}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,37 @@
+@import "shared";
+.producer-info-wrapper {
+    ::ng-deep .mat-dialog-content {
+        padding: map-get($spacers, 0);
+        .mat-dialog-title {
+            padding: map-get($spacers, 50) map-get($spacers, 50) map-get($spacers, 0);
+        }
+    }
+    .infomodal-content {
+        padding: map-get($spacers, 0) map-get($spacers, 50) map-get($spacers, 50);
+        .flex-cont {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: map-get($spacers, 15);
+            .left-label {
+                min-width: convert-unit(200px, "rem");
+                .label-txt {
+                    margin-bottom: 0;
+                    line-height: normal;
+                }
+            }
+            .leftlabel-initstate {
+                min-width: convert-unit(200px, "rem");
+                padding-left: map-get($spacers, 15);
+                .label-txt {
+                    margin-bottom: 0;
+                    line-height: normal;
+                }
+            }
+            .right-data {
+                .state-dropdown {
+                    width: convert-unit(200px, "rem");
+                }
+            }
+        }
+    }
+}

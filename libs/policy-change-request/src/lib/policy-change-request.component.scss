@@ -1,0 +1,143 @@
+@import "shared";
+
+:host {
+    .layout-header-2column {
+        height: calc(100vh - 100px);
+
+        .header {
+            padding: convert-unit(25px, "rem") convert-unit(50px, "rem");
+            .header-content {
+                display: flex;
+                flex: 1;
+                justify-content: space-between;
+                margin: map-get($spacers, 0);
+                align-items: center;
+                .mat-dialog-title {
+                    margin: map-get($spacers, 0);
+                }
+            }
+        }
+
+        .columns {
+            overflow: hidden;
+
+            .sidenav-area {
+                overflow-y: auto;
+                min-width: convert-unit(240px, "rem");
+                max-width: convert-unit(240px, "rem");
+            }
+
+            .content-area {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+        }
+    }
+}
+
+:host ::ng-deep {
+    .pcr-fileupload {
+        margin: convert-unit(10px, "rem") 0;
+        .file-list-wrapper,
+        .mat-hint-desc {
+            width: convert-unit(600px, "rem");
+            @include media-max("l") {
+                max-width: convert-unit(450px, "rem");
+            }
+        }
+
+        .mon-btn-upload {
+            @include media-max("l") {
+                max-width: convert-unit(400px, "rem");
+            }
+        }
+    }
+}
+
+:host ::ng-deep {
+    .pcrcheckbox {
+        .mat-checkbox-frame {
+            border-color: get("color.info.danger.500");
+        }
+    }
+}
+
+:host ::ng-deep {
+    .pcralert-section {
+        margin: convert-unit(30px, "rem");
+        align-items: flex-start;
+        &-danger {
+            margin: convert-unit(10px, "rem") 0;
+        }
+    }
+}
+
+:host ::ng-deep {
+    .pc-request {
+        .flex-form-wrapper {
+            .flex-item {
+                margin-right: convert-unit(10px, "rem") !important;
+            }
+        }
+
+        .dialog-footer {
+            padding: convert-unit(25px, "rem") convert-unit(30px, "rem") convert-unit(25px, "rem") convert-unit(22px, "rem");
+        }
+
+        .mat-form-field {
+            @include media-max("l") {
+                width: convert-unit(150px, "rem");
+            }
+        }
+
+        .mon-date-field {
+            @include media-max("l") {
+                width: convert-unit(150px, "rem");
+            }
+        }
+
+        .change-address {
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(105px, "rem");
+                }
+            }
+        }
+        .change-name {
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(78px, "rem");
+                }
+            }
+        }
+        .payroll {
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(108px, "rem");
+                }
+            }
+        }
+        .dependent {
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(80px, "rem");
+                }
+            }
+        }
+
+        .beneficiary {
+            .mat-form-field {
+                @include media-max("l") {
+                    width: convert-unit(90px, "rem");
+                }
+            }
+
+            .mon-date-field {
+                @include media-max("l") {
+                    width: convert-unit(150px, "rem");
+                }
+            }
+        }
+    }
+}

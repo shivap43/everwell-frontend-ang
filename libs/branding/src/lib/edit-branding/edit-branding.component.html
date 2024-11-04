@@ -1,0 +1,56 @@
+<div class="content">
+    <mon-alert alertType="danger" *ngIf="errorMessage$ | async as errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <mon-alert class="pending-upload-alert" alertType="info" *ngIf="isPending$ | async">
+        <span language="primary.portal.branding.upload_pending"></span>
+    </mon-alert>
+
+    <h1 language="primary.portal.branding.header"></h1>
+
+    <hr />
+
+    <empowered-branding-color-form
+        [currentBranding$]="updatedBranding$"
+        [groupName$]="groupName$"
+        [domainType$]="brandingDomainType$"
+        (colorChange)="onColorChange($event)"
+    >
+    </empowered-branding-color-form>
+
+    <hr />
+    <empowered-branding-logo-form
+        [currentBranding$]="updatedBranding$"
+        [domainType$]="brandingDomainType$"
+        (logoChange)="onLogoChange($event)"
+        [errorMsg$]="errorMessage$"
+    >
+    </empowered-branding-logo-form>
+
+    <ng-container *ngIf="hasDeletePermission$ | async">
+        <ng-container *ngIf="hasCustomBranding$ | async">
+            <hr class="bottom-rule" />
+
+            <h3 language="primary.portal.branding.removeHeader"></h3>
+            <p language="primary.portal.branding.removeContent"></p>
+            <a class="bottom-rule" language="primary.portal.branding.removeAction" (click)="removeBranding()"></a>
+        </ng-container>
+    </ng-container>
+</div>
+<div>
+    <button
+        [ngClass]="{'mon-btn-success': (currentModelSaved$ | async), 'mon-btn-primary': (canSaveBranding$ | async) !== true}"
+        mat-raised-button
+        (click)="submitBranding()"
+        [disabled]="(canSaveBranding$ | async) && (currentModelSaved$ | async) !== true"
+        *ngIf="hasCreatePermission$ | async"
+    >
+        <ng-container *ngIf="currentModelSaved$ | async as currentSaved; else pendingSubmit">
+            <mon-icon iconName="check-circle" [iconSize]="20" class="icon-white mat-icon"> </mon-icon>
+            <span language="primary.portal.branding.submit_success"></span>
+        </ng-container>
+        <ng-template #pendingSubmit>
+            <span language="primary.portal.branding.submit"></span>
+        </ng-template>
+    </button>
+</div>

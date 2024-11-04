@@ -1,0 +1,315 @@
+<empowered-sheet>
+    <empowered-sheet-header>
+        <mat-label class="plan-info-sub-heading">
+            {{injectedData.planChoiceDetail.plan.name}} / {{injectedData.planYearDetail.name}}
+        </mat-label>
+        {{languageStrings["primary.portal.aflacGroup.reviewPricesEligibility"]}}
+    </empowered-sheet-header>
+    <empowered-sheet-footer>
+        <button mat-button class="mon-btn-primary" (click)="onClose()">
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </empowered-sheet-footer>
+    <div class="content">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+        <mon-alert *ngIf="errorMessage" alertType="danger">
+            {{errorMessage}}
+        </mon-alert>
+        <mat-accordion class="accordion-default">
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                    <mon-icon iconName="down" class="accordion-indicator" iconSize="10"></mon-icon>
+                    <mat-panel-title>
+                        {{languageStrings["primary.portal.aflacGroup.allEmployees"]}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div>
+                    <div>
+                        <ng-container *ngIf="agPricingDetails?.riders?.length">
+                            <p>{{languageStrings["primary.portal.aflacGroup.ridersIncludedInCoverage"]}}</p>
+                            <ul>
+                                <li *ngFor="let riderPlan of agPricingDetails?.riders">{{riderPlan.planName}}</li>
+                            </ul>
+                        </ng-container>
+                        <ng-container *ngIf="templateVar===agPricingTemplates?.COVERAGE_LEVEL">
+                            <table mat-table [dataSource]="pricingTableData">
+                                <!-- coverageLevel Column -->
+                                <ng-container matColumnDef="coverageLevel">
+                                    <th mat-header-cell *matHeaderCellDef id="coverageLevel">
+                                        {{languageStrings["primary.portal.tpiEnrollment.coverageLevel"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.coverageLevelName}}
+                                    </td>
+                                </ng-container>
+
+                                <!-- Annual premium amount ($) Column -->
+                                <ng-container matColumnDef="annualPrice">
+                                    <th mat-header-cell *matHeaderCellDef id="annualPrice">
+                                        {{languageStrings["primary.portal.aflacGroup.annualPriceAmount"]}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.annualPrice}}
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="agPriceTemplateColumns?.COVERAGE_LEVEL"></tr>
+                                <tr mat-row *matRowDef="let row; columns: agPriceTemplateColumns?.COVERAGE_LEVEL;"></tr>
+                            </table>
+                        </ng-container>
+                        <ng-container *ngIf="templateVar===agPricingTemplates?.TOBACCO_INDIVIDUAL_AGE">
+                            <form [formGroup]="aflacGroupFilterDataForm">
+                                <div class="flex-form-wrapper">
+                                    <div class="d-flex">
+                                        <div class="flex-item">
+                                            <mat-label class="mat-label">
+                                                {{languageStrings["primary.portal.aflacGroup.offering.lblMember"]}}
+                                            </mat-label>
+                                            <mat-form-field>
+                                                <mat-select
+                                                    formControlName="memberType"
+                                                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                    disableOptionCentering="true"
+                                                    (selectionChange)="onMemberFilterChanged($event)"
+                                                >
+                                                    <mat-option
+                                                        *ngFor="let filterData of memberTypesFilterData"
+                                                        [value]="filterData?.value"
+                                                    >
+                                                        {{filterData?.viewValue}}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex-item">
+                                            <mat-label class="mat-label">
+                                                {{languageStrings["primary.portal.editCoverage.tobaccoStatus"]}}
+                                            </mat-label>
+                                            <mat-form-field>
+                                                <mat-select
+                                                    formControlName="tobaccoStatus"
+                                                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                    disableOptionCentering="true"
+                                                    [disabled]="tobaccoStatusDisable"
+                                                >
+                                                    <mat-option
+                                                        *ngFor="let filterData of tobaccoStatusFilterData"
+                                                        [value]="filterData?.value"
+                                                        >{{filterData?.viewValue}}</mat-option
+                                                    >
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex-item">
+                                            <mat-label class="mat-label">
+                                                {{languageStrings["primary.portal.shopQuote.label.age"]}}
+                                            </mat-label>
+                                            <div class="age-wrapper">
+                                                <mat-form-field>
+                                                    <mat-select
+                                                        formControlName="age"
+                                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                        disableOptionCentering="true"
+                                                    >
+                                                        <mat-option
+                                                            *ngFor="let filterData of ageFilterData"
+                                                            [value]="filterData"
+                                                        >
+                                                            {{filterData}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                                <button
+                                                    #submit
+                                                    mat-flat-button
+                                                    class="mon-btn-search mon-btn-primary"
+                                                    color="primary"
+                                                    type="button"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                                    (click)="onSearch()"
+                                                >
+                                                    <mon-icon
+                                                        class="mon-icon-search"
+                                                        iconSize="25"
+                                                        iconName="search"
+                                                    ></mon-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a
+                                    href="javascript:void(0)"
+                                    *ngIf="pricingTableData?.length"
+                                    (click)="clearSelections()"
+                                >
+                                    {{languageStrings['primary.portal.aflacGroup.clearSelections']}}
+                                </a>
+                                <mon-alert *ngIf="noFilterDataError" alertType="danger">
+                                    {{noFilterDataError}}
+                                </mon-alert>
+                                <table
+                                    class="tobacco-table"
+                                    *ngIf="pricingTableData?.length"
+                                    mat-table
+                                    [dataSource]="pricingTableData"
+                                >
+                                    <!-- coverageLevel Column -->
+                                    <ng-container matColumnDef="memberType">
+                                        <th mat-header-cell *matHeaderCellDef id="memberType">
+                                            {{languageStrings['primary.portal.aflacGroup.offering.lblMember']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element; let rowIndex = index">
+                                            <ng-container *ngIf="rowIndex<1">
+                                                {{element.memberType}}
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="tobaccoStatus">
+                                        <th mat-header-cell *matHeaderCellDef id="tobaccoStatus">
+                                            {{languageStrings['primary.portal.editCoverage.tobaccoStatus']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element; let rowIndex = index">
+                                            <ng-container *ngIf="rowIndex<1">
+                                                {{element.tobaccoStatus}}
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="age">
+                                        <th mat-header-cell *matHeaderCellDef id="age">
+                                            {{languageStrings['primary.portal.shopQuote.label.age']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element; let rowIndex = index">
+                                            <ng-container *ngIf="rowIndex<1">
+                                                {{element.age}}
+                                            </ng-container>
+                                        </td>
+                                    </ng-container>
+                                    <!-- Annual premium amount ($) Column -->
+                                    <ng-container matColumnDef="benefitAmount">
+                                        <th mat-header-cell *matHeaderCellDef id="benefitAmount">
+                                            {{languageStrings['primary.portal.agProductPrice.benefitDollar']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            {{ element.benefitAmount }}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="annualPrice">
+                                        <th mat-header-cell *matHeaderCellDef id="annualPrice">
+                                            {{languageStrings['primary.portal.agProductPrice.annualPremiumAmount']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            {{ element.annualPrice }}
+                                        </td>
+                                    </ng-container>
+                                    <tr
+                                        mat-header-row
+                                        *matHeaderRowDef="agPriceTemplateColumns?.TOBACCO_INDIVIDUAL_AGE"
+                                    ></tr>
+                                    <tr
+                                        mat-row
+                                        *matRowDef="let row; columns: agPriceTemplateColumns?.TOBACCO_INDIVIDUAL_AGE;"
+                                    ></tr>
+                                </table>
+                            </form>
+                        </ng-container>
+                        <ng-container *ngIf="templateVar===agPricingTemplates?.TOBACCO_AGE_RANGE">
+                            <table mat-table [dataSource]="pricingTableData">
+                                <!-- coverageLevel Column -->
+                                <ng-container matColumnDef="tobaccoStatus">
+                                    <th mat-header-cell *matHeaderCellDef id="tobaccoStatus">
+                                        {{languageStrings['primary.portal.editCoverage.tobaccoStatus']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element; let rowIndex = index">
+                                        <ng-container>
+                                            {{element.tobaccoStatus}}
+                                        </ng-container>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="age">
+                                    <th mat-header-cell *matHeaderCellDef id="age">
+                                        {{languageStrings['primary.portal.shopQuote.label.age']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.minAge}} - {{element.maxAge}}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="benefitAmount">
+                                    <th mat-header-cell *matHeaderCellDef id="benefitAmount">
+                                        {{languageStrings['primary.portal.agProductPrice.benefitDollar']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.benefitAmount }}
+                                    </td>
+                                </ng-container>
+                                <!-- Annual premium amount ($) Column -->
+                                <ng-container matColumnDef="employeePremium">
+                                    <th mat-header-cell *matHeaderCellDef id="employeePremium">
+                                        {{languageStrings['primary.portal.agProductPrice.annualPriceEmp']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.employeePremium }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="spousePremium">
+                                    <th mat-header-cell *matHeaderCellDef id="spousePremium">
+                                        {{languageStrings['primary.portal.agProductPrice.spousePremium']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.spousePremium }}
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="agPriceTemplateColumns?.TOBACCO_AGE_RANGE"></tr>
+                                <tr
+                                    mat-row
+                                    *matRowDef="let row; columns: agPriceTemplateColumns?.TOBACCO_AGE_RANGE;"
+                                ></tr>
+                            </table>
+                        </ng-container>
+                        <ng-container *ngIf="templateVar===agPricingTemplates?.SALARY_RANGE">
+                            <table mat-table [dataSource]="pricingTableData">
+                                <!-- coverageLevel Column -->
+                                <ng-container matColumnDef="age">
+                                    <th mat-header-cell *matHeaderCellDef id="age">
+                                        {{languageStrings['primary.portal.shopQuote.label.age']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <ng-container *ngIf="element.minAge && element.maxAge">
+                                            {{element.minAge}} - {{element.maxAge}}
+                                        </ng-container>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="minEligibleSalary">
+                                    <th mat-header-cell *matHeaderCellDef id="minEligibleSalary">
+                                        {{languageStrings['primary.portal.agProductPrice.minEligibleSalary']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.minEligibleSalary}}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="benefitAmount">
+                                    <th mat-header-cell *matHeaderCellDef id="benefitAmount">
+                                        {{languageStrings['primary.portal.agProductPrice.benefitDollar']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.benefitAmount}}
+                                    </td>
+                                </ng-container>
+                                <!-- Annual premium amount ($) Column -->
+                                <ng-container matColumnDef="annualPrice">
+                                    <th mat-header-cell *matHeaderCellDef id="annualPrice">
+                                        {{languageStrings['primary.portal.agProductPrice.annualPriceEmp']}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{ element.annualPrice }}
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="agPriceTemplateColumns?.SALARY_RANGE"></tr>
+                                <tr mat-row *matRowDef="let row; columns: agPriceTemplateColumns?.SALARY_RANGE;"></tr>
+                            </table>
+                        </ng-container>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</empowered-sheet>

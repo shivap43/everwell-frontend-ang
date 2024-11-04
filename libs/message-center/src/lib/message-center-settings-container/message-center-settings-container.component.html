@@ -1,0 +1,21 @@
+<div>
+  <h1>
+    <mon-icon iconName="email" iconSize="35"></mon-icon>
+    <span [language]="MessageCenterLanguage.SETTINGS_CONTAINER_HEADER"></span>
+  </h1>
+
+  <mat-tab-group [animationDuration]="animationDuration"
+      (selectedTabChange)="onTabChange($event)"
+      [selectedIndex]="selectedTabIndex$ | async">
+    <mat-tab [label]="tabCategories"></mat-tab>
+    <mat-tab [label]="tabAdmins"></mat-tab>
+  </mat-tab-group>
+
+  <div class="settings-body" [ngStyle]="{'display': categoryDisplayClass$ | async}">
+    <empowered-category-settings-container></empowered-category-settings-container>
+  </div>
+
+  <div class="settings-body" [ngStyle]="{'display': adminDisplayClass$ | async}">
+    <empowered-admin-settings-container></empowered-admin-settings-container>
+  </div>
+</div>

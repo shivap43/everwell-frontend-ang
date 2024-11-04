@@ -1,0 +1,39 @@
+<form [formGroup]="moreFilterForm">
+    <div class="product-filter-wrapper" *ngIf="forMobileDevices || forMediumDevices">
+        <div class="filter-options">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h3 class="mon-mt-0">{{languageStrings['primary.portal.common.filters']}}</h3>
+                </div>
+            </div>
+
+            <div>
+                <h4>{{languageStrings['primary.portal.assignAdmin.moreFilter.status']}}</h4>
+                <div>
+                    <div formArrayName="statusFilter" class="status">
+                        <mat-checkbox
+                            *ngFor="let status of statusFilterData; let i=index"
+                            [formControlName]="i"
+                            [value]="status"
+                        >
+                            {{status}}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+            <div class="mon-clear">
+                <div>
+                    <a href="javascript:void(0)" language="primary.portal.common.clear" (click)="resetMoreFilter()"></a>
+                </div>
+                <div>
+                    <a
+                        href="javascript:void(0)"
+                        class="mon-apply"
+                        (click)="moreFilterApply()"
+                        language="primary.portal.common.apply"
+                    ></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,163 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick('cancel')"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="priceCategoryForm" class="review-categories">
+        <mat-dialog-content class="mon-p-0">
+            <div class="flex-form-wrapper">
+                <div class="review-heading">
+                    <h1 mat-dialog-title>
+                        {{title}}
+                    </h1>
+                    <p>
+                        {{subtitle}}
+                    </p>
+                </div>
+                <div *ngIf="actionStatus == 'update'" class="review-categories-content">
+                    <div class="review-row">
+                        <div class="flex-item w-300">
+                            <mat-label class="mat-label">
+                                {{languageStrings['primary.portal.pricingPopup.previouslyPriced']}}
+                            </mat-label>
+                        </div>
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label">
+                                {{languageStrings['primary.portal.pricingPopup.newCategories']}}
+                            </mat-label>
+                        </div>
+                    </div>
+                    <div class="review-row" *ngFor="let newCombination of newCombinations; let i = index">
+                        <div class="flex-item w-300">
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="prevCombination{{i}}"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="updateCombinations(newCombination, i)"
+                                >
+                                    <mat-option
+                                        *ngFor="let priviousCombination of priviousCombinations; let optIndex = index"
+                                        [value]="priviousCombination.id"
+                                        >{{optIndex + 1}}. {{priviousCombination.name}}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="priceCategoryForm.get('prevCombination'+ i).hasError('required')"
+                                    language="secondary.portal.members.selectionRequired"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label">{{newCombination.name}}</mat-label>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="actionStatus == 'removed'" class="review-categories-content">
+                    <div class="review-row">
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.pricingPopup.newCategories']}}</mat-label
+                            >
+                        </div>
+                        <div class="flex-item w-300">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.pricingPopup.copyPrices']}}</mat-label
+                            >
+                        </div>
+                    </div>
+                    <div class="review-row" *ngFor="let newCombination of newCombinations; let i = index">
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label">{{newCombination.name}}</mat-label>
+                        </div>
+                        <div class="flex-item w-300">
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="prevCombination{{i}}"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="updateCombinations(newCombination, i)"
+                                >
+                                    <mat-option
+                                        *ngFor="let priviousCombination of priviousCombinations; let optIndex = index"
+                                        [value]="priviousCombination.id"
+                                        >{{optIndex + 1}}. {{priviousCombination.name}}</mat-option
+                                    >
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="actionStatus === 'empty'" class="review-categories-content">
+                    <div class="review-row">
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.pricingPopup.newCategories']}}</mat-label
+                            >
+                        </div>
+                        <div class="flex-item w-300">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.pricingPopup.copyPrices']}}</mat-label
+                            >
+                        </div>
+                    </div>
+                    <div class="review-row" *ngFor="let newCombination of newCombinations; let i = index">
+                        <div class="w-300 align-self-center">
+                            <mat-label class="mat-label">{{newCombination.name}}</mat-label>
+                        </div>
+                        <div class="flex-item w-300">
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="prevCombination{{i}}"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="updateCombinations(newCombination, i)"
+                                >
+                                    <mat-option
+                                        *ngFor="let priviousCombination of priviousCombinations"
+                                        [value]="priviousCombination.id"
+                                        >{{priviousCombination.name}}</mat-option
+                                    >
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <div>
+                <a
+                    href="javascript:void(0)"
+                    (click)="onCancelClick('cancel')"
+                    class="mon-btn-link"
+                    [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                    language="primary.portal.common.cancel"
+                    >{{languageStrings['primary.portal.common.cancel']}}</a
+                >
+            </div>
+            <div>
+                <button
+                    (click)="onCancelClick('undo')"
+                    mat-flat-button
+                    class="mon-btn-secondary mon-mr-20"
+                    [attr.aria-label]="languageStrings['primary.portal.pricingPopup.undoChanges']"
+                >
+                    {{languageStrings['primary.portal.pricingPopup.undoChanges']}}
+                </button>
+                <button
+                    (click)="onSubmit('update')"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    [attr.aria-label]="languageStrings['primary.portal.pricingPopup.saveChanges']"
+                >
+                    {{languageStrings['primary.portal.pricingPopup.saveChanges']}}
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</div>

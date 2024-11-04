@@ -1,0 +1,36 @@
+<div class="mon-px-20">
+    <h2>
+        {{languageStrings["primary.portal.maintenanceBenefitsOffering.planYearQuasi.managePlans"].replace("#productName",data.productInformation.productName)}}
+    </h2>
+    <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.planYearQuasi.updatesToPlanYear']}}</p>
+    <mat-radio-group aria-label="Select an option" (change)="updateSelection($event)" [value]="existingChoice">
+        <div *ngFor="let py of planYears">
+            <mat-radio-button [value]="py.id" class="mon-mb-10">
+                {{py.name}}
+            </mat-radio-button>
+        </div>
+        <div *ngIf="!isActivePlanYear">
+            <mat-radio-button value="current_plan" class="mon-mb-10">
+                {{data.productInformation.plans[0].planYear.name}}
+            </mat-radio-button>
+        </div>
+        <div>
+            <mat-radio-button value="new_plan" class="mon-mb-10">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.planYearQuasi.newPlanYear']}}
+            </mat-radio-button>
+        </div>
+    </mat-radio-group>
+</div>
+<div class="dialog-footer justify-content-end">
+    <button
+        class="mon-btn-primary"
+        type="submit"
+        mat-flat-button
+        (click)="onNext()"
+        [disabled]="isSubmitted"
+        [attr.aria-label]="languageStrings['primary.portal.common.next']"
+    >
+        <span> {{languageStrings['primary.portal.common.next']}}</span>
+        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+    </button>
+</div>

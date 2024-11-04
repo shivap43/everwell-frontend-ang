@@ -1,0 +1,113 @@
+@import "shared";
+
+:host ::ng-deep .vertical-tab.mat-tab-group {
+    .mat-tab-label-container {
+        .mat-tab-label {
+            .mat-tab-label-content {
+                .products-nav {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                }
+            }
+            min-height: convert-unit(45px, "rem") !important;
+            span {
+                width: convert-unit(145px, "rem") !important;
+            }
+
+            .mon-icon {
+                margin: 0;
+                height: convert-unit(16px, "rem");
+            }
+        }
+        .mat-tab-label-active {
+            border-bottom: none !important;
+
+            .plan-in-cart {
+                .mat-icon {
+                    &.mat-primary {
+                        .cls-1 {
+                            fill: get("color.white");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.eb-products-tab {
+        .mat-tab-label-container {
+            .mat-tab-label {
+                height: auto !important;
+                &:hover {
+                    background-color: get("color.gray.200") !important;
+                    border-right: convert-unit(1px, "rem") solid get("color.gray.600");
+                    .mat-tab-label-content {
+                        color: get("color.black") !important;
+                    }
+                    .icon-decline,
+                    .mat-icon {
+                        fill: get("color.info.danger.500") !important;
+                    }
+
+                    .icon-primary {
+                        .mat-icon {
+                            &.mat-primary {
+                                .cls-1 {
+                                    fill: get("color.primary.500");
+                                }
+                            }
+                        }
+                    }
+
+                    .icon-success {
+                        .mat-icon {
+                            &.mat-primary {
+                                .cls-1 {
+                                    fill: get("color.info.success");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .mat-tab-label-active:hover {
+                background-color: get("color.primary.500") !important;
+                border-right: 0;
+
+                .mat-tab-label-content {
+                    color: get("color.white") !important;
+                }
+
+                .icon-decline,
+                .mat-icon {
+                    fill: get("color.white") !important;
+                }
+
+                .icon-primary {
+                    .mat-icon {
+                        &.mat-primary {
+                            .cls-1 {
+                                fill: get("color.white");
+                            }
+                        }
+                    }
+                }
+                .icon-success {
+                    .mat-icon {
+                        &.mat-primary {
+                            .cls-1 {
+                                fill: get("color.white");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .icon-decline {
+        display: flex;
+        margin: map-get($spacers, 0) map-get($spacers, 5);
+    }
+}

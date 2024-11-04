@@ -1,0 +1,101 @@
+@import "shared";
+
+.expansion-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.content-column {
+    width: 60%;
+}
+.align-right {
+    width: 30%;
+    margin-left: 10%;
+    @include media-max("l") {
+        margin-left: 6%;
+    }
+}
+.content-column {
+    > div {
+        display: flex;
+        .rider-list {
+            display: flex;
+            flex-direction: column;
+            font-size: convert-unit(16px, "rem");
+        }
+        > span {
+            text-align: left;
+            padding-bottom: convert-unit(8px, "rem");
+            font-size: convert-unit(16px, "rem");
+        }
+        > span.content-label {
+            @include fontFace("primary.bold");
+            min-width: convert-unit(142px, "rem");
+            max-width: convert-unit(142px, "rem");
+            text-align: left;
+            font-size: convert-unit(16px, "rem");
+            margin-right: 20px;
+            &.base-adjustment-cost {
+                @include fontFace("primary.regular");
+            }
+        }
+    }
+    .content-action {
+        flex-direction: column;
+        align-items: flex-end;
+        button {
+            margin-top: convert-unit(20px, "rem");
+            width: convert-unit(125px, "rem");
+        }
+        a {
+            margin-top: convert-unit(20px, "rem");
+            width: auto;
+            font-size: convert-unit(16px, "rem");
+        }
+        .end-coverage-link,
+        .withdraw-application {
+            color: get("color.info.danger.500");
+            margin-top: map-get($spacers, 5);
+        }
+        .disable-link {
+            color: get("color.gray.600");
+            margin-top: map-get($spacers, 5);
+        }
+    }
+}
+.content-column.align-right {
+    > div {
+        justify-content: space-between;
+        > span {
+            text-align: right;
+        }
+        > span:first-child {
+            text-align: left;
+        }
+    }
+}
+.final-cost {
+    border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+    padding-top: convert-unit(10px, "rem");
+    margin-top: convert-unit(10px, "rem");
+    font-family: "Roboto-Bold", sans-serif;
+}
+.has-star-right:after {
+    content: "*";
+}
+.has-star-left:before {
+    content: "*";
+}
+
+.icon-warning {
+    ::ng-deep.mat-icon.mat-primary {
+        color: get("color.info.warn");
+        .cls-1 {
+            fill: get("color.info.warn");
+        }
+    }
+}
+@include media-min("l") {
+    .your-selection {
+        margin: map-get($spacers, 0) convert-unit(-24px, "rem") convert-unit(-16px, "rem") convert-unit(55px, "rem");
+    }
+}

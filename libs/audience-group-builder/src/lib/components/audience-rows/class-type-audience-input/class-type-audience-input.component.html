@@ -1,0 +1,12 @@
+<form [formGroup]="classTypeAudienceForm">
+    <empowered-chip-select
+        [chipOptions$]="allClassNameChips$"
+        (chipChange)="monitorChipChange($event)"
+        [valuesChipControl]="classTypeValueChipSelect"
+        [changeStrategy]="submitEvent$"
+    >
+    </empowered-chip-select>
+    <mat-error *ngIf="(validOnSubmit$ | async) === false"
+        ><span language="primary.portal.common.selectionRequired"></span
+    ></mat-error>
+</form>

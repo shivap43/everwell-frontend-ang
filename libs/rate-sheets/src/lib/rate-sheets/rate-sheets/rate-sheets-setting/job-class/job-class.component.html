@@ -1,0 +1,9 @@
+<form [formGroup]="form">
+    <ng-container *ngIf="jobClasses$ | async as jobClasses">
+        <mat-radio-group class="plan-radio-group" formControlName="selectedJobClass">
+            <mat-radio-button class="plan-radio-button" *ngFor="let jobClass of jobClasses" [value]="jobClass.name">
+                {{jobClass.name}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </ng-container>
+</form>

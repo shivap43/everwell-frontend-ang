@@ -1,0 +1,34 @@
+@import "shared";
+
+.employees-link {
+    display: none;
+    @include media-max("l") {
+        display: block;
+        margin: convert-unit(16px, "rem") 0 0 convert-unit(32px, "rem");
+    }
+}
+.enrollment-main-section {
+    flex: 1 1 auto;
+    padding: 0 convert-unit(30px, "rem");
+
+    .results-grid {
+        .mat-column-manage {
+            text-align: left;
+        }
+    }
+}
+
+.mat-table {
+    .mat-icon-button {
+        height: convert-unit(46px, "rem");
+        .more-option {
+            display: inline-flex;
+            margin: 0;
+        }
+        &.mat-icon-button[aria-expanded="true"] {
+            .more-option {
+                opacity: 1;
+            }
+        }
+    }
+}

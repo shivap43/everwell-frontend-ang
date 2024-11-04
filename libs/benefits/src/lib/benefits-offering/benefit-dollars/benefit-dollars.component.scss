@@ -1,0 +1,59 @@
+@import "shared";
+:host {
+    .review-setting-title {
+        margin: map-get($spacers, 0);
+    }
+}
+
+.benefit-dollar {
+    padding: map-get($spacers, 20) map-get($spacers, 0);
+    .description {
+        padding: map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 30);
+        .no-benefit {
+            margin-right: map-get($spacers, 5);
+        }
+    }
+
+    ::ng-deep {
+        .mat-expansion-panel {
+            border: none;
+            margin-bottom: map-get($spacers, 20);
+            .mat-expansion-panel-header {
+                border: none;
+                height: auto !important;
+                padding: map-get($spacers, 15) map-get($spacers, 30);
+                min-height: map-get($spacers, 50);
+                h4 {
+                    margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 5) !important;
+                    font-size: convert-unit(18px, "rem");
+                    color: get("color.black");
+                }
+                p {
+                    color: get("color.gray.700");
+                }
+                .text-danger {
+                    color: get("color.info.danger.500");
+                    opacity: 0;
+                    margin-right: map-get($spacers, 20);
+                }
+                &:hover .text-danger {
+                    opacity: 1;
+                }
+
+                .mat-expansion-panel-header-title {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-grow: 1 !important;
+                    div {
+                        align-items: inherit !important;
+                        margin: map-get($spacers, 0) !important;
+
+                        .mon-icon {
+                            margin: map-get($spacers, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

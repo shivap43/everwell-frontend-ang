@@ -1,0 +1,124 @@
+@import "shared";
+
+.shopping-experience {
+    padding: convert-unit(30px, "rem");
+}
+
+.tpi-exit {
+    display: block;
+}
+
+.page-title {
+    margin: 0 0 convert-unit(15px, "rem");
+    color: get("color.black");
+}
+
+.page-description {
+    color: get("color.gray.700");
+}
+
+.button-bar {
+    text-align: right;
+}
+
+.member-shopping-cart {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.product-dropdown {
+    width: convert-unit(20px, "rem");
+    margin-bottom: map-get($spacers, 0);
+
+    ::ng-deep {
+        .mat-form-field-flex {
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: transparent !important;
+            }
+
+            .mat-form-field-outline-thick {
+                opacity: 0;
+
+                > div {
+                    border-width: convert-unit(0px, "rem");
+                }
+            }
+
+            .mat-select-arrow {
+                opacity: 0;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                .mat-form-field-outline-thick {
+                    opacity: 0;
+
+                    > div {
+                        border-color: transparent !important;
+                    }
+                }
+            }
+
+            .icon-gray {
+                vertical-align: sub;
+            }
+        }
+    }
+}
+
+::ng-deep .mat-select-panel-wrap .shop-overview-plans.mat-select-panel {
+    position: absolute;
+    left: convert-unit(-360px, "rem");
+    top: convert(17px, "rem");
+    min-width: 100vw !important;
+    margin-left: convert-unit(4px, "rem");
+
+    .mat-option {
+        height: convert-unit(64px, "rem") !important;
+
+        .mat-option-text {
+            height: convert-unit(64px, "rem") !important;
+        }
+    }
+}
+
+.benefit-dropdown {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    padding-bottom: map-get($spacers, 20);
+    margin-bottom: map-get($spacers, 30);
+    .title {
+        order: 1;
+    }
+
+    .dropdown-pos {
+        order: 2;
+        padding-left: map-get($spacers, 10);
+    }
+
+    h1 {
+        font-size: convert-unit(36px, "rem");
+        margin: map-get($spacers, 0);
+    }
+    .mon-icon {
+        vertical-align: middle;
+        margin: map-get($spacers, 0);
+    }
+}
+
+.lnl-footer {
+    padding: map-get($spacers, 25) map-get($spacers, 30);
+
+    .lnl-exit {
+        display: none;
+    }
+}
+
+.tpi-shop-nav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}

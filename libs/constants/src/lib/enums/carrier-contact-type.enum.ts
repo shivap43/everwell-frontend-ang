@@ -1,0 +1,13 @@
+export enum CarrierContactType {
+    GENERAL = "GENERAL",
+    AFLAC_SMART_CLAIM = "AFLAC_SMART_CLAIM",
+    POLICY_INFORMATION = "POLICY_INFORMATION ",
+    CLAIMS = "CLAIMS",
+    POLICYHOLDER_SERVICES = "POLICYHOLDER_SERVICES",
+}
+
+export enum CarrierContactTypeRank {
+    GENERAL = 1,
+    CLAIMS = 2,
+    POLICYHOLDER_SERVICES = 3,
+}

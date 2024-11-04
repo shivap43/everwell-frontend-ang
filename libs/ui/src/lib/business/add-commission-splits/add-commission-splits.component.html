@@ -1,0 +1,299 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<form [formGroup]="addUpdateCustomizedSplitForm" (ngSubmit)="checkValidity()">
+    <mat-dialog-content>
+        <div class="step-two-header">
+            <table>
+                <tr>
+                    <th><span language="primary.portal.commission.producer.single.table.npn"></span>:</th>
+                    <th>{{producerData.npn}}</th>
+                </tr>
+                <tr>
+                    <th><span language="primary.portal.commission.producer.single.table.carriers"></span>:</th>
+                    <th>
+                        {{producerData.carrierAppointments.length}}
+                        <span *ngIf="producerData.carrierAppointments.length">
+                            <button
+                                type="button"
+                                mat-icon-button
+                                [richTooltip]="producerData.carriers"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                class="info-icon"
+                                [attr.aria-label]="languageString['primary.portal.members.workLabel.info']"
+                            >
+                                <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="18"></mon-icon>
+                            </button>
+                        </span>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <mat-divider aria-hidden="true" class="mon-my-20"></mat-divider>
+        <div class="step-two-content" *ngIf="!this.producerData.isUnauthorized; else addUnauthorizedSplit">
+            <div>{{setInfo}}</div>
+
+            <div class="split-details">
+                <div class="split-content" formArrayName="assignments">
+                    <div class="split-content-data">
+                        <div id="producer" class="comm-prod-id">
+                            <mat-label class="mat-label" language="primary.portal.commission.producer.single.addSplit.producer"></mat-label>
+                        </div>
+                        <div id="percentage" class="comm-prod-fields">
+                            <mat-label class="mat-label" language="primary.portal.commission.producer.single.addSplit.percent"></mat-label>
+                        </div>
+                        <div id="writing-number" class="comm-prod-fields">
+                            <mat-label class="mat-label" language="primary.portal.commission.producer.single.addSplit.number"></mat-label>
+                        </div>
+                        <div id="sitCode" class="comm-prod-fields">
+                            <mat-label class="mat-label" language="primary.portal.commission.producer.single.addSplit.sit"></mat-label>
+                        </div>
+                    </div>
+                    <div
+                        class="split-content-data"
+                        *ngFor="let assignment of addUpdateCustomizedSplitForm.get('assignments')['controls']; let i = index"
+                        [formGroupName]="i"
+                    >
+                        <div class="comm-prod-id">
+                            <mat-form-field>
+                                <mat-select
+                                    class="mon-input producer-id-field"
+                                    formControlName="producerId"
+                                    placeholder="Select"
+                                    (selectionChange)="loadWritingNumber(assignment.controls.producerId.value, i)"
+                                    disableOptionCentering="true"
+                                    panelClass="comm-spilts-select"
+                                >
+                                    <mat-option *ngFor="let item of producersList" value="{{item.id}}"> {{item.name}} </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addUpdateCustomizedSplitForm.controls.assignments.controls[i].get('producerId').hasError('required')"
+                                    ><span language="primary.portal.commission.producer.addSplit.required"></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="comm-prod-fields">
+                            <mat-form-field>
+                                <mat-select
+                                    class="mon-input"
+                                    formControlName="percentage"
+                                    (selectionChange)="checkPercentage()"
+                                    disableOptionCentering="true"
+                                    placeholder="Select"
+                                    panelClass="comm-spilts-select"
+                                >
+                                    <mat-option *ngFor="let item of percentageDropdown" value="{{item}}"> {{item}}% </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addUpdateCustomizedSplitForm.controls.assignments.controls[i].get('percentage').hasError('required')"
+                                    ><span language="primary.portal.commission.producer.addSplit.required"></span
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="!assignment.controls.percentage.hasError('required') && assignment.controls.percentage.hasError('invalid')"
+                                    class="mon-pl-20 percentage-error"
+                                >
+                                    {{secondaryLanguageStrings["secondary.portal.commissionSplit.addUpdate.percentMustBe100"]}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="comm-prod-fields">
+                            <mat-form-field *ngIf="activeWritingNumbers[i]; else defaultState">
+                                <mat-select
+                                    class="mon-input"
+                                    formControlName="writingNumber"
+                                    [disableControl]="!assignment.controls.producerId.value"
+                                    (selectionChange)="checkForDuplicateWritingNumber(i)"
+                                    placeholder="Select"
+                                    disableOptionCentering="true"
+                                    panelClass="comm-spilts-select"
+                                    [ngClass]="{'isDisabled':!assignment.controls.producerId.value}"
+                                >
+                                    <mat-option *ngFor="let item of activeWritingNumbers[i].writingNumbers" value="{{item.number}}">
+                                        {{item.number}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addUpdateCustomizedSplitForm.controls.assignments.controls[i].get('writingNumber').hasError('required')"
+                                    language="primary.portal.common.selectionRequired"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                            <ng-template #defaultState>
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="writingNumber"
+                                        [disableControl]="!assignment.controls.producerId.value"
+                                        [placeholder]="languageString['primary.portal.common.select']"
+                                        disableOptionCentering="true"
+                                        panelClass="comm-spilts-select"
+                                        [ngClass]="{'isDisabled':!assignment.controls.producerId.value}"
+                                    >
+                                    </mat-select>
+                                </mat-form-field>
+                            </ng-template>
+                        </div>
+
+                        <div class="comm-prod-fields">
+                            <mat-form-field>
+                                <mat-select
+                                    class="mon-input"
+                                    formControlName="sitCode"
+                                    [disableControl]="!assignment.controls.writingNumber.value"
+                                    placeholder="Select"
+                                    disableOptionCentering="true"
+                                    panelClass="comm-spilts-select"
+                                    [ngClass]="{'isDisabled':!assignment.controls.writingNumber.value}"
+                                    (selectionChange)="loadSitCodeHierarchy(i,assignment.controls.sitCode.value)"
+                                >
+                                    <mat-option
+                                        *ngFor="let item of getSitCodesByWritingNumberProdcuerId(assignment.controls.producerId.value, assignment.controls.writingNumber.value)"
+                                        value="{{item.id}}"
+                                    >
+                                        {{item.code}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="addUpdateCustomizedSplitForm.controls.assignments.controls[i].get('sitCode').hasError('required')"
+                                    ><span language="primary.portal.common.selectionRequired"></span
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="sit-tooltip" *configEnabled="'general.enable.sit_code.hierarchy'">
+                            <button
+                                type="button"
+                                [id]="'infoIcon_'+i"
+                                mat-icon-button
+                                [richTooltip]="assignment.controls.SITCodeHierarchyList.value"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                *ngIf="assignment.controls.writingNumber.value!=='' && assignment.controls.sitCode.value!==''"
+                                class="sit-code-tooltip"
+                                [attr.aria-label]="languageString['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                            >
+                                <mon-icon iconName="Filled-info" [iconSize]="18" class="icon-primary"></mon-icon>
+                            </button>
+                        </div>
+                        <div class="mon-pt-10">
+                            <a
+                                (click)="removeMultipleProducer(i)"
+                                class="text-danger"
+                                language="primary.portal.common.remove"
+                                *ngIf="!(addUpdateCustomizedSplitForm.controls.assignments.controls.length >=1 && addUpdateCustomizedSplitForm.controls.assignments.controls[i].get('producerId').disabled)"
+                                name="primary.portal.common.remove"
+                            ></a>
+                        </div>
+                    </div>
+                    <div class="mon-mb-25" *ngIf="sumError">
+                        <mon-alert alertType="danger">
+                            <span>{{sumError}}</span>
+                        </mon-alert>
+                    </div>
+                    <div class="duplicate-error" *ngIf="duplicateWritingNumber">
+                        <span>{{languageString['primary.portal.commissionSplit.addUpdate.duplicateWritingNumber']}}</span>
+                    </div>
+                </div>
+                <div class="add-new-split-link">
+                    <span *ngIf="addUpdateCustomizedSplitForm.get(this.assignmentControlList.ASSIGNMENTS).value.length === 4">
+                        <span
+                            id="add-new-split-link"
+                            richTooltip="{{languageString['primary.portal.commission.producer.single.addSplit.addProducerTooltip']}}"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                        >
+                            <span language="primary.portal.commission.producer.single.addSplit.addCo"></span>
+                        </span>
+                    </span>
+                    <span
+                        *ngIf="4 > addUpdateCustomizedSplitForm.get(this.assignmentControlList.ASSIGNMENTS).value.length && roleList.length>1"
+                    >
+                        <a id="add-new-split-link" (click)="addMultipleProducers()">
+                            <span language="primary.portal.commission.producer.single.addSplit.addCo"></span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="select-role">
+                <div class="select-role-title">
+                    <span language="primary.portal.commission.producer.single.addSplit.selectRole"></span>
+                    <span>
+                        <button
+                            type="button"
+                            mat-icon-button
+                            [richTooltip]="ROLE_DETAILS"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            [attr.aria-label]="languageString['primary.portal.members.workLabel.info']"
+                        >
+                            <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="18"></mon-icon></button
+                    ></span>
+                </div>
+                <mat-form-field>
+                    <mat-select
+                        class="mon-input"
+                        formControlName="role"
+                        placeholder="Select"
+                        disableOptionCentering="true"
+                        panelClass="comm-spilts-select"
+                        [disabled]="producerData?.enrollerInvitesOnly"
+                    >
+                        <mat-option *ngFor="let item of roleList" value="{{item.id}}"> {{item.name}} </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="addUpdateCustomizedSplitForm.get('role').hasError('required')"
+                        ><span language="primary.portal.common.selectionRequired"></span
+                    ></mat-error>
+                </mat-form-field>
+            </div>
+            <ng-container [ngTemplateOutlet]="welcomeMessage"></ng-container>
+        </div>
+        <ng-template #addUnauthorizedSplit>
+            <div class="step-two-content">
+                <div class="split-info">
+                    {{"primary.portal.commission.producer.single.addunAuthorisedSplit.desc" | replaceTag: { "##producername##":
+                    producerData?.name?.firstName } }}
+                </div>
+                <ng-container [ngTemplateOutlet]="welcomeMessage"></ng-container>
+            </div>
+        </ng-template>
+        <ng-template #welcomeMessage>
+            <div class="welcome-message">
+                <div class="welcome-message-title">
+                    <mat-label class="mat-label" language="primary.portal.commission.producer.single.addSplit.welcomeMsg"></mat-label>
+                </div>
+                <div class="welcome-message-content">
+                    <mat-form-field>
+                        <textarea formControlName="message" matInput class="mon-input" class="textarea" [maxlength]="maxLength"></textarea>
+                    </mat-form-field>
+                    <mat-hint>
+                        <span language="primary.portal.commission.producer.single.addSplit.maxLength"></span>{{maxLength}}
+                    </mat-hint>
+                </div>
+            </div>
+        </ng-template>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-between step-two-footer">
+        <div>
+            <button
+                class="btn-left mon-btn-link"
+                (click)="cancelAction()"
+                mat-flat-button
+                type="button"
+                language="primary.portal.common.cancel"
+            ></button>
+        </div>
+        <div>
+            <button (click)="backToStepOne()" class="mon-px-30 btn-right mon-btn-secondary mon-mr-20" mat-flat-button type="button">
+                <mon-icon class="icon-left" iconName="left" [iconSize]="12"></mon-icon>
+                <span language="primary.portal.common.back"></span>
+            </button>
+            <button class="mon-px-30 btn-right mon-btn-primary" mat-flat-button type="submit" [disabled]="producerInvited">
+                <span language="primary.portal.commission.producer.single.addProducerButton"></span>
+            </button>
+        </div>
+    </mat-dialog-actions>
+</form>

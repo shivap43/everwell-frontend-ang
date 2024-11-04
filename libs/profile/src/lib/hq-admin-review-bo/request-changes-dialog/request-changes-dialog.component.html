@@ -1,0 +1,35 @@
+<form [formGroup]="requestChangesForm" (ngSubmit)="submit()">
+    <empowered-modal type="POPUP">
+        <empowered-modal-header>
+            {{languageStrings['primary.portal.requestChanges.requestOfferingChanges']}}
+        </empowered-modal-header>
+        <p class="description">
+            {{languageStrings['primary.portal.requestChanges.description']}}
+        </p>
+        <mat-label class="mat-label">
+            {{languageStrings['primary.portal.requestChanges.requestChanges']}}
+        </mat-label>
+        <mat-form-field class="textarea">
+            <textarea
+                matInput
+                rows="5"
+                type="text"
+                formControlName="requestedChanges"
+                class="carrier-request"
+            ></textarea>
+            <mat-hint
+                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.addEditOffering.description.maxChar']}}</mat-hint
+            >
+            <mat-error>
+                <span *ngIf="requestChangesForm?.controls?.requestedChanges?.errors?.required">
+                    {{languageStrings['primary.portal.common.requiredField']}}
+                </span>
+            </mat-error>
+        </mat-form-field>
+        <empowered-modal-footer>
+            <button class="mon-btn-primary" mat-flat-button type="submit">
+                {{languageStrings['primary.portal.common.submit']}}
+            </button>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>

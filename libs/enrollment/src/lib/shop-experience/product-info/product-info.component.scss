@@ -1,0 +1,103 @@
+@import "shared";
+
+.product-list {
+    margin: convert-unit(40px, "rem") 0;
+    border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    align-items: flex-start;
+    padding: convert-unit(30px, "rem") 0;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+}
+
+:host {
+    .product-item {
+        > div {
+            margin-left: convert-unit(30px, "rem");
+        }
+
+        .product-thumbnail {
+            min-width: convert-unit(48px, "rem");
+            max-width: convert-unit(48px, "rem");
+
+            .mon-icon {
+                margin: 0;
+            }
+        }
+
+        .product-label {
+            min-width: convert-unit(240px, "rem");
+            max-width: convert-unit(240px, "rem");
+            padding: convert-unit(10px, "rem");
+
+            h2 {
+                color: get("color.gray.700");
+                font-size: convert-unit(28px, "rem");
+                @include fontFace("primary.light");
+                font-weight: 300;
+                letter-spacing: 0;
+                line-height: convert-unit(28px, "rem");
+                margin: 0;
+            }
+
+            span {
+                color: get("color.black");
+                font-size: convert-unit(14px, "rem");
+                @include fontFace("primary.bold");
+                font-weight: bold;
+                letter-spacing: 0;
+            }
+            span.carrier-name {
+                font-size: convert-unit(14px, "rem");
+            }
+        }
+
+        .product-description {
+            color: get("color.gray.700");
+            font-size: convert-unit(16px, "rem");
+            font-weight: normal;
+            letter-spacing: 0;
+            width: 100%;
+            display: flex;
+            mon-icon {
+                margin: map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 0);
+            }
+        }
+
+        .product-tpi-description {
+            color: get("color.gray.700");
+            font-size: convert-unit(16px, "rem");
+            font-weight: normal;
+            letter-spacing: map-get($spacers, 0);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            mon-icon {
+                margin: map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 0);
+            }
+        }
+        .product-action {
+            min-width: convert-unit(142px, "rem");
+            max-width: convert-unit(142px, "rem");
+            text-align: right;
+        }
+    }
+    .lnl-product {
+        flex-direction: column;
+        > div {
+            display: flex;
+        }
+    }
+}
+
+.shopping-experience-plans {
+    margin: map-get($spacers, 10) map-get($spacers, 0);
+    width: convert-unit(400px, "rem");
+}
+
+.text-right-margin-space {
+    margin-right: map-get($spacers, 5);
+}

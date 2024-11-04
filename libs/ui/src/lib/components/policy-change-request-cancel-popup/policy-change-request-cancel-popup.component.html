@@ -1,0 +1,55 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCloseClick()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="info-modal" *ngIf="showPolicyFlowCancelModal">
+        <div class="flex-form-wrapper">
+            <div mat-dialog-content>
+                <div>
+                    <div class="d-md-flex">
+                        <div class="flex-item" mat-dialog-title>{{data.requestType}}</div>
+                    </div>
+                    <div class="d-md-flex">{{data.description}}</div>
+                </div>
+            </div>
+            <div mat-dialog-actions class="dialog-footer cancel-back">
+                <button mat-button mat-flat-button class="mon-btn-secondary" (click)="onBackClick()">{{data.backButton}}</button>
+
+                <button mat-button mat-flat-button class="mon-btn-primary" (click)="onCancelClick()">{{data.cancelButton}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="info-modal" *ngIf="showPolicyFlowRemoveModal">
+        <div class="flex-form-wrapper">
+            <div mat-dialog-content>
+                <div>
+                    <div class="d-md-flex">
+                        <div class="flex-item" mat-dialog-title>{{policyChangeTitle}}</div>
+                    </div>
+                </div>
+            </div>
+            <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">{{data.cancelButton}}</a>
+                <button mat-button mat-flat-button class="mon-btn-danger" (click)="onRemoveClick()">{{data.removeButton}}</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-modal" *ngIf="showPolicyFlowNoUpdateModal">
+        <div class="flex-form-wrapper">
+            <div mat-dialog-content>
+                <div>
+                    <div class="d-md-flex">
+                        <div class="flex-item" mat-dialog-title>{{policyChangeTitle}}</div>
+                    </div>
+                </div>
+            </div>
+            <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">{{data.cancelButton}}</a>
+                <button mat-button mat-flat-button class="mon-btn-primary" (click)="onGotItClick()">{{data.gotItButton}}</button>
+            </div>
+        </div>
+    </div>
+</div>

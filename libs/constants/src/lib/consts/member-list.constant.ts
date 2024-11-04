@@ -1,0 +1,15 @@
+export const MemberList = {
+    allProductsSelected: "All",
+    noneProductsSelected: "None",
+    statusType: "status",
+    productType: "product",
+    notificationType: "notification",
+    nameType: "name",
+    idType: "id",
+    maxCharLenToDisplay: 31,
+    minSearchTextLength: 3,
+    pageNumberCount: 1,
+    escapKeyUnicode: 27,
+    enterKeyUnicode: 13,
+    tabKey: "Tab",
+};

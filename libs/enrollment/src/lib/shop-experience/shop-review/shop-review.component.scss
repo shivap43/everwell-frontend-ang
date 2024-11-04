@@ -1,0 +1,84 @@
+@import "shared";
+
+.tpi-shop-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: map-get($spacers, 30) map-get($spacers, 30) map-get($spacers, 0);
+
+    .review-selection {
+        font-size: convert-unit(36px, "rem");
+        margin-bottom: map-get($spacers, 40);
+        @include fontFace("secondary.light");
+        font-weight: 300;
+    }
+    .zero-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    .product-list {
+        margin-bottom: map-get($spacers, 10);
+
+        &:last-child .shopping-review-container {
+            border-bottom: map-get($spacers, 0);
+        }
+        .shopping-review-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            font-size: convert-unit(14px, "rem");
+            border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+
+            .plan-name {
+                color: get("color.primary.500");
+                margin: map-get($spacers, 0);
+                font-size: convert-unit(16px, "rem");
+                margin-bottom: convert-unit(4px, "rem");
+            }
+            .coverage-level-name {
+                color: get("color.gray.700");
+            }
+            .mon-btn-link {
+                text-align: left;
+                line-height: inherit;
+                padding: map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 15);
+                color: get("color.gray.600");
+            }
+            p {
+                line-height: convert-unit(18px, "rem");
+            }
+
+            .cost {
+                @include fontFace("primary.bold");
+                font-size: convert-unit(16px, "rem");
+            }
+            .tax-status-text {
+                color: get("color.gray.600");
+            }
+        }
+    }
+}
+.total-cost {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding: map-get($spacers, 10) map-get($spacers, 0);
+    margin: map-get($spacers, 0) map-get($spacers, 30);
+    h3 {
+        margin: map-get($spacers, 0);
+        color: get("color.black");
+    }
+    p {
+        color: get("color.gray.600");
+        font-size: convert-unit(14px, "rem");
+    }
+    .price {
+        text-align: right;
+        @include fontFace("primary.bold");
+    }
+}
+.lnl-zero-state {
+    margin: convert-unit(100px, "rem") map-get($spacers, 0);
+}

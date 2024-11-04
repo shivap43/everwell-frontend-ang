@@ -1,0 +1,32 @@
+.mat-autocomplete-panel {
+    border: convert-unit(1px, "rem") solid;
+    border-radius: 0;
+    padding: convert-unit(10px, "rem") 0;
+    border-color: get("color.gray.600");
+    box-shadow: none;
+
+    .mat-option {
+        padding: convert-unit(1px, "rem") convert-unit(15px, "rem");
+        padding-right: convert-unit(15px, "rem");
+        height: auto;
+        line-height: normal;
+
+        &:hover,
+        &.mat-selected:not(.mat-option-multiple) {
+            background-color: get("color.gray.200");
+            color: get("color.black") !important;
+        }
+
+        &:hover:not(.mat-option-disabled) {
+            color: get("color.black") !important;
+            background: get("color.gray.200") !important;
+        }
+
+        .mat-option-text {
+            height: auto;
+            line-height: normal;
+            color: get("color.black");
+            padding: convert-unit(3px, "rem") 0;
+        }
+    }
+}

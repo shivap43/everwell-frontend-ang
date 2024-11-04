@@ -1,0 +1,72 @@
+<empowered-modal type="POPUP"
+    ><empowered-modal-header>
+        <span *ngIf="!plansToUpdate?.length"> {{languageStrings['primary.portal.aflacGroup.offering.ineligiblePlans']}} </span>
+        <span *ngIf="plansToUpdate?.length"> {{languageStrings['primary.portal.aflacGroup.offering.stopOfferingIneligiblePlans']}} </span>
+    </empowered-modal-header>
+    <div>
+        <p class="info-text">{{languageStrings['primary.portal.aflacGroup.offering.ineligiblePlansInfo']}}</p>
+        <div *ngIf="ineligiblePlans?.length">
+            <ul class="product-list">
+                <li *ngFor="let plan of ineligiblePlans">{{plan.productName}}</li>
+            </ul>
+        </div>
+        <div *ngIf="!ineligiblePlans?.length && plansToUpdate?.length">
+            <ul class="product-list">
+                <li *ngFor="let plan of plansToUpdate">{{plan.productName}}</li>
+            </ul>
+        </div>
+        <div *ngIf="!ineligiblePlans?.length" class="info-text">
+            {{languageStrings['primary.portal.aflacGroup.offering.existingEnrollments']}}
+        </div>
+        <div *ngIf="ineligiblePlans?.length && plansToUpdate?.length">
+            <div class="info-text">{{languageStrings['primary.portal.aflacGroup.offering.enrollmentForSomeProducts']}}</div>
+            <ul class="product-list">
+                <li *ngFor="let plan of plansToUpdate">{{plan.productName}}</li>
+            </ul>
+        </div>
+    </div>
+    <div *ngIf="plansToUpdate?.length">
+        <form [formGroup]="editOfferingForm" class="edit-offering">
+            <mat-label class="mat-label">{{languageStrings['primary.portal.aflacGroup.offering.stopOfferingProducts']}} </mat-label>
+            <mat-form-field class="mon-date-field">
+                <input
+                    [matDatepicker]="offeringEndDate"
+                    matInput
+                    formControlName="offeringEndDate"
+                    [attr.aria-label]="languageStrings['primary.portal.aflacGroup.offering.stopOfferingProducts']"
+                    empoweredDateTransform
+                    autocomplete="off"
+                    [min]="today"
+                    [max]="oeEndDate"
+                    (blur)="onBlur($event, editOfferingForm.controls.offeringEndDate)"
+                    (input)="checkDateInput($event, editOfferingForm.controls.offeringEndDate)"
+                />
+                <mat-datepicker #offeringEndDate></mat-datepicker>
+                <mat-datepicker-toggle matSuffix (click)="offeringEndDate.open()">
+                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                </mat-datepicker-toggle>
+                <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                <mat-error>
+                    <span *ngIf="editOfferingForm.controls.offeringEndDate.errors?.required"
+                        >{{languageStrings['primary.portal.common.requiredField']}}</span
+                    >
+                    <span *ngIf="editOfferingForm.controls.offeringEndDate.errors?.pastDate"
+                        >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                    >
+                    <span *ngIf="editOfferingForm.controls.offeringEndDate.errors?.invalid"
+                        >{{languageStrings['primary.portal.benefits.agOffering.invalidDate']}}</span
+                    >
+                    <span *ngIf="editOfferingForm.controls.offeringEndDate.errors?.greaterThanCoverageDate"
+                        >{{languageStrings['primary.portal.aflacGroup.offering.dateBeforeEnrollmentEndDate']}}</span
+                    >
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-primary" (click)="close()">
+            <span *ngIf="!plansToUpdate?.length"> {{languageStrings['primary.portal.common.gotIt']}} </span>
+            <span *ngIf="plansToUpdate?.length"> {{languageStrings['primary.portal.common.confirm']}} </span>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

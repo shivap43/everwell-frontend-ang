@@ -1,0 +1,29 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+
+    .mat-label {
+        padding: map-get($spacers, 0);
+        padding-top: map-get($spacers, 5);
+    }
+
+    .mat-divider {
+        padding-bottom: map-get($spacers, 10);
+    }
+}
+
+:host > .mat-checkbox {
+    &:not(.select-all) {
+        padding-bottom: map-get($spacers, 20);
+    }
+
+    &.select-all {
+        padding-bottom: map-get($spacers, 10);
+    }
+
+    &:last-child {
+        padding-bottom: map-get($spacers, 0);
+    }
+}

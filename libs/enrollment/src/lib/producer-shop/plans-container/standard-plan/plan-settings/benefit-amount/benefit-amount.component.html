@@ -1,0 +1,14 @@
+<div class="eb-benefit-amount">
+    <form [formGroup]="form" (submit)="onApply()" data-test="eb-benefit-amount__form">
+        <mat-radio-group class="plan-radio-group" formControlName="selectedBenefitAmount">
+            <mat-radio-button
+                class="plan-radio-button"
+                *ngFor="let benefitAmount of benefitAmounts$ | async; trackBy: trackByBenefitAmount"
+                [value]="benefitAmount"
+                data-test="eb-benefit-amount__form--radio-group"
+            >
+                {{ benefitAmount | currency : 'USD' : 'symbol' : '1.0' }}
+            </mat-radio-button>
+        </mat-radio-group>
+    </form>
+</div>

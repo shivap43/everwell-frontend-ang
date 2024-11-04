@@ -1,0 +1,144 @@
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+
+<h3>{{languageStrings['primary.portal.editCoverage.coveredDependents']}}</h3>
+<mat-hint *ngIf="isShowHintMsg">{{this.dependentHintMsg}}</mat-hint>
+<div>
+    <form [formGroup]="dependentForm">
+        <table formArrayName="dependents" [dataSource]="dataSource" mat-table class="coverage-table">
+            <ng-container matColumnDef="dependentId">
+                <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.editCoverage.name']}}</th>
+                <td class="normal-txt" valign="top" *matCellDef="let element; let rowIndex = index" mat-cell>
+                    <div *ngIf="element.isExisting">
+                        {{ element.name }}
+                    </div>
+                    <div *ngIf="!element.isExisting" [formGroupName]="rowIndex">
+                        <mat-form-field class="mon-mb-0">
+                            <mat-select
+                                (selectionChange)="changeDatePickers($event,rowIndex)"
+                                formControlName="dependentId"
+                                attr.aria-required="true"
+                                required
+                                [disableOptionCentering]="true"
+                            >
+                                <mat-option value="" selected
+                                    >{{languageStrings['primary.portal.editCoverage.select']}}</mat-option
+                                >
+                                <mat-option
+                                    *ngFor="let dependent of memberDependents"
+                                    [value]="dependent.id"
+                                    [disabled]="getDependentStatus(dependent.id)"
+                                    [ngClass]="{'manage-dependent-disabled': getDependentStatus(dependent.id) }"
+                                >
+                                    {{dependent.name.firstName}} {{dependent.name.lastName}}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="dependentForm.get('dependents').at(rowIndex).get('dependentId').hasError('required')"
+                                >{{languageStrings['primary.portal.common.selectionRequired']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </td>
+                <td valign="top" mat-footer-row *matFooterCellDef [attr.colspan]="4">
+                    {{dependentMsg}}
+                    <button
+                        *ngIf="!isDependentAvailable"
+                        [richTooltip]="toolTipText"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        class="mon-btn-link"
+                        [ngClass]="{'mon-btn-disabled': !isActive}"
+                    >
+                        {{languageStrings['primary.portal.editCoverage.addDependent']}}
+                    </button>
+                    <button
+                        *ngIf="isDependentAvailable"
+                        [ngClass]="{'mon-btn-disabled': !isActive}"
+                        class="mon-btn-link"
+                        (click)="addDependent()"
+                        [disabled]="!isActive"
+                    >
+                        {{languageStrings['primary.portal.editCoverage.addDependent']}}
+                    </button>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings['primary.portal.editCoverage.startDatelowercase']}}
+                </th>
+                <td valign="top" *matCellDef="let element; let rowIndex = index" mat-cell>
+                    <div *ngIf="element.isExisting">
+                        {{ element.validity.effectiveStarting | date: 'MM/dd/yyyy'}}
+                    </div>
+                    <div *ngIf="!element.isExisting" [formGroupName]="rowIndex">
+                        <mat-form-field class="mon-date-field mon-mb-0">
+                            <input
+                                matInput
+                                [matDatepicker]="startDatePicker"
+                                formControlName="startDate"
+                                name="startDatePicker"
+                                [min]="currentDate"
+                                (keyup)="transform($event)"
+                                [attr.aria-label]="languageStrings['primary.portal.editCoverage.startDatelowercase']"
+                            />
+                            <mat-datepicker #startDatePicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix [for]="startDatePicker" (click)="startDatePicker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                        </mat-form-field>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings['primary.portal.editCoverage.endDatelowercase']}}
+                </th>
+                <td valign="top" *matCellDef="let element;let rowIndex = index" mat-cell>
+                    <div *ngIf="element.isExisting">
+                        {{ element.validity?.expiresAfter | date: 'MM/dd/yyyy'}}
+                    </div>
+                    <div *ngIf="!element.isExisting" [formGroupName]="rowIndex ">
+                        <mat-form-field class="mon-date-field mon-mb-0">
+                            <input
+                                matInput
+                                [matDatepicker]="endDatePicker"
+                                formControlName="endDate"
+                                name="endDatePicker"
+                                [min]="currentDate"
+                                (keyup)="transform($event)"
+                                [attr.aria-label]="languageStrings['primary.portal.editCoverage.endDatelowercase']"
+                            />
+                            <mat-datepicker #endDatePicker></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix [for]="endDatePicker" (click)="endDatePicker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                            </mat-datepicker-toggle>
+                        </mat-form-field>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.editCoverage.manage']}}</th>
+                <td valign="top" *matCellDef="let element; let rowIndex = index" mat-cell>
+                    <a
+                        class="link-danger"
+                        *ngIf="element.operation !== null"
+                        href="javascript:void(0)"
+                        (click)="removeDependent(rowIndex)"
+                        >{{languageStrings['primary.portal.editCoverage.remove']}}</a
+                    >
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+            <tr mat-footer-row *matFooterRowDef="['dependentId']"></tr>
+        </table>
+    </form>
+
+    <div class="d-flex justify-content-end">
+        <a href="javascript:void(0)" (click)="openPreviouslyCoveredDependent()"
+            >{{languageStrings['primary.portal.editCoverage.viewpreviouslyDependent']}}</a
+        >
+    </div>
+</div>

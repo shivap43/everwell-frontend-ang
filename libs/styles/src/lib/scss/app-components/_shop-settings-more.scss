@@ -1,0 +1,171 @@
+.settings-controls-dropdown-content {
+    position: absolute;
+    top: convert-unit(-5px, "rem");
+    z-index: 2;
+    background-color: get("color.white");
+    border-radius: convert-unit(4px, "rem");
+    box-shadow: none;
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    .reset-apply-link {
+        padding: convert-unit(2px, "rem") convert-unit(20px, "rem") convert-unit(20px, "rem") convert-unit(5px, "rem");
+    }
+}
+.settings-controls-label {
+    line-height: convert-unit(40px, "rem");
+    cursor: pointer;
+    margin-right: convert-unit(10px, "rem");
+    color: get("color.primary.500");
+    font-size: convert-unit(16px, "rem");
+    @include fontFace("primary.regular");
+    display: flex;
+    .dropdown-arrow {
+        width: 0;
+        height: 0;
+        margin: convert-unit(15px, "rem") convert-unit(4px, "rem") convert-unit(3px, "rem") convert-unit(10px, "rem");
+        border: solid get("color.gray.600") !important;
+        border-width: 0 convert-unit(1px, "rem") convert-unit(1px, "rem") 0 !important;
+        display: inline-block;
+        padding: convert-unit(3px, "rem");
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        cursor: pointer;
+    }
+
+    @include media-max("xl") {
+        line-height: convert-unit(20px, "rem");
+        flex-direction: column;
+    }
+
+    .plan-settings {
+        @include media-max("xl") {
+            justify-content: start !important;
+        }
+    }
+}
+.custom-mat-menu-large {
+    &-container {
+        max-width: convert-unit(512px, "rem");
+        height: 100%;
+        padding: convert-unit(15px, "rem");
+        h6 {
+            font-size: convert-unit(16px, "rem");
+            font-weight: normal;
+            color: get("color.black");
+            margin-bottom: convert-unit(20px, "rem");
+            margin-top: 0;
+        }
+        .pl-0 {
+            padding-left: 0 !important;
+        }
+        .pr-0 {
+            padding-left: 0 !important;
+        }
+        .mb-10 {
+            margin-bottom: convert-unit(10px, "rem") !important;
+        }
+        .custom-input-align {
+            margin-left: convert-unit(35px, "rem") !important;
+            margin-bottom: convert-unit(10px, "rem") !important;
+        }
+        .custom-mat-menu-large-content {
+            display: flex;
+            .applicant-info-container,
+            .spouse-info-container {
+                margin-bottom: convert-unit(30px, "rem");
+                .custom-mat-menu-content-heading {
+                    font-size: convert-unit(16px, "rem");
+                    font-weight: normal;
+                    color: get("color.gray.700");
+                    margin-bottom: convert-unit(10px, "rem");
+                }
+                .custom-mat-menu-content-option {
+                    margin-bottom: 0;
+                    ::ng-deep .default-mat-select-cntr {
+                        width: convert-unit(115px, "rem") !important;
+                        .mat-form-field-wrapper {
+                            padding-bottom: convert-unit(5px, "rem") !important;
+                        }
+                    }
+                    .custom-mat-input-cntr {
+                        width: convert-unit(68px, "rem");
+                    }
+                }
+                .applicant-info-row,
+                .spouse-info-row {
+                    ::ng-deep .custom-mat-menu-content-checkboxoption-cntr {
+                        ::ng-deep .mat-checkbox-frame {
+                            border: convert-unit(1px, "rem") solid get("color.gray.600");
+                            border-radius: 0;
+                        }
+                        ::ng-deep .mat-checkbox-checked {
+                            .mat-checkbox-background {
+                                background-color: get("color.gray.900");
+                            }
+                        }
+                    }
+                }
+            }
+            .spouse-info-container,
+            .non-spouse-info-container {
+                margin-bottom: convert-unit(30px, "rem");
+            }
+            .custom-mat-menu-content-option {
+                margin-bottom: convert-unit(20px, "rem");
+                .custom-mat-menu-content-heading {
+                    font-size: convert-unit(16px, "rem");
+                    font-weight: normal;
+                    color: get("color.gray.700");
+                }
+                .custom-mat-menu-content-label {
+                    font-size: convert-unit(14px, "rem");
+                    font-weight: bold;
+                    color: $black;
+                }
+                .custom-mat-input-cntr {
+                    width: convert-unit(122px, "rem");
+                    margin-right: convert-unit(15px, "rem");
+                    ::ng-deep .mat-form-field-wrapper {
+                        padding: 0 !important;
+                        .mat-form-field-flex {
+                            .mat-form-field-outline {
+                                .mat-form-field-outline-start {
+                                    border-radius: convert-unit(5px, "rem") 0 0 convert-unit(5px, "rem");
+                                }
+                                .mat-form-field-outline-end {
+                                    border-radius: 0 convert-unit(5px, "rem") convert-unit(5px, "rem") 0;
+                                }
+                            }
+                            .mat-form-field-infix {
+                                padding: convert-unit(10px, "rem") 0 convert-unit(9px, "rem") 0 !important;
+                            }
+                        }
+                    }
+                }
+                .income_radio_cntr {
+                    width: 100%;
+                    .income_radio_option {
+                        width: 100%;
+                        margin: convert-unit(5px, "rem") 0px convert-unit(10px, "rem") 0px;
+                    }
+                }
+            }
+            .custom-mat-menu-content-option:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+    }
+}
+
+.empowered-drop-down-portal {
+    .settings-controls-dropdown-content {
+        position: static;
+        border: none;
+    }
+    .custom-mat-menu-large-container {
+        padding: map-get($spacers, 0);
+    }
+    .reset-apply-link {
+        padding: map-get($spacers, 0);
+        padding-bottom: map-get($spacers, 15);
+    }
+}

@@ -1,0 +1,94 @@
+<ng-container *ngIf="combinedOfferingData$ | async as combinedOfferingData">
+    <div class="eb-plans" *ngIf="combinedOfferingData.combinedOffering as combinedOffering">
+        <h2 class="hide-product-name">{{ combinedOffering.productOffering.product.name }}</h2>
+        <div class="plans-alert">
+            <mon-alert alertType="info" *ngIf="combinedOfferingData.missingInformation as missingInformation">
+                <span *ngIf="missingInformation === missingInfoType.SALARY">
+                    {{ languageStrings['primary.portal.quoteShop.plansDisplay.salaryMissing'] }}
+                    <a href="javascript:void(0)" (click)="navigateToProfileWorkTab()"
+                        ><span language="primary.portal.quoteShop.plansDisplay.updateInfo"></span
+                    ></a>
+                </span>
+                <span *ngIf="missingInformation === missingInfoType.WORK_ZIP_STATE">
+                    {{ languageStrings['primary.portal.quoteShop.plansDisplay.productPlanData'] }}
+                    <a href="javascript:void(0)" (click)="navigateToProfileWorkTab()"
+                        ><span language="primary.portal.quoteShop.plansDisplay.updateInfo"></span
+                    ></a>
+                </span>
+                <span *ngIf="missingInformation === missingInfoType.OCCUPATION_CLASS">
+                    <ng-container *ngIf="memberInfo$ | async as memberInfo">
+                        {{ languageStrings['primary.portal.shopQuote.peo.product.notAvailable'] | replaceTag: { "##carriername##":
+                        memberInfo.name.firstName} }}
+                        <a href="javascript:void(0)" (click)="navigateToMemberProfile()"
+                            ><span language="primary.portal.activityHistory.profileLabel"></span></a
+                    ></ng-container>
+                </span>
+                <span *ngIf="missingInformation === missingInfoType.CARRIER_APPOINTMENT">
+                    {{ languageStrings['primary.portal.shopQuote.productStatusInfo'].replace('##carrierName##',
+                    combinedOffering.planOfferingsWithCartAndEnrollment[0].planOffering.plan.carrierNameOverride) }}
+                </span>
+            </mon-alert>
+            <mon-alert *ngIf="alertMessage$ | async as alertMessage" [alertType]="alertMessage.alertType">
+                <span [language]="alertMessage.language">{{ alertMessage.displayText }}</span>
+            </mon-alert>
+            <mon-alert *ngIf="isDependentRequired$ | async as isDependentRequired" alertType="info">
+                <span language="primary.portal.quoteshop.plansDisplay.juvenileDemographic"></span>
+            </mon-alert>
+        </div>
+        <mat-accordion class="accordion-default" data-test="eb-plans__accordion">
+            <ng-container
+                *ngFor="let planOfferingWithCartAndEnrollment of combinedOffering.planOfferingsWithCartAndEnrollment; trackBy:trackByPanelIdentifiers"
+            >
+                <empowered-plan-container
+                    [planPanel]="planOfferingWithCartAndEnrollment"
+                    [productHasMissingInfo]="combinedOfferingData.missingInformation"
+                >
+                </empowered-plan-container>
+            </ng-container>
+        </mat-accordion>
+        <!-- Link to provide import policy for additional units and buy up plans-->
+        <div *ngIf="displayImportPolicyLink$ | async" class="mon-my-15">
+            <ng-container *ngIf="importPolicyForBuyUpPlan$ | async">
+                {{ languageStrings['primary.portal.quoteShopMpp.plansDisplay.purchaseBuyUps'] | replaceTag : {"##productname##":
+                combinedOffering.productOffering.product.name } }}
+            </ng-container>
+            <ng-container *ngIf="importPolicyForAdditionalUnit$ | async">
+                {{ languageStrings['primary.portal.quoteShopMpp.plansDisplay.purchaseAdditionalUnits'] | replaceTag : {"##productname##":
+                combinedOffering.productOffering.product.name } }}
+            </ng-container>
+            <empowered-import-policy-link [productName]="combinedOffering.productOffering.product.name"> </empowered-import-policy-link>
+        </div>
+        <div class="decline-coverage-btn" *ngIf="showDeclineCoverage$ | async">
+            <a
+                [matTooltipDisabled]="(disableDeclineCoverage$ | async) === false"
+                [richTooltip]="languageStrings
+            ['primary.portal.producerShopPage.toolTipText.anotherUserIsUpdatingCart']"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+            >
+                <button
+                    (click)="declineCoverage(declineProductParam)"
+                    class="mon-btn-secondary"
+                    mat-flat-button
+                    [disabled]="(disableDeclineCoverage$ | async)"
+                    *ngIf="(disableCoverageButton$ | async) === false && declineProductParamSet$ | async as declineProductParam"
+                    data-test="eb-plans__button--decline-coverage"
+                >
+                    <span>
+                        {{ "primary.portal.qouteShop.declineCoverage" | replaceTag : {"#coverageplan":
+                        combinedOffering.productOffering.product.name } }}
+                    </span>
+                </button>
+            </a>
+            <button
+                class="mon-btn-secondary-disabled decline-coverage-disabled-btn line-height"
+                mat-button
+                *ngIf="disableCoverageButton$ | async"
+                data-test="eb-plans__button--decline-coverage-disabled"
+            >
+                <mon-icon iconName="In-cart-decline" class="ban-icon" [iconSize]="16"> </mon-icon>
+                <span language="primary.portal.quoteShop.declineCoverage"></span>
+            </button>
+        </div>
+    </div>
+</ng-container>

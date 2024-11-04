@@ -1,0 +1,115 @@
+@import "shared";
+.set-pricelist-wrapper {
+    margin: 0 convert-unit(30px, "rem");
+    h2 {
+        color: get("color.black");
+        font-weight: normal;
+        margin-top: convert-unit(30px, "rem");
+        margin-bottom: convert-unit(15px, "rem");
+    }
+    .productelig-heading {
+        margin-bottom: 30px;
+    }
+    :host ::ng-deep .mat-select-panel-wrap {
+        .mat-select-panel {
+            margin-top: convert-unit(5px, "rem") !important;
+            left: convert-unit(-15px, "rem") !important;
+        }
+    }
+    .filter-wrapper {
+        padding-left: 0px !important;
+        margin-bottom: convert-unit(12px, "rem");
+        .filter-sub-wrapper {
+            .mat-form-field {
+                padding-right: convert-unit(15px, "rem");
+                ::ng-deep {
+                    .mat-form-field-flex {
+                        padding: convert-unit(9px, "rem") convert-unit(23px, "rem");
+                        letter-spacing: 0;
+                        font-weight: normal;
+                    }
+                    .mat-form-field-infix {
+                        padding: 0;
+                    }
+                }
+            }
+        }
+    }
+    .planinfo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: convert-unit(20px, "rem");
+        padding-top: convert-unit(20px, "rem");
+        border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+        .plandetails {
+            font-size: convert-unit(16px, "rem");
+            line-height: convert-unit(24px, "rem");
+            .planname {
+                @include fontFace("primary.bold");
+            }
+        }
+        .price-status-set {
+            font-size: convert-unit(16px, "rem");
+            @include fontFace("primary.regular");
+            line-height: convert-unit(24px, "rem");
+            align-items: flex-start;
+            align-self: center;
+            display: flex;
+            margin-right: convert-unit(180px, "rem") !important;
+            margin-top: convert-unit(-10px, "rem");
+            ::ng-deep .icon-success {
+                margin-top: convert-unit(2px, "rem");
+                color: inherit !important;
+                align-self: flex-start;
+            }
+        }
+
+        .prices-incomplete {
+            margin-right: convert-unit(128px, "rem") !important;
+            font-size: convert-unit(16px, "rem");
+            @include fontFace("primary.regular");
+            line-height: convert-unit(24px, "rem");
+            align-items: flex-start;
+            align-self: center;
+            display: flex;
+            margin-top: convert-unit(-10px, "rem");
+            ::ng-deep .icon-warning {
+                margin-top: convert-unit(2px, "rem");
+                color: inherit !important;
+                align-self: flex-start;
+            }
+        }
+        .view-Edit {
+            align-self: flex-start !important;
+        }
+        .pricebtn {
+            margin-top: convert-unit(-10px, "rem");
+        }
+    }
+    .price-list-btn {
+        border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+        margin-top: convert-unit(100px, "rem");
+        display: flex;
+        justify-content: flex-end;
+        padding: 25px 0;
+    }
+}
+.radio-group-filter {
+    min-width: 200px;
+    max-height: 250px;
+    overflow-y: auto;
+    ::ng-deep {
+        .mat-radio-button {
+            .mat-radio-label {
+                .mat-radio-label-content {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}
+.disabled-apply {
+    pointer-events: none;
+    color: get("color.gray.700") !important;
+}

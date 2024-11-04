@@ -1,0 +1,9 @@
+<form [formGroup]="form">
+    <ng-container *ngIf="channels$ | async as channels">
+        <mat-radio-group class="plan-radio-group" formControlName="selectedChannel">
+            <mat-radio-button class="plan-radio-button" *ngFor="let channel of channels" [value]="channel">
+                {{channel | titlecase}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </ng-container>
+</form>

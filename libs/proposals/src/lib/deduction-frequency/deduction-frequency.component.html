@@ -1,0 +1,12 @@
+<mat-label class="mat-label">
+    <span language="primary.portal.proposals.create.proposalDetails.deductionFrequency"></span>
+</mat-label>
+
+<mat-form-field>
+    <mat-select [formControl]="formControl" (selectionChange)="onDeductionFrequencyChange($event.value)">
+        <mat-option *ngFor="let deductionFrequency of deductionFrequencies$ | async" [value]="deductionFrequency.id">
+            {{ deductionFrequency.name }}
+        </mat-option>
+    </mat-select>
+    <mat-error *ngIf="formControl.errors?.required"><span language="primary.portal.common.requiredField"></span></mat-error>
+</mat-form-field>

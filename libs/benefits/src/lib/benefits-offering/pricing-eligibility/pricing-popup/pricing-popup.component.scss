@@ -1,0 +1,43 @@
+@import "shared";
+
+.review-categories {
+    .review-heading {
+        padding: convert-unit(50px, "rem") convert-unit(50px, "rem") convert-unit(20px, "rem");
+    }
+
+    .review-categories-content {
+        overflow-y: auto;
+        padding: 0 convert-unit(50px, "rem") convert-unit(50px, "rem") convert-unit(50px, "rem");
+        max-height: calc(100vh - 470px);
+        min-height: convert-unit(160px, "rem");
+
+        .review-row {
+            padding: convert-unit(10px, "rem");
+            border-bottom: convert-unit(2px, "rem") solid get("color.gray.300");
+            display: flex !important;
+
+            .mat-form-field {
+                margin-bottom: convert-unit(0px, "rem");
+            }
+
+            mat-label,
+            .mat-label {
+                @include fontFace("primary.regular");
+                font-size: convert-unit(16px, "rem");
+            }
+        }
+
+        .review-row:first-child {
+            border-bottom: convert-unit(2px, "rem") solid get("color.gray.600");
+
+            mat-label,
+            .mat-label {
+                color: get("color.gray.600");
+            }
+        }
+
+        .review-row:nth-child(odd) {
+            background-color: get("color.gray.200");
+        }
+    }
+}

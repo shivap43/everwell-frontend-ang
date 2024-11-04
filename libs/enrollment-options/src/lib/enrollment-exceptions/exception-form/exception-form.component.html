@@ -1,0 +1,174 @@
+<form [formGroup]="exceptionForm" (ngSubmit)="onSubmit()">
+    <empowered-modal type="POPUP" size="MD">
+        <empowered-modal-header class="modal-title"
+            ><span *ngIf="data.action === exceptionFormTypeEnum.ADD">{{languageStrings['primary.portal.pinSignature.newException']}}</span>
+            <span *ngIf="data.action === exceptionFormTypeEnum.EDIT">{{languageStrings['primary.portal.pinSignature.editException']}}</span>
+            <div *ngIf="data.action === exceptionFormTypeEnum.REMOVE">
+                <span
+                    *ngIf="data.inputData.type === ExceptionType.ALLOWED_ENROLLMENT_EXCEPTIONS"
+                    language="primary.portal.pinSignature.removeException"
+                ></span>
+                <span
+                    *ngIf="data.inputData.type === ExceptionType.ALLOWED_DISABILITY_ENROLLMENT"
+                    language="primary.portal.disabilityPinSignature.removeException"
+                ></span>
+            </div>
+        </empowered-modal-header>
+        <empowered-modal-footer>
+            <button
+                [ngClass]="{'mon-btn-danger': data.action === 'REMOVE', 'mon-btn-primary': data.action !== 'REMOVE'}"
+                mat-raised-button
+                color="primary"
+                type="submit"
+                cdkFocusInitial
+                [disabled]="cannotAddException$ | async"
+            >
+                {{data.action === 'REMOVE' ? languageStrings['primary.portal.common.remove'] :
+                languageStrings['primary.portal.common.save']}}
+            </button>
+        </empowered-modal-footer>
+        <div class="exception-popup" *ngIf="data.action !== 'REMOVE'">
+            <div class="error-msg">
+                <mon-alert *ngIf="showError" alertType="danger">
+                    <span> {{errorMessage}} </span>
+                </mon-alert>
+            </div>
+            <div class="exception-type">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.pinSignature.exceptionType']}}</mat-label>
+                <mat-form-field class="mon-mb-10">
+                    <mat-select
+                        disableOptionCentering="true"
+                        formControlName="type"
+                        [placeholder]="languageStrings['primary.portal.common.select']"
+                    >
+                        <mat-option *ngFor="let exceptionType of exceptionTypes" [value]="exceptionType.value"
+                            >{{ exceptionType.name }}</mat-option
+                        >
+                    </mat-select>
+                    <mat-error> {{languageStrings['secondary.portal.members.selectionRequired']}} </mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mon-alert *ngFor="let alert of alerts$ | async" class="mon-mb-20" [alertType]="alert.alertType">
+                    <span>{{ alert.content }}</span>
+                </mon-alert>
+            </div>
+            <div formGroupName="validity" class="flex-form-wrapper" *ngIf="(cannotAddException$ | async) === false">
+                <div class="flex-item date-picker">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.pinSignature.startDate']}}</mat-label>
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            matInput
+                            formControlName="effectiveStarting"
+                            [min]="minStartDate"
+                            [max]="maxStartDate"
+                            [matDatepicker]="startDatePicker"
+                            name="startDatePicker"
+                            [attr.aria-label]="languageStrings['primary.portal.pinSignature.startDate']"
+                            empoweredDateTransform
+                            [maxlength]="maxLength"
+                            [errorStateMatcher]="startDateErrorMatcher"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #startDatePicker></mat-datepicker>
+                        <mat-error>
+                            <!-- Required -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.effectiveStarting.errors?.required && 
+                                !exceptionForm.controls.validity.controls.effectiveStarting.errors?.matDatepickerParse?.text"
+                                language="primary.portal.common.requiredField"
+                            >
+                            </span>
+
+                            <!-- Invalid date format -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.effectiveStarting.errors?.matDatepickerParse?.text"
+                                language="primary.portal.common.invalidDateFormat"
+                            >
+                            </span>
+
+                            <!-- Cannot be in the past (min) -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.effectiveStarting.errors?.matDatepickerMin"
+                                language="primary.portal.coverage.cannotBePast"
+                            >
+                            </span>
+
+                            <!-- Must be before end date (max) -->
+                            <!-- Cannot be after one year (max) -->
+                            <span *ngIf="exceptionForm.controls.validity.controls.effectiveStarting.errors?.matDatepickerMax"
+                                >{{ maxStartDateError }}
+                            </span>
+
+                            <!-- Overlap error -->
+                            <span
+                                *ngIf="exceptionForm.errors?.overlap && !exceptionForm.controls.validity.controls.effectiveStarting.errors"
+                                >{{ overlapError }}
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-hint language="primary.portal.accountEnrollments.filterEnrollment.dateFormatHint"></mat-hint>
+                </div>
+                <div class="flex-item date-picker">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.pinSignature.endDate']}}</mat-label>
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            matInput
+                            formControlName="expiresAfter"
+                            [min]="minEndDate"
+                            [max]="maxEndDate"
+                            [matDatepicker]="endDatePicker"
+                            name="endDatePicker"
+                            [attr.aria-label]="languageStrings['primary.portal.pinSignature.endDate']"
+                            empoweredDateTransform
+                            [errorStateMatcher]="endDateErrorMatcher"
+                            [maxlength]="maxLength"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #endDatePicker></mat-datepicker>
+
+                        <mat-error>
+                            <!-- Required -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.expiresAfter.errors?.required && 
+                                !exceptionForm.controls.validity.controls.expiresAfter.errors?.matDatepickerParse?.text"
+                                language="primary.portal.common.requiredField"
+                            >
+                            </span>
+
+                            <!-- Invalid date format -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.expiresAfter.errors?.matDatepickerParse?.text"
+                                language="primary.portal.common.invalidDateFormat"
+                            >
+                            </span>
+
+                            <!-- Cannot be after two years (max) -->
+                            <span
+                                *ngIf="exceptionForm.controls.validity.controls.expiresAfter.errors?.matDatepickerMax"
+                                language="secondary.portal.benefitsOffering.coveragedates.twoYearAfterEndDate"
+                            >
+                            </span>
+
+                            <!-- Cannot be in the past (min) -->
+                            <!-- Cannot be before enrollment start date (min) -->
+                            <span *ngIf="exceptionForm.controls.validity.controls.expiresAfter.errors?.matDatepickerMin"
+                                >{{ minEndDateError }}
+                            </span>
+
+                            <!-- Overlap error -->
+                            <span *ngIf="exceptionForm.errors?.overlap && !exceptionForm.controls.validity.controls.expiresAfter.errors"
+                                >{{ overlapError }}
+                            </span>
+                        </mat-error> </mat-form-field
+                    ><mat-hint language="primary.portal.accountEnrollments.filterEnrollment.dateFormatHint"></mat-hint>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="data.action === 'REMOVE'">{{languageStrings['primary.portal.pinSignature.removeExceptionContent']}}</div>
+    </empowered-modal>
+</form>

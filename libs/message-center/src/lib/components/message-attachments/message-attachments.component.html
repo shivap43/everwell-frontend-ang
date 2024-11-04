@@ -1,0 +1,16 @@
+<ng-container *ngIf="attachments$ | async as attachments">
+  <ng-container *ngFor="let attachment of attachments">
+    <div>
+      <div>
+        <mon-icon class="icon-black" iconName="file" [iconSize]="34"></mon-icon>
+      </div>
+      <div class="attachment-details">
+        <span>{{ attachment.name }}</span>
+        <button class="mon-btn-link" (click)="onViewClick(attachment.viewFunction)">
+          <span [language]="MessageCenterLanguage.MESSAGE_CENTER_ATTACHMENTS_BUTTON_VIEW"></span>
+          <span>({{ attachment.type }})</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

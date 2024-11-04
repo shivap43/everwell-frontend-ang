@@ -1,0 +1,38 @@
+@import "shared";
+
+.info-modal {
+    @include media-max("l") {
+        width: 100%;
+    }
+
+    width: convert-unit(800px, "rem");
+
+    h2 {
+        margin: map-get($spacers, 0);
+        padding: map-get($spacers, 50) map-get($spacers, 50) map-get($spacers, 30);
+    }
+}
+
+.contacts {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 map-get($spacers, 20) 0;
+
+    ::ng-deep {
+        .mat-radio-button {
+            padding: map-get($spacers, 15) 0 0 0;
+        }
+    }
+}
+
+.dialog-footer {
+    justify-content: flex-end;
+
+    .mon-btn-primary {
+        margin: 0 0 0 map-get($spacers, 20);
+    }
+}
+
+.contact-form h2 {
+    padding: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 30);
+}

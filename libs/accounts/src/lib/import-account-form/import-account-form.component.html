@@ -1,0 +1,620 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <mat-horizontal-stepper class="dialog-horizontal-stepper mon-pt-30" aria-orientation="horizontal" role="tablist">
+        <mat-step [stepControl]="stepOneForm">
+            <div mat-dialog-content>
+                <mat-label class="mat-label mon-mt-0 mon-mb-0">{{languageStrings['primary.portal.prospects.stepOneOfThree']}}</mat-label>
+                <h2 class="mon-mt-0 mon-mb-20" mat-dialog-title id="step-1-title">
+                    {{languageStrings['primary.portals.accounts.importAccount.step1.subtitle']}}
+                </h2>
+                <mat-label class="mat-label" language="{{importAccountLanguagePath}}.step1.search" id="search-by-account-label"></mat-label>
+                <form [formGroup]="stepOneForm" (ngSubmit)="submit.focus(); stepOneForm.valid && searchAccountbyGroupNumber()">
+                    <div class="content-wrapper" aria-live="polite" aria-relevant="additions">
+                        <div class="row">
+                            <mat-form-field class="w-200 mon-ml-15">
+                                <input
+                                    matInput
+                                    formControlName="groupNumber"
+                                    autocomplete="off"
+                                    maxlength="45"
+                                    aria-labelledby="search-by-account-label"
+                                />
+                                <mat-error
+                                    aria-required="true"
+                                    *ngIf="stepOneForm.controls.groupNumber.errors?.required"
+                                    language="{{importAccountLanguagePath}}.step1.errors.required.groupNumber"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.groupNumber.errors?.invalid"
+                                    language="{{importAccountLanguagePath}}.{{errorCode}}"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="stepOneForm.controls.groupNumber.hasError('pattern')"
+                                    language="{{importAccountLanguagePath}}.errors.invalidGroupNumber"
+                                >
+                                </mat-error>
+                                <mat-error *ngIf="stepOneForm.controls.groupNumber.errors?.invalid && forbiddenError"
+                                    ><span class="sr-only">Error </span>{{forbiddenError}}
+                                </mat-error>
+                            </mat-form-field>
+                            <button
+                                #submit
+                                mat-flat-button
+                                class="mon-btn-search mon-btn-primary"
+                                color="primary"
+                                type="submit"
+                                (click)="resetStepTwoForm()"
+                                [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                            >
+                                <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                            </button>
+                        </div>
+                        <ng-container [ngTemplateOutlet]="accountInfo"></ng-container>
+                        <a *ngIf="!isSelfDuplicate" href="javascript:void(0)" (click)="goToStep(3)"
+                            >{{languageStrings['primary.portals.accounts.importAccount.step1.aboutLink']}}</a
+                        >
+                        <ng-container
+                            *ngIf="errorCode && !errorCode?.match(inlineErrorCodePattern) || !accountSearched"
+                            [ngTemplateOutlet]="errorInfo"
+                        ></ng-container>
+                        <div class="mon-mt-30">
+                            <mon-alert alertType="danger" *ngIf="stepOneForm.controls.groupNumber.errors?.duplicate">
+                                <span language="{{importAccountLanguagePath}}.{{errorCode}}"></span>&nbsp;
+                                <a href="javascript:void(0)" (click)="navigateToAccount()"
+                                    >{{languageStrings['primary.portals.accounts.importAccount.viewAccount']}}</a
+                                >
+                            </mon-alert>
+                            <mon-alert alertType="danger" *ngIf="errorMessage" class="message-block">
+                                <span>{{ errorMessage }}</span>
+                            </mon-alert>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <button
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    [disabled]="stepOneForm.controls.groupNumber.errors?.invalidZipError"
+                    (click)="goToStep(1)"
+                >
+                    <span>{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon
+                        class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                        iconSize="12"
+                        iconName="right"
+                    ></mon-icon>
+                </button>
+            </mat-dialog-actions>
+        </mat-step>
+        <mat-step [stepControl]="stepTwoForm">
+            <form [formGroup]="stepTwoForm">
+                <div mat-dialog-content>
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.stepTwoOfThree']}}</mat-label>
+                    <h2 mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.step2.subtitle']}}</h2>
+                    <div class="content-wrapper">
+                        <ng-container [ngTemplateOutlet]="accountInfo"></ng-container>
+                        <div class="row mon-mt-10 dropdown-section" *ngIf="!subordinateFlag">
+                            <div class="col-4 mon-pr-0">
+                                <mat-label
+                                    class="mat-label"
+                                    language="{{importAccountLanguagePath}}.step2.writingNumber"
+                                    id="writing-num-label"
+                                ></mat-label>
+                                <mat-form-field [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']">
+                                    <mat-select
+                                        formControlName="writingNumber"
+                                        [disableOptionCentering]="true"
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        (selectionChange)="getSitCodeOptions($event, null)"
+                                        aria-labelledby="writing-num-label"
+                                    >
+                                        <mat-option *ngFor="let writingNumber of writingNumbers" [value]="writingNumber.number">
+                                            {{writingNumber.number}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="stepTwoForm.controls.writingNumber.errors?.required"
+                                        language="{{primaryPortalCommonPath}}.selectionRequired"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="stepTwoForm.controls.writingNumber.errors?.invalid"
+                                        [language]="invalidWritingNumberResponse
+                                            ? 'primary.portals.accounts.importAccount.errors.invalidWritingNumber'
+                                            : 'primary.portals.accounts.importAccount.errors.getAflacAccount.403.forbidden'"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-4">
+                                <mat-label
+                                    class="mat-label"
+                                    language="{{importAccountLanguagePath}}.step2.sitCode"
+                                    id="sit-code-label"
+                                ></mat-label>
+                                <div class="sit-code-row">
+                                    <mat-form-field
+                                        class="sit-code-select"
+                                        [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    >
+                                        <mat-select
+                                            formControlName="sitCode"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                            (selectionChange)="loadSitCodeHierarchy($event.value,sitCodeHierarchy)"
+                                            aria-labelledby="sit-code-label"
+                                        >
+                                            <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">{{sitCode.code}}</mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="stepTwoForm.controls.sitCode.errors?.required"
+                                            language="{{primaryPortalCommonPath}}.selectionRequired"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <ng-container *configEnabled="'general.enable.sit_code.hierarchy'">
+                                        <button
+                                            type="button"
+                                            mat-icon-button
+                                            [richTooltip]="stepTwoForm.controls.sitCodeHierarchy.value"
+                                            matTooltipPosition="above"
+                                            matTooltipClass="pos-above"
+                                            *ngIf="stepTwoForm.controls.sitCode.value"
+                                            class="sit-tooltip"
+                                            [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                                        >
+                                            <mon-icon iconName="Filled-info" iconSize="18" class="icon-primary"></mon-icon>
+                                        </button>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <!--clarification pending start here-->
+                        <h4 *ngIf="subordinateFlag" class="primary-producer">Primary producer:</h4>
+                        <mat-radio-group
+                            [attr.aria-label]="languageStrings['primary.portal.accounts.primaryProducer']"
+                            *ngIf="subordinateFlag"
+                            (change)="getRadioValue($event)"
+                        >
+                            <!--Me start here-->
+                            <mat-radio-button
+                                class="primary-radio"
+                                [checked]="true"
+                                value="me"
+                                [attr.aria-label]="languageStrings['primary.portal.producerFilter.me']"
+                                >{{languageStrings['primary.portal.producerFilter.me']}}</mat-radio-button
+                            >
+                            <!--Me end here-->
+                            <!--Some one start here-->
+                            <!--writing sit start code-->
+                            <div class="row mon-mt-10 dropdown-section" *ngIf="selectedRadioButton === 'me'">
+                                <div class="col-4 mon-pr-0">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="{{importAccountLanguagePath}}.step2.writingNumber"
+                                        id="hq-writing-num-label"
+                                    ></mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="writingNumber"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                            (selectionChange)="getSitCodeOptions($event, null)"
+                                            aria-labelledby="hq-writing-num-label"
+                                        >
+                                            <mat-option *ngFor="let writingNumber of writingNumbers" [value]="writingNumber.number">
+                                                {{writingNumber.number}}</mat-option
+                                            >
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="stepTwoForm.controls.writingNumber.errors?.required"
+                                            language="{{primaryPortalCommonPath}}.selectionRequired"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                    <mat-label
+                                        class="mat-label"
+                                        language="{{importAccountLanguagePath}}.step2.sitCode"
+                                        id="hq-sit-code-label"
+                                    ></mat-label>
+                                    <div class="sit-code-row">
+                                        <mat-form-field
+                                            class="sit-code-select"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        >
+                                            <mat-select
+                                                formControlName="sitCode"
+                                                [disableOptionCentering]="true"
+                                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                (selectionChange)="loadSitCodeHierarchy($event.value,sitCodeHierarchy)"
+                                                aria-labelledby="hq-sit-code-label"
+                                            >
+                                                <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">
+                                                    {{sitCode.code}}</mat-option
+                                                >
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.sitCode.errors?.required"
+                                                language="{{primaryPortalCommonPath}}.selectionRequired"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <ng-container *configEnabled="'general.enable.sit_code.hierarchy'">
+                                            <button
+                                                type="button"
+                                                mat-icon-button
+                                                [richTooltip]="stepTwoForm.controls.sitCodeHierarchy.value"
+                                                matTooltipPosition="above"
+                                                matTooltipClass="pos-above"
+                                                class="sit-tooltip"
+                                                *ngIf="stepTwoForm.controls.sitCode.value"
+                                                [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                                            >
+                                                <mon-icon iconName="Filled-info" iconSize="18" class="icon-primary"></mon-icon>
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--writing and sit end code-->
+                            <!--Some one start here-->
+                            <mat-radio-button class="primary-radio" value="other"
+                                >{{languageStrings['primary.portal.producerFilter.someonefromMyteam']}}</mat-radio-button
+                            >
+                        </mat-radio-group>
+
+                        <form [formGroup]="searchForm">
+                            <div class="input-section" *ngIf="selectedRadioButton === 'other'">
+                                <mat-form-field class="search-producer">
+                                    <input
+                                        type="text"
+                                        matInput
+                                        formControlName="searchControl"
+                                        class="producer-input"
+                                        [matAutocomplete]="auto"
+                                        #searchValue
+                                        [attr.aria-label]="languageStrings['primary.portal.producerFilter.searchbyProducer']"
+                                    />
+                                    <mat-autocomplete
+                                        autoActiveFirstOption
+                                        #auto="matAutocomplete"
+                                        (optionSelected)="selectedSubproducer($event.option)"
+                                        class="producer-search-filter"
+                                    >
+                                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
+                                            <span class="producer-name">{{option.name}}</span>
+                                            <span class="producer-email">{{option.email}}</span>
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-error
+                                        *ngIf="!searchForm.controls.searchControl.errors?.required"
+                                        language="primary.portal.producerFilter.producernotFound"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="searchForm.controls.searchControl.errors?.required"
+                                        language="{{primaryPortalCommonPath}}.selectionRequired"
+                                    ></mat-error>
+                                </mat-form-field>
+                                <span class="hint-txt">{{languageStrings['primary.portal.producerFilter.searchbyProducer']}}</span>
+                            </div>
+                        </form>
+
+                        <!--Some one start here-->
+                        <!--writing sit start code-->
+                        <div class="row mon-mt-10 dropdown-section" *ngIf="selectedRadioButton === 'other'">
+                            <div class="col-4 mon-pr-0">
+                                <mat-label
+                                    class="mat-label"
+                                    language="{{importAccountLanguagePath}}.step2.writingNumber"
+                                    id="other-writing-num-label"
+                                ></mat-label>
+                                <mat-form-field [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']">
+                                    <mat-select
+                                        formControlName="writingNumberOther"
+                                        [disableOptionCentering]="true"
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        (selectionChange)="getSitCodeOptions($event, 'fromOption')"
+                                        aria-labelledby="other-writing-num-label"
+                                    >
+                                        <mat-option *ngFor="let writingNumber of writingNumbers" [value]="writingNumber.number">
+                                            {{writingNumber.number}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="stepTwoForm.controls.writingNumberOther.errors?.required"
+                                        language="{{primaryPortalCommonPath}}.selectionRequired"
+                                    ></mat-error>
+                                    <mat-error
+                                        *ngIf="stepTwoForm.controls.writingNumberOther.errors?.invalid"
+                                        [language]="invalidWritingNumberResponse
+                                            ? 'primary.portals.accounts.importAccount.errors.invalidWritingNumber'
+                                            : 'primary.portals.accounts.importAccount.errors.getAflacAccount.403.forbidden'"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-3">
+                                <mat-label
+                                    class="mat-label"
+                                    language="{{importAccountLanguagePath}}.step2.sitCode"
+                                    id="other-sit-code-label"
+                                ></mat-label>
+                                <mat-form-field [attr.aria-label]="languageStrings['primary.portal.common.placeholderSelect']">
+                                    <mat-select
+                                        formControlName="sitCodeOther"
+                                        [disableOptionCentering]="true"
+                                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        (selectionChange)="loadSitCodeHierarchy($event.value,sitCodeHierarchyOther)"
+                                        aria-labelledby="other-sit-code-label"
+                                    >
+                                        <mat-option *ngFor="let sitCode of sitCodes" [value]="sitCode.id">{{sitCode.code}}</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="stepTwoForm.controls.sitCodeOther.errors?.required"
+                                        language="{{primaryPortalCommonPath}}.selectionRequired"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="sit-tooltip" *configEnabled="'general.enable.sit_code.hierarchy'">
+                                <button
+                                    type="button"
+                                    mat-icon-button
+                                    [richTooltip]="stepTwoForm.controls.sitCodeHierarchyOther.value"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    *ngIf="stepTwoForm.controls.sitCodeOther.value"
+                                    class="sit-code-tooltip"
+                                    [attr.aria-label]="languageStrings['primary.portal.commissionSplit.addUpdate.column.sitCode']"
+                                >
+                                    <mon-icon iconName="Filled-info" iconSize="18" class="icon-primary"></mon-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!--writing and sit end code-->
+                        <!--clarificatin pending -->
+                        <!--clarificatin pending start here-->
+                        <ng-container *ngIf="errorCode" [ngTemplateOutlet]="errorInfo"></ng-container>
+                        <div class="mon-mt-30">
+                            <mon-alert alertType="danger" *ngIf="aflacErrorMessage" class="message-block">
+                                <span>{{ aflacErrorMessage }}</span>
+                            </mon-alert>
+                        </div>
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-mr-20" color="primary" mat-flat-button type="button" matStepperPrevious>
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-primary" mat-flat-button (click)="goToStep(3)">
+                            <span>{{languageStrings['primary.portal.common.next']}}</span>
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0"
+                                iconSize="12"
+                                iconName="right"
+                            ></mon-icon>
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+        <!--MON-34742-Import/create the default enrollment period for New Hire eligibility rule start-->
+        <mat-step>
+            <form [formGroup]="stepThreeForm" (ngSubmit)="onClickImport()" *ngIf="isStepThreeFormValid">
+                <div mat-dialog-content class="newhire-wrapper">
+                    <mat-label class="mat-label mon-mt-0 mon-mb-0"
+                        >{{languageStrings['primary.portal.prospects.stepThreeOfThree']}}</mat-label
+                    >
+                    <h2 mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.newhireEligibility']}}</h2>
+                    <p>{{languageStrings['primary.portals.accounts.importAccount.settingsDetermine']}}</p>
+                    <div class="content-wrapper">
+                        <mat-label class="mat-label" id="new-enroll-period"
+                            >{{languageStrings['primary.portals.accounts.importAccount.enrollmentPeriod']}}
+                        </mat-label>
+                        <div class="new-enroll">
+                            {{languageStrings['primary.portals.accounts.importAccount.newEmployees']}}
+                            <mat-form-field class="days-input">
+                                <input
+                                    formControlName="enrollmentPeriod"
+                                    [maxLength]="3"
+                                    matInput
+                                    (paste)="numberValidation($event)"
+                                    (keypress)="numberValidation($event)"
+                                    aria-labelledby="new-enroll-period"
+                                />
+                            </mat-form-field>
+                            {{languageStrings['primary.portals.accounts.importAccount.daystoEnroll']}}
+                        </div>
+                        <div class="enrollperiod-error">
+                            <mat-error *ngIf="stepThreeForm.get('enrollmentPeriod').hasError('required')">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                        </div>
+                        <div class="coverage-start">
+                            <mat-label class="mat-label" id="coverage-start-label"
+                                >{{languageStrings['primary.portals.accounts.importAccount.coveragestartDate']}}</mat-label
+                            >
+                            <mat-radio-group
+                                aria-labelledby="coverage-start-label"
+                                formControlName="coverageStartDate"
+                                (change)="onClickCoverageStart($event)"
+                            >
+                                <mat-radio-button value="IMMEDIATELY" [checked]="true"
+                                    >{{languageStrings['primary.portals.accounts.importAccount.immediatelySigned']}}</mat-radio-button
+                                >
+
+                                <mat-radio-button value="AFTER_EVENT"
+                                    ><div class="radio-input">
+                                        {{languageStrings['primary.portals.accounts.importAccount.immediatelyAfter']}}
+                                        <mat-form-field class="days-input">
+                                            <input
+                                                formControlName="daysBeforeCoverageStart"
+                                                [disabled]="isAfterEvent"
+                                                [maxLength]="3"
+                                                matInput
+                                                (paste)="numberValidation($event)"
+                                                (keypress)="numberValidation($event)"
+                                                [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.immediatelyAfter']+' '+languageStrings['primary.portals.accounts.importAccount.daysofEmployment']"
+                                            /> </mat-form-field
+                                        >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                                    </div></mat-radio-button
+                                >
+                                <div class="after-error">
+                                    <mat-error *ngIf="stepThreeForm.get('daysBeforeCoverageStart').hasError('required')">
+                                        <span language="primary.portal.common.requiredField"></span>
+                                    </mat-error>
+                                </div>
+
+                                <mat-radio-button value="FIRST_OF_THE_MONTH_AFTER_EVENT"
+                                    ><div class="radio-input">
+                                        {{languageStrings['primary.portals.accounts.importAccount.firstDay']}}
+                                        <mat-form-field class="days-input">
+                                            <input
+                                                formControlName="monthsBeforeCoverageStart"
+                                                [disabled]="isFirstOfTheMonethAfter"
+                                                matInput
+                                                [maxLength]="3"
+                                                (paste)="numberValidation($event)"
+                                                (keypress)="numberValidation($event)"
+                                                [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.firstDay']+' '+languageStrings['primary.portals.accounts.importAccount.daysofEmployment']"
+                                            /> </mat-form-field
+                                        >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                                    </div></mat-radio-button
+                                >
+                                <div class="before-error">
+                                    <mat-error *ngIf="stepThreeForm.get('monthsBeforeCoverageStart').hasError('required')">
+                                        <span language="primary.portal.common.requiredField"></span>
+                                    </mat-error>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">
+                        {{languageStrings['primary.portal.common.cancel']}}
+                    </a>
+                    <div class="d-flex">
+                        <button class="mon-btn-secondary mon-mr-20" color="primary" mat-flat-button type="button" matStepperPrevious>
+                            <mon-icon
+                                class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                                iconSize="12"
+                                iconName="left"
+                            ></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button class="mon-btn-primary" mat-flat-button type="submit">
+                            {{languageStrings['primary.portals.accounts.importAccount.step2.import']}}
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+        <!--MON-34742-Import/create the default enrollment period for New Hire eligibility rule end-->
+        <mat-step>
+            <div mat-dialog-content>
+                <div class="content-wrapper">
+                    <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.about.title']}}</h2>
+                    <!-- Don't remove this line since it has been commented out for pilot. This will be reverted sometime in future. Refer to MON-33954. -->
+                    <!-- <p class="mon-mb-30" language="{{importAccountLanguagePath}}.about.infoPart1"></p> -->
+                    <p language="primary.portals.accounts.importAccount.about.NASSA.infoPart1"></p>
+                    <p class="mon-mt-10">
+                        {{languageStrings['primary.portals.accounts.importAccount.about.NASSA.infoPart2']}}
+                        <a
+                            class="email-info"
+                            href="mailto:{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}?subject={{languageStrings['primary.portals.accounts.importAccount.NASSA.email.subject']}}"
+                            >{{languageStrings['primary.portals.accounts.importAccount.NASSA.email']}}</a
+                        >.
+                    </p>
+                    <!-- Don't remove this line since it has been commented out for pilot. This will be reverted sometime in future. Refer to MON-33954. -->
+                    <!-- <p class="mon-mt-10">
+                        <a
+                            target="_blank"
+                            [href]="languageStrings['primary.portals.accounts.importAccount.about.precallWorksheet.link']"
+                        >
+                            {{languageStrings['primary.portals.accounts.importAccount.about.precallWorksheetView']}}
+                        </a>
+                    </p> -->
+                    <p class="mon-mt-10">
+                        <a
+                            class="info-link"
+                            target="_blank"
+                            [href]="languageStrings['primary.portals.accounts.importAccount.about.NASSA.link']"
+                            >{{languageStrings['primary.portals.accounts.importAccount.about.learnMoreNASSA']}}</a
+                        >
+                        <mon-icon iconName="open-in-new" iconSize="16"></mon-icon>
+                    </p>
+                </div>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()">
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </a>
+                <span>
+                    <button class="mon-btn-secondary mon-mr-20" color="primary" mat-flat-button type="button" (click)="goToStep(0)">
+                        <mon-icon
+                            class="mon-icon mon-directions-btn-icon icon-left mon-mt-0 mon-ml-0"
+                            iconSize="12"
+                            iconName="left"
+                        ></mon-icon
+                        ><span>{{languageStrings['primary.portal.common.back']}}</span>
+                    </button>
+                    <button type="button" class="mon-btn-primary mon-m-0" (click)="onCancelClick()" mat-flat-button>
+                        {{languageStrings['primary.portals.accounts.importAccount.about.startNASSA']}}
+                    </button>
+                </span>
+            </mat-dialog-actions>
+        </mat-step>
+        <ng-template #accountInfo>
+            <div class="import-account-detail-wrapper" *ngIf="aflacAccount">
+                {{aflacAccount.name | titlecase}}
+                <span *ngIf="aflacAccount.primaryContact.address as address">
+                    / {{address.city | titlecase}}, {{address.state}}
+                    <span>
+                        / {{languageStrings['primary.portals.accounts.importAccount.accountNo']}} {{aflacAccount.accountNumber |
+                        uppercase}}</span
+                    >
+                </span>
+            </div>
+        </ng-template>
+        <ng-template #errorInfo>
+            <mon-alert class="d-block mon-mt-40" alertType="danger">
+                <span *ngIf="accountSearched && serviceUnavailableErrorMessage">{{serviceUnavailableErrorMessage}}</span>
+                <span *ngIf="errorCode?.endsWith('selfDuplicate') && accountSearched;else other_error">
+                    <span language="{{importAccountLanguagePath}}.{{errorCode}}"></span>&nbsp;
+                    <a href="javascript:void(0)" (click)="navigateToAccount()"
+                        >{{languageStrings['primary.portals.accounts.importAccount.viewAccount']}}</a
+                    >
+                </span>
+                <ng-template #other_error>
+                    <span *ngIf="errorCode && accountSearched" language="{{importAccountLanguagePath}}.{{errorCode}}"> </span>
+                </ng-template>
+                <span
+                    *ngIf="!accountSearched"
+                    language="{{importAccountLanguagePath}}.errors.searchFirst"
+                    [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.errors.searchFirst']"
+                ></span>
+            </mon-alert>
+        </ng-template>
+    </mat-horizontal-stepper>
+</div>

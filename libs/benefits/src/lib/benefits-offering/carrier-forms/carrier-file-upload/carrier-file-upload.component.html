@@ -1,0 +1,18 @@
+<mat-label class="mat-label">Supporting documents</mat-label>
+<empowered-mon-upload
+    [accept]="acceptableFormats"
+    (uploadFile)="validateFileAndUpload($event)"
+    (cancelUpload)="cancelUpload()"
+    [modeProgress]="modeProgress"
+    [files]="files"
+    [hasError]="hasError"
+    [isSucess]="isSucess"
+    [uploadSucessStatus]="uploadSuccessStatus"
+    [isProgressBarEnabled]="true"
+    [isFileSelected]="true"
+    [lastUploadFileName]="lastUploadFileName"
+    [fileUploadPercentage]="fileUploadPercentage"
+    [isUploadingStarted]="isUploadingStarted"
+    [isSucess]="isSucess"
+></empowered-mon-upload>
+<mat-error *ngIf="errorMessage"></mat-error>

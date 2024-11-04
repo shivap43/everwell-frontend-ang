@@ -1,0 +1,74 @@
+<form [formGroup]="removeForm" (ngSubmit)="removePlan()">
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <mat-dialog-content>
+            <h1 mat-dialog-title *ngIf="removePlanData.continuous">
+                {{"primary.portal.maintenanceBenefitsOffering.removePlan.title" | replaceTag: { "##planname##":
+                planName} }}
+            </h1>
+            <h1 mat-dialog-title *ngIf="!removePlanData.continuous">
+                {{"primary.portal.maintenanceBenefitsOffering.removePlan.planYearTitle" | replaceTag: { "##planname##":
+                planName, "##planyear##": planYearName } }}
+            </h1>
+            <p *ngIf="displayEnrollmentEndDate && !removePlanData.continuous">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.removePlan.openEnrollment']}}
+            </p>
+            <p *ngIf="displayEnrollmentEndDate && removePlanData.continuous">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.removeContinuousPlan.openEnrollment']}}
+            </p>
+            <div *ngIf="displayEnrollmentEndDate" class="flex-form-wrapper">
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.common.stopOfferingPlan']}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [matDatepicker]="enrollmentEndDate"
+                                matInput
+                                class="mon-input"
+                                [min]="todayDate"
+                                [max]="setMaxDate()"
+                                formControlName="enrollmentEndDate"
+                                empoweredDateTransform
+                                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.removePlan.enrollmentEndDate']"
+                            />
+                            <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix (click)="enrollmentEndDate.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-error *ngIf="removeForm.controls['enrollmentEndDate'].errors?.required">
+                                {{languageStrings['primary.portal.common.requiredField']}}
+                            </mat-error>
+                            <mat-error *ngIf="removeForm.controls['enrollmentEndDate'].errors?.matDatepickerMin">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.invalidDate']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-dialog-close
+                (click)="cancel()"
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button
+                type="submit"
+                mat-flat-button
+                class="mon-btn-danger"
+                [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+            >
+                {{languageStrings['primary.portal.common.remove']}}
+            </button>
+        </mat-dialog-actions>
+    </div>
+</form>

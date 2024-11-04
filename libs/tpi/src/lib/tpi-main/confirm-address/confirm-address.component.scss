@@ -1,0 +1,34 @@
+@import "shared";
+
+.address-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    .address {
+        width: convert-unit(250px, "rem");
+    }
+    .state,
+    .zip-code {
+        width: convert-unit(100px, "rem");
+    }
+}
+::ng-deep .select-states-confirm-address {
+    .mat-option {
+        padding: convert-unit(23px, "rem");
+    }
+}
+.lnl-footer {
+    padding: map-get($spacers, 25) map-get($spacers, 30);
+}
+
+.acknowledge-txt {
+    max-width: convert-unit(650px, "rem");
+
+    ::ng-deep {
+        .mat-checkbox-layout {
+            white-space: normal;
+            .mat-checkbox-inner-container {
+                margin-top: map-get($spacers, 5);
+            }
+        }
+    }
+}

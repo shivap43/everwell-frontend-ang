@@ -1,0 +1,46 @@
+<h3 [ngClass]="{'tpi-h3-header': isModalMode}">{{ this.languageStrings[this.languageKeys.selectPoliciesHeader] }}</h3>
+<div class="row">
+    <div class="col mon-pl-0">
+        <mon-alert
+            alertType="danger"
+            class="error-block mon-mb-10"
+            *ngIf="(hasClickedNext$ | async) === true && (isLoading$ | async) !== true && (isPolicySelected$ | async) !== true"
+            closeButton="true"
+            iconAltText="Close error alert"
+        >
+            <span>{{this.languageStrings[this.languageKeys.noPolicySelected]}}</span>
+        </mon-alert>
+        <mon-alert
+            alertType="danger"
+            class="error-block mon-mb-10"
+            *ngIf="(hasClickedNext$ | async) === true && (isLoading$ | async) !== true && (noPoliciesFound$ | async) === true"
+            closeButton="true"
+            iconAltText="Close error alert"
+        >
+            <span>{{this.languageStrings[this.languageKeys.noPoliciesFound]}}</span>
+        </mon-alert>
+        <p [ngClass]="{'pd-bt-40': isModalMode && !shouldShowEnrollmentMethod}">
+            {{ this.languageStrings[this.languageKeys.selectPoliciesText] }}
+        </p>
+    </div>
+</div>
+<form [formGroup]="formGroup">
+    <div class="row" *ngIf="shouldShowEnrollmentMethod">
+        <div class="col mon-pl-0 enrollment-method-container" [ngClass]="{'mon-mt-10': !isModalMode,'pd-tp-40': isModalMode}">
+            <empowered-enrollment-method-select [formControlName]="formKeys.enrollmentMethod"></empowered-enrollment-method-select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col mon-pl-0">
+            <empowered-eligible-policies-table
+                [isModalMode]="isModalMode"
+                [formControlName]="formKeys.eligiblePolicies"
+            ></empowered-eligible-policies-table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col mon-pl-0">
+            <empowered-import-policy-form [formControlName]="formKeys.importPolicy"></empowered-import-policy-form>
+        </div>
+    </div>
+</form>

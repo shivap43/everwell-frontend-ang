@@ -1,0 +1,187 @@
+<div class="enroll-aflac-always-modal" [ngClass]="{'quasi-modal': !isModalMode}">
+    <div class="row modal-header" *ngIf="!isModalMode">
+        <div class="col d-flex align-items-center h-100 justify-content-start modal-header-title">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+        </div>
+        <div class="col d-flex align-items-center h-100 justify-content-end modal-header-cancel">
+            <ng-container *ngTemplateOutlet="headerCloseButton"></ng-container>
+        </div>
+    </div>
+    <ng-container *ngIf="isModalMode" [ngTemplateOutlet]="mainContent"></ng-container>
+
+    <mat-dialog-content *ngIf="!isModalMode">
+        <ng-container [ngTemplateOutlet]="mainContent"></ng-container>
+    </mat-dialog-content>
+    <div class="tpi-footer" *ngIf="isModalMode">
+        <div>
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-flat-button
+                (click)="onExit()"
+                language="primary.portal.tpiEnrollment.exit"
+            >
+            </a>
+        </div>
+        <div class="d-flex">
+            <ng-container *ngTemplateOutlet="backButton"></ng-container>
+            <div class="mon-ml-5"><ng-container *ngTemplateOutlet="nextButton"></ng-container></div>
+            <div class="mon-ml-5"><ng-container *ngTemplateOutlet="saveAndCompleteButton"></ng-container></div>
+        </div>
+    </div>
+</div>
+
+<ng-template #mainContent>
+    <div class="h-100" [ngClass]="{'row': !isModalMode}">
+        <div [ngClass]="{'btm-shadow-border': isModalMode, 'd-none': !isModalMode}">
+            <div [ngClass]="{'tpi-stepper ' : isModalMode}" class="stepper-trigger-wrapper">
+                <button
+                    matButton
+                    class="stepperTrigger mon-btn-link"
+                    id="stepperTrigger"
+                    (click)="display = !display"
+                    [ngClass]="{'arrow-up' : !display}"
+                >
+                    <span class="selected-step-index">{{stepper.selectedIndex+1}}. </span>
+                    <span class="selected-step-label"></span>
+                    <mon-icon class="icon-right" iconName="down" iconSize="10"></mon-icon>
+                </button>
+            </div>
+        </div>
+        <div
+            class="col enroll-aflac-always-modal-stepper-container p-0"
+            [ngClass]="{'sidenav-area': isModalMode, 'shown': !display}"
+            app-Overlaystepper="stepperTrigger"
+            [tpiLnlMode]="!isModalMode"
+            stepperId="aflac-always-stepper"
+        >
+            <mat-vertical-stepper
+                #stepper
+                [selectedIndex]="activeStep"
+                (selectionChange)="nextStep($event)"
+                id="aflac-always-stepper"
+                [ngClass]="{'side-nav-stepper': !isModalMode}"
+            >
+                <mat-step [completed]="isSelectPoliciesComplete">
+                    <ng-template matStepLabel>{{ languageStrings[languageKeys.selectPolicies] }}</ng-template>
+                </mat-step>
+                <mat-step [completed]="isPaymentMethodComplete" [aria-labelledby]="!isSelectPoliciesComplete ? 'disable-nav-stepper': null">                    
+                    <ng-template matStepLabel>{{ languageStrings[languageKeys.paymentMethod] }}</ng-template>
+                </mat-step>
+                <mat-step [completed]="isBillingAddressComplete" [aria-labelledby]="!isPaymentMethodComplete ? 'disable-nav-stepper': null">
+                    <ng-template matStepLabel>{{ languageStrings[languageKeys.billingAddress] }}</ng-template>
+                </mat-step>
+                <mat-step [completed]="isPaymentSettingsComplete" [aria-labelledby]="!isBillingAddressComplete ? 'disable-nav-stepper': null">
+                    <ng-template matStepLabel>{{ languageStrings[languageKeys.paymentSettings] }}</ng-template>
+                </mat-step>
+                <ng-template matStepperIcon="done">
+                    <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                </ng-template>
+            </mat-vertical-stepper>
+        </div>
+        <div
+            class="col p-0 d-flex flex-column justify-content-between h-100 enroll-aflac-always-modal-content-container"
+            [ngClass]="{'tpi-content': isModalMode}"
+        >
+            <div class="" [ngClass]="{'content-area-container content-wrapper row': !isModalMode}">
+                <div class="p-0" [ngClass]="{'col': !isModalMode}">
+                    <div class="content-area" [ngSwitch]="activeStep">
+                        <div *ngSwitchCase="0">
+                            <empowered-select-policies-step
+                                [isModalMode]="isModalMode"
+                                [shouldShowEnrollmentMethod]="shouldShowEnrollmentMethod"
+                            ></empowered-select-policies-step>
+                        </div>
+                        <div *ngSwitchCase="1">
+                            <empowered-payment-method-step [isBilling] = "isBillingFromStepper" [isModalMode]="isModalMode"></empowered-payment-method-step>
+                        </div>
+                        <div *ngSwitchCase="2">
+                            <empowered-billing-address-step></empowered-billing-address-step>
+                        </div>
+                        <div *ngSwitchCase="3">
+                            <empowered-payment-settings-step [isModalMode]="isModalMode"></empowered-payment-settings-step>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" *ngIf="!isModalMode">
+                <div class="col m-0 p-0">
+                    <mat-dialog-actions class="dialog-footer">
+                        <ng-container *ngTemplateOutlet="cancelLink"></ng-container>
+                        <div class="d-flex justify-content-end flex-fill">
+                            <ng-container *ngTemplateOutlet="backButton; context: { $implicit: stepper }"></ng-container>
+                            <ng-container *ngTemplateOutlet="nextButton; context: { $implicit: stepper }"></ng-container>
+                            <ng-container *ngTemplateOutlet="saveAndCompleteButton; context: { $implicit: stepper }"></ng-container>
+                        </div>
+                    </mat-dialog-actions>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #saveAndCompleteButton let-stepper>
+    <button
+        *ngIf="activeStep + 1 === templates.length"
+        class="mon-btn-primary ml-3"
+        type="button"
+        mat-flat-button
+        (click)="onSaveAndCompleteClick()"
+        [attr.aria-label]="languageStrings[languageKeys.saveAndComplete]"
+    >
+        <span>{{languageStrings[languageKeys.saveAndComplete]}}</span>
+    </button>
+</ng-template>
+
+<ng-template #nextButton let-stepper>
+    <button
+        *ngIf="activeStep + 1 !== templates.length"
+        class="mon-btn-primary ml-3"
+        type="button"
+        mat-flat-button
+        (click)="onNextClick()"
+        [attr.aria-label]="languageStrings[languageKeys.next]"
+    >
+        <span>{{languageStrings[languageKeys.next]}}</span>
+        <mon-icon class="mon-icon icon-right" [iconSize]="12" iconName="right"></mon-icon>
+    </button>
+</ng-template>
+
+<ng-template #cancelLink>
+    <a
+        href="javascript:void(0)"
+        class="mon-btn-link"
+        mat-dialog-close
+        (click)="onCancel()"
+        [attr.aria-label]="languageStrings[languageKeys.cancel]"
+        >{{ languageStrings[languageKeys.cancel] }}</a
+    >
+</ng-template>
+
+<ng-template #backButton let-stepper>
+    <button
+        *ngIf="activeStep !== 0"
+        class="mon-btn-secondary"
+        color="primary"
+        mat-stroked-button
+        (click)="onBackClick()"
+        [attr.aria-label]="languageStrings[languageKeys.back]"
+    >
+        <mon-icon class="mon-icon icon-left" [iconSize]="12" iconName="left"></mon-icon>
+        <span>{{languageStrings[languageKeys.back]}}</span>
+    </button>
+</ng-template>
+
+<ng-template #headerCloseButton>
+    <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings[languageKeys.close]" class="header-close-icon-button">
+        <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+    </button>
+</ng-template>
+
+<ng-template #headerTitle>
+    <h2 [tabindex]="0" mat-dialog-title [attr.aria-label]="languageStrings[languageKeys.headerTitle]">
+        {{ languageStrings[languageKeys.headerTitle] }}
+    </h2>
+</ng-template>
+
+<empowered-mon-spinner [enableSpinner]="true" [backdrop]="true" *ngIf="showSpinner$ | async"></empowered-mon-spinner>

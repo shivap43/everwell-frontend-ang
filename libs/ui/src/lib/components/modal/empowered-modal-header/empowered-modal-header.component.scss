@@ -1,0 +1,18 @@
+@import "shared";
+
+.modal-header-label {
+    padding-bottom: map-get($spacers, 5);
+    @include fontFace("primary.bold");
+    font-size: convert-unit(14px, "rem");
+    color: get("color.black");
+}
+
+:host {
+    @include media-min("s") {
+        padding: map-get($spacers, 50) map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 50);
+    }
+
+    h2 {
+        margin: map-get($spacers, 0) !important;
+    }
+}

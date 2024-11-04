@@ -1,0 +1,52 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<empowered-modal type="POPUP" size="MD">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="false"></empowered-mon-spinner>
+    <empowered-modal-header class="empowered-modal-header">
+        <h2 mat-dialog-title language="primary.portal.agent.selfEnrollment.header" class="self-enrollment-title"></h2>
+    </empowered-modal-header>
+    <div>
+        <p *ngIf="!onlyNYStateLicensed && isNYStateLicensed">
+            {{languageStrings['primary.portal.agent.selfEnrollment.subHeader']}}
+        </p>
+        <p *ngIf="!isNYStateLicensed">{{languageStrings['primary.portal.agent.selfEnrollment.usOnly.subHeader']}}</p>
+        <p *ngIf="onlyNYStateLicensed">{{languageStrings['primary.portal.agent.selfEnrollment.newYorkOnly']}}</p>
+
+        <div *ngIf="isNYStateLicensed && !onlyNYStateLicensed">
+            {{languageStrings['primary.portal.agent.selfEnrollment.enrollLocation']}}
+            <mat-radio-group [formControl]="selectedLocation" (change)="chooseLocation($event.value)">
+                <div>
+                    <mat-radio-button [value]="usOption" class="primary-radio"> {{usOption}} </mat-radio-button>
+                </div>
+                <div>
+                    <mat-radio-button [value]="newYorkOption" class="primary-radio">
+                        {{newYorkOption}}
+                    </mat-radio-button>
+                </div>
+            </mat-radio-group>
+        </div>
+        <div class="enroll-products" *ngIf="isUS && !onlyNYStateLicensed">
+            {{languageStrings['primary.portal.agent.selfEnrollment.enrollProduct']}}
+            <mat-radio-group [formControl]="productType" (change)="chooseLifeProduct($event.value)">
+                <div>
+                    <mat-radio-button [value]="usNonLifeAccountNumber" class="primary-radio">
+                        {{nonProdLife}}
+                    </mat-radio-button>
+                </div>
+                <div>
+                    <mat-radio-button [value]="usLifeAccountNumber" class="primary-radio">
+                        {{prodLife}}
+                    </mat-radio-button>
+                </div>
+            </mat-radio-group>
+        </div>
+    </div>
+    <empowered-modal-footer>
+        <button mat-raised-button class="mon-btn-primary" (click)="continue()">
+            <span>{{languageStrings['primary.portal.agent.selfEnrollment.continue']}}</span>
+            <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

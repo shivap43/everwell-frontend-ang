@@ -1,0 +1,88 @@
+@import "shared";
+
+$borderStyle: convert-unit(1px, "rem") solid get("color.gray.600");
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .state-select-control {
+        border: $borderStyle;
+        border-radius: convert-unit(4px, "rem");
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .chiplist-wrapper {
+            position: relative;
+
+            ::ng-deep {
+                .mat-chip-list-wrapper {
+                    margin: map-get($spacers, 0);
+                    min-height: convert-unit(40px, "rem");
+                    max-height: convert-unit(120px, "rem");
+                    overflow-y: auto;
+
+                    .state-filter-input {
+                        padding: map-get($spacers, 5px);
+                    }
+
+                    .mat-chip {
+                        width: convert-unit(60px, "rem");
+
+                        .mat-chip-remove {
+                            width: auto;
+                        }
+                    }
+                }
+            }
+
+            .icon-clear {
+                position: absolute;
+                right: map-get($spacers, 0);
+                top: map-get($spacers, 0);
+                padding: map-get($spacers, 10);
+                line-height: convert-unit(10px, "rem");
+
+                .icon-black {
+                    margin: map-get($spacers, 0);
+                }
+            }
+        }
+        .list-group {
+            flex-grow: 1;
+            border-top: $borderStyle;
+            max-height: convert-unit(200px, "rem");
+            overflow-y: auto;
+
+            &.expanded {
+                min-height: convert-unit(140px, "rem");
+            }
+
+            .list-item {
+                &.select-all {
+                    display: block;
+                    padding: map-get($spacers, 10) map-get($spacers, 20);
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+
+//CSS to target only IE-11 browser
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    :host .state-select-control {
+        .chiplist-wrapper {
+            ::ng-deep {
+                .mat-chip-list-wrapper {
+                    .state-filter-input {
+                        height: convert-unit(38px, "rem");
+                    }
+                }
+            }
+        }
+    }
+}

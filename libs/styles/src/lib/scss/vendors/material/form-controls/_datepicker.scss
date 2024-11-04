@@ -1,0 +1,190 @@
+.mon-date-field {
+    .mat-form-field-flex {
+        .mat-form-field-suffix {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: convert-unit(4px, "rem") 0;
+            background-color: get("color.primary.500");
+            border-top-right-radius: convert-unit(4px, "rem");
+            border-bottom-right-radius: convert-unit(4px, "rem");
+            // 38px makes the icon overflow for datepickers
+            height: convert-unit(37px, "rem");
+
+            .mat-icon-button {
+                display: block;
+                height: convert-unit(29px, "rem");
+                width: convert-unit(38px, "rem");
+                border-radius: 0;
+                padding: 0;
+
+                &.cdk-program-focused .mat-button-focus-overlay {
+                    opacity: 0;
+                }
+
+                .mon-icon {
+                    margin-top: convert-unit(3px, "rem");
+                    vertical-align: top;
+                }
+
+                .mat-icon .cls-1 {
+                    fill: get("color.white");
+                }
+            }
+        }
+    }
+
+    &.mat-form-field-invalid .mat-form-field-flex .mat-form-field-suffix {
+        background-color: get("color.info.danger.500");
+    }
+
+    &.mat-form-field-disabled .mat-form-field-flex .mat-form-field-suffix {
+        background: get("color.gray.400");
+        height: convert-unit(38px, "rem");
+        border-left: 0;
+
+        .mat-icon .cls-1 {
+            fill: get("color.gray.700");
+        }
+    }
+
+    &.mat-form-field-readonly .mat-form-field-flex .mat-form-field-suffix {
+        background: get("color.gray.400");
+        height: convert-unit(38px, "rem");
+        border-left: 0;
+
+        .mat-icon .cls-1 {
+            fill: get("color.gray.700");
+        }
+    }
+}
+
+.mat-datepicker-popup .mat-datepicker-content {
+    box-shadow: none;
+    border: convert-unit(1px, "rem") solid get("color.black");
+
+    .mat-calendar {
+        height: auto;
+
+        .mat-calendar-header {
+            background-color: get("color.gray.100");
+            padding: 0;
+            border-top-left-radius: convert-unit(4px, "rem");
+            border-top-right-radius: convert-unit(4px, "rem");
+
+            .mat-calendar-controls {
+                justify-content: space-between;
+                margin: 0;
+                border-bottom: convert-unit(1px, "rem") solid get("color.gray.300");
+
+                .mat-calendar-period-button {
+                    order: 2;
+                    color: get("color.black");
+                    @include fontFace("primary.bold");
+
+                    &:hover {
+                        background-color: transparent;
+                    }
+                }
+
+                .mat-calendar-previous-button {
+                    order: 1;
+                }
+
+                .mat-calendar-next-button {
+                    order: 3;
+                }
+
+                .mat-calendar-spacer,
+                .mat-calendar-arrow {
+                    display: none;
+                }
+
+                .mat-calendar-next-button::after,
+                .mat-calendar-previous-button::after {
+                    border-top-width: convert-unit(1px, "rem");
+                    color: get("color.primary.500");
+                }
+
+                .mat-calendar-previous-button::after {
+                    border-left-width: convert-unit(1px, "rem");
+                }
+
+                .mat-calendar-next-button::after {
+                    border-right-width: convert-unit(1px, "rem");
+                }
+            }
+        }
+
+        .mat-calendar-content {
+            padding: 0 convert-unit(20px, "rem") convert-unit(20px, "rem");
+
+            .mat-calendar-table {
+                .mat-calendar-table-header tr th {
+                    height: convert-unit(40px, "rem");
+                    padding: 0;
+                    color: get("color.black");
+
+                    &.mat-calendar-table-header-divider {
+                        visibility: hidden;
+                        height: 0;
+                    }
+                }
+
+                .mat-calendar-body-label {
+                    visibility: hidden;
+                    padding: 0 !important;
+                }
+
+                .mat-calendar-body {
+                    .mat-calendar-body-cell {
+                        &-content {
+                            border-radius: 0;
+                            color: get("color.primary.500");
+                            border: 0;
+                        }
+
+                        &:hover .mat-calendar-body-cell-content,
+                        .mat-calendar-body-selected {
+                            background-color: get("color.primary.500");
+                            color: get("color.white");
+                        }
+                    }
+
+                    .mat-calendar-body-active .mat-calendar-body-today,
+                    .mat-calendar-body-active .mat-calendar-body-selected {
+                        background-color: get("color.primary.500");
+                        color: get("color.white");
+                    }
+                }
+
+                // disabled mode
+                .mat-calendar-body {
+                    .mat-calendar-body-cell.mat-calendar-body-disabled {
+                        .mat-calendar-body-cell-content {
+                            color: get("color.gray.400");
+
+                            &:hover {
+                                background-color: get("color.gray.400");
+                                color: get("color.white");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+&.is-touch {
+    .mat-calendar-controls {
+        .mat-icon-button {
+            height: convert-unit(70px, "rem");
+            width: convert-unit(70px, "rem");
+
+            &::after {
+                margin: convert-unit(28px, "rem");
+            }
+        }
+    }
+}

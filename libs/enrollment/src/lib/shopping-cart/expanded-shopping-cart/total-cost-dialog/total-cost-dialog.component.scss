@@ -1,0 +1,31 @@
+@import "shared";
+.totalcost-container {
+    .cart-total,
+    .existing-coverage {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+    .new-total {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: convert-unit(22px, "rem");
+        border-top: convert-unit(1px, "rem") solid get("color.black");
+        margin-top: map-get($spacers, 20);
+        padding-top: map-get($spacers, 15);
+        text-align: right;
+        align-items: baseline;
+        .pay-freq {
+            display: block;
+            font-size: convert-unit(16px, "rem");
+            color: get("color.gray.700");
+        }
+    }
+    .instructions {
+        margin-top: map-get($spacers, 15);
+        font-size: convert-unit(12px, "rem");
+        color: get("color.gray.600");
+    }
+}

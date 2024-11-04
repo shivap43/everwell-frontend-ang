@@ -1,0 +1,38 @@
+@import "shared";
+
+.question-knockout {
+    min-height: convert-unit(600px, "rem");
+    border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+
+    ::ng-deep {
+        h1 {
+            font-weight: 400;
+            @include fontFace("primary.regular");
+            font-size: convert-unit(22px, "rem");
+            color: get("color.black");
+            margin: convert-unit(30px, "rem") 0;
+        }
+        .knock-out-text {
+            h3 {
+                font-size: convert-unit(16px, "rem");
+                color: get("color.black");
+                margin: map-get($spacers, 0);
+            }
+            h1 {
+                font-size: convert-unit(16px, "rem");
+            }
+        }
+    }
+
+    .action-btns {
+        padding-top: convert-unit(40px, "rem");
+    }
+}
+
+.section-container {
+    min-height: map-get($spacers, 0);
+}
+
+.margin-bottom {
+    margin-bottom: map-get($spacers, 20);
+}

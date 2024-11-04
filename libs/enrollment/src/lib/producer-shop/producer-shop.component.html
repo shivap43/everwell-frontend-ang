@@ -1,0 +1,53 @@
+<ng-container *ngIf="zeroState$ | async as zeroState">
+    <ng-container *ngIf="zeroState.errorMessage">
+        <div class="shop-header">
+            <div class="shop-title" language="primary.portal.shoppingCart.quoteLevelSettings.header.shop"></div>
+        </div>
+        <div class="shop-body">
+            <p class="margin-top-50">{{ zeroState.errorMessage }}</p>
+            <div class="shop-button-group">
+                <button
+                    *ngIf="zeroState.buttonType"
+                    [attr.aria-label]="zeroState.buttonText"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    data-test="eb-shop-page__zero-state-button"
+                    (click)="updateNavigation(zeroState.buttonType)"
+                >
+                    {{zeroState.buttonText}}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="!zeroState.errorMessage && zeroState.planOfferingAsyncStatus === asyncStatus.SUCCEEDED">
+        <div class="shop-header" *ngIf="zeroState.shopLabelText">
+            <div class="shop-title">
+                <span> {{zeroState.shopLabelText}} </span>
+            </div>
+            <empowered-shopping-cart-display></empowered-shopping-cart-display>
+        </div>
+        <div class="shop-body">
+            <empowered-enrollment-settings
+                [backdropAnchor]="planAndProductsContainer"
+                [coverageDateBoldConfigEnabled]="coverageDateBoldConfigEnabled"
+            ></empowered-enrollment-settings>
+            <button mat-flat-button class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+                <span class="selected-step-index"></span>
+                <span class="selected-tab-label"></span>
+                <mon-icon class="icon-right" iconName="down" iconSize="20"></mon-icon>
+            </button>
+            <div #planAndProductsContainer class="plan-and-products-container">
+                <div app-Overlaystepper="stepperTrigger" stepperId="quoteShop" [ngClass]="{'shown': !display}">
+                    <div id="quoteShop">
+                        <empowered-products-container></empowered-products-container>
+                    </div>
+                </div>
+                <div class="vertical-border"></div>
+                <empowered-plans-container></empowered-plans-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-container>
+
+<empowered-mon-spinner [enableSpinner]="true" [backdrop]="true" *ngIf="showSpinner$ | async"></empowered-mon-spinner>

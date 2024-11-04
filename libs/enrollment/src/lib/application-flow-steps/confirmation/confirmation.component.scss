@@ -1,0 +1,191 @@
+@import "shared";
+
+:host {
+    flex: 1;
+    overflow: auto;
+
+    .section-step.active-section {
+        min-height: auto !important;
+        border: none !important;
+    }
+}
+
+.info-modal {
+    width: convert-unit(1200px, "rem");
+    max-width: 100%;
+    max-height: 100%;
+
+    .alert-msg {
+        .alert-content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        margin-top: convert-unit(20px, "rem");
+    }
+}
+
+.apply-coverage {
+    padding: map-get($spacers, 0) map-get($spacers, 30);
+
+    .alert-msg {
+        margin-top: map-get($spacers, 20);
+    }
+    .summary-title {
+        margin: 0 0 convert-unit(20px, "rem");
+        color: get("color.black");
+        @include fontFace("secondary.light");
+        font-size: convert-unit(36px, "rem");
+        font-weight: 300;
+        line-height: convert-unit(40px, "rem");
+    }
+
+    .summary-brief {
+        font-size: convert-unit(16px, "rem");
+        line-height: convert-unit(22px, "rem");
+        margin: 0 0 convert-unit(20px, "rem") 0;
+        color: get("color.gray.700");
+        width: 100%;
+    }
+
+    .payroll {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .force-right {
+        text-align: right;
+    }
+
+    td.mat-cell {
+        vertical-align: top;
+
+        &:first-of-type {
+            @include fontFace("primary.regular");
+        }
+
+        .product-cost,
+        .product-name {
+            @include fontFace("primary.bold");
+        }
+
+        .product-wrapper {
+            display: flex;
+
+            .mon-icon::ng-deep {
+                margin: convert-unit(5px, "rem") 0;
+            }
+
+            .product-label {
+                display: flex;
+                flex-direction: column;
+                padding-left: convert-unit(15px, "rem");
+            }
+        }
+    }
+
+    .footer-wrapper {
+        ::ng-deep {
+            td {
+                border: none;
+                text-align: right;
+                padding: convert-unit(20px, "rem") convert-unit(10px, "rem");
+                color: get("color.black");
+                font-size: convert-unit(22px, "rem");
+
+                > div {
+                    display: flex;
+                    justify-content: flex-end;
+
+                    > span {
+                        margin-right: convert-unit(110px, "rem");
+                    }
+                }
+            }
+        }
+    }
+
+    .wizard-footer {
+        padding: convert-unit(30px, "rem") 0;
+        display: flex;
+        justify-content: flex-end;
+
+        .icon-white {
+            margin: 0 convert-unit(5px, "rem") 0 0;
+        }
+    }
+}
+
+.product-wrapper {
+    display: flex;
+    align-items: flex-start;
+}
+
+.section-container {
+    margin-top: convert-unit(20px, "rem");
+}
+
+.text-bold {
+    @include fontFace("primary.bold");
+}
+
+.plan-name {
+    @include fontFace("primary.bold");
+    font-size: convert-unit(14px, "rem");
+    height: convert-unit(16px, "rem");
+}
+
+.apply-coverage {
+    .appflow-section .section-step {
+        margin: 0;
+    }
+
+    h3 {
+        @include fontFace("primary.regular");
+        font-size: convert-unit(28px, "rem");
+        color: get("color.black");
+        margin: 0 0 convert-unit(20px, "rem") 0;
+    }
+}
+
+.view-application {
+    @include fontFace("primary.regular");
+    font-size: convert-unit(14px, "rem");
+}
+
+.app-details {
+    margin-left: convert-unit(10px, "rem");
+}
+
+.response-block {
+    .file-section {
+        margin: convert-unit(15px, "rem") 0;
+        padding: 0 0 convert-unit(10px, "rem") 0;
+    }
+}
+
+.alert-msg {
+    margin-top: convert-unit(20px, "rem");
+}
+
+.btn-link {
+    padding-left: map-get($spacers, 5);
+}
+
+.submit-app-flow-form {
+    margin-right: map-get($spacers, 20);
+}
+
+.dual-plan-action-btns {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.aflac-always-producer {
+    margin-top: convert-unit(20px, "rem");
+}
+
+.aflac-always-member {
+    margin-top: convert-unit(30px, "rem");
+    margin-bottom: convert-unit(30px, "rem");
+}

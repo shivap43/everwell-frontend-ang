@@ -1,0 +1,41 @@
+@import "shared";
+.duplicate-split {
+    .message-block {
+        display: block;
+        margin-bottom: map-get($spacers, 10);
+    }
+    p {
+        margin-bottom: map-get($spacers, 15);
+    }
+    .split-heading {
+        font-size: convert-unit(22px, "rem");
+        margin-bottom: map-get($spacers, 10);
+    }
+    .commission-details {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: map-get($spacers, 10);
+        .label {
+            @include fontFace("primary.bold");
+            width: convert-unit(120px, "rem");
+        }
+        .split-details {
+            display: flex;
+            flex-direction: column;
+            span {
+                word-spacing: convert-unit(12px, "rem");
+            }
+        }
+        .applied-split {
+            display: flex;
+            flex-direction: column;
+            width: convert-unit(420px, "rem");
+            .applied-value {
+                @include fontFace("primary.bold");
+            }
+        }
+    }
+}
+.mon-btn-secondary {
+    margin-right: map-get($spacers, 20);
+}

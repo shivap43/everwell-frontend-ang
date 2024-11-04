@@ -1,0 +1,33 @@
+@import "shared";
+
+.pended-business-wrapper {
+    .mat-tab-group {
+        ::ng-deep .mat-tab-header {
+            .mat-tab-label-container {
+                .mat-tab-list {
+                    .mat-tab-labels {
+                        .mat-tab-label {
+                            &.mat-tab-disabled {
+                                margin-left: auto;
+
+                                &:hover {
+                                    border-color: transparent;
+                                }
+                            }
+
+                            .mat-tab-label-content {
+                                line-height: convert-unit(18px, "rem");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+::ng-deep .mat-select-panel-wrap {
+    .mat-select-panel {
+        min-width: calc(100% + 21px) !important;
+    }
+}

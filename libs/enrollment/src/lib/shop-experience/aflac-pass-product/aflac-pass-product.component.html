@@ -1,0 +1,53 @@
+<div>
+    <div class="product-header">
+        <mon-icon
+            [iconName]="productName"
+            [fetchedIconPath]="productOffering.product.iconLocation"
+            class="product-icon"
+            [iconSize]="46"
+        ></mon-icon>
+        <div class="product-info">
+            <h1>{{productName}}</h1>
+            <div class="product-carrier">{{productOffering?.product?.carrierName}}</div>
+            <div class="product-description">{{productOffering?.product?.description}}</div>
+        </div>
+    </div>
+    <h2 class="module-title">{{languageStrings['primary.portal.shoppingExperience.selectplan']}}</h2>
+    <ng-container>
+        <mat-accordion class="card-list pass-product-accordion">
+            <ng-template ngFor let-planOffering [ngForOf]="productOffering.planOfferings">
+                <mat-expansion-panel
+                    (afterExpand)="setPlanExpanded(true)"
+                    (afterCollapse)="setPlanExpanded(false)"
+                    [ngStyle]="{'border-color': isPlanExpanded ? '#'+productOffering.product.cardColorCode : DEFAULT_PANEL_COLOR}"
+                >
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <div>
+                                <mon-icon
+                                    [iconName]="productName"
+                                    [fetchedIconPath]="productOffering.product.iconSelectedLocation"
+                                    class="plan-icon"
+                                    [iconSize]="32"
+                                ></mon-icon>
+                                <div>{{planOffering.plan?.name}}</div>
+                            </div>
+                            <hr class="dotted-border-bottom bottom-spliter" />
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div [innerHTML]="planOffering?.text"></div>
+                    <div class="footer-button">
+                        <button
+                            mat-button
+                            type="button"
+                            class="mon-btn-primary"
+                            (click)="openConfirmationModal(planOffering)"
+                        >
+                            {{languageStrings['primary.portal.shoppingExperience.visitsite']}}
+                        </button>
+                    </div>
+                </mat-expansion-panel>
+            </ng-template>
+        </mat-accordion>
+    </ng-container>
+</div>

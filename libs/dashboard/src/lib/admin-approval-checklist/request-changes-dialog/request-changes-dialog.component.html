@@ -1,0 +1,38 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="close()"
+            tabindex="-1"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="requestChangesForm" (ngSubmit)="requestChangesForm.valid && submit()">
+        <mat-dialog-content>
+            <h1 mat-dialog-title>
+                {{ title }}
+            </h1>
+            <p>
+                {{ description }}
+            </p>
+            <mat-label class="mat-label mon-mt-20">{{ label }}</mat-label>
+            <mat-form-field class="mon-mb-0 textarea">
+                <textarea
+                    matInput
+                    rows="5"
+                    type="text"
+                    formControlName="changesText"
+                    class="carrier-request"
+                ></textarea>
+            </mat-form-field>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" (click)="close()">{{languageStrings["primary.portal.common.cancel"]}}</a>
+            <button mat-button class="mon-btn-primary" type="submit">
+                {{languageStrings["primary.portal.common.submit"]}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

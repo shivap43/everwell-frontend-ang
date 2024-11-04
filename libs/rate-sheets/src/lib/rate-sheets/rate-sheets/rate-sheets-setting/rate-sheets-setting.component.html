@@ -1,0 +1,40 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="settings-header-padding">
+    <div class="settings-container">
+        <div class="settings-header">
+            <span language="primary.portal.rateSheets.settings"></span>
+        </div>
+        <div class="settings-content rate-sheet-settings-dropdown-block">
+            <empowered-settings-dropdown [settingsDropdownContent]="state" [meta]="statePortalMeta" #stateDropdown>
+                <empowered-state class="content" #state [portalRef]="stateDropdown.portal"></empowered-state>
+            </empowered-settings-dropdown>
+            <empowered-settings-dropdown [settingsDropdownContent]="channel" [meta]="channelPortalMeta" #channelDropdown>
+                <empowered-channel class="content" #channel [portalRef]="channelDropdown.portal"></empowered-channel>
+            </empowered-settings-dropdown>
+            <empowered-settings-dropdown
+                [settingsDropdownContent]="paymentFrequency"
+                [meta]="paymentFrequencyPortalMeta"
+                #paymentFrequencyDropdown
+            >
+                <empowered-payment-frequency
+                    class="content"
+                    #paymentFrequency
+                    [portalRef]="paymentFrequencyDropdown.portal"
+                ></empowered-payment-frequency>
+            </empowered-settings-dropdown>
+            <empowered-settings-dropdown [settingsDropdownContent]="jobClass" [meta]="jobClassPortalMeta" #jobClassDropdown>
+                <empowered-job-class class="content" #jobClass [portalRef]="jobClassDropdown.portal"></empowered-job-class>
+            </empowered-settings-dropdown>
+            <empowered-settings-dropdown [settingsDropdownContent]="moreSettings" [meta]="moreSettingsPortalMeta" #moreSettingsDropdown>
+                <empowered-rate-sheet-more-settings
+                    class="content"
+                    #moreSettings
+                    [portalRef]="moreSettingsDropdown.portal"
+                ></empowered-rate-sheet-more-settings>
+            </empowered-settings-dropdown>
+        </div>
+        <div class="settings-footer">
+            <button class="mon-btn-link" language="primary.portal.rateSheets.reset" (click)="emitResetEvent()"></button>
+        </div>
+    </div>
+</div>

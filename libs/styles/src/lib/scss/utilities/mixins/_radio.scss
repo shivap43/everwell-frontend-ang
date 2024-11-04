@@ -1,0 +1,13 @@
+@mixin radioCircles($state: "unselected") {
+    $allStates: get("states", $radio-config);
+
+    $thisState: get($state, $allStates);
+
+    .mat-radio-outer-circle {
+        border-color: get("shape.borderColor", $thisState);
+        background-color: get("shape.bgColor", $thisState);
+    }
+    .mat-radio-inner-circle {
+        background-color: get("indicator.bgColor", $thisState);
+    }
+}

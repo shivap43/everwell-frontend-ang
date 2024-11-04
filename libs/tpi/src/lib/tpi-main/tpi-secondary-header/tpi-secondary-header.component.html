@@ -1,0 +1,11 @@
+<div [ngClass]="tpiModalMode? 'lnl-header-text':'header-text'">
+    <div *ngIf="!isReviewPage">
+        <ng-content></ng-content>
+    </div>
+    <div *ngIf="isReviewPage">
+        <p>
+            {{languageStrings['primary.portal.tpi.shopReview.reviewyourSelections']}} ({{cartCount}}) {{totalCost |
+            currency}} {{payfrequencyName}}
+        </p>
+    </div>
+</div>

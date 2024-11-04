@@ -1,0 +1,40 @@
+@import "shared";
+
+.settings-header-padding {
+    padding: 0px !important;
+    @include media-min("l") {
+        padding-left: convert-unit(30px, "rem") !important;
+        padding-right: convert-unit(30px, "rem") !important;
+    }
+}
+
+.settings-container {
+    font-size: convert-unit(14px, "rem");
+    display: flex;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    height: convert-unit(56px, "rem");
+    padding-left: convert-unit(10px, "rem");
+    padding-right: convert-unit(10px, "rem");
+    align-items: center;
+    @include media-min("l") {
+        font-size: convert-unit(16px, "rem");
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.settings-container .settings-content {
+    color: get("color.black") !important;
+}
+
+.settings-footer {
+    padding-left: convert-unit(10px, "rem");
+    @include media-min("l") {
+        padding-left: convert-unit(30px, "rem") !important;
+    }
+}
+
+.rate-sheet-settings-dropdown-block {
+    display: flex;
+    flex-wrap: wrap;
+}

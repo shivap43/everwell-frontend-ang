@@ -1,0 +1,170 @@
+@import "shared";
+
+.universal-quote-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.text-bold {
+    @include fontFace("primary.bold");
+}
+
+.quote-settings {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    .steps-cont {
+        flex-grow: 1;
+
+        .flex-container {
+            height: 100%;
+        }
+    }
+}
+
+.rate-sheet-container {
+    padding-bottom: convert-unit(10px, "rem");
+}
+
+.top-headericon-text {
+    font-size: convert-unit(36px, "rem");
+    font-weight: 300;
+    @include fontFace("primary.light");
+    height: convert-unit(70px, "rem");
+    color: get("color.gray.600");
+    margin: convert-unit(0px, "rem");
+    padding-left: convert-unit(35px, "rem");
+    align-items: center;
+}
+
+.btn-header {
+    margin-bottom: convert-unit(30px, "rem") !important;
+    margin-top: convert-unit(30px, "rem") !important;
+}
+
+//
+.container-fluid {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    @include media-max("l") {
+        .stepperTrigger {
+            padding-left: 0;
+
+            .mon-btn-link {
+                font-size: convert-unit(22px, "rem");
+                color: get("color.black");
+
+                ::ng-deep .mon-icon {
+                    margin-left: convert-unit(-5px, "rem");
+                    vertical-align: sub;
+                }
+            }
+        }
+
+        .flex-container {
+            padding: 0 convert-unit(10px, "rem");
+
+            @include media-min("l") {
+                padding-left: convert-unit(30px, "rem");
+            }
+
+            .stepper-overlay.shown {
+                width: auto !important;
+            }
+        }
+    }
+
+    > .row {
+        flex: 1;
+
+        .plan-details-coloumn {
+            flex-grow: 2;
+            flex-basis: 100%;
+
+            @include media-min("l") {
+                padding-left: convert-unit(30px, "rem") !important;
+                margin-left: convert-unit(-1px, "rem");
+                border-left: convert-unit(1px, "rem") solid get("color.gray.600");
+            }
+        }
+    }
+}
+
+.mon-icon {
+    margin-top: 0px;
+}
+
+.top-header-container {
+    height: auto;
+    align-items: center;
+    padding-right: convert-unit(30px, "rem");
+}
+
+.settings-header-padding {
+    padding: 0 convert-unit(10px, "rem");
+}
+
+@include media-min("l") {
+    .settings-header-padding {
+        padding: 0 convert-unit(30px, "rem");
+    }
+}
+
+.custom-select-withoutBorder.mat-form-field {
+    &.mat-form-field-disabled {
+        ::ng-deep .mat-form-field-flex {
+            background-color: get("color.white");
+        }
+    }
+}
+
+.stepper-overlay-trigger {
+    display: none !important;
+}
+
+.stepper-overlay {
+    position: absolute;
+    width: 100% !important;
+    background-color: get("color.transparent");
+    box-shadow: 0 convert-unit(2px, "rem") convert-unit(5px, "rem") rgba(0, 0, 0, 0);
+    max-height: convert-unit(400px, "rem");
+    overflow: inherit;
+    z-index: 100;
+    display: none;
+
+    &.shown {
+        display: block;
+    }
+}
+
+.stepperTrigger {
+    display: block;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding: convert-unit(10px, "rem") convert-unit(30px, "rem");
+
+    &.mon-btn-link {
+        display: block;
+        text-decoration: none;
+    }
+}
+
+@include media-min("l") {
+    .stepperTrigger {
+        display: none;
+    }
+}
+
+.plan-details-coloumn.flex-grow-two {
+    padding: 0;
+
+    @include media-min("l") {
+        padding-left: convert-unit(30px, "rem") !important;
+        padding-bottom: convert-unit(20px, "rem") !important;
+        margin-left: convert-unit(-1px, "rem") !important;
+        border-left: convert-unit(1px, "rem") solid get("color.gray.600");
+    }
+}

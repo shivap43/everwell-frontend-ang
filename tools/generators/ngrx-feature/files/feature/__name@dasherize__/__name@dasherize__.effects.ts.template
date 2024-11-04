@@ -1,0 +1,25 @@
+import { Injectable } from "@angular/core";
+import { createEffect, Actions, ofType } from "@ngrx/effects";
+import { fetch } from "@nrwl/angular";
+
+import * as <%= classify(name) %>Actions from "./<%= dasherize(name) %>.actions";
+
+@Injectable()
+export class <%= classify(name) %>Effects {
+    init$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(<%= classify(name) %>Actions.init),
+            fetch({
+                run: (action) => {
+                    // Your custom service 'load' logic goes here. For now just return a success action...
+                    return <%= classify(name) %>Actions.load<%= classify(name) %>Success({ <%= camelize(name) %>: [] });
+                },
+                onError: (action, error) => {
+                    return <%= classify(name) %>Actions.load<%= classify(name) %>Failure({ error });
+                },
+            })
+        )
+    );
+
+    constructor(private readonly actions$: Actions) {}
+}

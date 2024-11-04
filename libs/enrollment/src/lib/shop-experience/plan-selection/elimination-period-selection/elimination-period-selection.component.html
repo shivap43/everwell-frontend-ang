@@ -1,0 +1,70 @@
+<!--TO DO languages-->
+<ng-template [ngIf]="isLoading" [ngIfElse]="coverageView">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template #coverageView>
+    <div class="row">
+        <ng-template [ngIf]="data.length < 9 && !isRiderCoverage" [ngIfElse]="dropdownTemplate">
+            <mat-radio-group
+                [attr.aria-label]="languageStrings.selectOption"
+                [formControl]="eliminationSelectRadio"
+                (change)="selectCoverage($event.value.id)"
+                class="plan-selection-radio"
+                [ngClass]="{'plan-selection-wrapper' : isTpi}"
+            >
+                <mat-radio-button
+                    *ngFor="let coverage of  data"
+                    [value]="coverage"
+                    [checked]="coverage.id === currentCoverage.coverageLevelId"
+                >
+                    <div *ngIf="coverage && currentCoverage" class="plan-card elimination-card">
+                        <div
+                            class="coverage-head elimination-period"
+                            [ngClass]="{'active': coverage.id === currentCoverage.coverageLevelId }"
+                        >
+                            <p>{{trimDays(coverage.name)}}</p>
+                        </div>
+
+                        <div>
+                            <p *ngIf="data.length > 1">
+                                {{getCoverageAmountById(coverage.id) | currency}}
+                            </p>
+                        </div>
+                    </div>
+                </mat-radio-button>
+            </mat-radio-group>
+        </ng-template>
+    </div>
+    <ng-template #dropdownTemplate>
+        <div
+            class="plan-select"
+            [ngClass]="{'rider-elimination-coverage':isRiderCoverage}"
+            *ngIf=" isSingleRiderCoverage() && planOfferingObj.planPricing.length > 1 "
+        >
+            <form>
+                <mat-label class="mat-label"
+                    >{{langStrings['primary.portal.shoppingExperience.eliminationPeriod']}}</mat-label
+                >
+                <p language="primary.portal.shoppingExperience.eleminationPeriodRiderDescription"></p>
+                <mat-form-field class="w-200">
+                    <mat-select
+                        [formControl]="coverageSelectInput"
+                        (valueChange)="selectCoverage($event)"
+                        class="mon-select-arrow"
+                        disableOptionCentering="true"
+                        attr.aria-required="true"
+                        panelClass="elimination-period-select"
+                    >
+                        <mat-option *ngFor="let coverage of data" [value]="coverage.id">
+                            {{trimDays(coverage.name) }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <p *ngIf="currentCoverage">
+                    {{ "primary.portal.shoppingExperience.memberCost" | replaceTag: { "#membercost":
+                    getCoverageAmountById(currentCoverage?.coverageLevelId) | currency } }}
+                </p>
+            </form>
+        </div>
+    </ng-template>
+</ng-template>

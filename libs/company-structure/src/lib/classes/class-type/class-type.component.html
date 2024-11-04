@@ -1,0 +1,166 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<!-- TODO - Use language. -->
+<mat-accordion>
+    <mat-expansion-panel
+        [ngClass]="{'add-class-type': !addClassType, 'panel-active': panelOpenState }"
+        class="group-expand"
+        hideToggle
+        (closed)="triggerPanelToggle(false)"
+        (opened)="triggerPanelToggle(true)"
+        [disabled]="true"
+    >
+        <mat-expansion-panel-header
+            class="prevent-click"
+            expandedHeight="52px"
+            collapsedHeight="52px"
+            [ngClass]="{'zero-state':zeroState,'non-zero-state':!zeroState }"
+            *ngIf="isPEOAccount || !isPEOClassType"
+        >
+            <mat-panel-title class="classtype-panel-title">
+                <ng-container [ngTemplateOutlet]="addClassType?addTitle:title"></ng-container>
+            </mat-panel-title>
+            <mat-panel-description class="classtype-panel-desc">
+                <ng-container [ngTemplateOutlet]="addClassType?empty:description"></ng-container>
+            </mat-panel-description>
+            <ng-container [ngTemplateOutlet]="addClassType || !classTypeDetails?.classType.visible ? empty : links"></ng-container>
+            <ng-container [ngTemplateOutlet]="isPEOClassType ? peoLinks : empty"></ng-container>
+        </mat-expansion-panel-header>
+        <ng-template [cdkPortalOutlet]="portalsService.selectedPortal"></ng-template>
+    </mat-expansion-panel>
+</mat-accordion>
+<ng-container *configEnabled="PEO_FEATURE_ENABLE">
+    <!-- PEO Rating refreshing info -->
+    <mon-alert
+        *ngIf="spinner && importPeoAlertType!==SUCCESS && importPeoAlertType!==WARNING && importPeoAlertType!==DANGER && isPEOClassType"
+        alertType="info"
+    >
+        <span language="primary.portal.classes.refreshingData.PEO"></span>
+    </mon-alert>
+    <!-- PEO Rating success -->
+    <mon-alert *ngIf="importPeoAlertType===SUCCESS && isPEOClassType" alertType="success">
+        <span language="primary.portal.classes.refreshedDataSuccess.PEO"></span>
+    </mon-alert>
+    <!-- PEO Rating Warning -->
+    <mon-alert *ngIf="importPeoAlertType===WARNING && isPEOClassType" alertType="warning">
+        <span language="primary.portal.classes.refreshedDataWarning.PEO"></span>
+    </mon-alert>
+    <!-- PEO Rating error -->
+    <mon-alert *ngIf="importPeoAlertType===DANGER && isPEOClassType" alertType="danger">
+        <span language="primary.portal.classes.refreshedDataError.PEO">
+            <button
+                mat-flat-button
+                class="mon-btn-link mon-alert-btn-link"
+                (click)="refreshPeoData()"
+                language="primary.portal.importPeoToast.actionText.retry"
+                [tabIndex]="-1"
+            ></button>
+        </span>
+    </mon-alert>
+</ng-container>
+<ng-container [ngTemplateOutlet]="addClassType || !(!isPEOClassType || isPEOAccount) ? empty : classes"></ng-container>
+<ng-template #addTitle>
+    <ng-container *isRestricted="permissionEnum.ACCOUNT_RESTRICT_CREATE_CLASS_TYPE">
+        <button
+            mat-button
+            class="authorize-click"
+            (click)="addClassTypes()"
+            *ngIf="!panelOpenState && !isPrivacyOnForEnroller"
+            [attr.aria-label]="languageStrings['primary.portal.classes.addClassType']"
+            [tabIndex]="-1"
+            [ngClass]="{'mon-btn-primary':zeroState,'mon-btn-link':!zeroState }"
+            [language]="zeroState ? 'primary.portal.classes.addClassTypes' : 'primary.portal.classes.addClassType'"
+        ></button>
+        <h4 *ngIf="panelOpenState" class="classtype-newclass-title">{{ languageStrings['primary.portal.classes.newClassType'] }}</h4>
+    </ng-container>
+</ng-template>
+<ng-template #empty></ng-template>
+<ng-template #title>
+    <p class="space class-type-name">{{classTypeDetails?.classType.name}}</p>
+    <span *ngIf="!classTypeDetails?.classType?.visible" language="primary.portal.classes.requiredMessage"></span>
+    <span *ngIf="classTypeDetails?.classType.determinesPayFrequency" language="primary.portal.classes.textPayFrequency"></span>
+</ng-template>
+
+<ng-template #description
+    ><div class="panel-desc">
+        <span *ngIf="!isPEOClassType; else peoDisclaimer">{{classTypeDetails?.classType.description}}</span>
+    </div>
+</ng-template>
+<!-- PEO required class warning -->
+<ng-template #peoDisclaimer>{{languageStrings["primary.portal.classes.classType.remove.required"]}}</ng-template>
+<!-- PEO Rating refresh link -->
+<ng-template #peoLinks>
+    <ng-container *configEnabled="PEO_FEATURE_ENABLE">
+        <div class="action-buttons authorize-click d-flex classtype-removeedit-wrapper" *ngIf="isPEOAccount">
+            <span>
+                <button
+                    mat-flat-button
+                    class="mon-btn-link"
+                    (click)="refreshPeoData()"
+                    language="primary.portal.classes.refreshData.PEO"
+                    [tabIndex]="-1"
+                ></button>
+            </span>
+        </div>
+    </ng-container>
+</ng-template>
+<ng-template #links>
+    <ng-container *ngIf="!isPEOClassType">
+        <div class="action-buttons authorize-click d-flex classtype-removeedit-wrapper">
+            <span *ngIf="!panelOpenState">
+                <span
+                    [richTooltip]="getRemoveClassTypeError()"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                    *isRestricted="permissionEnum.ACCOUNT_RESTRICT_DELETE_CLASS_TYPE"
+                >
+                    <button
+                        mat-flat-button
+                        class="mon-btn-link link-danger"
+                        [ngClass]="{'disabledLink': getRemoveClassTypeError()}"
+                        [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+                        [disabled]="getRemoveClassTypeError()"
+                        (click)="$event.stopPropagation(); openRemoveClassTypeDialog()"
+                        language="primary.portal.common.remove"
+                        [tabIndex]="-1"
+                        *ngIf="!isPrivacyOnForEnroller"
+                    ></button>
+                </span>
+            </span>
+            <span *isRestricted="permissionEnum.ACCOUNT_RESTRICT_UPDATE_CLASS_TYPE">
+                <button
+                    mat-flat-button
+                    class="mon-btn-link"
+                    (click)="editClassType()"
+                    *ngIf="!panelOpenState && !isPrivacyOnForEnroller"
+                    [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                    language="primary.portal.common.edit"
+                    [tabIndex]="-1"
+                ></button>
+            </span>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #classes>
+    <ng-container *ngFor="let class of classTypeDetails?.classes">
+        <empowered-class
+            *ngIf="!isPEOAccount || (isPEOAccount && class?.name !== 'UNSP')"
+            [className]="class"
+            [classType]="classTypeDetails?.classType"
+            [addClass]="false"
+            [hasOneClass]="classesList.length === 1"
+            [classesList]="classesList"
+            (removeClass)="openRemoveClassDialog($event)"
+            [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+        ></empowered-class>
+    </ng-container>
+    <empowered-class
+        #addclassView
+        *ngIf="classTypeDetails?.classType.visible"
+        [addClass]="true"
+        [classType]="classTypeDetails?.classType"
+        [hasOneClass]="classesList.length === 1"
+        [classesList]="classesList"
+        [isPrivacyOnForEnroller]="isPrivacyOnForEnroller"
+    ></empowered-class>
+</ng-template>

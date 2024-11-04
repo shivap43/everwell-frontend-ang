@@ -1,0 +1,65 @@
+@import "shared";
+
+.report-list-page {
+    margin: convert-unit(50px, "rem") convert-unit(20px, "rem");
+}
+
+.non-zero-state {
+    margin-top: convert-unit(50px, "rem");
+}
+
+.zero-state {
+    margin-top: convert-unit(15px, "rem");
+    margin-bottom: convert-unit(15px, "rem");
+}
+
+.report-list-page-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.report-button {
+    margin-right: map-get($spacers, 20);
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.building-icon {
+    animation: spin 4s infinite linear;
+    margin-right: convert-unit(5px, "rem");
+}
+
+.failed-icon {
+    margin: 0 convert-unit(5px, "rem") 0 0;
+    vertical-align: sub;
+}
+
+.paginator-separator {
+    margin-left: convert-unit(5px, "rem");
+}
+
+.create-report-button {
+    color: get("color.white") !important;
+    padding-left: map-get($spacers, 30);
+    padding-right: map-get($spacers, 15);
+}
+
+.mon-btn-pulldown-indicator {
+    margin-left: map-get($spacers, 15);
+    height: convert-unit(10px, "rem");
+    width: convert-unit(10px, "rem");
+}
+
+.report-menu > .menu-item {
+    padding: map-get($spacers, 10) map-get($spacers, 15);
+    width: convert-unit(120px, "rem");
+    font-size: convert-unit(14px, "rem");
+}

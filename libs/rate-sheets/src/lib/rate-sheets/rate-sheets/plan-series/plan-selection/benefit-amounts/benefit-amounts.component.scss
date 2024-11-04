@@ -1,0 +1,47 @@
+@import "shared";
+
+.benefit-amount-multiple-dropdown {
+    margin-right: map-get($spacers, 10);
+    .mat-form-field {
+        margin-bottom: map-get($spacers, 5);
+    }
+}
+
+.benefit-amount-checkbox {
+    margin-top: map-get($spacers, 20);
+    ::ng-deep .mat-list-option {
+        width: fit-content;
+        pointer-events: all;
+        .mat-list-item-content {
+            .mat-pseudo-checkbox-checked {
+                background-color: get("color.gray.800");
+            }
+            .mat-pseudo-checkbox-disabled {
+                background-color: get("color.gray.300");
+            }
+            padding: map-get($spacers, 0);
+            max-height: map-get($spacers, 5);
+        }
+        &:hover {
+            background: none;
+        }
+        &:focus {
+            background: none;
+        }
+        &.mat-list-item-disabled {
+            background: none;
+            .mat-list-text {
+                color: get("color.gray.600");
+            }
+        }
+        &.error {
+            .mat-list-item-content {
+                .mat-pseudo-checkbox {
+                    border-color: get("color.info.danger.500") !important;
+                    background-color: get("color.info.danger.100") !important;
+                }
+                color: get("color.info.danger.500") !important;
+            }
+        }
+    }
+}

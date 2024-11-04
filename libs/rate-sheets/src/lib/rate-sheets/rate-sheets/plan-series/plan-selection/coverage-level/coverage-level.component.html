@@ -1,0 +1,16 @@
+<div class="coverage-level-checkbox">
+    <mat-selection-list [formControl]="formControl" ngDefaultControl>
+        <mat-list-option
+            checkboxPosition="before"
+            *ngFor="let coverageData of coverageLevels; let i=index"
+            [value]="coverageData"
+            [richTooltip]="disableCoverageLevels && disableCoverageLevels[i] ? toolTipMessage : '' "
+            matTooltipPosition="above"
+            matTooltipClass="pos-above"
+            [disabled]="disableCoverageLevels ? disableCoverageLevels[i] : false"
+        >
+            {{ coverageData.name }}
+        </mat-list-option>
+    </mat-selection-list>
+</div>
+<mat-error><ng-content></ng-content></mat-error>

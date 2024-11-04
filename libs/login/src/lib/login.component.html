@@ -1,0 +1,145 @@
+<div *ngIf="!loader">
+    <ng-container *ngIf="!selfService">
+        <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" class="mon-card-wrapper mon-my-25" role="form">
+            <mat-card class="mon-card mon-p-0">
+                <mat-card-content>
+                    <mon-alert *ngIf="showAlert" alertType="danger" class="mon-alert">
+                        <span language="secondary.portal.login.incompleteRegistrationError"></span>
+                    </mon-alert>
+                    <mat-card-title language="primary.portal.login.loginTitle"></mat-card-title>
+                    <div class="mon-mb-20">
+                        <mon-alert *ngIf="inValidCredentials" alertType="danger">
+                            <ng-container *ngIf="notAuthorized; else otherErrors">
+                                <span>{{notAuthorizedErrorMessage}}</span>
+                            </ng-container>
+                            <ng-template #otherErrors>
+                                <span [language]="errorMessage"></span>
+                            </ng-template>
+                        </mon-alert>
+                    </div>
+                    <div class="mon-common-form">
+                        <empowered-input displayOrder="1" [formName]="formName">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.login.username"></span>
+                                <a
+                                    href="javascript:void(0)"
+                                    [richTooltip]="languageStrings['primary.portal.login.usernameInfo']"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageStrings['primary.portal.login.usernameInfo']"
+                                >
+                                    <mon-icon iconName="Filled-info" iconSize="17" class="username-info-icon icon-primary"> </mon-icon>
+                                </a>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    (input)="handleEmptyUsername($event)"
+                                    formControlName="username"
+                                    matInput
+                                    empoweredTrimSpace
+                                    type="text"
+                                    [attr.aria-label]="languageStrings['primary.portal.login.username']"
+                                    [maxlength]="userNameMaxLength"
+                                />
+                                <mat-error *ngIf="!isUsernameValid" [language]="usernamePasswordErrorMessage" class="mon-pt-6 mon-mat-hint">
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="loginForm.controls.username.errors?.minlength"
+                                    language="secondary.portal.login.usernameMinLength"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="loginForm.controls.username.errors?.requirements && !loginForm.controls.username.errors?.minlength"
+                                    language="secondary.portal.login.userName.invalidFormat"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </empowered-input>
+                        <empowered-input displayOrder="2" [formName]="formName">
+                            <mat-label class="mat-label" language="primary.portal.login.password"></mat-label>
+                            <mat-form-field>
+                                <input
+                                    (input)="handleEmptyPassword($event)"
+                                    formControlName="password"
+                                    matInput
+                                    type="password"
+                                    onPaste="return false"
+                                    [attr.aria-label]="languageStrings['primary.portal.login.password']"
+                                />
+                                <mat-error *ngIf="!isPasswordValid" [language]="usernamePasswordErrorMessage" class="mon-pt-6 mon-mat-hint">
+                                </mat-error>
+                            </mat-form-field>
+                        </empowered-input>
+                    </div>
+                </mat-card-content>
+
+                <mat-card-footer class="text-center bg-gray-100">
+                    <button
+                        class="mon-button-full-width mon-mb-30 mon-btn-primary"
+                        mat-flat-button
+                        type="submit"
+                        [attr.aria-label]="languageStrings['primary.portal.login.login']"
+                        language="primary.portal.login.login"
+                    ></button>
+                    <mat-divider></mat-divider>
+                    <p class="mon-m-0 mon-my-15">
+                        <span language="primary.portal.login.textForgot"> </span>
+                        <a
+                            href="javascript:void(0)"
+                            routerLink="../forgot-username"
+                            attr.aria-label="{{languageStrings['primary.portal.login.textForgot']}} {{languageStrings['primary.portal.login.textUsername']}}"
+                            language="primary.portal.login.textUsername"
+                        >
+                        </a>
+                        <span language="primary.portal.login.textOr"> </span>
+                        <a
+                            routerLink="../forgot-password"
+                            attr.aria-label="{{languageStrings['primary.portal.login.textForgot']}} {{languageStrings['primary.portal.login.textPassword']}}"
+                            language="primary.portal.login.textPassword"
+                        >
+                        </a>
+                    </p>
+                    <p class="mon-my-0">
+                        <span
+                            ><a
+                                href="javascript:void(0)"
+                                routerLink="../register"
+                                [attr.aria-label]="languageStrings['primary.portal.login.register']"
+                                language="primary.portal.login.register"
+                            >
+                            </a>
+                        </span>
+                    </p>
+                </mat-card-footer>
+            </mat-card>
+        </form>
+    </ng-container>
+    <ng-container *ngIf="selfService">
+        <div class="mon-card-wrapper mon-my-50 w-600 form-mobile">
+            <mat-card class="mon-card mon-p-0">
+                <mat-card-content>
+                    <mat-card-title language="primary.portal.maxIntegration.login.title"></mat-card-title>
+                    <p language="primary.portal.maxIntegration.login.textMessage"></p>
+                    <span language="primary.portal.maxIntegration.login.list"></span>
+                    <p>
+                        <span language="primary.portal.maxIntegration.login.selfServiceText"></span
+                        ><a
+                            href="javascript:void(0)"
+                            routerLink="../self-service"
+                            language="primary.portal.maxIntegration.login.selfServiceLink"
+                        ></a>
+                    </p>
+                </mat-card-content>
+
+                <mat-card-footer class="text-center bg-gray-100">
+                    <a
+                        class="mon-button-full-width mon-mb-30 mon-btn-primary"
+                        mat-flat-button
+                        [attr.aria-label]="languageStrings['primary.portal.login.login']"
+                        language="primary.portal.maxIntegration.login.buttonText"
+                        href="{{AFLAC_LOGIN_REDIRECT}}"
+                    ></a>
+                </mat-card-footer>
+            </mat-card>
+        </div>
+    </ng-container>
+</div>

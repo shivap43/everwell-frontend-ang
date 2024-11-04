@@ -1,0 +1,99 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<empowered-modal type="POPUP" size="LG" [showCancel]="data.isSameProducer">
+    <empowered-modal-header>
+        <span>{{languageStrings['primary.portal.commissions.duplicateSplit.duplicateSplitFound']}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div *ngIf="data.isSameProducer; else gotIt">
+            <button mat-flat-button class="mon-btn-secondary" (click)="directToCommissionSplits()">
+                {{languageStrings['primary.portal.commissions.duplicateSplit.dontReplace']}}
+            </button>
+            <button
+                mat-flat-button
+                [disabled]="isDefaultDuplicate"
+                class="mon-btn-primary"
+                (click)="replaceCommissionSplit()"
+            >
+                {{languageStrings['primary.portal.commissions.duplicateSplit.replace']}}
+            </button>
+        </div>
+        <ng-template #gotIt>
+            <button mat-flat-button class="mon-btn-primary" (click)="directToCommissionSplits()">
+                {{languageStrings['primary.portal.commissions.duplicateSplit.gotIt']}}
+            </button>
+        </ng-template>
+    </empowered-modal-footer>
+    <div class="duplicate-split">
+        <mon-alert alertType="danger" *ngIf="isDefaultDuplicate && data.isSameProducer" class="message-block">
+            <span>{{languageStrings['primary.portal.commissions.duplicateSplit.defaultCommissionSplit']}}</span>
+        </mon-alert>
+        <p *ngIf="data.isSameProducer; else differentProducer">
+            {{languageStrings['primary.portal.commissions.duplicateSplit.haveCommissionsSplit']}}
+        </p>
+        <ng-template #differentProducer>
+            <p>{{languageStrings['primary.portal.commissions.duplicateSplit.createdCommissionsSplit']}}</p></ng-template
+        >
+        <div class="split-heading">{{languageStrings['primary.portal.commissions.duplicateSplit.existingSplit']}}</div>
+        <div class="commission-details">
+            <span class="label">{{languageStrings['primary.portal.commissions.duplicateSplit.name']}}</span>
+            <span>{{data.existingCommissionSplit.name}}</span>
+        </div>
+        <div class="commission-details" *ngIf="!data.isSameProducer && ownerName">
+            <span class="label">{{languageStrings['primary.portal.commissions.duplicateSplit.owner']}}</span>
+            <span>{{ownerName}}</span>
+        </div>
+        <div class="commission-details">
+            <span class="label">{{languageStrings['primary.portal.commissions.duplicateSplit.split']}}</span>
+            <div class="split-details">
+                <span *ngFor="let assignment of assignmentsString">{{assignment}}</span>
+            </div>
+        </div>
+        <div class="commission-details">
+            <span class="label">{{languageStrings['primary.portal.commissions.duplicateSplit.appliedWhen']}}</span>
+            <div class="applied-split">
+                <div class="split" *ngIf="writingProducerLength">
+                    {{writingProducerRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let producer of writingProducerValue; last as isLast">
+                        {{producer}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+                <div class="split" *ngIf="productLength">
+                    {{productRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let product of productValue; last as isLast">
+                        {{product}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+                <div class="split" *ngIf="statesLength">
+                    {{stateRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let state of stateValue; last as isLast">
+                        {{state}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+                <div class="split" *ngIf="dateWrittenLength">
+                    {{dateWrittenRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let dateWritten of dateWrittenValue; last as isLast">
+                        {{dateWritten}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+                <div class="split" *ngIf="careerLength">
+                    {{careerRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let career of careerValue; last as isLast">
+                        {{career}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+                <div class="split" *ngIf="enrollmentMethodLength">
+                    {{enrollmentMethodRule}} {{languageStrings[EQUALS]}}
+                    <span class="applied-value" *ngFor="let enrollmentMethod of enrollmentMethodValue; last as isLast">
+                        {{enrollmentMethod}}
+                        <span *ngIf="!isLast">{{languageStrings[this.OR]}}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</empowered-modal>

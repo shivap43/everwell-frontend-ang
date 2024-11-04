@@ -1,0 +1,41 @@
+@import "shared";
+:host ::ng-deep {
+    .state-input {
+        .mat-form-field-infix,
+        .mat-form-field-flex {
+            padding: map-get($spacers, 0);
+        }
+
+        .mat-chip-list-wrapper {
+            margin: map-get($spacers, 0);
+            padding: map-get($spacers, 5);
+            cursor: text;
+        }
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-prefix {
+        top: map-get($spacers, 0);
+    }
+}
+
+.mat-option.selected-state {
+    background: get("color.primary.500");
+    color: get("color.white");
+
+    &:hover {
+        background: get("color.primary.600");
+    }
+}
+
+.contributionType {
+    display: flex;
+    flex-direction: column;
+
+    .mat-radio-button {
+        margin: map-get($spacers, 5) map-get($spacers, 0);
+    }
+}
+
+.amount-form {
+    margin-top: map-get($spacers, 10);
+}

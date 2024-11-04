@@ -1,0 +1,534 @@
+<div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner || isLoading"></empowered-mon-spinner>
+    <div class="apply-coverage">
+        <ng-template [ngIf]="!isMember">
+            <ng-container *ngIf="downloadError">
+                <div class="alert-msg">
+                    <mon-alert alertType="danger" closeButton="true">
+                        <span>{{errorMessage}}</span>
+                    </mon-alert>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="isHeadset">
+                <div class="alert-msg" *ngIf="signRequestSent">
+                    <mon-alert alertType="success" closeButton="true">
+                        <span
+                            >{{isSignatureForSingle ? languageStrings['primary.portal.applicationFlow.confirmation.signRequestSuccessHas']
+                            .replace("##signRequestType",signRequestType).replace("##memberFirstName",memberFirstName).replace("##memberFirstName##", memberFirstName)
+                            : languageStrings['primary.portal.applicationFlow.confirmation.signRequestSuccessHave']
+                            .replace("##signRequestType",signRequestType).replace("##memberFirstName",memberFirstName).replace("##memberFirstName##", memberFirstName)}}
+                        </span>
+                    </mon-alert>
+                </div>
+                <div class="alert-msg" *ngIf="!signRequestSent">
+                    <mon-alert alertType="warning" closeButton="true">
+                        <span
+                            >{{languageStrings['primary.portal.applicationFlow.confirmation.signRequestSentWarning']
+                            .replace("#memberFirstName",memberFirstName) .replace("##isSignatureAvailable##", signText)}}
+                        </span>
+                    </mon-alert>
+                </div>
+            </ng-container>
+            <ng-container>
+                <div class="alert-msg" *ngIf="contactInfo">
+                    <mon-alert alertType="success" closeButton="true">
+                        <span
+                            >{{languageStrings['primary.portal.applicationFlow.confirmation.enrollmentSummarySentConfirmation']
+                            .replace("##empContactInfo",contactInfo)}}</span
+                        >
+                    </mon-alert>
+                </div>
+            </ng-container>
+            <section class="section-container">
+                <div class="appflow-section">
+                    <div class="section-step active-section">
+                        <div class="section-header">
+                            <h3 *ngIf="!isHeadset" language="primary.portal.applicationFlow.confirmation.confirmationTitle"></h3>
+                            <h3 *ngIf="isHeadset">
+                                {{ isSignatureForSingle ?
+                                languageStrings['primary.portal.applicationFlow.confirmation.applicationSubmitted'].replace("#FirstName",memberFirstName)
+                                :
+                                languageStrings['primary.portal.applicationFlow.confirmation.applicationsSubmitted'].replace("#FirstName",memberFirstName)}}
+                            </h3>
+
+                            <div class="section-subheader">
+                                <p *ngIf="!isHeadset" language="primary.portal.applicationFlow.confirmation.applicationComplete"></p>
+                                <p *ngIf="!isHeadset && isAdmin" language="primary.portal.applicationFlow.confirmation.contactAgent"></p>
+                            </div>
+                        </div>
+                        <ng-container *hasPermission="CREATE_FORM_PDA">
+                            <div
+                                class="d-md-flex"
+                                *ngIf="!pdaSubmitted && !showPda && !isDirectAcc && !isMember && !isAgPlanOnly &&  !isCompletePdaPartnerAccountType"
+                            >
+                                <p>
+                                    <span language="primary.portal.applicationFlow.confirmation.complete"></span>
+
+                                    <a class="btn-link" href="javascript:void(0)" (click)="openPda()"
+                                        >{{languageStrings['primary.portal.pda.form.pda']}}
+                                    </a>
+
+                                    <span language="primary.portal.applicationFlow.confirmation.yourRecords"></span>
+                                </p>
+                            </div>
+                        </ng-container>
+                        <div class="d-flex mon-my-15" *ngIf="pdaSubmitted && !isMember && !isAgPlanOnly">
+                            <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                            <div class="app-details">
+                                <p class="plan-name" language="primary.portal.pda.form.pdaFull"></p>
+                                <a class="view-application" href="javascript:void(0)" *ngIf="pdaSubmitted" (click)="downloadForm()">
+                                    <span language="primary.portal.common.view"></span>
+                                    <span language="primary.portal.pda.form.pda"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Aflac Always Card for MPP -->
+                        <ng-container
+                            *ngIf="(isAflacAlways$ | async) && !isDirectFlow && (enrollmentMethod === 'FACE_TO_FACE' || enrollmentMethod === 'SELF_SERVICE' || isPinSignature || isHeadset)"
+                            [ngTemplateOutlet]="aflacAlwaysCard"
+                        >
+                        </ng-container>
+                        <ng-container>
+                            <div class="response-block">
+                                <div class="divider tpi-flow-border">
+                                    <div *ngFor="let plan of planEnrollmentData">
+                                        <div class="file-section">
+                                            <div class="d-flex">
+                                                <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                                                <div class="app-details">
+                                                    <p class="plan-name">{{plan.productName}}: {{plan.planName}}</p>
+                                                    <div *ngIf="plan.carrierId !== agCarrierId">
+                                                        <a
+                                                            class="view-application"
+                                                            href="javascript:void(0)"
+                                                            (click)="getEnrollmentId(plan.planName, plan.enrollmentId)"
+                                                        >
+                                                            {{isHeadset? "View unsigned application" :"View application"}}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngFor="let planReview of planDataReview">
+                                        <div class="mon-my-15">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <p class="text-bold" [innerHTML]="planReview.planName"></p>
+                                                    <div *ngIf="planReview.carrierId === agCarrierId">
+                                                        <a
+                                                            class="view-application"
+                                                            href="javascript:void(0)"
+                                                            (click)="viewPlanDetailsDialog(planReview.enrollmentId)"
+                                                            language="primary.portal.shoppingExperience.viewDetails"
+                                                        >
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="showPin">
+                                    <div class="d-flex">
+                                        <div class="mon-mr-20">
+                                            <!-- TODO: Need to add language -->
+                                            <p class="text-bold" language="primary.portal.applicationFlow.confirmation.pin"></p>
+                                            <p
+                                                class="text-bold"
+                                                language="primary.portal.applicationFlow.confirmation.applicationSigned"
+                                            ></p>
+                                            <p
+                                                class="text-bold"
+                                                language="primary.portal.applicationFlow.confirmation.agentElectronicallySigned"
+                                            ></p>
+                                            <p class="text-bold" language="primary.portal.applicationFlow.confirmation.agentSignature"></p>
+                                        </div>
+                                        <div>
+                                            <p>{{ pinDetails.pin }}</p>
+                                            <p language="primary.portal.applicationFlow.confirmation.duringPhoneConvers"></p>
+                                            <p>{{pinDetails.date | date:'MM/dd/yyyy'}}</p>
+                                            <p>{{pinDetails.signature}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </section>
+            <div>
+                <ng-container *ngIf="!isReinstate">
+                    <button
+                        *ngIf="isOeShop"
+                        id="submitAppFlowForm"
+                        class="mon-btn-secondary submit-app-flow-form"
+                        (click)="goToMyCoverage()"
+                        mat-flat-button
+                        language="primary.portal.applicationFlow.confirmation.viewCoverageSummary"
+                    ></button>
+                    <button
+                        mat-flat-button
+                        (click)="openDialog()"
+                        *ngIf="qleFlag && isQleShop && isQleDuringOeEnrollment"
+                        class="submit-app-flow-form"
+                        [ngClass]="{'mon-btn-success': isSEPClosed, 'mon-btn-secondary': !isSEPClosed}"
+                    >
+                        <mon-icon *ngIf="isSEPClosed" iconName="circle-check" class="icon-white" iconSize="16"> </mon-icon>
+                        {{buttonLabel}}
+                    </button>
+                    <button
+                        *ngIf="!isDirectAcc && !isTpi  && isOeShop"
+                        class="mon-btn-secondary mon-mr-20"
+                        mat-flat-button
+                        (click)="goToEmployees()"
+                        language="primary.portal.applicationFlow.confirmation.returnToEmployees"
+                    ></button>
+                    <button
+                        *ngIf="isDirectAcc && !isTpi"
+                        class="mon-btn-secondary mon-mr-20"
+                        mat-flat-button
+                        (click)="goToEmployees()"
+                        language="primary.portal.applicationFlow.confirmation.returnToCustomers"
+                    ></button>
+                    <div class="dual-plan-action-btns" *ngIf="dualPlanYearData.isDualPlanYear && isQleShop">
+                        <button
+                            *ngIf="isQleDuringOeEnrollment"
+                            class="mon-btn-primary mon-mr-20"
+                            mat-flat-button
+                            (click)="shopForOpenEnrollmentYear()"
+                            language="primary.portal.shop.confirmation.dualPlanYear.shopCoveragePlan"
+                        ></button>
+                        <button
+                            *ngIf="isQleAfterOeEnrollment"
+                            class="mon-btn-primary mon-mr-20"
+                            mat-flat-button
+                            (click)="shopForOpenEnrollmentYear()"
+                        >
+                            {{enrollmentShopButtonLabel}}
+                        </button>
+                    </div>
+                </ng-container>
+                <button
+                    *ngIf="isReinstate"
+                    class="mon-btn-primary mon-mr-20"
+                    mat-flat-button
+                    (click)="closeForm.emit()"
+                    language="primary.portal.common.continue"
+                ></button>
+            </div>
+        </ng-template>
+        <ng-template [ngIf]="isMember && !loadSpinner">
+            <!-- dual plan year qle enrollment -->
+            <ng-container *ngIf="isDualPlanYear && isQleDuringOeEnrollment && isQleMemberShop">
+                <h2 class="summary-title">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.coverageUpdates"] | replaceTag: {
+                    "##employeename##": firstName } }}
+                </h2>
+                <p class="summary-brief">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.changeCoverage"] | replaceTag: {
+                    "##plandate##": qleEndDate } }}
+                </p>
+            </ng-container>
+            <!-- Dual plan year Qle after OE is over -->
+            <ng-container *ngIf="isDualPlanYear && isQleAfterOeEnrollment && isQleMemberShop">
+                <h2 class="summary-title">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.coverageUpdates"] | replaceTag: {
+                    "##employeename##": firstName } }}
+                </h2>
+                <p class="summary-brief">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.coverageChangePara.current"] | replaceTag: {
+                    "##qleenddate##": qleEndDate, "##newplanyear##": oeYear } }}
+                </p>
+            </ng-container>
+            <!-- Dual plan year - New plan year Qle after OE is over -->
+            <ng-container *ngIf="isDualPlanYear && isQleAfterOeEnrollment && !isQleMemberShop">
+                <h2 class="summary-title">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.coverageUpdates"] | replaceTag: {
+                    "##employeename##": firstName } }}
+                </h2>
+                <p class="summary-brief">
+                    {{ this.languageStrings["primary.portal.members.confirmation.dualPlanYear.newCoverageChangePara"] | replaceTag: {
+                    "##qleenddate##": qleEndDate, "##newpystartdate##": newCoverageDate } }}
+                </p>
+            </ng-container>
+            <!-- For OE -->
+            <ng-container *ngIf="(oeFlag && !qleFlag) || (isOeShop && isDualPlanYear && isQleDuringOeEnrollment)">
+                <h2 class="summary-title">
+                    {{languageStrings["primary.portal.applicationFlow.confirmation.enrollmemtComplete"] .replace("#firstName",
+                    this.firstName) }}
+                </h2>
+                <mon-alert alertType="info">
+                    <p class="summary-brief">
+                        <span language="primary.portal.applicationFlow.confirmation.changesSaved"></span>
+
+                        <span *ngIf="newCoverageDate">
+                            {{languageStrings["primary.portal.applicationFlow.confirmation.newCoverageDate"] .replace("#newCoverageDate",
+                            newCoverageDate) }}
+                        </span>
+                        {{languageStrings["primary.portal.applicationFlow.confirmation.oeMaxDate"].replace("#oeMaxDate", oeMaxDate) }}
+                    </p>
+                </mon-alert>
+            </ng-container>
+            <!-- Dual scenario -->
+            <ng-container *ngIf="oeFlag && qleFlag && !isDualPlanYear && !isQleMemberShop">
+                <h2 class="summary-title"><span language="primary.portal.enrollment.complete.special"></span>, {{this.firstName}}</h2>
+                <mon-alert alertType="info">
+                    <p class="summary-brief">
+                        {{languageStrings['primary.portal.enrollment.complete.review'].replace("#mm/dd/yy",qleEndDate)}}
+                    </p>
+                </mon-alert>
+            </ng-container>
+            <!-- For QLE -->
+            <ng-container *ngIf="!oeFlag && qleFlag && !isDualPlanYear && !isQleMemberShop">
+                <div *ngIf="isQLEApproved">
+                    <h2 class="summary-title">
+                        <span language="primary.portal.applicationFlow.confirmation.qleApprovedSummaryTitle"></span>
+                        <span> {{this.firstName}}</span>
+                    </h2>
+                    <mon-alert alertType="info">
+                        <p class="summary-brief">
+                            {{languageStrings['primary.portal.applicationFlow.confirmation.qleApprovedSummaryBrief'].replace('#qleEndDate',qleEndDate)}}
+                        </p>
+                    </mon-alert>
+                </div>
+                <div *ngIf="isQLEPending">
+                    <h2 class="summary-title"><span>language="primary.portal.enrollment.complete.special"></span>, {{this.firstName}}</h2>
+                    <mon-alert alertType="info">
+                        <p class="summary-brief">
+                            {{languageStrings['primary.portal.enrollment.complete.review'].replace("#mm/dd/yy",qleEndDate)}}
+                        </p>
+                    </mon-alert>
+                </div>
+            </ng-container>
+            <!-- For continuous -->
+            <ng-container *ngIf="!oeFlag && !qleFlag && !isDualPlanYear && !isQleMemberShop">
+                <h2 class="summary-title" [ngClass]="{'mon-mt-30' : isTpi}">
+                    <span language="primary.portal.applicationFlow.confirmation.continuousSummaryTitle"></span>
+                    <span> {{this.firstName}}</span>
+                </h2>
+                <div class="mon-mb-20">
+                    <mon-alert alertType="info">
+                        <p class="summary-brief">
+                            <span language="primary.portal.applicationFlow.confirmation.changesSaved"></span>
+                            {{languageStrings['primary.portal.applicationFlow.confirmation.continuousSummaryBrief'].replace('#newCoverageDate',newCoverageDate)}}
+                        </p>
+                    </mon-alert>
+                </div>
+            </ng-container>
+            <ng-container *hasPermission="CREATE_FORM_PDA">
+                <div class="d-md-flex" *ngIf="!pdaSubmitted && !isMember && !showPda && !isAgPlanOnly">
+                    <p class="summary-brief">
+                        <span language="primary.portal.applicationFlow.confirmation.complete"></span>
+
+                        <a class="btn-link" href="javascript:void(0)" (click)="openPda()" language="primary.portal.pda.form.pda"></a>
+
+                        <span language="primary.portal.applicationFlow.confirmation.yourRecords"></span>
+                    </p>
+                </div>
+            </ng-container>
+            <div class="d-flex mon-my-15" *ngIf="pdaSubmitted && isMember && !isAgPlanOnly">
+                <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                <div class="app-details">
+                    <p class="plan-name" language="primary.portal.pda.form.pdaFull"></p>
+                    <a class="view-application" href="javascript:void(0)" *ngIf="pdaSubmitted" (click)="downloadForm()">
+                        <span language="primary.portal.common.view"></span>
+                        <span language="primary.portal.pda.form.pda"></span>
+                    </a>
+                </div>
+            </div>
+            <!-- Aflac Always Card for MMP and TPI Self Assisted -->
+            <ng-container *ngIf="(isAflacAlways$ | async) && !isDirectFlow" [ngTemplateOutlet]="aflacAlwaysCard"></ng-container>
+            <table mat-table [dataSource]="confirmationTableData">
+                <ng-container matColumnDef="product_name">
+                    <th mat-header-cell *matHeaderCellDef language="primary.portal.applicationFlow.confirmation.yourNewCoverage"></th>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="product-wrapper">
+                            <mon-icon
+                                [iconName]="element.product?.product.name"
+                                class="plan-in-cart"
+                                iconSize="24"
+                                [fetchedIconPath]="element.product?.product.iconSelectedLocation"
+                            ></mon-icon>
+                            <div class="product-label">
+                                <span class="product-name">{{element.product?.product.name}}</span>
+                                <ng-container *ngIf="virginiaFeatureEnabled$ | async; else virginiaFeatureNotEnabled">
+                                    {{element.carrierName | aflacLegalName: element.legalName}}
+                                </ng-container>
+                                <ng-template #virginiaFeatureNotEnabled> {{element.carrierName}} </ng-template>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="plan">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                        <div>{{element.plan.name }}</div>
+                        <div>{{ element.coverageLevel.name}}</div>
+                        <div>
+                            Coverage Dates: {{ element.validity.effectiveStarting| date:signoffDataFormat}}
+                            <span *ngIf="element.validity.expiresAfter">
+                                - {{ element.validity.expiresAfter | date:signoffDataFormat }}
+                            </span>
+                        </div>
+                        <div *ngIf="element.planLevelBenefitDollars">
+                            <span>{{element.paymentLabel}}: </span>
+                            <span>{{element.employerCostPerPayPeriod | currency}}</span>
+                        </div>
+                        <div *ngIf="getEnrollmentData[0].policyNumber">
+                            <div *ngIf="element.carrierId !== agCarrierId">
+                                <a
+                                    (click)="viewSignedApplication(element.eid, element.plan.name)"
+                                    language="primary.portal.applicationFlow.confirmation.viewSignedApplications"
+                                ></a>
+                            </div>
+                            <div *ngIf="element.carrierId === agCarrierId">
+                                <a
+                                    class="view-application"
+                                    href="javascript:void(0)"
+                                    (click)="viewPlanDetailsDialog(element.eid)"
+                                    language="primary.portal.shoppingExperience.viewDetails"
+                                >
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="cost">
+                    <th mat-header-cell *matHeaderCellDef class="force-right">
+                        {{payFrequency?.name}} cost as of {{ signOffData | date:signoffDataFormat}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="force-right">
+                        <div *ngIf="element.individualPlan" class="product-cost">{{element.individualPlan.cost | currency}}</div>
+                        <div *ngIf="element.agPlan" class="product-cost">{{element.agPlan.cost | currency}}</div>
+                        <div *ngIf="!element.individualPlan && !element.agPlan" class="product-cost">
+                            {{element.memberCostPerPayPeriod | currency}}
+                        </div>
+                        <div>{{element.taxStatus }}</div>
+                    </td>
+
+                    <td mat-footer-cell *matFooterCellDef [attr.colspan]="3">
+                        <div>
+                            <span>
+                                {{payFrequency?.name}}
+                                <span language="primary.portal.applicationFlow.confirmation.total"></span>
+                            </span>
+                            <div>
+                                <span>{{totalCost | currency}}</span>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-footer-row *matFooterRowDef="footerColumns" class="footer-wrapper"></tr>
+            </table>
+
+            <div class="wizard-footer">
+                <ng-container *ngIf="!isReinstate">
+                    <button
+                        id="submitAppFlowForm"
+                        class="mon-btn-secondary submit-app-flow-form"
+                        (click)="goToMyCoverage()"
+                        mat-flat-button
+                        *ngIf="oeFlag || (!oeFlag && !qleFlag) || qleFlag || (tpiLnlMode && isTpi) || (isOeShop && isDualPlanYear)"
+                        language="primary.portal.applicationFlow.confirmation.viewMyCoverage"
+                    ></button>
+                    <button
+                        mat-flat-button
+                        (click)="openDialog()"
+                        class="submit-app-flow-form"
+                        *ngIf="(isQLEPending || isQLEApproved) && !isTpi && !isDualPlanYear && !isQleMemberShop"
+                        [ngClass]="{'mon-btn-success': isSEPClosed, 'mon-btn-secondary': !isSEPClosed}"
+                    >
+                        <mon-icon *ngIf="isSEPClosed" iconName="circle-check" class="icon-white" iconSize="16"> </mon-icon>
+                        {{buttonLabel}}
+                    </button>
+                    <button
+                        *ngIf="!isTpi || (isDualPlanYear && isQleDuringOeEnrollment && isQleMemberShop)"
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="exitEnrollment()"
+                        [ngClass]="isDualPlanYear && isQleMemberShop ?  'mon-btn-secondary mon-mr-20':'mon-btn-primary mon-mr-20'"
+                        language="primary.portal.applicationFlow.confirmation.exitEnrollment"
+                    ></button>
+
+                    <button
+                        *ngIf="tpiLnlMode && isTpi && !isDualPlanYear && !isQleMemberShop"
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="exitEnrollment()"
+                        language="primary.portal.brandingModalExit.buttonExit"
+                    ></button>
+                    <button
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="shopForNextYear(false)"
+                        *ngIf="isDualPlanYear && isQleDuringOeEnrollment && isQleMemberShop"
+                        language="primary.portal.members.confirmation.dualPlanYear.shopCoverage"
+                    ></button>
+                    <button
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="shopForNextYear(true)"
+                        *ngIf="isDualPlanYear && isQleAfterOeEnrollment && isQleMemberShop"
+                        language="primary.portal.members.confirmation.dualPlanYear.updateEnrollments.future"
+                    ></button>
+                </ng-container>
+                <button
+                    *ngIf="isReinstate"
+                    class="mon-btn-primary mon-mr-20"
+                    mat-flat-button
+                    (click)="closeForm.emit()"
+                    language="primary.portal.common.continue"
+                ></button>
+            </div>
+        </ng-template>
+    </div>
+</div>
+<ng-template #formTemplate>
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button (click)="closeDialog()">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <div mat-dialog-content>
+            <iframe
+                id="myIframe"
+                [src]="formUrl"
+                name="targetframe"
+                allowTransparency="true"
+                width="100%"
+                scrolling="yes"
+                frameborder="0"
+                class="confirm-pdf"
+                [title]="languageStrings['primary.portal.applicationFlow.confirmation.confirmationTitle']"
+            >
+            </iframe>
+        </div>
+
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <button type="button" class="mon-btn-secondary" mat-flat-button (click)="print()">
+                <span language="primary.portal.common.print"></span>
+            </button>
+            <button class="mon-btn-primary" mat-flat-button (click)="closeDialog()">
+                <span language="primary.portal.common.finish"></span>
+                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+            </button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>
+<ng-template #aflacAlwaysCard>
+    <div [ngClass]="{'aflac-always-producer': !isMember, 'aflac-always-member': isMember}">
+        <empowered-aflac-always-card
+            bodyLanguageString="primary.portal.applicationFlow.confirmation.aflacAflaysCard.content"
+            [mpGroupId]="mpGroup"
+            [memberId]="memberId"
+            [isMemberPortal]="isMember"
+            [isTpi]="isTpi"
+        ></empowered-aflac-always-card>
+    </div>
+</ng-template>

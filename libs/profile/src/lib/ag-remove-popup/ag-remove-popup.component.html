@@ -1,0 +1,23 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.aflacGroup.removeAflacGroup']}}
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-danger" (click)="unlinkAflacAccount()">
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </empowered-modal-footer>
+    <div *ngIf="this.data.benefitOfferingStatus">
+        <p>
+            {{languageStrings['primary.portal.aflacGroup.info']}}
+        </p>
+        <p>
+            {{languageStrings['primary.portal.aflacGroup.reviewInfo']}}
+        </p>
+    </div>
+    <div *ngIf="!this.data.benefitOfferingStatus">
+        <p>
+            {{languageStrings['primary.portal.aflacGroup.removeInfoWhenIncompleteBO']}}
+        </p>
+    </div>
+</empowered-modal>

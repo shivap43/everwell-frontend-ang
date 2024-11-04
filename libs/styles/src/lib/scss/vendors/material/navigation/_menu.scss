@@ -1,0 +1,81 @@
+/**
+*   _menu.scss file used to apply css style to the empowered-menu
+
+*   Depends on user selection for positioning the menu along the x and y
+
+*   By default, the menu will display below (y-axis), after (x-axis),
+*   without overlapping its trigger. The position can be changed using
+*   the xPosition (before | after) and yPosition (above | below) attributes. The menu can be forced to overlap
+*   the trigger using the overlapTrigger attribute.
+
+*   Following css is used to position the menu according to our design protocol.
+*/
+@import "shared";
+.mat-menu-panel {
+    &.after {
+        margin-left: map-get($spacers, 40);
+        margin-top: convert-unit(-15px, "rem");
+        margin-right: convert-unit(-64px, "rem");
+    }
+
+    &.before {
+        margin-right: convert-unit(38px, "rem");
+        margin-top: convert-unit(-15px, "rem");
+    }
+}
+
+.mat-menu-panel {
+    box-shadow: 0px 0px 3px get("color.gray.600");
+    border-radius: convert-unit(4px, "rem");
+
+    div.mat-menu-content {
+        padding: convert-unit(10px, "rem") 0;
+        padding-bottom: map-get($spacers, 10);
+        min-width: convert-unit(120px, "rem");
+        border-radius: convert-unit(4px, "rem");
+        font-weight: normal;
+        font-size: convert-unit(14px, "rem");
+        text-align: left;
+
+        .seperator {
+            margin: 0 convert-unit(15px, "rem");
+        }
+
+        .mat-menu-item {
+            line-height: inherit;
+            height: auto;
+            color: get("color.black");
+            padding: convert-unit(10px, "rem") convert-unit(15px, "rem");
+            margin: 0 convert-unit(4px, "rem");
+            width: calc(100% - 0.5rem);
+
+            &.text-danger {
+                color: get("color.info.danger.500");
+                &:hover {
+                    background-color: get("color.info.danger.500");
+                    color: get("color.white");
+                }
+            }
+
+            &:focus {
+                background-color: get("color.white");
+                box-shadow: 0 0 convert-unit(1px, "rem") convert-unit(1px, "rem") get("color.primary.300"),
+                    0 0 convert-unit(3px, "rem") convert-unit(4px, "rem") get("color.primary.200");
+            }
+
+            &:hover {
+                background-color: get("color.primary.500");
+                color: get("color.white");
+            }
+            &:disabled {
+                color: get("color.gray.700");
+                cursor: not-allowed;
+
+                &:hover {
+                    background-color: get("color.gray.300");
+                    color: get("color.gray.700");
+                }
+            }
+        }
+    }
+}

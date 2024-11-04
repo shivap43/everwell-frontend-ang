@@ -1,0 +1,30 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span [language]="MessageCenterLanguage.CATEGORY_MODAL_HEADER"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            class="mon-btn-primary"
+            [mat-dialog-close]="categoryForm.controls['categoryFormControl'].value"
+            [disabled]="!categoryForm.valid"
+            [language]="MessageCenterLanguage.CATEGORY_MODAL_BUTTON"
+        >
+        </button>
+    </empowered-modal-footer>
+
+    <form [formGroup]="categoryForm">
+        <mat-label [language]="MessageCenterLanguage.CATEGORY_MODAL_LABEL"></mat-label>
+        <mat-form-field>
+            <mat-select formControlName="categoryFormControl" [disableOptionCentering]="true">
+                <ng-container *ngIf="messageCategories$ | async as messageCategories">
+                    <mat-option *ngFor="let category of messageCategories" [value]="category.id"
+                        >{{ category.name }}</mat-option
+                    >
+                </ng-container>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</empowered-modal>

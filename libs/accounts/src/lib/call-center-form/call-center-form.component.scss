@@ -1,0 +1,53 @@
+@import "shared";
+.heading {
+    display: flex;
+    flex-direction: column;
+    p {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+}
+.searchcont {
+    display: flex;
+    align-items: flex-end;
+    margin-top: convert-unit(20px, "rem");
+}
+.error-cont {
+    margin-top: convert-unit(5px, "rem");
+}
+.radiowrapper {
+    display: flex;
+    & .mat-radio-group {
+        & .mat-radio-button {
+            &:first-child {
+                margin-right: convert-unit(20px, "rem");
+            }
+        }
+    }
+}
+
+.callcenterform-divider {
+    border-top: convert-unit(1px, "rem") solid get("color.gray.700");
+    margin: convert-unit(16px, "rem") 0;
+}
+.tablewrapper {
+    box-sizing: border-box;
+    max-height: 30vh;
+    overflow-y: auto;
+    td {
+        &.valigntop {
+            vertical-align: top;
+        }
+        & .accountswrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: convert-unit(5px, "rem");
+            word-break: break-word;
+        }
+        & .account-name {
+            padding-right: convert-unit (10px, "rem");
+        }
+        &.emailid {
+            word-break: break-all;
+        }
+    }
+}

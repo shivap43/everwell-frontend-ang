@@ -1,0 +1,53 @@
+<h1 class="content-header">
+    <span>{{languageStrings['primary.portal.members.account-setting.header']}}</span>
+</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2 link-nav">
+            <a href="javascript:void(0)" (click)="backClick()" class="mon-btn-link"
+                ><mon-icon [iconSize]="10" iconName="left" class="icon-primary accordion-indicator"></mon-icon
+                ><span> {{languageStrings['primary.portal.common.back']}}</span></a
+            >
+            <ul class="link-list">
+                <li *ngIf="selfEnrollment$ && (selfEnrollment$ | async) === false">
+                    <a [routerLink]="['change-password']" [routerLinkActive]="'router-link-active'">
+                        {{languageStrings['primary.portal.members.account-setting.nav.change-password']}}
+                    </a>
+                </li>
+                <li *ngIf="notification">
+                    <a
+                        [routerLink]="['notificationPreferences']"
+                        [routerLinkActive]="'router-link-active'"
+                        *configEnabled="'portal.member_communication_preference.enabled'"
+                        >{{languageStrings['primary.portal.members.account-setting.nav.notification-preferences']}}
+                    </a>
+                </li>
+                <li *ngIf="!notification">
+                    <a [routerLink]="['profile']" [routerLinkActive]="'router-link-active'"
+                        >{{languageStrings['primary.portal.memberDashboard.profile']}}
+                    </a>
+                </li>
+                <li *ngIf="!notification && !isAdmin">
+                    <a
+                        [routerLink]="['producerInfo']"
+                        [routerLinkActive]="'router-link-active'"
+                        *isRestricted="permissionEnum.RESTRICT_PRODUCER_INFO"
+                        >{{languageStrings['primary.portal.common.producerInfo']}}
+                    </a>
+                </li>
+                <li *configEnabled="'general.branding.enabled'">
+                    <a
+                        [routerLink]="['branding']"
+                        [routerLinkActive]="'router-link-active'"
+                        language="primary.portal.branding.header"
+                        *hasPermission="CREATE_BRANDING_PERMISSION"
+                    ></a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

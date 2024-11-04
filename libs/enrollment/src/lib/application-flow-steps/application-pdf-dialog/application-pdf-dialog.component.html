@@ -1,0 +1,35 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeDialog()">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="confirm-application" mat-dialog-content>
+        <h2>
+            <span>{{languageStrings['primary.portal.applicationFlow.confirmation.applicationForInsurance']}}</span
+            ><span> {{data.planName}}</span>
+        </h2>
+        <div class="iframe-wrapper">
+            <iframe
+                id="applicationPdfIframe"
+                [src]="data.safeUrl"
+                name="targetframe"
+                allowTransparency="true"
+                scrolling="yes"
+                class="confirm-pdf"
+                [title]="languageStrings['primary.portal.applicationFlow.confirmation.applicationForInsurance'] + data.planName"
+            >
+            </iframe>
+        </div>
+    </div>
+
+    <mat-dialog-actions class="dialog-footer justify-content-between">
+        <button type="button" class="mon-btn-secondary" mat-flat-button (click)="print()">
+            <span>{{languageStrings['primary.portal.common.print']}}</span>
+        </button>
+        <button class="mon-btn-primary" mat-flat-button (click)="closeDialog()">
+            <span>{{languageStrings['primary.portal.common.finish']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </mat-dialog-actions>
+</div>

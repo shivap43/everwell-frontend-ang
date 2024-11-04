@@ -1,0 +1,45 @@
+@import "shared";
+
+.enrollment-nav {
+    a {
+        opacity: 1;
+        color: get("color.black");
+        text-decoration: none;
+        .icon-numeric {
+            padding-right: convert-unit(3px, "rem");
+        }
+    }
+    .icon-done,
+    .icon-active {
+        line-height: 100%;
+    }
+    ::ng-deep {
+        .mat-tab-link {
+            height: auto;
+            @include media-max("l") {
+                min-width: convert-unit(120px, "rem");
+            }
+        }
+        .icon-done {
+            .mat-icon .cls-1 {
+                fill: get("color.info.success") !important;
+            }
+        }
+        .icon-active {
+            .mat-icon .cls-1 {
+                fill: get("color.primary.500") !important;
+            }
+        }
+        .mat-ink-bar {
+            background-color: get("color.gray.600");
+        }
+        .mat-tab-label-active {
+            @include fontFace("primary.bold");
+        }
+    }
+    .member-shopping-cart-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+}

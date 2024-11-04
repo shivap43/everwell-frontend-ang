@@ -1,0 +1,26 @@
+<mat-form-field class="mon-date-field  w-200">
+    <input
+        matInput
+        [matDatepicker]="dp"
+        placeholder="Month and Year"
+        [min]="minDate"
+        [formControl]="date"
+        [attr.aria-label]="languageStrings['primary.portal.common.monthandyear']"
+        (dateChange)="dateValueChange($event)"
+    />
+    <mat-datepicker-toggle matSuffix [for]="dp">
+        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+    </mat-datepicker-toggle>
+    <mat-datepicker
+        #dp
+        startView="multi-year"
+        panelClass="example-month-picker"
+        (yearSelected)="chosenYearHandler($event)"
+        (monthSelected)="chosenMonthHandler($event, dp)"
+    ></mat-datepicker>
+    <mat-hint
+        ><span>
+            {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.expDate.dateFormat']}}
+        </span></mat-hint
+    >
+</mat-form-field>

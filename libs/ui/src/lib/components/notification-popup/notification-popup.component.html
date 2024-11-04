@@ -1,0 +1,471 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="example-container">
+    <div class="notification-panel">
+        <h3>
+            {{languageStrings['primary.portal.notification.notification']}}
+            <span *ngIf="this.totalNotificationCount+this.totalDirectSaleNotificationCount > 0 && !mpGroup && !directPage"
+                >({{this.totalNotificationCount+this.totalDirectSaleNotificationCount}})</span
+            >
+        </h3>
+        <!----------Universal All Notification Panel--------------------------->
+        <div *ngIf="(producerId || adminId) && !mpGroup && !directPage" class="notification-panel-body">
+            <div class="action-panel">
+                <div #headerNotification class="header-notification" tabindex="-1">
+                    <div *ngIf="notificationsList">
+                        <div *ngFor="let item of notificationsList | keyvalue" class="notification-sub-header">
+                            <p *ngIf="item.key === notificationtype.CTA">
+                                {{languageStrings['primary.portal.notification.actionNeeded']}}
+                                <span *ngIf="item.value.categorizedNotificationCount">({{item.value.categorizedNotificationCount}})</span>
+                            </p>
+                            <p *ngIf="item.key === notificationtype.REMINDER">
+                                {{languageStrings['primary.portal.notification.reminders']}}
+                                <span *ngIf="item.value.categorizedNotificationCount">({{item.value.categorizedNotificationCount}})</span>
+                            </p>
+                            <p *ngIf="item.key === notificationtype.UPDATE">
+                                {{languageStrings['primary.portal.notification.updates']}}
+                                <span *ngIf="item.value.categorizedNotificationCount">({{item.value.categorizedNotificationCount}})</span>
+                            </p>
+                            <div *ngIf="item.value">
+                                <div class="notification-action-needed" *ngFor="let notification of item.value">
+                                    <div class="notification-text-block">
+                                        <p
+                                            class="notification-count"
+                                            *ngIf="notification.count === 1 || !notification.count && item.value.categorizedNotificationCount > 0"
+                                        ></p>
+                                        <p class="notification-count" *ngIf="notification.count > 1 && notification.count < 100">
+                                            {{notification.count}}
+                                        </p>
+                                        <p class="notification-count" *ngIf="notification.count >= 100">
+                                            {{languageStrings['primary.portal.notification.moreThan99Records']}}
+                                        </p>
+                                    </div>
+                                    <div class="notification-info">
+                                        <div>
+                                            <p *ngIf="item.value.categorizedNotificationCount > 0">{{notification.displayText}}</p>
+                                        </div>
+                                        <div class="notification-action-block">
+                                            <a *ngIf="notification.dismissable" (click)="clearNotifications(notification)" class="mon-pr-5">
+                                                {{languageStrings['primary.portal.notification.clear']}}
+                                            </a>
+                                            <ng-container *configEnabled="'general.notifications.link_display'">
+                                                <span
+                                                    *ngIf="notification.link && notification.linkText && notification.dismissable"
+                                                    class="seperator"
+                                                >
+                                                    {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                                </span>
+                                                <a
+                                                    *ngIf="notification.link && notification.linkText"
+                                                    (click)="viewNotifications(notification)"
+                                                    class="mon-pl-5"
+                                                >
+                                                    {{notification.linkText}}
+                                                </a>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!item.value.length || !item.value.categorizedNotificationCount">
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="notificationsList && notificationsList.length === 0">
+                        <div class="notification-sub-header">
+                            <p>{{languageStrings['primary.portal.notification.actionNeeded']}}</p>
+                            <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                        </div>
+                        <div class="notification-sub-header">
+                            <p>{{languageStrings['primary.portal.notification.reminders']}}</p>
+                            <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                        </div>
+                        <div class="notification-sub-header">
+                            <p>{{languageStrings['primary.portal.notification.updates']}}</p>
+                            <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                        </div>
+                    </div>
+                    <!--------Universal All Direct Notification section------------->
+                    <ng-template [ngTemplateOutlet]="directNotification"></ng-template>
+                </div>
+            </div>
+        </div>
+
+        <!--Account Payroll Page Notifications-->
+        <mat-tab-group #tabGroup animationDuration="0ms" class="notification-tab" *ngIf="(producerId || adminId) && mpGroup && !directPage">
+            <!--Account All Notification Section-->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{languageStrings['primary.portal.notification.allAccounts']}}
+                    <span class="total-count" *ngIf="totalNotificationCount > 0"
+                        >({{totalNotificationCount+totalDirectSaleNotificationCount}})</span
+                    >
+                </ng-template>
+                <div class="action-panel">
+                    <div class="header-notification">
+                        <div *ngIf="notificationsList">
+                            <div *ngFor="let item of notificationsList | keyvalue" class="notification-sub-header">
+                                <p *ngIf="item.key === notificationtype.CTA">
+                                    {{languageStrings['primary.portal.notification.actionNeeded']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.REMINDER">
+                                    {{languageStrings['primary.portal.notification.reminders']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.UPDATE">
+                                    {{languageStrings['primary.portal.notification.updates']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <div *ngIf="item.value">
+                                    <div class="notification-action-needed" *ngFor="let notification of item.value">
+                                        <div class="notification-text-block">
+                                            <p
+                                                class="notification-count"
+                                                *ngIf="notification.count === 1 || !notification.count && item.value.categorizedNotificationCount > 0"
+                                            ></p>
+                                            <p class="notification-count" *ngIf="notification.count > 1 && notification.count < 100">
+                                                {{notification.count}}
+                                            </p>
+                                            <p class="notification-count" *ngIf="notification.count >= 100">
+                                                {{languageStrings['primary.portal.notification.moreThan99Records']}}
+                                            </p>
+                                        </div>
+                                        <div class="notification-info">
+                                            <div>
+                                                <p *ngIf="item.value.categorizedNotificationCount > 0">{{notification.displayText}}</p>
+                                            </div>
+                                            <div class="notification-action-block">
+                                                <a
+                                                    *ngIf="notification.dismissable"
+                                                    (click)="clearNotifications(notification)"
+                                                    class="mon-pr-5"
+                                                >
+                                                    {{languageStrings['primary.portal.notification.clear']}}
+                                                </a>
+                                                <ng-container *configEnabled="'general.notifications.link_display'">
+                                                    <span
+                                                        *ngIf="notification.link && notification.linkText && notification.dismissable"
+                                                        class="seperator"
+                                                    >
+                                                        {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                                    </span>
+                                                    <a
+                                                        *ngIf="notification.link && notification.linkText"
+                                                        (click)="viewNotifications(notification)"
+                                                        class="mon-pl-5"
+                                                    >
+                                                        {{notification.linkText}}
+                                                    </a>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="!item.value.length || !item.value.categorizedNotificationCount">
+                                    <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="notificationsList && notificationsList.length === 0">
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.actionNeeded']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.reminders']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.updates']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                        </div>
+
+                        <!--Direct Notification in All Notification Section-->
+                        <ng-template [ngTemplateOutlet]="directNotification"></ng-template>
+                    </div>
+                </div>
+            </mat-tab>
+
+            <!--Account Specific Notification Tab Start Here-->
+            <mat-tab *ngIf="mpGroup">
+                <ng-template mat-tab-label>
+                    {{languageStrings['primary.portal.notification.thisAccount']}}<span class="mon-pl-5"
+                        >({{totalAccountNotificationCount}})</span
+                    >
+                </ng-template>
+                <div class="action-panel">
+                    <div class="header-notification">
+                        <div *ngIf="!emptyNotificationObj(notificationsAccountList)">
+                            <div *ngFor="let item of notificationsAccountList | keyvalue" class="notification-sub-header">
+                                <p *ngIf="item.key === notificationtype.CTA">
+                                    {{languageStrings['primary.portal.notification.actionNeeded']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.REMINDER">
+                                    {{languageStrings['primary.portal.notification.reminders']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.UPDATE">
+                                    {{languageStrings['primary.portal.notification.updates']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <div *ngIf="item.value">
+                                    <div class="notification-action-needed" *ngFor="let notification of item.value">
+                                        <div class="notification-text-block">
+                                            <p
+                                                class="notification-count"
+                                                *ngIf="notification.count === 1 || !notification.count && item.value.categorizedNotificationCount > 0"
+                                            ></p>
+                                            <p class="notification-count" *ngIf="notification.count > 1 && notification.count < 100">
+                                                {{notification.count}}
+                                            </p>
+                                            <p class="notification-count" *ngIf="notification.count >= 100">
+                                                {{languageStrings['primary.portal.notification.moreThan99Records']}}
+                                            </p>
+                                        </div>
+                                        <div class="notification-info">
+                                            <div>
+                                                <p *ngIf="item.value.categorizedNotificationCount">{{notification.displayText}}</p>
+                                            </div>
+                                            <div class="notification-action-block">
+                                                <a
+                                                    *ngIf="notification.dismissable"
+                                                    (click)="clearNotifications(notification)"
+                                                    class="mon-pr-5"
+                                                >
+                                                    {{languageStrings['primary.portal.notification.clear']}}
+                                                </a>
+                                                <ng-container *configEnabled="'general.notifications.link_display'">
+                                                    <span
+                                                        *ngIf="notification.link && notification.linkText && notification.dismissable"
+                                                        class="seperator"
+                                                    >
+                                                        {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                                    </span>
+                                                    <a
+                                                        *ngIf="notification.link && notification.linkText"
+                                                        (click)="viewNotifications(notification)"
+                                                        class="mon-pl-5"
+                                                    >
+                                                        {{notification.linkText}}
+                                                    </a>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="!item.value.length || !item.value.categorizedNotificationCount ">
+                                    <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="emptyNotificationObj(notificationsAccountList)">
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.actionNeeded']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.reminders']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.updates']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+        <!--Account Specific Notification Tab End HEre-->
+
+        <!--Direct Sale Notification Tab Group Start Here-->
+        <mat-tab-group #tabGroup animationDuration="0ms" class="notification-tab" *ngIf="(producerId || adminId) && mpGroup && directPage">
+            <!--Direct Sale All Notification Tab Start Here-->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{languageStrings['primary.portal.notification.allAccounts']}}<span
+                        class="total-count"
+                        *ngIf="totalNotificationCount > 0"
+                        >({{totalNotificationCount+this.totalDirectSaleNotificationCount}})</span
+                    >
+                </ng-template>
+                <div class="action-panel">
+                    <div class="header-notification">
+                        <div *ngIf="notificationsList">
+                            <div *ngFor="let item of notificationsList | keyvalue" class="notification-sub-header">
+                                <p *ngIf="item.key === notificationtype.CTA">
+                                    {{languageStrings['primary.portal.notification.actionNeeded']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.REMINDER">
+                                    {{languageStrings['primary.portal.notification.reminders']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <p *ngIf="item.key === notificationtype.UPDATE">
+                                    {{languageStrings['primary.portal.notification.updates']}}
+                                    <span *ngIf="item.value.categorizedNotificationCount"
+                                        >({{item.value.categorizedNotificationCount}})</span
+                                    >
+                                </p>
+                                <div *ngIf="item.value">
+                                    <div class="notification-action-needed" *ngFor="let notification of item.value">
+                                        <div class="notification-text-block">
+                                            <p
+                                                class="notification-count"
+                                                *ngIf="notification.count === 1 || !notification.count && item.value.categorizedNotificationCount > 0"
+                                            ></p>
+                                            <p class="notification-count" *ngIf="notification.count > 1 && notification.count < 100">
+                                                {{notification.count}}
+                                            </p>
+                                            <p class="notification-count" *ngIf="notification.count >= 100">
+                                                {{languageStrings['primary.portal.notification.moreThan99Records']}}
+                                            </p>
+                                        </div>
+                                        <div class="notification-info">
+                                            <div>
+                                                <p *ngIf="item.value.categorizedNotificationCount > 0">{{notification.displayText}}</p>
+                                            </div>
+                                            <div class="notification-action-block">
+                                                <a
+                                                    *ngIf="notification.dismissable"
+                                                    (click)="clearNotifications(notification)"
+                                                    class="mon-pr-5"
+                                                >
+                                                    {{languageStrings['primary.portal.notification.clear']}}
+                                                </a>
+                                                <ng-container *configEnabled="'general.notifications.link_display'">
+                                                    <span
+                                                        *ngIf="notification.link && notification.linkText && notification.dismissable"
+                                                        class="seperator"
+                                                    >
+                                                        {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                                    </span>
+                                                    <a
+                                                        *ngIf="notification.link && notification.linkText"
+                                                        (click)="viewNotifications(notification)"
+                                                        class="mon-pl-5"
+                                                    >
+                                                        {{notification.linkText}}
+                                                    </a>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="!item.value.length || !item.value.categorizedNotificationCount ">
+                                    <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="notificationsList && notificationsList.length === 0">
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.actionNeeded']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.reminders']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                            <div class="notification-sub-header">
+                                <p>{{languageStrings['primary.portal.notification.updates']}}</p>
+                                <p class="no-message-text">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab *ngIf="mpGroup">
+                <ng-template mat-tab-label>
+                    {{languageStrings['primary.portal.notification.directAccounts']}}
+                    <span class="mon-pl-5">({{totalDirectSaleNotificationCount}})</span>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+        <!--Direct Sale All Notification Tab End Here-->
+
+        <!--Direct Sale Direct Notification Tab Start Here-->
+        <div *ngIf="(producerId || adminId) && mpGroup && directPage" class="notification-panel-body">
+            <ng-template [ngTemplateOutlet]="directNotification"></ng-template>
+        </div>
+        <!--Direct Sale All Notification Tab End Here-->
+    </div>
+</div>
+<!--Direct Sale All Notification Tab Group End Here-->
+
+<!--Direct Notification template in order to reuse in the same page-->
+<ng-template #directNotification>
+    <div class="action-panel">
+        <div class="header-notification">
+            <div class="notification-sub-header">
+                <p>
+                    {{languageStrings['primary.portal.notification.directAccounts']}}
+                    <span *ngIf="totalDirectSaleNotificationCount" class="mon-pl-5">({{totalDirectSaleNotificationCount}})</span>
+                </p>
+                <div *ngFor="let item of directNotificationsList | keyvalue">
+                    <div *ngIf="item.value && item.value.categorizedNotificationCount > 0">
+                        <div class="notification-action-needed" *ngFor="let notification of item.value">
+                            <div class="notification-text-block">
+                                <p
+                                    class="notification-count"
+                                    *ngIf="notification.count === 1 || !notification.count && item.value.categorizedNotificationCount > 0"
+                                ></p>
+                                <p class="notification-count" *ngIf="notification.count > 1 && notification.count < 100">
+                                    {{notification.count}}
+                                </p>
+                            </div>
+                            <div class="notification-info">
+                                <div>
+                                    <p *ngIf="item.value.categorizedNotificationCount > 0">{{notification.displayText}}</p>
+                                </div>
+                                <div class="notification-action-block">
+                                    <a *ngIf="notification.dismissable" (click)="clearNotifications(notification)" class="mon-pr-5">
+                                        {{languageStrings['primary.portal.notification.clear']}}
+                                    </a>
+                                    <ng-container *configEnabled="'general.notifications.link_display'">
+                                        <span
+                                            *ngIf="notification.link && notification.linkText && notification.dismissable"
+                                            class="seperator"
+                                        >
+                                            {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                        </span>
+                                        <a
+                                            *ngIf="notification.link && notification.linkText"
+                                            (click)="viewNotifications(notification)"
+                                            class="mon-pl-5"
+                                        >
+                                            {{notification.linkText}}
+                                        </a>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="no-message-text" *ngIf="totalDirectSaleNotificationCount===0">{{languageStrings['primary.portal.notification.noMessage']}}</p>
+</ng-template>

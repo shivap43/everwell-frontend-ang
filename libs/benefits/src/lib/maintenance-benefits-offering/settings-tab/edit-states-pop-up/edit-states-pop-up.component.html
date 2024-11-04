@@ -1,0 +1,78 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <mat-dialog-content>
+            <div class="header">
+                <h1 mat-dialog-title class="mon-mb-0">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.editStates']}}
+                </h1>
+                <p>{{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.statesServicing']}}</p>
+                <p>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.statesServicingDesc']}}
+                </p>
+            </div>
+            <div class="scroll-content">
+                <div class="state-wrapper" *ngIf="!enableCensusField">
+                    <ng-template [ngTemplateOutlet]="stateChipSelect"></ng-template>
+                </div>
+                <mat-radio-group
+                    aria-label="Select an option"
+                    *ngIf="enableCensusField"
+                    (change)="radioChange($event)"
+                    [value]="1"
+                >
+                    <div>
+                        <mat-radio-button id="selectStates" class="mon-mb-10" value="1" checked="checked">
+                            <span
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.selectStates']}}</span
+                            >
+                        </mat-radio-button>
+                        <div class="state-wrapper mon-ml-30">
+                            <ng-template [ngTemplateOutlet]="stateChipSelect"></ng-template>
+                        </div>
+                    </div>
+                    <div *ngIf="censusStates">
+                        <mat-radio-button id="statesCensus" class="mon-mb-10" value="2">
+                            <span
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.useStates']}}</span
+                            >
+                        </mat-radio-button>
+                        <div class="mon-ml-30">
+                            <h4 class="mon-m-0">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.editStatesPopup.includeStates']}}
+                            </h4>
+                            <p>{{ censusStates }}</p>
+                        </div>
+                    </div>
+                </mat-radio-group>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <a class="mon-btn-link" mat-dialog-close (click)="closeForm()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button type="submit" mat-flat-button class="mon-btn-primary">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>
+<ng-template #stateChipSelect>
+    <empowered-chip-select
+        [chipOptions$]="allStates$"
+        [hasSelectAll]="!data.isSitusNY"
+        [valuesChipControl]="form.controls?.stateControl"
+        [changeStrategy]="UPDATE_ON_CHANGE"
+        [initSelectedChips]="selectedStates"
+    >
+    </empowered-chip-select>
+
+    <mat-error
+        *ngIf="form.controls?.stateControl?.errors?.atLeastOneStateRequired"
+        language="secondary.portal.benefitsOffering.setting.statesRequired"
+    ></mat-error>
+</ng-template>

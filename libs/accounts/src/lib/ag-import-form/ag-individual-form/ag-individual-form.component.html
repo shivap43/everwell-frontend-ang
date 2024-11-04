@@ -1,0 +1,25 @@
+<div mat-dialog-content class="aflacgroup-individual">
+    <h2 role="heading" mat-dialog-title>
+        {{isAiOnly ? languageStrings['primary.portal.aflacgroup.importaccount.individual.agGroupTitle'] :
+        languageStrings['primary.portal.aflacgroup.importaccount.individual.title']}}
+    </h2>
+    <div class="select-txt">
+        {{languageStrings['primary.portal.aflacgroup.importaccount.individual.choice']}}
+    </div>
+    <form [formGroup]="linkAccounts">
+        <mat-radio-group formControlName="link">
+            <mat-radio-button class="primary-radio" value="link"
+                >{{isAiOnly ?
+                languageStrings['primary.portal.aflacgroup.importaccount.individual.linkAflacGroup']:languageStrings['primary.portal.aflacgroup.importaccount.individual.linkOption']}}</mat-radio-button
+            >
+            <mat-radio-button class="primary-radio mon-mt-15" value="create"
+                >{{languageStrings['primary.portal.aflacgroup.importaccount.individual.createAccount']}}
+            </mat-radio-button>
+            <br />
+            <mat-hint class="mat-hint mon-ml-30" id="mat-hint-1"
+                >{{isAiOnly ? languageStrings['primary.portal.aflacgroup.importaccount.individual.cantLinkAflacgroup']
+                :languageStrings['primary.portal.aflacgroup.importaccount.individual.hintInfo']}}</mat-hint
+            >
+        </mat-radio-group>
+    </form>
+</div>

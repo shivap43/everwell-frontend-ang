@@ -1,0 +1,330 @@
+@import "shared";
+
+.mat-row {
+    td.mat-cell:first-of-type {
+        max-width: convert-unit(250px, "rem");
+        width: convert-unit(250px, "rem");
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        .inactive-name {
+            @include fontFace("primary.regular");
+        }
+
+        a {
+            @include fontFace("primary.bold");
+        }
+    }
+
+    &.inactive {
+        td,
+        td:first-of-type {
+            a {
+                @include fontFace("primary.regular");
+            }
+        }
+    }
+}
+
+td.mat-column-notificationCount {
+    ::ng-deep .notification-badge {
+        justify-content: inherit;
+        padding-right: convert-unit(37px, "rem");
+    }
+}
+
+.state-composite {
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    padding: convert-unit(5px, "rem") 0;
+    margin: convert-unit(20px, "rem") convert-unit(20px, "rem") 0;
+    border-radius: convert-unit(4px, "rem");
+    max-height: convert-unit(120px, "rem");
+    overflow-y: auto;
+    position: relative;
+
+    .icon-clear {
+        position: absolute;
+        right: convert-unit(5px, "rem");
+        top: convert-unit(5px, "rem");
+    }
+
+    &.state-options {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.filter-options-wrapper {
+    max-height: convert-unit(120px, "rem");
+    overflow-y: auto;
+    border: convert-unit(1px, "rem") solid get("color.gray.600");
+    border-top: 0;
+    margin: 0 convert-unit(20px, "rem");
+    transition: max-height 0.3s;
+
+    ::ng-deep .mat-checkbox-layout {
+        flex: 1;
+    }
+
+    .mat-option {
+        &.mat-active {
+            background-color: get("color.gray.200");
+        }
+    }
+}
+
+.hideStateOptions {
+    max-height: 0;
+    border-color: transparent;
+}
+
+:host {
+    ::ng-deep {
+        .header-less-tabs > .mat-tab-header {
+            display: none;
+        }
+    }
+}
+
+.large-screen {
+    width: convert-unit(500px, "rem");
+}
+
+.medium-screen {
+    width: convert-unit(250px, "rem");
+}
+
+.has-status {
+    display: flex;
+    align-items: center;
+
+    .status-content {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .status-text {
+        margin-left: convert-unit(5px, "rem");
+    }
+}
+
+.invitation-link {
+    color: get("color.primary.500") !important;
+}
+
+.producer-btn {
+    padding: convert-unit(7px, "rem") convert-unit(20px, "rem");
+    margin-right: convert-unit(10px, "rem");
+    border-radius: convert-unit(20px, "rem");
+    background-color: get("color.gray.200");
+    border: 1px solid get("color.gray.500");
+    font-size: convert-unit(14px, "rem");
+    color: get("color.gray.900");
+    cursor: pointer;
+    vertical-align: top;
+
+    &:hover {
+        background: get("color.gray.300");
+        color: get("color.gray.900");
+    }
+
+    &:active,
+    &:focus,
+    &:focus-within {
+        background: get("color.gray.800");
+        border-color: get("color.gray.800");
+        color: get("color.white");
+        @include fontFace("primary.bold");
+    }
+
+    &.button-color {
+        font-size: convert-unit(14px, "rem");
+        @include fontFace("primary.bold");
+        background: get("color.gray.800");
+        color: get("color.white");
+        margin-right: convert-unit(10px, "rem");
+    }
+
+    &.button-active {
+        font-size: convert-unit(14px, "rem");
+        @include fontFace("primary.bold");
+        background: get("color.gray.800");
+        color: get("color.white");
+        margin-right: convert-unit(10px, "rem");
+
+        &:hover {
+            background: get("color.gray.900");
+            color: get("color.white");
+        }
+
+        &:active {
+            background: get("color.gray.1000");
+            color: get("color.white");
+        }
+    }
+}
+
+::ng-deep {
+    .producer-search-filter {
+        .producer-name {
+            display: flex;
+            line-height: normal;
+        }
+
+        .producer-email {
+            display: flex;
+            line-height: normal;
+            font-size: convert-unit(12px, "rem");
+            color: get("color.gray.600");
+            margin-bottom: convert-unit(5px, "rem");
+        }
+    }
+}
+
+.tabs-hidden {
+    ::ng-deep {
+        .mat-tab-header {
+            height: 0;
+            border: none;
+        }
+    }
+}
+
+::ng-deep .account-list-more-view {
+    display: flex;
+    flex-direction: column;
+    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    border-radius: convert-unit(4px, "rem");
+    background-color: get("color.white");
+    margin-top: convert-unit(10px, "rem");
+    width: convert-unit(410px, "rem") !important;
+}
+
+.productfilter-backdrop-view {
+    opacity: 0;
+}
+
+.zero-products-count {
+    text-indent: convert-unit(24px, "rem");
+}
+
+.infoicon {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.state-filter-trigger {
+    &.filter-label {
+        padding: convert-unit(7px, "rem") map-get($map: $spacers, $key: 20);
+        margin-right: map-get($map: $spacers, $key: 10);
+        border-radius: map-get($map: $spacers, $key: 20);
+        background-color: get("color.gray.200");
+        border: convert-unit(1px, "rem") solid get("color.gray.500");
+        font-size: convert-unit(14px, "rem");
+        color: get("color.gray.900");
+        cursor: pointer;
+        vertical-align: top;
+
+        &:hover {
+            background: get("color.gray.300");
+            color: get("color.gray.900");
+        }
+    }
+
+    &.filter {
+        &-selected,
+        &-applied,
+        &-open {
+            background-color: get("color.gray.800");
+            color: get("color.white");
+            @include fontFace("primary.bold");
+            padding: convert-unit(7px, "rem") map-get($map: $spacers, $key: 20);
+            margin-right: map-get($map: $spacers, $key: 10);
+            border-radius: map-get($map: $spacers, $key: 20);
+            font-size: convert-unit(14px, "rem");
+            cursor: pointer;
+            vertical-align: top;
+
+            &:hover {
+                background-color: get("color.gray.800");
+                color: get("color.white");
+            }
+        }
+    }
+}
+
+::ng-deep {
+    .state-filter-panel-wrapper {
+        &.mat-menu-panel {
+            border: convert-unit(1px, "rem") solid get("color.gray.600");
+            border-radius: convert-unit(4px, "rem");
+            width: convert-unit(350px, "rem");
+            margin-top: convert-unit(10px, "rem");
+            padding: map-get($map: $spacers, $key: 20) map-get($map: $spacers, $key: 20) map-get($map: $spacers, $key: 0) map-get($map: $spacers, $key: 20);
+            box-shadow: none;
+            max-width: none;
+
+            .state-filter-panel {
+                margin: map-get($spacers, 0);
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mat-menu-content {
+                padding: map-get($spacers, 0);
+                height: 100%;
+
+                .mat-chip-list-wrapper {
+                    margin: map-get($spacers, 0);
+
+                    .state-filter-input {
+                        padding: map-get($spacers, 5px);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.products-info:focus {
+    .infoicon {
+        opacity: 1;
+    }
+}
+
+.show-menu:focus {
+    .more-option {
+        opacity: 1;
+    }
+}
+
+.search-filter-wraper {
+    margin-top: map-get($spacers, 30);
+}
+
+.icon-gray {
+    display: flex;
+}
+
+.notification-badge {
+    display: inline-block;
+    margin-left: map-get($spacers, 5);
+}
+
+.notification-count {
+    min-width: convert-unit(20px, "rem");
+    height: convert-unit(20px, "rem");
+    background: get("color.info.danger.500");
+    font-size: convert-unit(11px, "rem");
+    line-height: normal;
+    color: get("color.white");
+    border-radius: convert-unit(10px, "rem");
+    padding: map-get($spacers, 0) map-get($spacers, 5);
+    margin: map-get($spacers, 5) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}

@@ -1,0 +1,10 @@
+export enum DeductionFrequencyTypes {
+    BIWEEKLY_28DAY = "BIWEEKLY_28DAY",
+    BI_WEEKLY = "BI_WEEKLY",
+    MONTHLY = "MONTHLY",
+    MONTHLY_10 = "MONTHLY_10",
+    MONTHLY_9 = "MONTHLY_9",
+    MONTHLY_8 = "MONTHLY_8",
+    SEMI_MONTHLY = "SEMI_MONTHLY",
+    WEEKLY = "WEEKLY",
+}

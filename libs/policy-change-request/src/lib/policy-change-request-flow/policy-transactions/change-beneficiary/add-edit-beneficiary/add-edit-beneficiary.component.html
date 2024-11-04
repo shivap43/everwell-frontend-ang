@@ -1,0 +1,356 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="beneficiary">
+    <form [formGroup]="addBeneficiaryForm" class="flex-form-wrapper" (ngSubmit)="beneficiary ? updateBeneficiary() : addBeneficiary()">
+        <div *ngIf="beneficiary">{{formControl?.firstName?.value}} {{formControl?.lastName?.value}}</div>
+
+        <div class="flex-form-wrapper mon-px-30">
+            <h3 *ngIf="!beneficiary">
+                {{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.header']}}
+            </h3>
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.firstName']}}</span
+                        >
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="firstName"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.firstName']"
+                        />
+                        <mat-error *ngIf="formControl?.firstName?.errors?.required">
+                            <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                        </mat-error>
+                        <mat-error *ngIf="formControl?.firstName?.errors?.length"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.maxLength60']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.firstName?.errors?.pattern && !nameWithHypenApostrophesValidation.test(formControl?.firstName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg1']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.firstName?.errors?.pattern && nameWithHypenApostrophesValidation.test(formControl?.firstName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg2']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.mi']}}</span
+                        >
+                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="middleName"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.mi']"
+                        />
+                        <mat-error *ngIf="formControl?.middleName.errors?.length"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.maxLength60']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.middleName?.errors?.pattern && !nameWithHypenApostrophesValidation.test(formControl?.middleName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg1']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.middleName?.errors?.pattern && nameWithHypenApostrophesValidation.test(formControl?.middleName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg2']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.lastName']}}</span
+                        >
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="lastName"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.lastName']"
+                        />
+                        <mat-error *ngIf="formControl?.lastName?.errors?.required">
+                            <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                        </mat-error>
+                        <mat-error *ngIf="formControl?.lastName?.errors?.length"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.maxLength60']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.lastName?.errors?.pattern && !nameWithHypenApostrophesValidation.test(formControl?.lastName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg1']}}
+                        </mat-error>
+                        <mat-error
+                            *ngIf="formControl?.lastName?.errors?.pattern && nameWithHypenApostrophesValidation.test(formControl?.lastName?.value)"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.namevalidationMsg2']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.suffix']}}</span
+                        >
+                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                    </mat-label>
+                    <mat-form-field>
+                        <mat-select placeholder="Select" formControlName="suffix">
+                            <mat-option *ngFor="let item of suffixes$ | async" value="{{ item }}"> {{ item }} </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.relationship']}}</span
+                        >
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="relationship"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.relationship']"
+                        />
+                        <mat-error *ngIf="formControl?.relationship?.errors?.required">
+                            <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                        </mat-error>
+                        <mat-error *ngIf="formControl?.relationship?.errors?.pattern">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.validationError.relationship"
+                            ></span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span>{{languageStrings['primary.portal.member.ssn_itin']}}</span>
+                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="ssn"
+                            [maxlength]="ssnMaxLength"
+                            empoweredSsnFormat
+                            (click)="ssnMaskingToggler(true)"
+                            (focusout)="ssnMaskingToggler(false)"
+                            (focusin)="ssnMaskingToggler(false)"
+                            (change)="maskValue()"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.ssn']"
+                        />
+                        <mat-error *ngIf="formControl?.ssn?.errors?.pattern"
+                            >{{languageStrings['primary.portal.members.beneficiaryValidationMsg.SSNMsg2']}}</mat-error
+                        >
+                    </mat-form-field>
+                </div>
+                <div class="flex-item">
+                    <mat-label class="mat-label">
+                        <span
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.birthdate']}}</span
+                        >
+                    </mat-label>
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            [matDatepicker]="picker"
+                            formControlName="birthDate"
+                            matInput
+                            [max]="maxDate"
+                            (keyup)="transform($event)"
+                            [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.birthdate']"
+                        />
+                        <mat-hint
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.dateFormat']}}</mat-hint
+                        >
+                        <mat-datepicker-toggle matSuffix [for]="picker">
+                            <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="picker.open()"></mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-error *ngIf="formControl?.birthDate?.errors?.required">
+                            <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                        </mat-error>
+                        <mat-error *ngIf="formControl?.birthDate?.errors?.matDatepickerMax">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.validationError.birtdate']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.streetAddress1']}}</span
+                            >
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="address1"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.streetAddress1']"
+                            />
+                            <mat-error *ngIf="formControl?.address1?.errors?.required">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.address1?.errors?.maxlength"
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.maxLength100']}}
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.address1?.errors?.pattern"
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.streetAddress2']}}</span
+                            >
+                            <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="address2"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.streetAddress2']"
+                            />
+                            <mat-error *ngIf="formControl?.address2?.errors?.maxlength"
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.maxLength100']}}
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.address2?.errors?.pattern"
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.city']}}</span
+                            >
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="city"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.city']"
+                            />
+                            <mat-error *ngIf="formControl?.city?.errors?.required">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.city?.errors?.pattern"
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage']}}</mat-error
+                            >
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.state']}}</span
+                            >
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" formControlName="state">
+                                <mat-option *ngFor="let state of states$ | async" value="{{ state.abbreviation }}">
+                                    {{ state.abbreviation }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="formControl?.state?.errors?.required">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.selectionRequired']}}</span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.zip']}}</span
+                            >
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="zip"
+                                (focusout)="validateZipCode()"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.zip']"
+                            />
+                            <mat-error *ngIf="(formControl?.zip?.errors?.required)">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.zip?.errors?.zipValid || formControl?.state?.errors?.zipValid">
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.validationError.zip']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.validationError.phone']}}</span
+                            >
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="phoneNumber"
+                                [maxlength]="phoneNumberMaxLength"
+                                empoweredNumberValidation
+                                [allowDashes]="true"
+                                type="text"
+                                empoweredPhoneNumberFormat
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.addEditBeneficiary.validationError.phone']"
+                            />
+                            <mat-error *ngIf="formControl?.phoneNumber?.errors?.required">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl?.phoneNumber?.errors?.pattern">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.invalidPhoneNumber']}}</span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="footer-section">
+                <button
+                    type="button"
+                    mat-flat-button
+                    class="mon-btn-secondary mon-mr-20"
+                    (click)="cancel()"
+                    [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </button>
+                <button
+                    *ngIf="!beneficiary"
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary mon-mr-20"
+                    [attr.aria-label]="languageStrings['primary.portal.common.save']"
+                >
+                    {{languageStrings['primary.portal.common.save']}}
+                </button>
+                <button
+                    *ngIf="beneficiary"
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary mon-mr-20"
+                    (click)="updateBeneficiary()"
+                    [attr.aria-label]="languageStrings['primary.portal.common.update']"
+                >
+                    {{languageStrings['primary.portal.common.update']}}
+                </button>
+            </div>
+        </footer>
+    </form>
+</div>

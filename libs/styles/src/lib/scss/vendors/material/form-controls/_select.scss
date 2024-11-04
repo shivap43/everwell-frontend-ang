@@ -1,0 +1,98 @@
+.mat-select {
+    .mat-select-arrow {
+        transform: rotate(225deg);
+        border-top: 1px solid get("color.gray.700");
+        border-left: 1px solid get("color.gray.700");
+        border-right: 0;
+        margin-top: convert-unit(5px, "rem");
+        width: convert-unit(6px, "rem");
+        height: convert-unit(6px, "rem");
+    }
+
+    .mat-select-placeholder {
+        color: get("color.black");
+    }
+
+    &.mat-select-invalid {
+        .mat-select-placeholder {
+            color: get("color.info.danger.500");
+        }
+        .mat-select-arrow {
+            border-top: 1px solid get("color.info.danger.500");
+            border-left: 1px solid get("color.info.danger.500");
+        }
+    }
+    &.mat-select-disabled {
+        .mat-select-value {
+            color: get("color.gray.700");
+        }
+        .mat-select-placeholder {
+            color: get("color.gray.700");
+        }
+    }
+}
+
+.mat-select-panel {
+    margin-top: convert-unit(26px, "rem");
+    min-width: calc(100% + 22px);
+    margin-left: convert-unit(5px, "rem");
+    box-shadow: none;
+    border: convert-unit(1px, "rem") solid;
+    border-radius: 0;
+    padding-top: convert-unit(10px, "rem");
+    padding-bottom: convert-unit(10px, "rem");
+    border-color: get("color.gray.600");
+
+    .mat-option {
+        padding-left: convert-unit(15px, "rem");
+        padding-right: convert-unit(15px, "rem");
+        height: convert-unit(32px, "rem");
+        line-height: convert-unit(30px, "rem");
+
+        &:hover,
+        &.mat-selected:not(.mat-option-multiple) {
+            background-color: get("color.gray.200");
+            color: get("color.black") !important;
+        }
+
+        &:hover:not(.mat-option-disabled) {
+            color: get("color.black") !important;
+            background: get("color.gray.200") !important;
+        }
+
+        .mat-option-text {
+            height: convert-unit(30px, "rem");
+            line-height: convert-unit(30px, "rem");
+            color: get("color.black");
+        }
+    }
+}
+
+.wrap-select {
+    .mat-option {
+        height: auto !important;
+    }
+
+    .mat-option-text {
+        height: auto !important;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+
+            span {
+                font-size: 14px;
+                white-space: normal;
+
+                &:first-child {
+                    font-size: 16px;
+                    color: get("color.black") !important;
+                }
+                &:last-child {
+                    color: get("color.gray.600");
+                    line-height: convert-unit(16px, "rem");
+                }
+            }
+        }
+    }
+}

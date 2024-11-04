@@ -1,0 +1,69 @@
+<div *ngIf="exceptionData" class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button [attr.aria-label]="languageStrings['primary.portal.common.close']" (click)="closeView(false)">
+            <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <div>
+            <h1 mat-dialog-title *ngIf="!isVasException">
+                <ng-container *ngIf="exceptionData.plan"> {{exceptionData.plan.name}} </ng-container>
+                <ng-container *ngIf="!exceptionData.plan">
+                    {{languageStrings["primary.portal.productExceptions.viewException.vasException"]}}
+                </ng-container>
+            </h1>
+            <h1 mat-dialog-title *ngIf="isVasException">
+                {{languageStrings["primary.portal.productExceptions.viewException.vasException"]}}
+            </h1>
+        </div>
+        <mon-alert *ngIf="isVasException && !showDeleteWarning" alertType="info">
+            <span>{{languageStrings["primary.portal.productExceptions.viewException.availabilityDateWarning"]}}</span>
+        </mon-alert>
+        <mon-alert *ngIf="isVasException && showDeleteWarning" alertType="info">
+            <span> {{languageStrings["primary.portal.productExceptions.viewException.deleteWarning"]}} </span>
+        </mon-alert>
+        <div class="exception-info">
+            <div class="info-row">
+                <span>{{languageStrings["primary.portal.productExceptions.viewException.exceptionType"]}}</span>
+                <span *ngIf="!isVasException">
+                    <ng-container *ngIf="!exceptionData.plan"> {{exceptionData.type}} </ng-container>
+                    <ng-container *ngIf="exceptionData.plan"> {{AllowWithdrawnPlan}} </ng-container>
+                </span>
+                <span *ngIf="isVasException">{{exceptionData.name}}</span>
+            </div>
+            <div class="info-row">
+                <span>{{languageStrings["primary.portal.productExceptions.viewException.availability"]}}</span>
+                <span
+                    >{{exceptionData.validity.effectiveStarting|date: dateFormat}} - {{exceptionData.validity.expiresAfter|date:
+                    dateFormat}}</span
+                >
+            </div>
+            <div class="info-row" *ngIf="isVasMultiAflacFunded">
+                <span>{{languageStrings["primary.portal.productExceptions.newException.maxPlans"]}}</span>
+                <span>{{exceptionData.maxPlans}}</span>
+            </div>
+            <div class="info-row">
+                <span>{{languageStrings["primary.portal.productExceptions.viewException.states"]}}</span>
+                <span class="state-list" *ngIf="!isVasException">
+                    <ng-container *ngIf="exceptionData.states">{{exceptionData.states.join(', ')}}</ng-container>
+                    <ng-container *ngIf="!exceptionData.states">{{languageStrings["primary.portal.customer.all"]}}</ng-container>
+                </span>
+                <span class="state-list" *ngIf="isVasException"> {{languageStrings["primary.portal.customer.all"]}} </span>
+            </div>
+            <div class="info-row">
+                <span>{{languageStrings["primary.portal.productExceptions.viewException.approvedBy"]}}</span>
+                <span *ngIf="exceptionData.approvingProducer"
+                    >{{exceptionData.approvingProducer.fullName.lastName}}, {{exceptionData.approvingProducer.fullName.firstName}}</span
+                >
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button *ngIf="showEdit && !isExpired" class="mon-btn-secondary mon-px-30" (click)="closeView(true)" mat-flat-button type="button">
+            {{languageStrings["primary.portal.common.edit"]}}
+        </button>
+        <button class="mon-btn-primary mon-px-30" mat-flat-button type="button" (click)="closeView(false)">
+            {{languageStrings["primary.portal.common.close"]}}
+        </button>
+    </mat-dialog-actions>
+</div>

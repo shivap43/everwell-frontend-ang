@@ -1,0 +1,22 @@
+<ng-container *ngIf="to$ | async as toUnit">
+  <ng-container *ngIf="subject$ | async as subjectUnit">
+    <empowered-metadata-element
+        [label]="labelTo"
+        [value]="toUnit | dereferenceTargetUnit | async"
+        [showChange]="false"
+    >
+    </empowered-metadata-element>
+
+    <empowered-metadata-element
+        [label]="labelSubject"
+        [value]="subjectUnit"
+        [showChange]="false">
+    </empowered-metadata-element>
+
+    <empowered-metadata-element *ngIf="category$ | async as categoryUnit"
+        [label]="labelCategory"
+        [value]="categoryUnit?.name"
+        [showChange]="false">
+    </empowered-metadata-element>
+  </ng-container>
+</ng-container>

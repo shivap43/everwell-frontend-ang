@@ -1,0 +1,72 @@
+@import "shared";
+
+.new-benefits-offering {
+    display: flex;
+    flex-direction: column;
+    min-height: convert-unit(600px, "rem");
+    .benefit-dollar {
+        padding: map-get($spacers, 30) map-get($spacers, 0);
+        flex-grow: 1;
+
+        .message-block {
+            margin-bottom: map-get($spacers, 20);
+        }
+
+        .description {
+            padding: map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 30);
+        }
+        .accordion-indicator {
+            opacity: 0;
+        }
+        ::ng-deep .mat-expansion-panel {
+            border: convert-unit(0px, "rem");
+            margin-bottom: map-get($spacers, 20);
+            .mat-expansion-panel-header {
+                border: convert-unit(0px, "rem");
+                height: auto !important;
+                padding: map-get($spacers, 15) map-get($spacers, 30);
+                min-height: convert-unit(50px, "rem");
+                h4 {
+                    margin: map-get($spacers, 0) map-get($spacers, 0) convert-unit(4px, "rem") !important;
+                    font-size: convert-unit(18px, "rem");
+                    color: get("color.black");
+                }
+                p {
+                    color: get("color.gray.700");
+                }
+                .text-danger {
+                    color: get("color.info.danger.500");
+                    opacity: 0;
+                    margin-right: map-get($spacers, 20);
+                }
+                &:hover .text-danger {
+                    opacity: 1;
+                }
+            }
+            .accordion-default {
+                margin-bottom: map-get($spacers, 20);
+            }
+            .mat-expansion-panel-header-title {
+                display: flex;
+                justify-content: space-between;
+                flex-grow: 1 !important;
+                div {
+                    align-items: inherit !important;
+                    margin: map-get($spacers, 0) !important;
+                }
+            }
+        }
+        .bg-gray {
+            background-color: get("color.gray.200");
+            padding: map-get($spacers, 20) map-get($spacers, 30) map-get($spacers, 30);
+            ::ng-deep .mat-form-field .mat-form-field-flex {
+                background-color: get("color.white");
+            }
+        }
+    }
+
+    .footer-message {
+        font-size: convert-unit(14px, "rem");
+        align-self: flex-end;
+    }
+}

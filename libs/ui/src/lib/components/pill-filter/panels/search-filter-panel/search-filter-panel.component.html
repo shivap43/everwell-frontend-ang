@@ -1,0 +1,6 @@
+<form [formGroup]="searchForm">
+    <mat-label class="mat-label" *ngIf="combined">{{ filterModel.title }}</mat-label>
+    <mat-form-field class="search-filter-panel">
+        <input matInput formControlName="search" [attr.aria-label]="filterModel.title" />
+    </mat-form-field>
+</form>

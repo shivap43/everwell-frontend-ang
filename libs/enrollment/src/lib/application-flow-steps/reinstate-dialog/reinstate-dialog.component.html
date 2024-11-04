@@ -1,0 +1,308 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div>
+    <mon-alert *ngIf="hasApiError" alertType="danger">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+</div>
+<div class="quasi-modal content-scroll no-reinstatement-view" *ngIf="!showComponents">
+    <div class="modal-header">
+        <h2 class="header-content">
+            <span mat-dialog-title
+                >{{"primary.portal.applicationFlow.reinstate.reinstatementPlanname"| replaceTag: { "#planname": this.planName } }}</span
+            >
+        </h2>
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <mon-alert *ngIf="hasDocumentError" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </mat-dialog-content>
+</div>
+
+<div class="quasi-modal content-scroll" *ngIf="showComponents">
+    <div class="modal-header">
+        <h2 class="header-content">
+            <span mat-dialog-title
+                >{{"primary.portal.applicationFlow.reinstate.reinstatementPlanname"| replaceTag: { "#planname": this.planName } }}</span
+            >
+        </h2>
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="dialog-content">
+        <ng-container *ngIf="showComponents && online">
+            <mat-dialog-content>
+                <div class="stepper-sidebar">
+                    <div class="sidenav-area">
+                        <mat-vertical-stepper
+                            class="side-nav-stepper"
+                            linear="true"
+                            (selectionChange)="onSectionChange($event)"
+                            #progressIndicator
+                        >
+                            <mat-step
+                                *ngFor="let section of sections; let i=index"
+                                [completed]="completedSectionIndex >i"
+                                [editable]="isStepperEditable"
+                            >
+                                <ng-template matStepLabel>
+                                    <span class="text-wrap">{{ section }}</span>
+                                </ng-template>
+                            </mat-step>
+                            <ng-container *ngIf="showBilling">
+                                <mat-step [completed]="lastCompletedStaticStep >=1" [editable]="isStepperEditable">
+                                    <ng-template matStepLabel
+                                        >{{languageStrings['primary.portal.applicationFlow.reinstate.billing']}}
+                                    </ng-template>
+                                    <mat-vertical-stepper
+                                        class="payment-stepper"
+                                        (selectionChange)="onBillingChange($event)"
+                                        linear="true"
+                                        #billingIndicator
+                                    >
+                                        <mat-step [completed]="lastCompletedBillingStep >1">
+                                            <ng-template matStepLabel
+                                                >{{languageStrings['primary.portal.applicationFlow.reinstate.payment']}}
+                                            </ng-template>
+                                        </mat-step>
+                                        <mat-step [completed]="lastCompletedBillingStep >2">
+                                            <ng-template matStepLabel>
+                                                {{languageStrings['primary.portal.applicationFlow.reinstate.billingAddress']}}</ng-template
+                                            >
+                                        </mat-step>
+                                        <mat-step [completed]="lastCompletedBillingStep >3">
+                                            <ng-template matStepLabel>
+                                                {{languageStrings['primary.portal.applicationFlow.reinstate.paymentSettings']}}</ng-template
+                                            >
+                                        </mat-step>
+                                    </mat-vertical-stepper>
+                                </mat-step>
+                            </ng-container>
+                            <ng-container *ngIf="showAflacAlways">
+                                <mat-step [completed]="lastCompletedStaticStep >=1" [editable]="isStepperEditable">
+                                    <!--TODO Languages yet to be implemented -->
+                                    <ng-template matStepLabel
+                                        >{{languageStrings['primary.portal.applicationFlow.reinstate.aflacAlways']}}
+                                    </ng-template>
+                                    <mat-vertical-stepper
+                                        class="payment-stepper"
+                                        (selectionChange)="onPaymentChange($event)"
+                                        linear="true"
+                                        #paymentIndicator
+                                    >
+                                        <mat-step [completed]="lastCompletedPaymentStep >1 ">
+                                            <ng-template matStepLabel
+                                                >{{languageStrings['primary.portal.applicationFlow.reinstate.enroll']}}
+                                            </ng-template>
+                                        </mat-step>
+                                        <mat-step [completed]="lastCompletedPaymentStep >2">
+                                            <ng-template matStepLabel
+                                                >{{languageStrings['primary.portal.applicationFlow.reinstate.payment']}}
+                                            </ng-template>
+                                        </mat-step>
+                                        <mat-step [completed]="lastCompletedPaymentStep >3">
+                                            <ng-template matStepLabel>
+                                                {{languageStrings['primary.portal.applicationFlow.reinstate.billingAddress']}}</ng-template
+                                            >
+                                        </mat-step>
+                                        <mat-step [completed]="lastCompletedPaymentStep >4">
+                                            <ng-template matStepLabel>
+                                                {{languageStrings['primary.portal.applicationFlow.reinstate.paymentSettings']}}</ng-template
+                                            >
+                                        </mat-step>
+                                    </mat-vertical-stepper>
+                                </mat-step>
+                            </ng-container>
+                            <mat-step [completed]="lastCompletedStaticStep >=2" [editable]="isStepperEditable">
+                                <ng-template matStepLabel>
+                                    {{languageStrings['primary.portal.applicationFlow.reinstate.finishApplication']}}</ng-template
+                                >
+                            </mat-step>
+                            <mat-step [completed]="lastCompletedStaticStep >=3" [editable]="isStepperEditable">
+                                <ng-template matStepLabel
+                                    >{{languageStrings['primary.portal.applicationFlow.reinstate.confirmation']}}
+                                </ng-template>
+                            </mat-step>
+                            <ng-template matStepperIcon="edit">
+                                <mon-icon class="edit-check" [iconSize]="10" iconName="check"></mon-icon>
+                            </ng-template>
+                            <ng-template matStepperIcon="done">
+                                <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                            </ng-template>
+                        </mat-vertical-stepper>
+                    </div>
+                </div>
+                <div class="stepper-content">
+                    <div class="content-wrapper">
+                        <div
+                            class="scroll-spy-element"
+                            id="parentDiv"
+                            scrollSpy
+                            [spiedTags]="['DIV']"
+                            (sectionChange)="updateStepper($event)"
+                            *ngIf="actualStep === staticStep.NORMAL_STEP || !actualStep"
+                        >
+                            <div
+                                *ngFor="let section of updatedPlanObject.application.appData.sections; let i= index "
+                                [id]="getSectionId(i)"
+                                class="appflow-section"
+                            >
+                                <ng-container *ngFor="let step of section.steps; let j = index">
+                                    <div
+                                        *ngIf="step.showStep && (!((step?.step[0]?.type === stepType.QUESTION) || (step?.step[0]?.type === stepType.TOBACCO) || (step?.step[0]?.type === stepType.REQUIREDDEMOGRAPHICS) || section.title === 'Riders') || (i<currentSectionIndex || i<=currentSectionIndex  && j <= currentStepIndex))"
+                                        class="section-step"
+                                        [ngClass]="{'active-section':  ( i< currentSectionIndex || i<=currentSectionIndex  && j <= currentStepIndex )}"
+                                        [id]="getStepId(i,j)"
+                                    >
+                                        <section class="section-container">
+                                            <div class="section-header">
+                                                <h3 *ngIf="!(section.title === 'Riders')">{{section.title}}</h3>
+                                            </div>
+                                        </section>
+                                        <empowered-question
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j)"
+                                            (discardReinstateDialog)="discardReinstateDialog()"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.QUESTION && step.showStep"
+                                        >
+                                        </empowered-question>
+                                        <empowered-plan-options
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [tpiSSODetails]="data.tpiSSODetails"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j, section, step)"
+                                            (closeForm)="closeForm(true)"
+                                            *ngIf="(step.step[0].type && step.step[0].type === stepType.PLANOPTIONS||step.step[0].type && step.step[0].type === stepType.COVERAGELEVELCHOICE )&& step.showStep"
+                                        >
+                                        </empowered-plan-options>
+                                        <empowered-beneficiary
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j, section, step)"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.BENEFICIARIES && step.showStep"
+                                        >
+                                        </empowered-beneficiary>
+                                        <empowered-tobacco
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j)"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.TOBACCO && step.showStep"
+                                        >
+                                        </empowered-tobacco>
+                                        <empowered-conversion
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j, section, step)"
+                                            *ngIf="step.step.length && (step.step[0].type === stepType.CONVERSION || step.step[0].type === stepType.ADDITION || step.step[0].type === stepType.DOWNGRADE) && step.showStep"
+                                        >
+                                        </empowered-conversion>
+                                        <!-- fix me : un-comment demographic component after implementation -->
+                                        <empowered-demographic
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j, section, step)"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.REQUIREDDEMOGRAPHICS && step.showStep"
+                                        >
+                                        </empowered-demographic>
+                                        <empowered-bucket-plan-flow
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j)"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.BUCKET && step.showStep"
+                                        >
+                                        </empowered-bucket-plan-flow>
+                                        <empowered-text
+                                            [planObject]="mapData(i,j)"
+                                            *ngIf="step.step[0].type && step.step[0].type === stepType.TEXT && step.showStep"
+                                        >
+                                        </empowered-text>
+                                        <empowered-reinstatement
+                                            [currentSectionIndex]="currentSectionIndex"
+                                            [currentStepIndex]="currentStepIndex"
+                                            [planObject]="mapData(i,j, section, step)"
+                                            [policyData]="baseEnrollment?.policyNumber"
+                                            *ngIf="step.step.length && step.step[0].type === stepType.REINSTATEMENT && step.showStep"
+                                        >
+                                        </empowered-reinstatement>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <empowered-signature-app
+                            *ngIf="actualStep === staticStep.ONE_SIGNATURE"
+                            [planObject]="planObject"
+                            [isReinstate]="true"
+                        >
+                        </empowered-signature-app>
+                        <empowered-payment *ngIf="actualStep === staticStep.AFLAC_ALWAYS" [reinstate]="isReinstate"> </empowered-payment>
+                        <empowered-direct-payment *ngIf="actualStep === staticStep.PAYMENT" [planId]="planId" [reinstate]="isReinstate">
+                        </empowered-direct-payment>
+                        <empowered-confirmation
+                            (closeForm)="closeForm()"
+                            *ngIf="actualStep === staticStep.CONFIRMATION"
+                            [planObject]="planObject"
+                            [fromApplicationFlow]="fromApplicationFlow"
+                        >
+                        </empowered-confirmation>
+                    </div>
+                </div>
+            </mat-dialog-content>
+        </ng-container>
+        <ng-container *ngIf="!online && showComponents">
+            <mat-dialog-content>
+                <div class="stepper-content">
+                    <div class="content-wrapper manual">
+                        <p class="each-item">{{languageStrings['primary.portal.applicationFlow.reinstate.downloadApplication']}}</p>
+                        <div class="document-list">
+                            <div class="doc-icon">
+                                <mon-icon [iconSize]="34" iconName="file"></mon-icon>
+                            </div>
+                            <div class="doc-info">
+                                <p>
+                                    <strong attr.aria-label="{{document.name}}">{{document.name | titlecase}}</strong>
+                                </p>
+                                <a href="javascript:void(0)" (click)="downloadPDF()" attr.aria-label="Download {{document.name}}">
+                                    <span>{{languageStrings['primary.portal.applicationFlow.reinstate.download']}}</span>
+                                    <span class="sr-only">{{document.name}}</span>
+                                    <span> {{document.location.split(".").pop()}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- <a (click)="downloadPDF()">Download</a> -->
+                        <p class="each-item">{{languageStrings['primary.portal.applicationFlow.reinstate.uploadApplication']}}</p>
+                        <div class="upload-wrapper">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.applicationFlow.reinstate.completedApplication']}}
+                            </mat-label>
+                            <empowered-mon-upload
+                                [accept]="acceptableFormats"
+                                [isFileAvailable]="isFileAvailable"
+                                [uploadErrorStatus]="uploadErrorStatus"
+                                [uploadSucessStatus]="uploadSuccessStatus"
+                                [isSucess]="isSucess"
+                                [modeProgress]="modeProgress"
+                                [fileUploadPercentage]="fileUploadPercentage"
+                                [isUploadingStarted]="isUploadingStarted"
+                                (uploadFile)="validateFileAndUpload($event)"
+                                [files]="files"
+                                (cancelUpload)="uploadCancel()"
+                                [hasError]="hasError"
+                                [isFileSelected]="isFileSelected"
+                                [isProgressBarEnabled]="isProgressBarEnabled"
+                                [isFileViewable]="isFileViewable"
+                            ></empowered-mon-upload>
+                        </div>
+                        <button type="button" mat-button class="mon-btn-primary" (click)="onSubmit()">
+                            {{languageStrings['primary.portal.common.submit']}}
+                        </button>
+                    </div>
+                </div>
+            </mat-dialog-content>
+        </ng-container>
+    </div>
+</div>

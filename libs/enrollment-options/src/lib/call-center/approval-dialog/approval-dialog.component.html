@@ -1,0 +1,114 @@
+<div class="info-modal" *ngIf="data.purpose === 'approve'">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelApprove()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.callCenter.approvalDialog.requestApproval']}}</h2>
+        <p class="mon-mb-20">{{ approvalText }}</p>
+        <p *ngIf="approvalTextNote">{{ approvalTextNote }}</p>
+    </div>
+    <mat-dialog-actions class="dialog-footer gotit-btn">
+        <button mat-flat-button class="mon-btn-primary" (click)="onCancelApprove()">
+            {{languageStrings['primary.portal.callCenter.approvalDialog.gotIt']}}
+        </button>
+    </mat-dialog-actions>
+</div>
+<div class="info-modal" *ngIf="data.purpose === 'remove'">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.common.remove']}} {{data.callCenterName}}?</h2>
+        <ng-container>
+            {{data.callCenterName}} {{languageStrings['primary.portal.callCenter.approvalDialog.callcenterList']}}
+        </ng-container>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancel()" aria-label="Cancel"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button mat-flat-button class="mon-btn-danger" (click)="onCancelRemove()">
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </mat-dialog-actions>
+</div>
+<div class="info-modal" *ngIf="data.purpose === 'sameCallCenterOverlap'">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.callCenter.approvalDialog.duplicateFound']}}</h2>
+        <ng-container>
+            <div class="para" *ngIf="data.currentAccountCallCenter.validity.expiresAfter">
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.enrollmentFor']}} </span
+                >{{data.currentAccountCallCenter.callCenter.name}}
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.isalreadyFor']}} </span
+                >{{dateFormat(data.currentAccountCallCenter.validity.effectiveStarting) | date:'MM/dd/yyy'
+                }}-{{dateFormat(data.currentAccountCallCenter.validity.expiresAfter) | date:'MM/dd/yyy' }}.
+            </div>
+            <div class="para" *ngIf="!data.currentAccountCallCenter.validity.expiresAfter">
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.enrollmentFor']}} </span
+                >{{data.currentAccountCallCenter.callCenter.name}}<span>
+                    {{languageStrings['primary.portal.callCenter.approvalDialog.isalreadyFrom']}} </span
+                >{{dateFormat(data.currentAccountCallCenter.validity.effectiveStarting) | date:'MM/dd/yyy' }}.
+            </div>
+            <div class="para">
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.wouldeditExisting']}} </span
+                >{{data.currentAccountCallCenter.callCenter.name}}
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.dates']}}</span>
+            </div>
+        </ng-container>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancel()" aria-label="Cancel"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button mat-flat-button class="mon-btn-primary" (click)="onCancelSameCallCenterOverlap()">
+            {{languageStrings['primary.portal.callCenter.approvalDialog.editExisting']}}
+        </button>
+    </mat-dialog-actions>
+</div>
+<div class="info-modal" *ngIf="data.purpose === 'sameCallCenterAdjacent'">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>{{languageStrings['primary.portal.callCenter.approvalDialog.adjacentEnrollment']}}</h2>
+        <ng-container>
+            <div class="para">
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.adjacentExisting']}} </span>{{
+                data.callCenterName }}
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.enrollment']}}</span>
+            </div>
+            <div class="para">
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.ratherExisting']}} </span>{{
+                data.callCenterName }}
+                <span>{{languageStrings['primary.portal.callCenter.approvalDialog.endDate']}}</span>
+            </div>
+        </ng-container>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancel()" aria-label="Cancel"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button mat-flat-button class="mon-btn-primary" (click)="onCancelSameCallCenterAdjacent()">
+            {{languageStrings['primary.portal.callCenter.approvalDialog.editExisting']}}
+        </button>
+    </mat-dialog-actions>
+</div>

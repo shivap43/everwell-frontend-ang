@@ -1,0 +1,152 @@
+@import "shared";
+
+.review-enrollments {
+    margin: 0;
+    .header {
+        h1 {
+            @include fontFace("secondary.light");
+            color: get("color.black");
+        }
+        p {
+            font-size: convert-unit(16px, "rem");
+            color: get("color.gray.700");
+        }
+        margin-bottom: convert-unit(40px, "rem");
+    }
+    .mon-card-wrapper {
+        margin: 0 auto;
+    }
+    .review-enrollments {
+        width: convert-unit(600px, "rem");
+    }
+    .verify-name {
+        display: flex;
+        .flex-item {
+            margin: 0 convert-unit(20px, "rem") 0 0;
+        }
+    }
+    .verify-date {
+        display: flex;
+        div {
+            width: convert-unit(200px, "rem");
+        }
+    }
+    .verify-email {
+        display: flex;
+        div {
+            width: convert-unit(300px, "rem");
+        }
+    }
+
+    .action-btn {
+        margin: convert-unit(30px, "rem") 0;
+    }
+    .total-cost {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 convert-unit(25px, "rem") 0 0;
+        .content-label {
+            font-size: convert-unit(22px, "rem");
+        }
+        span {
+            min-width: convert-unit(160px, "rem");
+            font-size: convert-unit(22px, "rem");
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            @include fontFace("primary.bold");
+            .frequency {
+                color: get("color.gray.700");
+                font-size: convert-unit(16px, "rem");
+                font-weight: normal;
+            }
+        }
+    }
+    .acknowledge {
+        margin: convert-unit(20px, "rem") convert-unit(200px, "rem") convert-unit(20px, "rem") 0;
+        color: get("color.gray.700");
+    }
+    .confirmation-text {
+        margin-bottom: convert-unit(60px, "rem");
+    }
+
+    .mon-btn-secondary {
+        margin-right: convert-unit(30px, "rem");
+    }
+    .mon-btn-primary {
+        margin-right: convert-unit(30px, "rem");
+    }
+
+    .content-column {
+        > div {
+            display: flex;
+            font-size: convert-unit(16px, "rem");
+            justify-content: flex-start;
+
+            > span.content-label {
+                @include fontFace("primary.bold");
+                min-width: convert-unit(200px, "rem");
+            }
+
+            .covered-values {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+        .dependent {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .links {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-modal {
+        width: convert-unit(600px, "rem");
+        max-width: 100%;
+    }
+    .alert-msg {
+        .alert-content {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+    .apply-coverage {
+        margin: 0 convert-unit(30px, "rem");
+        .payroll {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+.review-enrollments {
+    ::ng-deep {
+        .mat-horizontal-stepper-header-container {
+            .mat-step-header {
+                .mat-step-icon {
+                    color: get("color.gray.700");
+                    margin-right: 0;
+                    &-selected {
+                        margin-right: convert-unit(5px, "rem");
+                    }
+                    .mat-step-icon-selected {
+                        margin-right: convert-unit(5px, "rem");
+                    }
+                    .mat-step-icon-content {
+                        span:after {
+                            content: ".";
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.expired-link {
+    margin-left: convert-unit(20px, "rem");
+}

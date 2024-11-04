@@ -1,0 +1,51 @@
+import { TestBed } from "@angular/core/testing";
+import { provideMockActions } from "@ngrx/effects/testing";
+import { Action } from "@ngrx/store";
+import { provideMockStore } from "@ngrx/store/testing";
+import { NxModule } from "@nrwl/angular";
+import { Observable, of } from "rxjs";
+
+import * as <%= classify(name) %>Actions from "./<%= dasherize(name) %>.actions";
+import { <%= classify(name) %>Effects } from "./<%= dasherize(name) %>.effects";
+
+describe("<%= classify(name) %>Effects", () => {
+    let actions$: Observable<Action>;
+    let effects: <%= classify(name) %>Effects;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [NxModule.forRoot()],
+            providers: [<%= classify(name) %>Effects, provideMockActions(() => actions$), provideMockStore()],
+        });
+
+        effects = TestBed.inject(<%= classify(name) %>Effects);
+    });
+
+    describe("init$", () => {
+        beforeEach(() => {
+            actions$ = of(<%= classify(name) %>Actions.init());
+        });
+        
+        it("should get empty <%= classify(name) %> array on success", (done) => {
+            expect.assertions(1);
+
+            effects.init$.subscribe((action) => {
+                expect(action).toStrictEqual(<%= classify(name) %>Actions.load<%= classify(name) %>Success({ <%= camelize(name) %>: [] }));
+                done();
+            });
+        });
+
+        it("should get error on failure", (done) => {
+            expect.assertions(1);
+
+            jest.spyOn(<%= classify(name) %>Actions, "load<%= classify(name) %>Success").mockImplementationOnce(() => {
+                throw { message: "unexpected error" };
+            });
+
+            effects.init$.subscribe((action) => {
+                expect(action).toStrictEqual(<%= classify(name) %>Actions.load<%= classify(name) %>Failure({ error: { message: "unexpected error" } }));
+                done();
+            });
+        });
+    });
+});

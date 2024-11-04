@@ -1,0 +1,51 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+
+<mon-alert *ngIf="saveError" alertType="danger" class="mon-alert">
+    <span>{{errorMessage}}</span>
+    <!-- TODO: Need to implement language -->
+</mon-alert>
+
+<form [formGroup]="thirdFormGroup" (ngSubmit)=" onSubmit()">
+    <ng-template matStepLabel>{{languageStrings['primary.portal.createReportForm.pda']}}</ng-template>
+    <div class="header">
+        <h1>{{languageStrings['primary.portal.enrollment.review.approvepda']}}</h1>
+        <p>{{languageStrings['primary.portal.enrollment.review.signature']}}</p>
+    </div>
+    <div class="d-flex">
+        <a (click)="openPDF()">{{languageStrings['primary.portal.enrollment.review.reviewpda']}}</a>
+    </div>
+    <p class="acknowledge">
+        {{languageStrings['primary.portal.enrollment.review.acknowledgetype']}}
+    </p>
+
+    <div class="d-flex">
+        <div class="flex-item">
+            <mat-label class="mat-label">
+                {{languageStrings['primary.portal.enrollment.review.esignature']}}
+            </mat-label>
+            <mat-form-field>
+                <input
+                    formControlName="signature"
+                    matInput
+                    [(ngModel)]="esignature"
+                    type="text"
+                    [attr.aria-label]="languageStrings['primary.portal.enrollment.review.esignature']"
+                />
+                <mat-error *ngIf="thirdFormGroup.controls['signature'].errors?.required">
+                    {{languageStrings['primary.portal.review.signature.required']}}</mat-error
+                >
+                <mat-error
+                    *ngIf="thirdFormGroup.controls['signature'].errors?.minlength && !thirdFormGroup.controls['signature'].errors?.pattern"
+                >
+                    {{languageStrings['primary.portal.review.reviewSignature']}}</mat-error
+                >
+                <mat-error *ngIf="thirdFormGroup.controls['signature'].errors?.pattern ">
+                    {{languageStrings['primary.portal.review.technicalHelp']}}
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+    <button type="submit" class="mon-btn-primary" mat-flat-button>
+        <span> {{languageStrings['primary.portal.common.submit']}}</span>
+    </button>
+</form>

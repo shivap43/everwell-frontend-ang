@@ -1,0 +1,48 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<div class="call-center" *ngIf="!isLoading">
+    <div [ngClass]="{'addcall-center': benefitsOfferingSet && accountCallCenters?.length && !isAdmin}">
+        <h3 [ngClass]="{'mon-my-0': benefitsOfferingSet && accountCallCenters?.length && !isAdmin}">
+            {{languageStrings['primary.portal.callCenter.callcenterenrollment']}}
+        </h3>
+        <div *hasPermission="'core.account.create.callCenter'">
+            <a
+                href="javascript:void(0)"
+                *ngIf="benefitsOfferingSet && !isAdmin && accountMeetsMinEmployeeCriteria"
+                (click)="openManageCallCenterDialog(true)"
+                >{{languageStrings['primary.portal.callCenter.addcallcenter']}}</a
+            >
+        </div>
+    </div>
+
+    <ng-container *hasPermission="'core.account.create.callCenter'">
+        <div *ngIf="!benefitsOfferingSet && accountCallCenters?.length === 0 && !isAdmin">
+            <p class="mon-mb-20">
+                {{languageStrings['primary.portal.callCenter.addfirstCallcenter']}}
+                <a href="javascript:void(0)" (click)="navigateToBenefitsOffering()"
+                    >{{languageStrings['primary.portal.callCenter.benefitsOffering']}}</a
+                >
+                {{languageStrings['primary.portal.callCenter.thisAccount']}}
+            </p>
+            <ng-container *ngIf="!accountMeetsMinEmployeeCriteria">
+                {{ "primary.portal.callCenter.noteNotEnoughEmployees" | replaceTag: { "##min##": (callCenter8x8Configs$ |
+                async)?.callCenterEnrollmentMinEmployees } }}
+            </ng-container>
+        </div>
+
+        <p *ngIf="benefitsOfferingSet && !accountMeetsMinEmployeeCriteria && !isAdmin">
+            {{ "primary.portal.callCenter.notEnoughEmployees" | replaceTag: { "##min##": (callCenter8x8Configs$ |
+            async)?.callCenterEnrollmentMinEmployees } }}
+        </p>
+    </ng-container>
+    <p *ngIf="(isAdmin && accountCallCenters?.length === 0) || (!isCreateCallCenter && !accountCallCenters)">
+        {{languageStrings['primary.portal.callCenter.associatedCallcenters']}}
+    </p>
+
+    <empowered-call-center-list
+        *ngIf="accountCallCenters?.length"
+        [accountCallCenters]="accountCallCenters"
+        (callCenterEditEvent)="onCallCenterEdit($event)"
+        (callCenterRemoveEvent)="onCallCenterRemove($event)"
+    ></empowered-call-center-list>
+</div>

@@ -1,0 +1,224 @@
+<div class="info-modal pended-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancelClick()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h2 class="mat-dialog-title">
+            {{data.applicationType === 'PENDED'? languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.title1"] :
+            languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.title2"]}} {{data?.applicationInfo?.applicationNumber}}
+        </h2>
+        <div class="tab-wrapper">
+            <mat-tab-group animationDuration="0ms">
+                <mat-tab label="Account info">
+                    <div class="application-info-table">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.accountName"]}}</td>
+                                    <td>{{applicationInfoDetails?.accountName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.account"]}}</td>
+                                    <td>{{applicationInfoDetails?.accountNumber}}</td>
+                                </tr>
+                                <tr class="make-group">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.producerName"]}}</td>
+                                    <td>{{applicationInfoDetails?.associateInfo[0]?.associateName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.writing"]}}</td>
+                                    <td>{{applicationInfoDetails?.associateInfo[0]?.writingNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.sitCode"]}}</td>
+                                    <td>{{applicationInfoDetails?.associateInfo[0]?.sitCode}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.phone"]}}</td>
+                                    <td>{{applicationInfoDetails?.associateInfo[0]?.phoneNumber | phone: country}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.transmittal"]}}</td>
+                                    <td>{{data?.applicationInfo?.transmittalNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.situsState"]}}</td>
+                                    <td>{{data?.applicationInfo?.state}}</td>
+                                </tr>
+                                <tr *ngIf="applicationInfoDetails?.associateInfo[0]?.commissionPercentage as commissionPercentage">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.commission"]}}</td>
+                                    <td>{{commissionPercentage}}%</td>
+                                </tr>
+                                <tr class="make-group">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.planYearStart"]}}</td>
+                                    <td>{{applicationInfoDetails?.flexPlanYearStart | date: dateFormat}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.planYearEnd"]}}</td>
+                                    <td>{{applicationInfoDetails?.flexPlanYearEnd | date: dateFormat}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </mat-tab>
+                <mat-tab label="Application info">
+                    <div class="application-info-table">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.application"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicationNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.lob"]}}</td>
+                                    <td>{{applicationInfoDetails?.lineOfBusiness}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.PENDED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.pendDate"]}}</td>
+                                    <td>{{applicationInfoDetails?.pendDate | date: dateFormat}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.RESOLVED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.processedDate"]}}</td>
+                                    <td>{{applicationInfoDetails?.pendDate | date: dateFormat}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.RESOLVED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.coverageEffDate"]}}</td>
+                                    <td>{{applicationInfoDetails?.coverageEffectiveDate | date: dateFormat}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.PENDED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.deskCode"]}}</td>
+                                    <td>{{applicationInfoDetails?.deskCode}}</td>
+                                </tr>
+                                <tr>
+                                    <td *ngIf="isAnnualizedPremium">
+                                        {{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.annualPremium"]}}
+                                    </td>
+                                    <td *ngIf=" isAnnualizedPremium && applicationInfoDetails?.annualPremium">
+                                        {{applicationInfoDetails?.annualPremium | currency}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td *ngIf="!isAnnualizedPremium">
+                                        {{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.conversionPremium"]}}
+                                    </td>
+                                    <td *ngIf="!isAnnualizedPremium && applicationInfoDetails?.annualPremium">
+                                        {{applicationInfoDetails?.annualPremium | currency}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.billForm"]}}</td>
+                                    <td>{{applicationInfoDetails?.billForm}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.baseStatus"]}}</td>
+                                    <td>{{applicationInfoDetails?.baseTaxStatus}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.riderStatus"]}}</td>
+                                    <td>{{applicationInfoDetails?.riderTaxStatus}}</td>
+                                </tr>
+                                <tr class="make-group">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.applicantName"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicantName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.birthDate"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicantDOB | date: dateFormat}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.ssn"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicantSSN | ssn: ssnSplitFormat }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.address"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicantAddress}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.phone"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicantPhone | phone: country}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.spouseName"]}}</td>
+                                    <td>{{applicationInfoDetails?.spouseName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.spouseBdate"]}}</td>
+                                    <td>{{applicationInfoDetails?.spouseDOB | date: dateFormat}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.policyOwner"]}}</td>
+                                    <td>{{applicationInfoDetails?.policyOwner}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.applicationStatus"]}}</td>
+                                    <td>{{applicationInfoDetails?.applicationStatus}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.newExistingEmployee"]}}</td>
+                                    <td>
+                                        {{applicationInfoDetails?.employeeStatusInd === applicationFrom.EXISTING ?
+                                        languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.existing"] :
+                                        languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.new"]}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </mat-tab>
+                <mat-tab
+                    label="{{data.applicationType === applicationFrom.PENDED ? 'Pended business details' : 'Resolved business details'}}"
+                >
+                    <div class="application-info-table">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.destination"]}}</td>
+                                    <td>{{data?.applicationInfo?.destinationDescription}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.dateDestination"]}}</td>
+                                    <td>{{applicationInfoDetails?.destinationDate | date: dateFormat}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.PENDED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.remarks"]}}</td>
+                                    <td>{{applicationInfoDetails?.remarks}}</td>
+                                </tr>
+                                <tr *ngIf="data.applicationType === applicationFrom.PENDED">
+                                    <td>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.reason"]}}</td>
+                                    <td>{{applicationInfoDetails?.reasons}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-between">
+        <button class="mon-btn-link" (click)="onCancelClick()">{{languageStrings["primary.portal.common.cancel"]}}</button>
+        <div>
+            <button class="mon-btn-secondary" type="button" mat-flat-button (click)="downloadApplication()">
+                <span>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.downloadApplication"]}}</span>
+            </button>
+            <button
+                *ngIf="data?.applicationType === applicationFrom.PENDED"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                (click)="openResolveApplicationModal()"
+            >
+                <span>{{languageStrings["primary.portal.pendedBusiness.pendedApplicationModal.resolve"]}}</span>
+            </button>
+            <button
+                *ngIf="data?.applicationType === applicationFrom.RESOLVED"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                (click)="onCancelClick()"
+            >
+                <span>{{languageStrings["primary.portal.common.close"]}}</span>
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>

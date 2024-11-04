@@ -1,0 +1,19 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<empowered-mon-upload
+    [accept]="acceptableFormats"
+    (uploadFile)="uploadFile($event)"
+    (cancelUpload)="cancelUpload($event)"
+    [modeProgress]="modeProgress"
+    [files]="files"
+    [hasError]="hasError"
+    [isFileAvailable]="isFileAvailable"
+    [isSucess]="isSucess"
+    [uploadSucessStatus]="uploadSuccessStatus"
+    [uploadErrorStatus]="uploadErrorStatus"
+    [isProgressBarEnabled]="true"
+    [isFileSelected]="true"
+    [fileUploadPercentage]="fileUploadPercentage"
+    [isUploadingStarted]="isUploadingStarted"
+    [isFileViewable]="isFileViewable"
+></empowered-mon-upload>
+<mat-error *ngIf="errorMessage"></mat-error>

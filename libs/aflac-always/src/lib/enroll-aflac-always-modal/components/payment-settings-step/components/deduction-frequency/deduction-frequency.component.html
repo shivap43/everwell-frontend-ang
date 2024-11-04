@@ -1,0 +1,13 @@
+<mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.deductionFrequency]">
+    {{ languageStrings[languageKeys.deductionFrequency] }}
+</mat-label>
+<mat-form-field>
+    <mat-select
+        (selectionChange)="onChange($event.value)"
+        [formControl]="control"
+        [attr.aria-label]="languageStrings[languageKeys.deductionFrequency]"
+    >
+        <mat-option *ngFor="let option of options$ | async, let i = index" [value]="option.value"> {{ option.label }} </mat-option>
+    </mat-select>
+    <mat-error> <ng-content></ng-content></mat-error>
+</mat-form-field>

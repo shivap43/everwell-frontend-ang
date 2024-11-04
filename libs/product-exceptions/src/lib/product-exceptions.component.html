@@ -1,0 +1,159 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="product-exceptions-wrapper">
+    <div class="d-flex">
+        <h1 class="product-exceptions-header">{{languageStrings["primary.portal.productExceptions.exceptions"]}}</h1>
+    </div>
+    <div class="alert-status" *ngIf="disableException || (accountCheckedOut && !maintenanceLock && !unpluggedAccessAllowed)">
+        <mon-alert alertType="info">
+            <div class="content">
+                <h4>{{languageStrings['primary.portal.maintenanceBenefitsOffering.editExceptionsDisabled']}}</h4>
+                <div class="description">
+                    <p>{{languageStrings['primary.portal.dashboard.unpluggedAccount.checkedOutToUnpluggedNew'] }}</p>
+                </div>
+            </div>
+        </mon-alert>
+    </div>
+    <div *ngIf="(exceptions$ | async) as exceptions">
+        <p *ngIf="exceptions.length === 0">
+            {{languageStrings["primary.portal.productExceptions.exceptionDescFirstHalf"]}}{{this.accountName}}{{languageStrings["primary.portal.productExceptions.exceptionDescSecondHalf"]}}
+        </p>
+        <p *ngIf="exceptions.length > 0">
+            {{languageStrings["primary.portal.productExceptions.availabeExceptions"].replace('#accountName', this.accountName)}}
+        </p>
+        <div
+            *ngIf="isRole20 || isRole108;else elseBlock"
+            class="add-exceptions"
+            [ngClass]="{'add-exceptions-right': exceptions.length > 0}"
+        >
+            <div *configEnabled="configs.BROKER_GROUP_VAS_EXCEPTIONS">
+                <button
+                    *hasAnyPermission="[userPermissions.EXCEPTION_CREATE,userPermissions.VAS_EXCEPTIONS_CREATE_PERMISSION]"
+                    [disabled]="disableException || (accountCheckedOut && !maintenanceLock && !unpluggedAccessAllowed)"
+                    (click)="showNewException()"
+                    mat-button
+                    [ngClass]="{'mon-btn-primary':exceptions.length > 0,'mon-btn-secondary':exceptions.length === 0 }"
+                >
+                    {{languageStrings["primary.portal.productExceptions.addException"]}}
+                </button>
+            </div>
+        </div>
+        <ng-template #elseBlock>
+            <div class="add-exceptions" [ngClass]="{'add-exceptions-right': exceptions.length > 0}">
+                <button
+                    *hasAnyPermission="[userPermissions.EXCEPTION_CREATE,userPermissions.VAS_EXCEPTIONS_CREATE_PERMISSION]"
+                    [disabled]="disableException || (accountCheckedOut && !maintenanceLock && !unpluggedAccessAllowed)"
+                    (click)="showNewException()"
+                    mat-button
+                    [ngClass]="{'mon-btn-primary':exceptions.length > 0,'mon-btn-secondary':exceptions.length === 0 }"
+                >
+                    {{languageStrings["primary.portal.productExceptions.addException"]}}
+                </button>
+            </div>
+        </ng-template>
+        <!-- code for table displaying list of product exceptions-->
+        <div class="carrier-tab" *ngIf="exceptions.length > 0">
+            <table mat-table [dataSource]="exceptions">
+                <!-- Plan Name/Exception type Column -->
+                <ng-container matColumnDef="planName">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{languageStrings["primary.portal.productExceptions.viewException.exceptionType"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <ng-container *ngIf="element.plan"> {{ element.plan.name }} </ng-container>
+                        <ng-container *ngIf="!element.plan"> {{element.name}} </ng-container>
+                    </td>
+                </ng-container>
+                <!-- Availability Column -->
+                <ng-container matColumnDef="availability">
+                    <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.productExceptions.availability"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.validity.effectiveStarting | date: dateFormat}} - {{element.validity.expiresAfter | date: dateFormat}}
+                    </td>
+                </ng-container>
+                <!-- Approved By Column -->
+                <ng-container matColumnDef="ApprovedBy">
+                    <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.productExceptions.approvedBy"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.approvingProducer"
+                            >{{element.approvingProducer.fullName.lastName}}, {{element.approvingProducer.fullName.firstName}}</span
+                        >
+                    </td>
+                </ng-container>
+                <!-- States Column -->
+                <ng-container matColumnDef="States">
+                    <th mat-header-cell *matHeaderCellDef>{{languageStrings["primary.portal.productExceptions.states"]}}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <ng-container *ngIf="element.states?.length">
+                            {{getStatesString(element.states)}}
+                            <a
+                                href="javascript:void(0)"
+                                [richTooltip]="element.statesTooltip"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above tooltip-wrapper"
+                                [attr.aria-label]="languageStrings['primary.portal.productExceptions.states']"
+                            >
+                                <mon-icon iconName="Filled-info" class="infoicon icon-primary" iconSize="15"></mon-icon>
+                            </a>
+                        </ng-container>
+                        <ng-container *ngIf="!element.states?.length"> {{languageStrings["primary.portal.customer.all"]}} </ng-container>
+                    </td>
+                </ng-container>
+                <!-- Manage Column -->
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">
+                        {{languageStrings["primary.portal.productExceptions.Manage"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="text-center">
+                        <a
+                            class="more-option"
+                            href="javascript:void(0)"
+                            *ngIf="(!createPermission || (accountCheckedOut && !maintenanceLock && !unpluggedAccessAllowed) || isRole12);else manageMenuWithButton"
+                            (click)="viewException(element)"
+                            >{{languageStrings["primary.portal.common.view"]}}</a
+                        >
+                        <ng-template #manageMenuWithButton>
+                            <button
+                                mat-icon-button
+                                [attr.aria-label]="languageStrings['primary.portal.common.view']"
+                                *hasAnyPermission="['core.exceptions.create.exception',vasExceptionsDeletePermission]"
+                                [matMenuTriggerFor]="manageMenu"
+                            >
+                                <mon-icon iconName="ellipsis" aria-label="menu" class="more-option icon-primary"></mon-icon>
+                            </button>
+                            <mat-menu #manageMenu="matMenu">
+                                <button
+                                    *hasAnyPermission="['core.exceptions.read.exception',vasExceptionsDeletePermission]"
+                                    mat-menu-item
+                                    (click)="trigger.closeMenu(); viewException(element)"
+                                >
+                                    {{languageStrings["primary.portal.common.view"]}}
+                                </button>
+                                <ng-container *ngIf="element.states?.length && !element?.isExpired">
+                                    <button
+                                        *hasAllPermission="['core.exceptions.delete.exception', 'core.exceptions.create.exception']"
+                                        mat-menu-item
+                                        (click)="trigger.closeMenu(); EditException(element.id)"
+                                    >
+                                        {{languageStrings["primary.portal.common.edit"]}}
+                                    </button>
+                                </ng-container>
+                                <ng-container *ngIf="element.states?.length || (!element.states?.length && (isRole20 || isRole108))">
+                                    <button
+                                        *hasAnyPermission="['core.exceptions.delete.exception',vasExceptionsDeletePermission]"
+                                        mat-menu-item
+                                        (click)="trigger.closeMenu(); removeException(element)"
+                                        class="text-danger"
+                                    >
+                                        {{languageStrings["primary.portal.common.remove"]}}
+                                    </button>
+                                </ng-container>
+                            </mat-menu>
+                        </ng-template>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="exceptionDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: exceptionDisplayedColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

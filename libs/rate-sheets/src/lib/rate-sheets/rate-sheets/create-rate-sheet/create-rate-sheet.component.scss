@@ -1,0 +1,57 @@
+@import "shared";
+
+.create-wrapper,
+.create-wrapper > * {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    padding: map-get($spacers, 30) map-get($spacers, 50);
+
+    .flex-form-wrapper {
+        .form-fields {
+            width: convert-unit(284px, "rem");
+            margin-right: convert-unit(15px, "rem");
+        }
+
+        .form-labels {
+            margin-top: convert-unit(40px, "rem");
+        }
+
+        .inline {
+            display: inline;
+            margin-right: convert-unit(10px, "rem");
+        }
+    }
+}
+
+::placeholder {
+    color: black;
+    opacity: 1;
+}
+
+.plans-table {
+    padding-top: map-get($spacers, 10);
+}
+
+.mat-table {
+    table-layout: fixed;
+    width: convert-unit(930px, "rem");
+    max-width: 100%;
+}
+
+.mat-row td.mat-cell:first-of-type {
+    // First column of mat-table defaults to font-family: Roboto-Bold, sans-serif;
+    font-family: "Roboto", "Helvetica Neue", sans-serif;
+}
+
+.mat-column-product {
+    width: 20%;
+}
+
+.mat-column-riders {
+    width: 7.8%;
+    text-align: right;
+}

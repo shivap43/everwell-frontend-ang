@@ -1,0 +1,362 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<!-- Accordion to display all selected Plans -->
+<ng-container>
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <div class="coverage-state" *ngIf="!isSpinnerLoading && !errorMessage">
+        <div>
+            <h2 class="empty-state-header">{{languageStrings['primary.portal.enrollment.summary.header']}}</h2>
+            <div class="election-content">{{languageStrings['primary.portal.enrollment.summary.text']}}</div>
+        </div>
+        <div class="cost-card-panel">
+            <div class="mat-pay-frequency-panel">
+                <div class="expansion-content">
+                    <div class="align-left cost-summary-header">
+                        {{languageStrings['primary.portal.enrollment.summary.cost']}} {{enrollData.payFrequencyType | lowercase}}
+                        <div class="cost-summary-text cost-breakup">
+                            {{enrollData.preTaxTotal > 0 && enrollData.postTaxTotal > 0 ?
+                            languageStrings['primary.portal.enrollment.summary.cost.preandposttax'] :
+                            languageStrings['primary.portal.enrollment.summary.cost.text']}}
+                        </div>
+                    </div>
+
+                    <div class="align-right" style="padding-left: 100px; text-align: right">
+                        <div class="cost-total">{{enrollData.costTotal| currency}}</div>
+                        <div class="cost-breakup" *ngIf="!(enrollData.preTaxTotal > 0 && enrollData.postTaxTotal > 0)">
+                            {{enrollData.preTaxTotal > 0 ? languageStrings['primary.portal.enrollment.summary.pre.tax'] :
+                            languageStrings['primary.portal.enrollment.summary.post.tax']}}
+                        </div>
+                        <ng-container *ngIf="enrollData.preTaxTotal > 0 && enrollData.postTaxTotal > 0">
+                            <div class="cost-breakup">
+                                {{enrollData.preTaxTotal | currency}} {{languageStrings['primary.portal.enrollment.summary.pre.tax']}}
+                            </div>
+                            <div class="cost-breakup">
+                                {{enrollData.postTaxTotal| currency}} {{languageStrings['primary.portal.enrollment.summary.post.tax']}}
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="padding-agent-info">
+                <div class="agent-info">{{languageStrings['primary.portal.enrollment.summary.your.agent']}}</div>
+                <div class="agent-info-child">{{enrollData.agentName}}</div>
+                <div class="agent-info-child-blue" [tabIndex]="0">{{enrollData.agentEmail}}</div>
+                <div class="agent-info-child-blue">{{enrollData.agentPhone}}</div>
+            </div>
+        </div>
+        <div class="your-recent-election" *ngIf="enrollData.updatedAndNewCoverageData.length">
+            <h3>{{languageStrings['primary.portal.enrollment.summary.elected.text']}} {{enrollData.latestEnrollmentDate}}</h3>
+        </div>
+
+        <ng-template ngFor let-enrollment [ngForOf]="enrollData.updatedAndNewCoverageData" let-i="index">
+            <div class="enrollment-summary">
+                <mat-accordion class="card-type-list">
+                    <mat-expansion-panel [class]="enrollment.productName" [ngStyle]="{'border-left-color': '#'+ enrollment.cardColorCode }">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <mon-icon
+                                    [iconName]="enrollment.productName"
+                                    [fetchedIconPath]="enrollment.iconPath"
+                                    class="plan-icon"
+                                ></mon-icon>
+                                <div class="plan-name">{{enrollment.productName}}</div>
+                                <div>
+                                    <hr class="dotted-border-bottom bottom-spliter" />
+                                </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                <div class="status">
+                                    <span class="status-icon">
+                                        <mon-icon
+                                            iconName="Filled-check"
+                                            iconSize="16"
+                                            *ngIf="enrollment.status===approvedStatus"
+                                            class="icon-success"
+                                        >
+                                        </mon-icon>
+                                        <mon-icon
+                                            iconName="Filled-dash"
+                                            iconSize="16"
+                                            *ngIf="(enrollment.status && enrollment.status.startsWith(pendingStatus))"
+                                            class="icon-warning"
+                                        >
+                                        </mon-icon>
+                                        <mon-icon
+                                            class="icon-danger"
+                                            *ngIf="enrollment.status===lapsedStatus"
+                                            iconSize="16"
+                                            iconName="Filled-X"
+                                        >
+                                        </mon-icon>
+                                    </span>
+                                    <span>{{enrollment.pendingReason}}</span>
+                                </div>
+                                <div class="plan-rates dotted-border-left" style="vertical-align: middle">
+                                    <div class="plan-rate">{{enrollment.totalCost | currency}}</div>
+                                    <div class="plan-rate-desc">{{enrollment.taxStatus}}</div>
+                                </div>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="expansion-content your-selection">
+                            <div class="content-column align-left">
+                                <div *ngIf="enrollment.planName">
+                                    <span class="content-label">{{languageStrings['primary.portal.enrollment.summary.elected.plan']}}</span>
+                                    <span>{{enrollment.planName }}</span>
+                                </div>
+                                <div *ngIf="enrollment.coverageLevel">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.coverage.level']}}</span
+                                    >
+                                    <span>{{enrollment.coverageLevel }}</span>
+                                </div>
+                                <div *ngIf="enrollment.policyNumber">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.policy']}}</span
+                                    >
+                                    <span>{{enrollment.policyNumber }}</span>
+                                </div>
+                                <div *ngIf="enrollment.carrierStatus">
+                                    <span class="content-label">{{enrollment.carrierName}}</span>
+                                    <span>{{enrollment.carrierStatus | titlecase}}</span>
+                                </div>
+                                <div *ngIf="enrollment.benefitAmount">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.benefit.amount']}}</span
+                                    >
+                                    <span>{{enrollment.benefitAmount | currency}}</span>
+                                </div>
+                                <div *ngIf="enrollment.eliminationPeriod">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.elimination.period']}}</span
+                                    >
+                                    <span>{{enrollment.eliminationPeriod }}</span>
+                                </div>
+                                <div *ngIf="enrollment.riderNames.length">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.riders']}}</span
+                                    >
+                                    <span class="riders-list">
+                                        <ng-template ngFor let-rider [ngForOf]="enrollment.riderNames">
+                                            <span>{{rider}}</span>
+                                        </ng-template>
+                                    </span>
+                                </div>
+                                <div *ngIf="enrollment.beneficiaries?.length">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.beneficiaries']}}</span
+                                    >
+                                    <div>
+                                        <ng-template ngFor let-beneficiary [ngForOf]="enrollment.beneficiaries">
+                                            <span [ngSwitch]="beneficiary?.type">
+                                                <span *ngSwitchCase="estate"> {{languageStrings['primary.portal.coverage.estate']}} </span>
+                                                <span *ngSwitchCase="trust">
+                                                    {{beneficiary.name.firstName | titlecase}} {{beneficiary.name.lastName | titlecase}}
+                                                </span>
+                                                <span *ngSwitchCase="charity">
+                                                    {{languageStrings['primary.portal.coverage.charity']}}
+                                                </span>
+                                                <span *ngSwitchCase="individual">
+                                                    {{beneficiary.name.firstName | titlecase}} {{beneficiary.name.lastName | titlecase}}
+                                                </span>
+                                                ({{ beneficiary.allocationType.toLowerCase() }}) - {{beneficiary.percent}}%
+                                            </span>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                                <div *ngIf="enrollment.paymentInformation">
+                                    <span class="content-label" *ngIf="enrollment.paymentInformation.aflacAlways"
+                                        >{{languageStrings['primary.portal.coverage.aflacalways']}}</span
+                                    >
+                                    <span class="content-label" *ngIf="!enrollment.paymentInformation.aflacAlways"
+                                        >{{languageStrings['primary.portal.applicationFlow.payments.billing']}}</span
+                                    >
+                                    <span *ngIf="enrollment.paymentInformation.paymentType === bankDraft"
+                                        >{{languageStrings['primary.portal.coverage.accountNumberEnding']}}
+                                    </span>
+                                    <span
+                                        *ngIf="enrollment.paymentInformation.paymentType === creditCard || enrollment.paymentInformation.paymentType === debitCard"
+                                        >{{languageStrings['primary.portal.coverage.cardNumberEnding']}}</span
+                                    >&nbsp;
+                                    <span>{{enrollment.paymentInformation.lastFour}}</span>
+                                </div>
+                                <div>
+                                    <span class="content-label">{{enrollment.coverageText}}</span>
+                                    <span>{{enrollment.coverageDate }}</span>
+                                </div>
+
+                                <div class="padding-top-ten">
+                                    <span>
+                                        <a href="javascript:void(0)" (click)="openPlanDetails(enrollment.enrollmentObj)"
+                                            >{{languageStrings['primary.portal.enrollment.summary.plan.details']}}</a
+                                        >
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+        </ng-template>
+
+        <div class="padding-top-ten" *ngIf="enrollData.currentCoverageData.length">
+            <hr />
+        </div>
+
+        <div class="your-recent-election" *ngIf="enrollData.currentCoverageData.length">
+            <h3>{{languageStrings['primary.portal.enrollment.summary.your.current.coverage']}}</h3>
+        </div>
+
+        <ng-template ngFor let-enrollment [ngForOf]="enrollData.currentCoverageData" let-i="index">
+            <div class="enrollment-summary">
+                <mat-accordion class="card-type-list">
+                    <mat-expansion-panel [class]="enrollment.productName" [ngStyle]="{'border-left-color': '#'+ enrollment.cardColorCode }">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <mon-icon
+                                    [iconName]="enrollment.productName"
+                                    [fetchedIconPath]="enrollment.iconPath"
+                                    class="plan-icon"
+                                ></mon-icon>
+                                <div class="plan-name">{{enrollment.productName}}</div>
+                                <div>
+                                    <hr class="dotted-border-bottom bottom-spliter" />
+                                </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                <div class="status">
+                                    <span class="status-icon">
+                                        <mon-icon
+                                            iconName="Filled-check"
+                                            iconSize="16"
+                                            *ngIf="enrollment.status===approvedStatus"
+                                            class="icon-success"
+                                        >
+                                        </mon-icon>
+                                        <mon-icon
+                                            iconName="Filled-dash"
+                                            iconSize="16"
+                                            *ngIf="(enrollment.status && enrollment.status.startsWith(pendingStatus))"
+                                            class="icon-warning"
+                                        >
+                                        </mon-icon>
+                                        <mon-icon
+                                            class="icon-danger"
+                                            *ngIf="enrollment.status===lapsedStatus"
+                                            iconSize="16"
+                                            iconName="Filled-X"
+                                        >
+                                        </mon-icon>
+                                    </span>
+                                    <span>{{enrollment.pendingReason}}</span>
+                                </div>
+                                <div class="plan-rates dotted-border-left" style="vertical-align: middle">
+                                    <div class="plan-rate">{{enrollment.totalCost | currency}}</div>
+                                    <div class="plan-rate-desc">{{enrollment.taxStatus}}</div>
+                                </div>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="expansion-content your-selection">
+                            <div class="content-column align-left">
+                                <div *ngIf="enrollment.planName">
+                                    <span class="content-label">{{languageStrings['primary.portal.enrollment.summary.elected.plan']}}</span>
+                                    <span>{{enrollment.planName }}</span>
+                                </div>
+                                <div *ngIf="enrollment.coverageLevel">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.coverage.level']}}</span
+                                    >
+                                    <span>{{enrollment.coverageLevel }}</span>
+                                </div>
+                                <div *ngIf="enrollment.policyNumber">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.policy']}}</span
+                                    >
+                                    <span>{{enrollment.policyNumber }}</span>
+                                </div>
+                                <div *ngIf="enrollment.carrierStatus">
+                                    <span class="content-label">{{enrollment.carrierName}}</span>
+                                    <span>{{enrollment.carrierStatus | titlecase}}</span>
+                                </div>
+                                <div *ngIf="enrollment.benefitAmount">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.benefit.amount']}}</span
+                                    >
+                                    <span>{{enrollment.benefitAmount | currency}}</span>
+                                </div>
+                                <div *ngIf="enrollment.eliminationPeriod">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.elimination.period']}}</span
+                                    >
+                                    <span>{{enrollment.eliminationPeriod }}</span>
+                                </div>
+                                <div *ngIf="enrollment.riderNames.length">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.riders']}}</span
+                                    >
+                                    <span class="riders-list">
+                                        <ng-template ngFor let-rider [ngForOf]="enrollment.riderNames">
+                                            <span>{{rider}}</span>
+                                        </ng-template>
+                                    </span>
+                                </div>
+                                <div *ngIf="enrollment.beneficiaries?.length">
+                                    <span class="content-label"
+                                        >{{languageStrings['primary.portal.enrollment.summary.elected.beneficiaries']}}</span
+                                    >
+                                    <div>
+                                        <ng-template ngFor let-beneficiary [ngForOf]="enrollment.beneficiaries">
+                                            <span [ngSwitch]="beneficiary?.type">
+                                                <span *ngSwitchCase="estate"> {{languageStrings['primary.portal.coverage.estate']}} </span>
+                                                <span *ngSwitchCase="trust">
+                                                    {{beneficiary.name.firstName | titlecase}} {{beneficiary.name.lastName | titlecase}}
+                                                </span>
+                                                <span *ngSwitchCase="charity">
+                                                    {{languageStrings['primary.portal.coverage.charity']}}
+                                                </span>
+                                                <span *ngSwitchCase="individual">
+                                                    {{beneficiary.name.firstName | titlecase}} {{beneficiary.name.lastName | titlecase}}
+                                                </span>
+                                                ({{ beneficiary.allocationType.toLowerCase() }}) - {{beneficiary.percent}}%
+                                            </span>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                                <div *ngIf="enrollment.paymentInformation">
+                                    <span class="content-label" *ngIf="enrollment.paymentInformation.aflacAlways"
+                                        >{{languageStrings['primary.portal.coverage.aflacalways']}}</span
+                                    >
+                                    <span class="content-label" *ngIf="!enrollment.paymentInformation.aflacAlways"
+                                        >{{languageStrings['primary.portal.applicationFlow.payments.billing']}}</span
+                                    >
+                                    <span *ngIf="enrollment.paymentInformation.paymentType === bankDraft"
+                                        >{{languageStrings['primary.portal.coverage.accountNumberEnding']}}
+                                    </span>
+                                    <span
+                                        *ngIf="enrollment.paymentInformation.paymentType === creditCard || enrollment.paymentInformation.paymentType === debitCard"
+                                        >{{languageStrings['primary.portal.coverage.cardNumberEnding']}}</span
+                                    >&nbsp;
+                                    <span>{{enrollment.paymentInformation.lastFour}}</span>
+                                </div>
+                                <div>
+                                    <span class="content-label">{{enrollment.coverageText}}</span>
+                                    <span>{{enrollment.coverageDate }}</span>
+                                </div>
+
+                                <div class="padding-top-ten">
+                                    <span>
+                                        <a href="javascript:void(0)" (click)="openPlanDetails(enrollment.enrollmentObj)"
+                                            >{{languageStrings['primary.portal.enrollment.summary.plan.details']}}</a
+                                        >
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+        </ng-template>
+    </div>
+</ng-container>

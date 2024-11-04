@@ -1,0 +1,7 @@
+<empowered-add-update-cart-button
+    *ngIf="addUpdateCartButton$ | async as addUpdateCartButton"
+    [addUpdateCartButtonState]="addUpdateCartButton.addUpdateCartButtonState"
+    [disableAddCart]="addUpdateCartButton.isDisabled"
+    [toolTipText]="addUpdateCartButton.toolTipText"
+    (addToCartHandler)="addUpdateCart()"
+></empowered-add-update-cart-button>

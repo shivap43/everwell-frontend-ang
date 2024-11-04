@@ -1,0 +1,37 @@
+@import "shared";
+
+.header {
+    display: flex;
+    justify-content: space-between;
+
+    .mon-btn-link {
+        line-height: convert-unit(26px, "rem");
+    }
+}
+
+.tpi-app-content {
+    overflow: hidden;
+    flex-grow: 1;
+
+    ::ng-deep {
+        .submit-app-flow-form {
+            display: none;
+        }
+
+        .tpi-flow-border {
+            border: 0 !important;
+        }
+    }
+}
+
+.lnl-app-content {
+    ::ng-deep {
+        .tpi-flow-border {
+            border: none !important;
+        }
+    }
+}
+
+.lnl-footer {
+    padding: map-get($spacers, 25) map-get($spacers, 30);
+}

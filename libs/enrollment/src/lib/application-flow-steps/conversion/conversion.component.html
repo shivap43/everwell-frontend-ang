@@ -1,0 +1,134 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<ng-container>
+    <form [formGroup]="form" (ngSubmit)="validatePolicy()">
+        <div *ngIf="body">
+            <section class="section-container">
+                <div class="question-container">
+                    <div class="question-block" id="conversionquestionlbl">
+                        <p [innerHTML]="body"></p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type radio">
+                            <mat-radio-group
+                                (change)="getRadioValue($event)"
+                                formControlName="question"
+                                aria-labelledby="conversionquestionlbl"
+                            >
+                                <mat-radio-button [ngClass]="{'field-invalid' : radioError}" value="yes"
+                                    >{{languageStrings['primary.portal.common.yes']}}
+                                </mat-radio-button>
+                                <mat-radio-button [ngClass]="{'field-invalid' : radioError}" value="no" [disabled]="disableRadio"
+                                    >{{languageStrings['primary.portal.common.no']}}</mat-radio-button
+                                >
+                                <mat-error *ngIf="radioError">{{languageStrings['primary.portal.common.requiredField']}} </mat-error>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                    <button
+                        (click)="saveChoice()"
+                        type="button"
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        *ngIf="radioValue === 'no' || !radioValue || !hasImport()"
+                    >
+                        <span>{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+        <ng-container>
+            <div *ngIf="policyToBeShown">
+                <section class="section-container">
+                    <div class="question-container">
+                        <div class="question-block" id="policyText">
+                            <p [innerHTML]="policyText"></p>
+                        </div>
+                        <div class="response-block">
+                            <div class="response-type input">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.applicationFlow.conversion.policyNumber']}}</mat-label
+                                >
+                                <mat-form-field class="d-md-flex">
+                                    <input
+                                        matInput
+                                        [value]="form.controls.policy.value"
+                                        formControlName="policy"
+                                        maxlength="8"
+                                        aria-labelledby="policyText"
+                                    />
+                                    <mat-error *ngIf="form.controls['policy'].errors?.pattern">
+                                        {{languageStrings['primary.portal.applicationFlow.conversion.MustBeAlphaNumCharacters']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="!form.controls['policy'].value">
+                                        {{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                    >
+                                    <mat-error *ngIf="form.controls['policy'].errors?.policy && form.controls['policy'].value">
+                                        {{languageStrings['primary.portal.applicationFlow.conversion.policyNotFound']}}
+                                    </mat-error>
+                                </mat-form-field>
+                                <ng-container>
+                                    <mat-label class="mat-label" id="policyHolderBirthdate"
+                                        >{{languageStrings['primary.portal.applicationFlow.conversion.policyHolderBirthdate']}}</mat-label
+                                    >
+                                    <mat-form-field class="d-md-flex mon-date-field">
+                                        <input
+                                            matInput
+                                            disabled
+                                            [value]="form.controls['date'].value"
+                                            formContolName="date"
+                                            aria-labelledby="policyHolderBirthdate"
+                                        />
+                                        <mat-datepicker #dp></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix [for]="dp" disabled>
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                        </mat-datepicker-toggle>
+                                    </mat-form-field>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                        <button
+                            id="submitAppFlowForm"
+                            *ngIf="planObject.lastStep"
+                            class="mon-btn-primary submit-app-flow-form"
+                            type="submit"
+                            mat-flat-button
+                        >
+                            <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                                ><span>{{languageStrings['primary.portal.applicationFlow.conversion.next']}}</span
+                                ><span>{{this.planObject.nextProduct}}</span>
+                            </span>
+                            <span
+                                *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                                >{{languageStrings['primary.portal.applicationFlow.conversion.nextAflacAlways']}}
+                            </span>
+                            <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                                >{{languageStrings['primary.portal.applicationFlow.conversion.nextBilling']}}
+                            </span>
+                            <span
+                                *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                                >{{languageStrings['primary.portal.applicationFlow.conversion.nextFinishApplications']}}
+                            </span>
+                        </button>
+                        <button *ngIf="!this.planObject.lastStep" type="submit" class="mon-btn-primary" mat-flat-button>
+                            <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </ng-container>
+    </form>
+</ng-container>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

@@ -1,0 +1,162 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="loadForm">
+    <ng-container *ngIf="isHSA && loadForm">
+        <section class="section-container">
+            <div class="question-container">
+                <div class="question-block">
+                    <p>{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.enrollHsaPlan']}}</p>
+                </div>
+            </div>
+            <div class="response-block">
+                <div class="response-type radio">
+                    <mat-radio-group (change)="getRadioValue($event)" formControlName="question">
+                        <mat-radio-button value="Yes">{{languageStrings['primary.portal.common.yes']}}</mat-radio-button>
+                        <mat-radio-button value="No">{{languageStrings['primary.portal.common.no']}}</mat-radio-button>
+                        <mat-error *ngIf="radioError">{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                <button
+                    type="button"
+                    (click)="saveChoice()"
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    *ngIf="radioValue === 'No' || !radioValue"
+                >
+                    <span *ngIf="this.planObject.lastStep"
+                        ><span>{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.next']}}</span>
+                        <span>{{this.planObject.nextProduct}}</span></span
+                    >
+                    <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </section>
+    </ng-container>
+    <ng-container>
+        <div *ngIf="showContributionStep">
+            <section class="section-container">
+                <div
+                    *ngIf="isHCFSAEmployerContributionPLan && (employerMinContribution <= employerContributionAmount)"
+                    class="question-container"
+                >
+                    <div class="question-block">
+                        <p>
+                            {{ languageStrings['primary.portal.applicationFlow.bucketPlanFlow.employerContribution'] |replaceTag: {
+                            "##minamount##" : employerMinContribution, '##maxamount##' : employerContributionAmount } }}
+                        </p>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-block">
+                        <p>
+                            {{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.annualContribution']}}
+                            <span>
+                                <a
+                                    [richTooltip]="languageStrings['primary.portal.applicationFlow.bucketPlanFlow.fsaPlanPara']"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    href="javascript:void(0)"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="17" class="icon-primary"> </mon-icon>
+                                </a>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="response-block inline">
+                    <div class="response-type input">
+                        <mat-form-field class="d-md-flex">
+                            <input
+                                matInput
+                                formControlName="annualContribution"
+                                (paste)="numberValidation($event);"
+                                (keyup)="getMonthlyContribution()"
+                                [value]="this.contributionAmount"
+                                (blur)="getAnnualContribution()"
+                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.bucketPlanFlow.annualContribution']"
+                            />
+                            <span matPrefix>$&nbsp;</span>
+                            <mat-hint
+                                >{{ languageStrings['primary.portal.applicationFlow.bucketPlanFlow.betweenLimit']|replaceTag: {
+                                "##minlimit##" : minLimit, '##maxlimit##' :maxLimit } }}</mat-hint
+                            >
+                            <mat-error *ngIf="form.controls['annualContribution'].hasError('required')"
+                                >{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.amountRequired'].replace("#minLimit#",minLimit).replace("#maxLimit#",maxLimit)}}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="form.controls['annualContribution'].hasError('limitError')
+              && !form.controls['annualContribution'].hasError('required')"
+                            >
+                                {{ languageStrings['primary.portal.applicationFlow.bucketPlanFlow.mustBeBetweenLimit']|replaceTag: {
+                                "##minlimit##" : minLimit, '##maxlimit##' :maxLimit } }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div
+                        class="mon-mt-10"
+                        *ngIf="!form.controls['annualContribution'].hasError('limitError') && !form.controls['annualContribution'].hasError('required')"
+                    >
+                        <span *ngIf="monthlyContribution" class="weekly-contribution-bold"
+                            >= {{monthlyContribution | currency}} {{payFrequency.name}}</span
+                        >
+                    </div>
+                </div>
+                <ng-container *ngIf="this.employerContributionAmount">
+                    <div class="question-container">
+                        <div class="question-block">
+                            <span class="contribution-block">
+                                {{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.employerAnnualContribution']}}
+                            </span>
+                            <span> {{employerContributionAmount| currency}}</span>
+                        </div>
+                        <div class="question-block" *ngIf="isHCFSAEmployerContributionPLan">
+                            <span class="contribution-block">
+                                {{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.totalAnnualContribution']}}
+                            </span>
+                            <span>{{totalAnnualContribution| currency}}</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                    <button
+                        id="submitAppFlowForm"
+                        *ngIf="planObject.lastStep"
+                        class="mon-btn-primary submit-app-flow-form"
+                        type="submit"
+                        mat-flat-button
+                    >
+                        <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                            ><span>{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.next']}}</span>
+                            <span>{{this.planObject.nextProduct}}</span>
+                        </span>
+                        <span
+                            *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                            >{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.nextAflacAlways']}}
+                        </span>
+                        <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                            >{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.nextBilling']}}
+                        </span>
+                        <span
+                            *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                            >{{languageStrings['primary.portal.applicationFlow.bucketPlanFlow.nextFinishApplications']}}
+                        </span>
+                    </button>
+                    <button *ngIf="!this.planObject.lastStep" class="mon-btn-primary" type="submit" mat-flat-button>
+                        <span *ngIf="!this.planObject.lastStep">{{languageStrings['primary.portal.common.next']}}</span>
+                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </ng-container>
+</form>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

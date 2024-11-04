@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <base href="/" />
+
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <!-- Fix supress Phone Numbers auto formated to a link, TBD wrap within a condition after RWD implementation-->
+        <meta name="format-detection" content="telephone=no" />
+        <link rel="icon" img-src="'self'" type="image/svg+xml" href="./favicon.svg" />
+        <link rel="icon" img-src="'self'" type="image/png" href="./favicon.png" />
+
+        <script src="./assets/js/PegaChatFeature.js"></script>
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-44929342-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+        </script>
+
+        <script type="text/javascript">
+            function walkMe(walkMeSource) {
+                var walkme = document.createElement("script");
+                walkme.type = "text/javascript";
+                walkme.async = true;
+                walkme.src = walkMeSource;
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(walkme, s);
+                window._walkmeConfig = { smartLoad: true };
+            }
+        </script>
+
+        <script src="./assets/legacy-browser/handle-legacy-browser.js" nomodule defer></script>
+
+        <!-- Dynatrace agentless tracking-->
+        <script type="text/javascript">
+            (function () {
+                const currentUrl = window.location.origin;
+                //Disabling DT tracking for localhost
+                if (currentUrl.includes("everwellbenefits")) {
+                    let dtCdn = "https://js-cdn.dynatrace.com/jstag/";
+                    let integrity = "";
+                    //NON-PRD URL like www.<env>.everwellbenefits.com
+                    //PROD URL like www.everwellbenefits.com
+                    if (currentUrl.includes(".dev.")) {
+                        dtCdn += "157944990f8/bf41709hdw/ebb1a6a1b09de100_complete.js";
+                        integrity = "sha256-bBFzRQ3A08WMoG6IsaavvpnRvhncnzw3l6kZrKDX1cU=";
+                    } else if (currentUrl.includes(".intg.")) {
+                        dtCdn += "157944990f8/bf41709hdw/772a04700526cf08_complete.js";
+                        integrity = "sha256-Qc57/KSsFY5WLzDXFE0UFJrIDOJ3fJp15GB5aZ+yJi0=";
+                    } else if (currentUrl.includes(".syst.")) {
+                        dtCdn += "157944990f8/bf41709hdw/5f77045d85f1eeb8_complete.js";
+                        integrity = "sha256-K+2zhT3PtUgEd1YDSFsugOgfkloKS2C2F1qbww2U+08=";
+                    } else if (currentUrl.includes(".uat.")) {
+                        dtCdn += "15c157a40ab/bf49323qjp/eea47f8a21b132db_complete.js";
+                        integrity = "sha256-lcROqTJ6ksCbgLLYMT/UNFuEYeObTDhgs7IcWVM/gqU=";
+                    } else if (currentUrl.includes(".trn.")) {
+                        dtCdn += "15c157a40ab/bf49323qjp/3c8b91038049dea0_complete.js";
+                        integrity = "sha256-HNj9D2s8cFAcIPcRHaQWi22P7UbgC6ulEpy76qWqgMA=";
+                    } else {
+                        dtCdn += "15c157a40ab/bf49323qjp/1c4fb59e3aa43fcd_complete.js";
+                        integrity = "sha256-cXXn1CjT6A092TeLCP6g1MsMfyBGFhI/BmNJ0UQ/TKU=";
+                    }
+
+                    const script = document.createElement("script");
+                    // script.crossOrigin = "anonymous";
+                    script.src = dtCdn;
+                    // Commenting out integrity due to dynatrace issue
+                    // script.integrity = integrity;
+                    document.getElementsByTagName("script")[0].parentNode.appendChild(script);
+                }
+            })();
+        </script>
+    </head>
+
+    <body class="empowered">
+        <div id="launcherminimized" tabindex="0" role="button" aria-label="Chat With Us">
+            Chat With Us
+            <div id="unreadCounter" style="display: none">0</div>
+        </div>
+        <empowered-root></empowered-root>
+    </body>
+</html>

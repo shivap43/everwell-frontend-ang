@@ -1,0 +1,21 @@
+@import "shared";
+
+.mat-row {
+    td.mat-cell:first-of-type {
+        a {
+            @include fontFace("primary.bold");
+        }
+    }
+
+    &.disabled-prospect {
+        .mat-cell {
+            color: get("color.gray.500") !important;
+            &:first-of-type {
+                span {
+                    @include fontFace("primary.regular");
+                    padding-left: map-get($spacers, 10);
+                }
+            }
+        }
+    }
+}

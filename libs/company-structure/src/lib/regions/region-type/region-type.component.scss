@@ -1,0 +1,54 @@
+@import "shared";
+
+:host {
+    margin-bottom: convert-unit(15px, "rem");
+
+    .mat-expansion-panel {
+        padding: 0 !important;
+        .mat-expansion-panel-header {
+            min-height: convert-unit(52px, "rem");
+            height: auto !important;
+        }
+        ::ng-deep .cdk-program-focused {
+            background: none !important;
+        }
+
+        &:hover {
+            .link-danger {
+                opacity: 1;
+            }
+        }
+        .regiontype-panel-desc {
+            color: get("color.gray.700");
+            @include fontFace("primary.regular");
+            font-size: convert-unit(16px, "rem");
+        }
+    }
+
+    .regiontype-panel-title {
+        > * {
+            margin-right: 10px !important;
+        }
+        p {
+            &.region-type-name {
+                color: get("color.gray.1000");
+                @include fontFace("primary.bold");
+                font-size: convert-unit(18px, "rem");
+            }
+        }
+        h4.regiontype-newclass-title {
+            @include fontFace("primary.regular");
+            font-size: convert-unit(22px, "rem") !important;
+            color: get("color.black");
+            font-weight: normal !important;
+        }
+    }
+    ::ng-deep .mat-expansion-panel.group-expand.mat-expanded.panel-active {
+        .mat-expansion-panel-content {
+            border-bottom: 1px solid get("color.gray.700");
+        }
+    }
+}
+.prevent-click:hover {
+    background-color: get("color.white") !important;
+}

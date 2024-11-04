@@ -1,0 +1,11 @@
+@mixin fontFace($faceKey: "primary.regular", $fallback: sans-serif, $important: false) {
+    $typography: get("faces", $mon-config);
+    $thisFace: get($faceKey, $typography);
+    $importantString: null;
+
+    @if $important {
+        $importantString: !important;
+    }
+
+    font-family: $thisFace, $fallback $importantString;
+}

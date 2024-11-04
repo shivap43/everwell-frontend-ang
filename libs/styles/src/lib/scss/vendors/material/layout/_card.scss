@@ -1,0 +1,90 @@
+@import "shared";
+
+.mon-card-wrapper {
+    display: flex;
+    width: convert-unit(400px, "rem");
+}
+
+.mat-card {
+    box-shadow: 0 0 10px 0 rgba(get("color.black"), 0.2);
+    border-radius: convert-unit(2px, "rem");
+    padding: 0;
+    width: 100%;
+
+    .mat-divider-horizontal {
+        position: static;
+        border-top-style: dotted;
+    }
+    .mat-card-content {
+        margin: convert-unit(50px, "rem") convert-unit(50px, "rem");
+        min-height: convert-unit(250px, "rem");
+        font-size: convert-unit(16px, "rem");
+    }
+
+    .mat-card-title {
+        font-size: convert-unit(36px, "rem");
+        color: get("color.gray.600");
+        font-weight: normal;
+        @include fontFace("primary.light");
+        margin-bottom: convert-unit(30px, "rem");
+    }
+
+    .mat-card-footer {
+        border-top: 1px solid get("color.gray.500");
+        margin: 0;
+        padding: convert-unit(30px, "rem") convert-unit(50px, "rem");
+
+        &.bg-gray-100 {
+            background-color: get("color.gray.100");
+        }
+    }
+    &.plan-card {
+        border-radius: 0;
+        border: convert-unit(1px, "rem") solid get("color.gray.500");
+        width: convert-unit(190px, "rem");
+        box-shadow: none;
+        margin: 0 convert-unit(20px, "rem") convert-unit(20px, "rem") 0;
+        cursor: pointer;
+        max-height: convert-unit(140px, "rem");
+        .coverage-head {
+            height: convert-unit(95px, "rem");
+
+            text-align: center;
+            &:active {
+                background: get("color.primary.500");
+                div {
+                    p {
+                        color: get("color.white");
+                    }
+                }
+            }
+        }
+        .benefit-amount,
+        .elimination-period {
+            height: convert-unit(75px, "rem");
+            h1 {
+                margin: 0;
+                padding: convert-unit(25px, "rem") 0;
+                &:hover,
+                &:active {
+                    color: get("color.white");
+                }
+            }
+        }
+        .mat-card-content {
+            min-height: convert-unit(45px, "rem");
+            margin: 0;
+            text-align: center;
+            border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+            p {
+                padding: convert-unit(10px, "rem");
+            }
+        }
+    }
+}
+
+.mat-card-subtitle {
+    line-height: convert-unit(24px, "rem");
+    font-size: convert-unit(16px, "rem");
+    color: get("color.black");
+}

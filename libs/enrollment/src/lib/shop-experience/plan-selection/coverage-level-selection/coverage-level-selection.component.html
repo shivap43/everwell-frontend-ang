@@ -1,0 +1,89 @@
+<!--TO DO languages-->
+<ng-template [ngIf]="isLoading" [ngIfElse]="coverageView">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template #coverageView>
+    <div class="row">
+        <ng-template [ngIf]="!isRiderCoverage">
+            <ng-container>
+                <div *ngIf="showDisableCoverageMessage" class="coverage-alert">
+                    <mon-alert alertType="info">
+                        <span>{{languageStrings.coverageDisabled}} </span>
+                        <a href="javascript:void(0)" (click)="reviewKnockoutQuestions()"
+                            >{{languageStrings.reviewAnswers}}</a
+                        >
+                    </mon-alert>
+                </div>
+                <mat-radio-group
+                    [attr.aria-label]="languageStrings.selectOption"
+                    [formControl]="coverageSelectRadio"
+                    (change)=" selectCoverage($event.value.id)"
+                    class="plan-selection-radio"
+                >
+                    <mat-radio-button
+                        *ngFor="let coverage of applicableCoverageLevels"
+                        [value]="coverage"
+                        [checked]="coverage.id === currentCoverage?.coverageLevelId"
+                        [disabled]="getCoverageAmountById(coverage.id) == -1 || coverage?.disabled"
+                        [ngClass]="{'disabled' : (getCoverageAmountById(coverage.id) == -1 || coverage?.disabled)}"
+                    >
+                        <div
+                            *ngIf="coverage && currentCoverage && getCoverageAmountById(coverage.id) != -1 "
+                            class="plan-card"
+                        >
+                            <div
+                                class="coverage-head"
+                                [ngClass]="{'active': coverage.id === currentCoverage.coverageLevelId}"
+                            >
+                                <mon-icon
+                                    [fetchedIconPath]="coverage.iconLocation"
+                                    [iconName]="coverage.name"
+                                    [iconSize]="50"
+                                    class="plan-icon"
+                                ></mon-icon>
+                                <p>{{coverage.name | coverageName}}</p>
+                            </div>
+
+                            <div *ngIf="data.length > 1">
+                                <p>
+                                    {{getCoverageAmountById(coverage.id) | currency}}
+                                </p>
+                            </div>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </ng-container>
+        </ng-template>
+        <div
+            *ngIf="isRiderCoverage  && isSingleRiderCoverage() && planOfferingObj.planPricing.length > 1 "
+            class="rider-select"
+        >
+            <p
+                *ngIf="!isAllCoverageZero &&  !isRiderCoverage"
+                language="primary.portal.shoppingExperience.riderCoverage"
+            ></p>
+            <p *ngIf="isRiderCoverage" language="primary.portal.shoppingExperience.coverageLevelDescription"></p>
+            <mat-form-field *ngIf="!isAllCoverageZero">
+                <mat-select
+                    [formControl]="coverageSelectInput"
+                    (valueChange)="selectCoverage($event)"
+                    class="mon-select-arrow"
+                    disableOptionCentering="true"
+                    attr.aria-required="true"
+                    panelClass="coverage-level-select"
+                >
+                    <ng-template ngFor let-coverage [ngForOf]="data">
+                        <mat-option [value]="coverage.id" *ngIf="getCoverageAmountById(coverage.id) != -1">
+                            {{ "primary.portal.shoppingExperience.coverageName" | replaceTag: { "#coveragename":
+                            coverage.name } }}
+                        </mat-option>
+                    </ng-template>
+                </mat-select>
+            </mat-form-field>
+            <span *ngIf="currentCoverage" class="rider-cost">
+                {{ "primary.portal.shoppingExperience.currentCoverage" | replaceTag: { "#currentcoverage":
+                getCoverageAmountById(currentCoverage.coverageLevelId) | currency } }}
+            </span>
+        </div>
+    </div>
+</ng-template>

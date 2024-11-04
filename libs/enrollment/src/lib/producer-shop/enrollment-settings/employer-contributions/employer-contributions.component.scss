@@ -1,0 +1,50 @@
+@import "shared";
+:host {
+    .mat-dialog-title h1 {
+        margin: 0 auto;
+    }
+
+    .employer-contributions-list {
+        width: convert-unit(562px, "rem");
+        margin: 0 auto;
+    }
+
+    .employer-contributions-list .item {
+        padding: map-get($spacers, 20);
+        border: convert-unit(1px, "rem") solid #6e6e6e;
+        margin-top: map-get($spacers, 20);
+        display: table;
+        width: 100%;
+
+        .price,
+        .text {
+            display: table-cell;
+            vertical-align: middle;
+            font-family: Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        .price {
+            font-size: convert-unit(22px, "rem");
+        }
+
+        .text {
+            font-size: convert-unit(16px, "rem");
+            border-left: convert-unit(1px, "rem") dashed #5b5b5b;
+            padding-left: map-get($spacers, 20);
+            margin-left: map-get($spacers, 20);
+        }
+
+        .text .title {
+            font-family: "Roboto-bold", sans-serif;
+        }
+
+        .text .subtitle {
+            font-weight: normal;
+        }
+
+        .flex-dollar::after {
+            content: "\a";
+            white-space: pre;
+        }
+    }
+}

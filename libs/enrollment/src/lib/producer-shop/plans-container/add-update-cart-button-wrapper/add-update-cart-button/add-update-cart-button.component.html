@@ -1,0 +1,16 @@
+<ng-template #button>
+    <button
+        [language]="languageMap[addUpdateCartButtonState]"
+        [disabled]="disableAddCart"
+        (click)="onAddToCartHandler()"
+        mat-button
+        [ngClass]="{
+            'mon-btn-success':addUpdateCartButtonState === addUpdateCartButtonStateEnum.IN_CART,
+            'mon-btn-primary':addUpdateCartButtonState !== addUpdateCartButtonStateEnum.IN_CART
+        }"
+        data-test="eb-plans__button--add-to-cart"
+    ></button>
+</ng-template>
+<a *ngIf="toolTipText; else button" [richTooltip]="toolTipText" matTooltipPosition="above" matTooltipClass="pos-above">
+    <ng-container *ngTemplateOutlet="button"> </ng-container>
+</a>

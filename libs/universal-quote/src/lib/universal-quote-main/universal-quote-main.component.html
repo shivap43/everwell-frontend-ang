@@ -1,0 +1,75 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="universal-quote-main">
+    <div class="top-header-container">
+        <div>
+            <h2 class="d-flex top-headericon-text">
+                <span>{{languageStrings['primary.portal.quickQuote.title']}}</span>
+            </h2>
+        </div>
+        <span class="mon-mb-20" *ngIf="isSendQuoteSuccessful">
+            <mon-alert alertType="success" closeButton="true" autoClose="true" autoCloseAfter="5000">
+                <span>{{languageStrings["primary.portal.shoppingCart.quoteSent"]}}</span>
+            </mon-alert>
+        </span>
+        <span class="mon-mb-10 btn-header">
+            <a
+                *configEnabled="configName.AFLAC_QUOTE_RATE_SHEET_ENABLED"
+                href="javascript:void(0)"
+                [richTooltip]="rateSheetPlanSelections.length ? '' : buttonDisabledTooltipValue"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+            >
+                <button
+                    class="mon-btn-secondary mon-mr-20"
+                    mat-button
+                    [disabled]="!rateSheetPlanSelections.length"
+                    (click)="downloadRateSheet()"
+                >
+                    <span>{{languageStrings['primary.portal.quickQuote.viewRateSheet']}}</span>
+                </button>
+            </a>
+            <a
+                href="javascript:void(0)"
+                richTooltip="{{buttonDisabledTooltipValue}}"
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+                *ngIf="!quotePlanSelections.length"
+            >
+                <button class="mon-btn-primary" mat-button [disabled]="!quotePlanSelections.length">
+                    <span>{{languageStrings['primary.portal.quickQuote.generate']}}</span>
+                </button>
+            </a>
+            <button class="mon-btn-primary" mat-button *ngIf="quotePlanSelections.length" (click)="createQuote()">
+                <span>{{languageStrings['primary.portal.quickQuote.generate']}}</span>
+            </button>
+        </span>
+    </div>
+
+    <div class="quote-settings">
+        <empowered-quote-level-setting (settingChanged)="quoteLevelSettingChanged($event)"> </empowered-quote-level-setting>
+
+        <div class="stepperTrigger">
+            <button mat-flat-button class="mon-btn-link" id="stepperTrigger" (click)="display = !display">
+                <span class="selected-step-index"></span>
+                <span class="selected-tab-label"></span>
+                <mon-icon class="icon-right" iconName="down" [iconSize]="20"></mon-icon>
+            </button>
+        </div>
+        <div class="steps-cont">
+            <div class="flex-container">
+                <div class="stepper-sidenav" app-Overlaystepper="stepperTrigger" stepperId="universalQuote" [ngClass]="{'shown': !display}">
+                    <div class="flex-grow-one specifc-payroll">
+                        <empowered-quick-quote-products
+                            id="universalQuote"
+                            [quickQuotePlans]="quickQuotePlans"
+                        ></empowered-quick-quote-products>
+                    </div>
+                </div>
+
+                <div class="plan-details-coloumn flex-grow-two">
+                    <empowered-quick-quote-plans [quickQuotePlans]="quickQuotePlans"></empowered-quick-quote-plans>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+@import "shared";
+
+:host {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.selected-account {
+    height: auto !important;
+
+    ::ng-deep {
+        .mat-option-text {
+            height: auto !important;
+            line-height: normal !important;
+            padding: map-get($spacers, 5) map-get($spacers, 0) !important;
+        }
+
+        .account-description {
+            font-size: convert-unit(14px, "rem");
+            color: get("color.gray.700");
+            margin: map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+        }
+    }
+}

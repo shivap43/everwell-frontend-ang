@@ -1,0 +1,200 @@
+<div [hidden]="resourceList.length === 0">
+    <div>
+        <h2 language="primary.portal.resources.companyLibrary"></h2>
+        <p *ngIf="isMember" language="primary.portal.resources.companyLibrary.mmp.infoParagraph"></p>
+        <p *ngIf="!isMember">
+            <span language="primary.portal.resources.mpp.infoParagraph"></span>
+        </p>
+    </div>
+    <br />
+    <div class="search-filter-wraper">
+        <div [formGroup]="form">
+            <div class="search-wrapper">
+                <mat-label class="mat-label" language="primary.portal.common.search"></mat-label>
+                <mat-form-field>
+                    <input
+                        (keyup)="applySearchFilter($event)"
+                        class="mon-input"
+                        matInput
+                        type="text"
+                        formControlName="searchInput"
+                        [formControl]="searchControl"
+                    />
+                    <mat-hint language="primary.portal.resources.resourceTitleHint"></mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="filter-wrapper">
+            <mat-label class="mat-label mon-label" language="primary.portal.resources.filters"></mat-label>
+            <div class="filter-sub-wrapper">
+                <!-- Company Library Filter -->
+                <empowered-pill-filter-group
+                    [filterModels$]="companyLibraryFilterModels$"
+                    (filterChange)="applyPillFilters($event)"
+                    (filterOpen)="pillFilterOpen($event)"
+                ></empowered-pill-filter-group>
+            </div>
+        </div>
+        <ng-container *hasPermission="'core.account.create.resource'">
+            <button
+                *ngIf="!isMember && !isPrivacyOnForEnroller"
+                mat-raised-button
+                (click)="addResource()"
+                class="mon-btn-secondary"
+                language="primary.portal.resources.addResource"
+            ></button>
+        </ng-container>
+    </div>
+    <div class="table-mask-wrapper" [ngClass]="{'grid-overlay' : filterOpen}">
+        <div class="mon-table-wraper">
+            <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
+                <!-- Resource title -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                        <span language="primary.portal.resources.resourceTitle"></span>
+                    </th>
+                    <td
+                        mat-cell
+                        *matCellDef="let resource"
+                        [ngClass]="{'sorted-column': activeCol === 'resourceTitle'}"
+                        [ngStyle]="isCurrentlyEffective(resource) && {'font-family':'Roboto'}"
+                    >
+                        <span>
+                            <a href="javascript:void(0)" (click)="viewDocument(resource)">{{resource.name}} </a>
+                        </span>
+                        <!-- TODO :: add condition to check if effective starting is future date then show this otherwise show only hidden. -->
+                        <span *ngIf="isCurrentlyEffective(resource) && isFutureEffective(resource) && !isMember">
+                            {{ "primary.portal.resources.hiddenUntil" | replaceTag: { "#effectivestarting":
+                            resource.visibilityValidity.effectiveStarting } }}
+                        </span>
+
+                        <span
+                            *ngIf="isCurrentlyEffective(resource) && !isFutureEffective(resource) && !isMember"
+                            language="primary.portal.resources.hidden"
+                        ></span>
+                        <span *ngIf="!isCurrentlyEffective(resource)" richTooltip="{{resource.description}}" matTooltipClass="pos-below">
+                            <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary"></mon-icon>
+                        </span>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- File type -->
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [hidden]="isMember" [disabled]="threshold">
+                        <span language="primary.portal.resources.type"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let resource" [hidden]="isMember" [ngClass]="{'sorted-column': activeCol === 'type'}">
+                        {{resource.resourceType}}
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- Category -->
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                        <span language="primary.portal.resources.category"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let resource" [ngClass]="{'sorted-column': activeCol === 'category'}">
+                        {{resource.category}}
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- Manage -->
+                <ng-container matColumnDef="manage">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <span language="primary.portal.resources.manage"></span>
+                    </th>
+                    <td mat-cell *matCellDef="let resource" [ngClass]="{'sorted-column': activeCol === 'view'}">
+                        <ng-container *hasAnyPermission="['core.account.update.resource','core.account.delete.resource']">
+                            <span *ngIf="!isMember">
+                                <button mat-icon-button [matMenuTriggerFor]="beforeMenu">
+                                    <mon-icon iconName="ellipsis" class="more-option icon-primary" [iconSize]="20"> </mon-icon>
+                                </button>
+                                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                    <button
+                                        mat-menu-item
+                                        mat-row
+                                        (click)="onEdit(resource)"
+                                        *hasPermission="'core.account.update.resource'"
+                                    >
+                                        {{manageOptions[0]}}
+                                    </button>
+                                    <button
+                                        class="text-danger"
+                                        mat-menu-item
+                                        mat-row
+                                        (click)="onRemove(resource)"
+                                        *hasPermission="'core.account.delete.resource'"
+                                    >
+                                        {{manageOptions[1]}}
+                                    </button>
+                                </mat-menu>
+                            </span>
+                        </ng-container>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- No Result Found -->
+                <ng-container matColumnDef="noResults">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                        <span language="primary.portal.resources.resultNotFound"></span>
+                        {{searchTerm && searchTerm.length >= 3 ? searchTerm: dispError}}
+                    </th>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                    mat-row
+                    *matRowDef="let row; columns: displayedColumns;"
+                    [ngStyle]="isCurrentlyEffective(row) && {'opacity': '0.5'}"
+                ></tr>
+                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource.data.length != 0 && dataLoaded"></tr>
+            </table>
+        </div>
+        <div
+            class="paginator-wrapper"
+            [hidden]="dataSource.data.length == 0"
+            [ngClass]="{'range-actions-hide': dataSource.paginator.getNumberOfPages() == 1}"
+        >
+            <mat-paginator [pageSizeOptions]="pageSizeOption" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                <span language="primary.portal.common.page"></span>
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ dataSource.paginator.getNumberOfPages() }}"
+                />
+                <span>
+                    {{ "primary.portal.resources.numberOfPages" | replaceTag: { "#numberofpages": dataSource.paginator.getNumberOfPages() }
+                    }}
+                </span>
+            </mat-form-field>
+        </div>
+    </div>
+</div>
+
+<div [hidden]="resourceList.length !== 0">
+    <h2 language="primary.portal.resources.companyLibrary"></h2>
+    <p *ngIf="isMember">
+        <span language="primary.portal.resources.companyLibrary.mmp.zeroStateInfoParagraph"></span>
+    </p>
+    <p *ngIf="!isMember">
+        <span language="primary.portal.resources.mpp.zeroStateInfoParagraph"></span>
+    </p>
+    <ng-container *hasPermission="'core.account.create.resource'">
+        <button
+            language="primary.portal.resources.addResource"
+            *ngIf="!isMember && !isPrivacyOnForEnroller"
+            mat-raised-button
+            (click)="addResource()"
+            class="mon-btn-primary mon-mt-20"
+        ></button>
+    </ng-container>
+</div>

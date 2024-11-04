@@ -1,0 +1,26 @@
+<div [formGroup]="form" class="d-flex age-select-wrapper">
+    <div class="age-select">
+        <mat-label>
+            <span language="primary.portal.rateSheets.planSeriesSettings.ages.min"></span>
+        </mat-label>
+        <mat-form-field>
+            <mat-select ngDefaultControl formControlName="minAge">
+                <mat-option *ngFor="let option of ageOptions$ | async" [value]="option"> {{ option }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <div class="age-select">
+        <mat-label>
+            <span language="primary.portal.rateSheets.planSeriesSettings.ages.max"></span>
+        </mat-label>
+        <mat-form-field>
+            <mat-select ngDefaultControl formControlName="maxAge"
+                ><mat-option *ngFor="let option of ageOptions$ | async" [value]="option"> {{ option }}</mat-option></mat-select
+            >
+            <mat-error *ngIf="form.controls.maxAge.errors?.invalid">
+                <span language="primary.portal.rateSheets.planSeriesSettings.ages.max.invalid"></span>
+            </mat-error>
+        </mat-form-field>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="welcome-tab-wrapper" *ngIf="scenarioObject?.title !==''">
+    <div class="wizard-content">
+        <h2>{{scenarioObject?.title}}</h2>
+
+        <span *ngIf="!(isQleShop || isOeShop || isNewPYQleShop)">{{scenarioObject?.description}}</span>
+
+        <div *ngIf="isQleShop">
+            <p>{{languageStrings["primary.portal.members.welcome.dualPlanYear.lifeEventContent.eventQualifies" ]}}</p>
+            <ul>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.lifeEventContent.updateCurrentCoverage"] | replaceTag :
+                    {"##plandateqle##": this.qlePlanDate} }}
+                </li>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.lifeEventContent.nextYearCoverage"] | replaceTag :
+                    {"##plandateoe##": this.oePlanDate} }}
+                </li>
+            </ul>
+            <p>{{languageStrings['primary.portal.members.welcome.dualPlanYear.lifeEventContent.needHelp']}}</p>
+        </div>
+
+        <div *ngIf="isOeShop">
+            <p>{{languageStrings['primary.portal.members.welcome.dualPlanYear.openEnrollmentContent.shopForNextYear']}}</p>
+            <ul>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.openEnrollmentContent.updateCurrentCoverage"] |
+                    replaceTag : {"##plandateqle##": this.qlePlanDate } }}
+                </li>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.openEnrollmentContent.nextYearCoverage"] | replaceTag :
+                    {"##plandateoe##": this.oePlanDate} }}
+                </li>
+            </ul>
+            <p>{{languageStrings['primary.portal.members.welcome.dualPlanYear.openEnrollmentContent.needHelp']}}</p>
+        </div>
+
+        <div *ngIf="isNewPYQleShop">
+            <p>{{languageStrings["primary.portal.members.welcome.dualPlanYear.newPlanYear.openEnrollment"] }}</p>
+            <ul>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.newPlanYear.updateCurrentCoverage.current"] | replaceTag
+                    : {"##plandateqle##": this.qlePlanDate} }}
+                </li>
+                <li>
+                    {{languageStrings["primary.portal.members.welcome.dualPlanYear.newPlanYear.nextYearCoverage.future"] | replaceTag :
+                    {"##plandateqle##": this.qlePlanDate} }}
+                </li>
+            </ul>
+            <p>{{languageStrings['primary.portal.members.welcome.dualPlanYear.newPlanYear.needHelp']}}</p>
+        </div>
+    </div>
+    <div class="wizard-footer">
+        <button class="mon-btn-primary" *ngIf="scenarioObject" mat-flat-button (click)="goToNextTab()">
+            {{scenarioObject?.buttonTitle}}
+            <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+        </button>
+    </div>
+</div>

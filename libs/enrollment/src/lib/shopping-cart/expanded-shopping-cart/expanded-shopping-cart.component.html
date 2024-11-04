@@ -1,0 +1,273 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+
+<div class="shopping-cart-container">
+    <div class="header-wrapper">
+        <div class="header">
+            <h1 class="left-wrapper">
+                {{languageStrings['primary.portal.shoppingCart.cart']}}
+                <span class="cart-count"> ({{cartCount}}) </span>
+            </h1>
+            <div class="right-wrapper" *ngIf="!apiErrorMessage">
+                <div
+                    *ngIf="isPayroll && productOfferingsInCart.length && !isMember && accountInfo.partnerId === AFLAC_PARTNER_ID && carrierEligibility"
+                >
+                    <a (click)="onEmailQuote()" *hasPermission="'core.shoppingCart.create.quote'">
+                        <span class="text-primary">
+                            <mon-icon class="icon-primary" [iconSize]="20" iconName="share"></mon-icon
+                            >{{languageStrings['primary.portal.quickQuote.generate']}}</span
+                        >
+                    </a>
+                </div>
+                <div *ngIf="isDirect && productOfferingsInCart.length && !isMember">
+                    <a (click)="onEmailQuote()" *hasPermission="'core.shoppingCart.create.quote'">
+                        <span class="text-primary">
+                            <mon-icon class="icon-primary" [iconSize]="20" iconName="share"></mon-icon
+                            >{{languageStrings['primary.portal.quickQuote.generate']}}</span
+                        >
+                    </a>
+                </div>
+                <div class="payment-section" *ngIf="!emptyCart() && !isMember">
+                    <mat-form-field *ngIf="payFrequencies" [formGroup]="payFrequencyForm">
+                        <mat-select
+                            placeholder="select"
+                            formControlName="payFrequencyControl"
+                            (selectionChange)="calculateCostOnFrequency($event)"
+                            disableOptionCentering="true"
+                            panelClass="pay-frequency-select"
+                        >
+                            <mat-option *ngFor="let pf of payFrequencies" [value]="pf.name">{{pf.name}} </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-label class="mat-label" language="primary.portal.shoppingCart.payFrequency"> </mat-label>
+                </div>
+            </div>
+        </div>
+
+        <mon-alert alertType="info" *ngIf="apiErrorMessage">
+            <span>{{apiErrorMessage}}</span>
+        </mon-alert>
+        <button
+            mat-flat-button
+            class="mon-btn-primary apply-benefits"
+            (click)="checkMemberConsent()"
+            [disabled]="locked || cartCount === 0 || (isProducer && !isMember) || !activeEmployee"
+        >
+            {{languageStrings['primary.portal.shoppingCart.enroll']}}
+        </button>
+    </div>
+
+    <div *ngIf="emptyCart() || cartFlag" class="empty-cart-wrapper">
+        <div class="expanded-body-empty">
+            <p>{{languageStrings['primary.portal.shoppingCart.emptyCart']}}</p>
+        </div>
+        <div class="empty-cart-section" *ngIf=" productOfferingsDeclined.length">
+            <p class="d-inline-block" language="primary.portal.shoppingCart.declinedProducts"></p>
+            <div *ngIf="!isMember" class="declined-plans-list">
+                <div *ngFor="let decline of declinedProductName; let i = index" class="d-inline-block">
+                    <a class="cursor-pointer declined-products-name" (click)="navigateDeclineProduct(decline.productOfferingId)"
+                        >{{decline.productName}}</a
+                    >
+                    <span class="declined-products-comma" *ngIf="i !== declinedProductName.length - 1">,</span>
+                </div>
+            </div>
+            <div *ngIf="isMember" class="declined-plans-list">
+                <div *ngFor="let prod of declinedProducts; let i = index" class="d-inline-block">
+                    <a *ngIf="i < declinedProducts.length - 1" class="cursor-pointer declined-products-name" (click)="editPlan(prod)"
+                        >{{prod.productName}},&nbsp;</a
+                    >
+                    <a *ngIf="i == declinedProducts.length - 1" class="cursor-pointer declined-products-name" (click)="editPlan(prod)"
+                        >{{prod.productName}}</a
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="cart-body-wrapper">
+        <div class="cart-body" *ngIf="!emptyCart() && !apiErrorMessage">
+            <ul class="cart-details-section">
+                <div class="mon-mb-20">
+                    <mon-alert alertType="success" *ngIf="emailSent" closeButton="true" autoClose="true" autoCloseAfter="5000">
+                        <span language="primary.portal.shoppingCart.quoteSent"></span>
+                    </mon-alert>
+                </div>
+                <!-- hiding code until api is implemented -->
+                <!-- <mon-alert alertType="danger" *ngIf="priceChanged && isMember">
+                    <span language="primary.portal.shoppingCart.priceChanged"></span>
+                </mon-alert>
+                <mon-alert alertType="warning" *ngIf="modified && isMember">
+                    <span language="primary.portal.shoppingCart.modifiedWarning"></span
+                    ><span><a language="primary.portal.members.shoppingCart.dismiss"></a></span>
+                </mon-alert> -->
+                <div *ngIf="cartLoop"></div>
+                <li class="product-details" *ngFor="let item of cartLoop">
+                    <div class="d-flex">
+                        <div *ngIf="isMember" class="product-thumbnail">
+                            <mon-icon [iconName]="item.productName" [fetchedIconPath]="item.productImagePath" [iconSize]="30"></mon-icon>
+                        </div>
+                        <div class="product-list" *ngIf="item.productOfferingId">
+                            <a class="cart-product-name cursor-pointer" (click)="editPlan(item)" [innerHTML]="item.planName"></a>
+                            <!-- hiding code until api is implemented -->
+                            <!-- <p *ngIf="isMember && item.recentChange" class="recent-price-change">
+                                {{ "primary.portal.members.shoppingCart.recentChange" | replaceTag: { "#previouscost":
+                                this.item.recentChange.previousCost, "#itemcost": this.item.cost, "#changedate":
+                                this.item.recentChange.changeDate } }}
+                            </p>
+                            <p
+                                class="modified-price"
+                                *ngIf="isMember && modified"
+                                language="primary.portal.members.shoppingCart.modifiedDate"
+                            ></p> -->
+                            <p *ngIf="item.coverageLevelName">
+                                {{ "primary.portal.members.shoppingCart.coverageLevelName" | replaceTag: { "#coveragelevelname":
+                                item.coverageLevelName | coverageName } }}
+                            </p>
+                            <div *ngIf="item.riderName">
+                                <p *ngFor="let rider of item.riderName; let i=index">
+                                    {{rider}}
+                                    <span *ngIf="item.riders[i].benefitAmount"
+                                        >: {{item.riders[i].benefitAmount | currency : 'USD' : 'symbol' : '1.0'}}</span
+                                    >
+                                </p>
+                            </div>
+                            <div *ngIf="item.flexDollars?.length">
+                                <p *ngFor="let flexDollar of item.flexDollars">
+                                    {{"primary.portal.shoppingCart.flexDiscountAmount" | replaceTag:{ "##name##":
+                                    flexDollar.flexDollarOrIncentiveName , "##amount##": (flexDollar.flexDollarOrIncentiveAmount |
+                                    payrollFrequencyCalculator: pfPipeObj | currency) } }}
+                                </p>
+                            </div>
+                            <div *ngIf="item.carrierId === aflacGroupId && item.memberCost !== item.totalCost">
+                                <p>
+                                    {{languageStrings['primary.portal.shoppingExperience.benefitDollars']}} {{item.memberCost -
+                                    item.totalCost | currency}}
+                                </p>
+                            </div>
+                            <!-- Coverage date not in bold  -->
+                            <div *ngIf="!isCoverageBoldConfigEnabled">
+                                <p *ngIf="item.coverageDateEnds">
+                                    {{ "primary.portal.members.shoppingCart.coverageEndStart" | replaceTag: { "#coveragedatestarts":
+                                    this.item.coverageDateStarts| date:dateFormat, "#coveragedateends": this.item.coverageDateEnds|
+                                    date:dateFormat} }}
+                                </p>
+                                <p *ngIf="!item.coverageDateEnds">
+                                    {{ "primary.portal.members.shoppingCart.coverageStart" | replaceTag: { "#coveragedatestarts":
+                                    item.coverageDateStarts| date:dateFormat} }}
+                                </p>
+                            </div>
+
+                            <p *ngIf="item.benefitAmount">
+                                {{ "primary.portal.members.shoppingCart.benefitAmount" | replaceTag: { "#benefitamount": item.benefitAmount
+                                | currency : 'USD' : 'symbol' : '1.0'} }}
+                            </p>
+
+                            <!-- Coverage Date in bold  -->
+                            <div *ngIf="isCoverageBoldConfigEnabled">
+                                <p *ngIf="item.coverageDateEnds" class="coverageDate">
+                                    <span>{{languageStrings['primary.portal.members.shoppingCart.coveragePeriod']}}</span>
+                                    {{ this.item.coverageDateStarts | date:dateFormat }} &ndash; {{ this.item.coverageDateEnds |
+                                    date:dateFormat }}
+                                </p>
+                                <p *ngIf="!item.coverageDateEnds" class="coverageDate">
+                                    <span>{{languageStrings['primary.portal.members.shoppingCart.coverageStarts']}}</span>
+                                    {{ item.coverageDateStarts | date:dateFormat }}
+                                </p>
+                            </div>
+
+                            <a
+                                class="remove-btn cursor-pointer"
+                                (click)="removePlan(item.id, item.planName, item.planOfferingId, item.productOfferingId)"
+                                *ngIf="!item.companyProvidedPlan && !locked"
+                                >{{languageStrings['primary.portal.common.remove']}}</a
+                            >
+                            <a
+                                class="remove-btn"
+                                [ngClass]="{'disabled-button-remove': locked}"
+                                *ngIf="!item.companyProvidedPlan && locked"
+                                [richTooltip]="languageStrings['primary.portal.producerShopPage.toolTipText.anotherUserIsUpdatingCart']"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                >{{languageStrings['primary.portal.common.remove']}}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="price-listing" *ngIf="item.productOfferingId">
+                        <p class="cost">
+                            {{(item.memberCost > 0 ? item.memberCost : 0) | payrollFrequencyCalculator: pfPipeObj | currency}}
+                        </p>
+                        <p class="tax-status-text"><span>{{item.taxStatus}}</span></p>
+                    </div>
+                </li>
+            </ul>
+            <div class="empty-cart-section" *ngIf="productOfferingsDeclined.length">
+                <p language="primary.portal.shoppingCart.declinedProducts" *ngIf="productOfferingsDeclined.length"></p>
+                <div *ngIf="isMember" class="declined-plans-list">
+                    <p *ngFor="let prod of declinedProducts; let i = index">
+                        <a *ngIf="i < declinedProducts.length - 1" class="cursor-pointer" (click)="editPlan(prod)"
+                            >{{prod.productName}},&nbsp;</a
+                        >
+                        <a *ngIf="i == declinedProducts.length - 1" class="cursor-pointer" (click)="editPlan(prod)">{{prod.productName}}</a>
+                    </p>
+                </div>
+                <div *ngIf="!isMember">
+                    <div *ngFor="let decline of declinedProductName; let i = index">
+                        <a class="cursor-pointer declined-products-name" (click)="navigateDeclineProduct(decline.productOfferingId)"
+                            >{{decline.productName}}</a
+                        >
+                        <span class="declined-products-comma" *ngIf="i !== declinedProductName.length - 1">,</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div>
+                <div *ngIf="!emptyCart && sum" class="employer-contribution">
+                    <p language="primary.portal.expandedShoppingCart.employerContribution"></p>
+                    <p><span>&mdash;</span>{{sum | currency}}</p>
+                </div>
+
+                <div class="cart-total-section">
+                    <div>
+                        <h2>
+                            {{languageStrings['primary.portal.shoppingCart.cartTotal']}}
+                            <sup *ngIf="isNotCompanyProvided">*</sup>
+                        </h2>
+                        <div *ngIf="isCostAndCurrentCoverage">
+                            <a *ngIf="existingCoverageAmount" (click)="viewTotalCost()"
+                                >{{isMember ? languageStrings['primary.portal.shoppingCart.viewTotalCost'] :
+                                languageStrings['primary.portal.shoppingCart.showCostCoverage'] }}</a
+                            >
+                        </div>
+                        <p
+                            *ngIf="productOfferingsInCart.length && isNotCompanyProvided"
+                            language="primary.portal.shoppingCart.notEmptyMessage"
+                            class="empty-cart-message"
+                        ></p>
+                    </div>
+                    <div class="expanded-text">
+                        <p class="cost" *ngIf="productOfferingsInCart.length && payFrequencyLoaded">
+                            {{(totalCost > -totalFlexCost ? ((totalCost + totalFlexCost) | payrollFrequencyCalculator: pfPipeObj) : 0) |
+                            currency}}
+                        </p>
+                        <p class="cost" *ngIf="!productOfferingsInCart.length">{{emptyCartCost | currency}}</p>
+                        <p class="short-term">{{pfPipeObj.pfType}}</p>
+                    </div>
+                </div>
+            </div>
+            <button
+                mat-flat-button
+                class="mon-btn-primary apply-benefits"
+                (click)="checkMemberConsent()"
+                [disabled]="locked || cartCount === 0 || (isProducer && !isMember) || !activeEmployee"
+            >
+                {{languageStrings['primary.portal.shoppingCart.enroll']}}
+            </button>
+            <div class="d-flex justify-content-end">
+                <p *ngIf="daysFlag && daysLeft > 0 && isApproved">
+                    {{ "primary.portal.shoppingCart.daysLeftEnrollment" | replaceTag: { "#daysleft": this.daysLeft, "#day": this.day } }}
+                </p>
+            </div>
+        </div>
+    </div>
+    <input #aflac_eic_prefs type="hidden" id="aflac_eic_prefs" name="aflac_eic_prefs" aria-hidden="true" />
+    <input #userPrefs type="hidden" id="user_prefs2" name="user_prefs2" aria-hidden="true" />
+</div>

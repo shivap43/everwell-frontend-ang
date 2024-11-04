@@ -1,0 +1,44 @@
+<mat-form-field class="empowered-chip-list" [ngClass]="{'invalid': invalidState$ | async}" (focus)="onFocus()" (blur)="onBlur()">
+    <mat-chip-list #chipList2>
+        <mat-chip
+            *ngFor="let data of selectedChips"
+            [disabled]="disableChip"
+            [selectable]="selectable"
+            [removable]="!data.required"
+            (removed)="remove(data.value)"
+        >
+            {{data.name}}
+            <mat-icon matChipRemove svgIcon="close" *ngIf="!data.required"></mat-icon>
+        </mat-chip>
+        <input
+            #input
+            [matChipInputFor]="chipList2"
+            [matChipInputAddOnBlur]="addOnBlur"
+            (matChipInputTokenEnd)="add($event)"
+            [matAutocomplete]="auto"
+            [formControl]="chipControl"
+            [autocomplete]="randomId"
+            [name]="'input_name_'+randomId"
+        />
+        <button *ngIf="!disableChip" mat-button matSuffix mat-icon-button (click)="clear($event)">
+            <mat-icon svgIcon="close"></mat-icon>
+        </button>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="add($event); input.value = ''" autoActiveFirstOption>
+            <mat-option
+                *ngIf="hasSelectAll"
+                [ngClass]="isAllChipsSelected? 'selected-data' : ''"
+                (click)="selectAllChips()"
+                language="primary.portal.benefitsOffering.setting.selectAll"
+            >
+            </mat-option>
+            <mat-option
+                *ngFor="let data of filteredData"
+                [value]="data.value"
+                [disabled]="!isParentSelectable && !data.parentValue"
+                [ngClass]="{'selectable-chip': data.parentValue}"
+            >
+                {{ data.name }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-chip-list>
+</mat-form-field>

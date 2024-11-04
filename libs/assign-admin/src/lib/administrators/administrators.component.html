@@ -1,0 +1,21 @@
+<ng-container class="member-list-wrapper" *ngIf="(showEmailsAndTexts$ | async); else adminList">
+    <h1 role="heading" class="member-list-header">
+        <span>{{languageStrings["primary.portal.administrators.header"]}}</span>
+    </h1>
+    <mat-tab-group>
+        <mat-tab [label]="languageStrings['primary.portal.administrators.tab.title.administratorList']">
+            <ng-template matTabContent>
+                <empowered-display-admin-list [tabView]="true"></empowered-display-admin-list>
+            </ng-template>
+        </mat-tab>
+        <mat-tab [label]="languageStrings['primary.portal.emailTracking.emailTextAudit']">
+            <ng-template matTabContent>
+                <empowered-email-tracking></empowered-email-tracking>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</ng-container>
+
+<ng-template #adminList>
+    <empowered-display-admin-list [tabView]="false"></empowered-display-admin-list>
+</ng-template>

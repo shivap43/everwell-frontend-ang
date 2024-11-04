@@ -1,0 +1,161 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="Enrollmentform">
+    <div *ngIf="!isLoading" class="quasi-modal content-scroll">
+        <div class="dialog-content">
+            <mat-dialog-content>
+                <div class="stepper-content">
+                    <div class="content-wrapper">
+                        <mon-alert *ngIf="errorFlag" alertType="danger">
+                            <span>{{errMsg}}</span>
+                        </mon-alert>
+                        <h2>{{this.enrollment.plan.product.name}}</h2>
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.accountPendingEnrollments.confirmEnrollment']}}</mat-label
+                        >
+                        <div class="gray-toggle-background">
+                            <mat-button-toggle-group (click)="onClickAproveOrDeny()" formControlName="enrollmentStatus">
+                                <mat-button-toggle class="mon-px-20 toggle-button-approve" value="APPROVED">
+                                    <mon-icon iconName="check" iconSize="10" class="icon-white"> </mon-icon>
+                                    Approve
+                                </mat-button-toggle>
+                                <mat-button-toggle class="mon-px-20 toggle-button-deny" value="DENIED">
+                                    <mon-icon iconName="close" iconSize="10" class="icon-white"> </mon-icon>
+                                    Deny
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </div>
+                        <div class="d-flex mon-mt-20 w-200 align-items-center">
+                            <div>
+                                <mat-label class="mat-label">
+                                    {{languageStrings['primary.portal.accountPendingEnrollments.effectiveDate']}}
+                                </mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="pendingEnrollPicker"
+                                        matInput
+                                        [min]="today"
+                                        [max]="maxDate"
+                                        maxlength="maxDateValue"
+                                        formControlName="effectiveDate"
+                                        [attr.aria-label]="languageStrings['primary.portal.accountPendingEnrollments.effectiveDate']"
+                                    />
+                                    <mat-datepicker #pendingEnrollPicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="pendingEnrollPicker.open() ">
+                                        <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon>
+                                        </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-error
+                                        *ngIf="Enrollmentform.controls['effectiveDate'].errors?.invalidDate || Enrollmentform.controls['effectiveDate'].errors?.matDatepickerMax || Enrollmentform.controls['effectiveDate'].errors?.matDatepickerMin"
+                                        >{{languageStrings['primary.portal.accountPendingEnrollment.effectiveEndDate']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="mon-mt-20" *ngFor="let eachDataSource of this.dataSource">
+                            <mat-accordion class="accordion-default">
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                                        <mon-icon
+                                            iconSize="10"
+                                            iconName="Caret-down"
+                                            class="accordion-indicator icon-black"
+                                        >
+                                        </mon-icon>
+                                        <mat-panel-title>
+                                            {{eachDataSource.member.memberName}} | {{eachDataSource.member.type}}
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div>
+                                        <table mat-table [dataSource]="eachDataSource.data">
+                                            <!-- Plan Column -->
+                                            <ng-container matColumnDef="plan">
+                                                <th mat-header-cell *matHeaderCellDef>
+                                                    {{languageStrings['primary.portal.accountPendingEnrollments.applyThisDate']}}
+                                                </th>
+                                                <td mat-cell *matCellDef="let element">
+                                                    <span *ngIf="element.Plan==='true'">
+                                                        {{languageStrings['primary.portal.accountPendingEnrollments.pending']}}
+                                                    </span>
+                                                    <span *ngIf="element.Plan==='false'">
+                                                        {{languageStrings['primary.portal.accountPendingEnrollments.current']}}
+                                                    </span>
+                                                    <p>{{element.PlanName}}</p>
+                                                </td>
+                                            </ng-container>
+
+                                            <!-- Initiial start date -->
+                                            <ng-container matColumnDef="initialStartDate">
+                                                <th mat-header-cell *matHeaderCellDef>
+                                                    {{languageStrings['primary.portal.accountPendingEnrollments.initialStartDate']}}
+                                                </th>
+                                                <td mat-cell *matCellDef="let element">{{element.PlanStartDate}}</td>
+                                            </ng-container>
+
+                                            <!-- Change Effective -->
+                                            <ng-container matColumnDef="changeEffective">
+                                                <th mat-header-cell *matHeaderCellDef>
+                                                    {{languageStrings['primary.portal.accountPendingEnrollments.changeEffective']}}
+                                                </th>
+                                                <td mat-cell *matCellDef="let element">
+                                                    {{element.PlanEffectiveDate}}
+                                                </td>
+                                            </ng-container>
+
+                                            <!-- Coverage end-->
+                                            <ng-container matColumnDef="coverageEnd">
+                                                <th mat-header-cell *matHeaderCellDef>
+                                                    {{languageStrings['primary.portal.accountPendingEnrollments.coverageEnd']}}
+                                                </th>
+                                                <td mat-cell *matCellDef="let element">{{element.PlanEndDate}}</td>
+                                            </ng-container>
+
+                                            <!-- Coverage amount-->
+                                            <ng-container matColumnDef="coverageAmount">
+                                                <th mat-header-cell *matHeaderCellDef>
+                                                    {{languageStrings['primary.portal.accountPendingEnrollments.coverageAmount']}}
+                                                </th>
+                                                <td mat-cell *matCellDef="let element">{{element.PlanCost}}</td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                        </table>
+                                    </div>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                    </div>
+                    <mat-dialog-actions class="dialog-footer">
+                        <div>
+                            <a href="javascript:void(0)" class="mon-btn-link" mat-flat-button (click)="onBack()">
+                                {{languageStrings['primary.portal.common.back']}}
+                            </a>
+                        </div>
+
+                        <div>
+                            <button
+                                class="mon-btn-secondary"
+                                mat-flat-button
+                                type="submit"
+                                (click)="onSave()"
+                                language=""
+                            >
+                                {{languageStrings['primary.portal.accountPendingEnrollments.saveAndClose']}}
+                            </button>
+                            <button
+                                *ngIf="this.enableNext"
+                                class="mon-btn-primary mon-ml-10"
+                                mat-flat-button
+                                type="button"
+                                (click)="onNext()"
+                            >
+                                {{languageStrings['primary.portal.common.next']}}
+                            </button>
+                        </div>
+                    </mat-dialog-actions>
+                </div>
+            </mat-dialog-content>
+        </div>
+    </div>
+</form>

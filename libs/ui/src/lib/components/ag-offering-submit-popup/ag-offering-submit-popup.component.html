@@ -1,0 +1,26 @@
+<empowered-modal type="POPUP" [showCancel]="false">
+    <empowered-modal-header>
+        <ng-container *ngIf="!data.isSharedAccount && isAdminApprovalRequired">
+            <span>{{languageStrings['primary.portal.reviewSubmit.submitToHR.title']}}</span>
+        </ng-container>
+        <ng-container *ngIf="data.isSharedAccount && isAdminApprovalRequired">
+            <span>{{languageStrings['primary.portal.reviewSubmit.submitToHQ.title']}}</span>
+        </ng-container>
+        <ng-container *ngIf="!data.isSharedAccount && !data.isAdminApprovalRequired">
+            <span>{{languageStrings['primary.portal.reviewSubmit.hQVas.adminAdded.message']}}</span>
+        </ng-container>
+    </empowered-modal-header>
+    <div *ngIf="isAdminApprovalRequired">
+        <ng-container *ngIf="!data.isSharedAccount"> {{languageStrings['primary.portal.reviewSubmit.submitToHR.subTitle']}} </ng-container>
+        <ng-container *ngIf="data.isSharedAccount && data.isAutoApproved">
+            {{languageStrings['primary.portal.reviewSubmit.submitToHQ.subTitle']}}
+        </ng-container>
+        <ng-container *ngIf="data.isSharedAccount && !data.isAutoApproved">
+            <p>{{languageStrings['primary.portal.reviewSubmit.submitToHQ.subTitle']}}</p>
+            <p>{{languageStrings["primary.portal.reviewSubmit.submitToAdmin.subTitle"]}}</p>
+        </ng-container>
+    </div>
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" mat-button [mat-dialog-close]="true">{{languageStrings['primary.portal.common.gotIt']}}</button>
+    </empowered-modal-footer>
+</empowered-modal>

@@ -1,0 +1,161 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancelClick()" [attr.aria-label]="languageStrings.ariaClose">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <form (ngSubmit)="onAddClass(data.title, classPopUpForm.value, classPopUpForm.valid)" [formGroup]="classPopUpForm">
+        <div mat-dialog-content formGroupName="classData" class="flex-form-wrapper">
+            <h1 mat-dialog-title>{{data.title}}</h1>
+            <div class="d-md-flex">
+                <ng-container *ngIf="hideFieldElementSetting.id">
+                    <div class="flex-item w-100">
+                        <mat-label class="mat-label" id="class-type">
+                            <span language="primary.portal.members.workLabel.className"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('id'))"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                aria-labelledby="class-type"
+                                formControlName="id"
+                                [(ngModel)]="selectedType"
+                                [disabled]="readOnlyFieldElementSetting.id"
+                                [placeholder]="languageStrings.select"
+                            >
+                                <mat-option value="" language="primary.portal.common.select"></mat-option>
+                                <mat-option
+                                    *ngFor="let className of data.classNames"
+                                    value="{{ className.id }}"
+                                    title="{{ className.name }}"
+                                    >{{ className.name }}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="classPopUpForm.get('classData').get('id').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="hideFieldElementSetting.effectiveStarting">
+                    <div class="flex-item w-175">
+                        <mat-label class="mat-label" for="start-date">
+                            <span language="primary.portal.members.workLabel.startDate"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('effectiveStarting'))"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="effectiveStarting"
+                                matInput
+                                id="start-date"
+                                [matDatepicker]="pickerStartDate"
+                                [readonly]="readOnlyFieldElementSetting.effectiveStarting"
+                                (dateInput)="validateEndDateChange('input', $event)"
+                                (dateChange)="validateEndDateChange('change', $event)"
+                                #datePickerInput
+                                (keyup)="transform($event)"
+                                attr.aria-label="{{languageStrings.startDateLabel}} {{languageStrings.optional}}"
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-datepicker-toggle matSuffix [for]="pickerStartDate">
+                                <mon-icon
+                                    matDatepickerToggleIcon
+                                    iconName="calendar-date"
+                                    (click)="pickerStartDate.open()"
+                                ></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerStartDate></mat-datepicker>
+                            <mat-error *ngIf="isDateInvalid"
+                                >{{validateDate('effectiveStarting', 'classPopUpForm',
+                                datePickerInput.value)}}</mat-error
+                            >
+                            <mat-error *ngIf="datesAreSame">
+                                <span
+                                    language="secondary.portal.members.workValidationMsg.classDate.sameStartDate"
+                                ></span
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="hideFieldElementSetting.expiresAfter">
+                    <div class="flex-item w-175">
+                        <mat-label class="mat-label" for="end-date">
+                            <span language="primary.portal.members.workLabel.endDate"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('expiresAfter'))"
+                                class="optional-text"
+                                language="primary.portal.common.ifApplicable"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="expiresAfter"
+                                matInput
+                                id="end-date"
+                                class="mon-input"
+                                [matDatepicker]="pickerEndDate"
+                                (dateInput)="validateEndDateChange('input', $event)"
+                                (dateChange)="validateEndDateChange('change', $event)"
+                                [readonly]="readOnlyFieldElementSetting.expiresAfter"
+                                #datePickerInput
+                                (keyup)="transform($event)"
+                                attr.aria-label="{{languageStrings.endDateLabel}} {{languageStrings.ifApplicable}}"
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-datepicker-toggle matSuffix [for]="pickerEndDate">
+                                <mon-icon
+                                    matDatepickerToggleIcon
+                                    iconName="calendar-date"
+                                    (click)="pickerEndDate.open()"
+                                ></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerEndDate></mat-datepicker>
+                            <mat-error *ngIf="isDateInvalid"
+                                >{{validateDate('expiresAfter', 'classPopUpForm', datePickerInput.value)}}</mat-error
+                            >
+                            <mat-error *ngIf="endDateLessThenStartDate">
+                                <span
+                                    language="secondary.portal.members.workValidationMsg.termination.cannotBeAfterStartDate"
+                                ></span>
+                            </mat-error>
+
+                            <mat-error *ngIf="datesAreSame">
+                                <span language="secondary.portal.members.workValidationMsg.classDate.sameEndDate"></span
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+            </div>
+            <mon-alert alertType="info" *ngIf="notificationOngoingOverlap">
+                {{updatedMessage}}
+            </mon-alert>
+        </div>
+        <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="onCancelClick()"
+                aria-label="Cancel adding class"
+                language="primary.portal.common.cancel"
+            ></a>
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                type="submit"
+                aria-label="Add class"
+                language="primary.portal.common.add"
+            ></button>
+        </mat-dialog-actions>
+    </form>
+</div>

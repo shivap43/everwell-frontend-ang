@@ -1,0 +1,1441 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage" class="message-block">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<mon-alert *ngIf="downloadError" alertType="danger" closeButton="true">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div [ngClass]="{'tpi-coverage-summary': isTPI}" *ngIf="!isLoading">
+    <div class="coverage-state">
+        <div class="coverage-filter" [ngClass]="{'tpi-coverage-filter': isTPI}">
+            <div *ngIf="!isTPI">
+                <h2 class="empty-state-header">
+                    <span>{{languageStrings['primary.portal.coverage.header']}}</span>
+                </h2>
+            </div>
+            <div *ngIf="enrollData.data.length">
+                <form class="coverage-utilities-wrapper" [formGroup]="dateFilterForm">
+                    <div class="coverage-utilities">
+                        <div class="filter-wrapper">
+                            <mat-label class="mat-label" *ngIf="!isMemberPortal"
+                                >{{languageStrings['primary.portal.coverage.filter']}}</mat-label
+                            >
+                            <div class="filter-sub-wrapper">
+                                <div *ngIf="!isMemberPortal">
+                                    <button [empoweredPortalTrigger]="priceDisplayFilterDropdown" class="filter-applied date-dropdown">
+                                        <span>{{languageStrings['primary.portal.coverageSummary.priceDisplay']}}</span>
+                                        <span *ngIf="selectedPriceFilter">{{selectedPriceFilter}}</span>
+                                    </button>
+                                    <empowered-drop-down-portal
+                                        #priceDisplayFilterDropdown
+                                        ariaTitle="language.spec.to.announce"
+                                        portalClass="enroll-date-filter"
+                                    >
+                                        <div class="filter-by-date">
+                                            <mat-radio-group formControlName="priceFilter" class="price-filter">
+                                                <mat-radio-button *ngFor="let filter of priceDisplayFilters" [value]="filter">
+                                                    {{filter}}
+                                                </mat-radio-button>
+                                            </mat-radio-group>
+                                        </div>
+                                        <div class="mon-clear justify-content-end">
+                                            <a href="javascript:void(0)" (click)="changePriceDisplayFilter()" class="mon-apply"
+                                                >{{languageStrings['primary.portal.coverage.apply']}}</a
+                                            >
+                                        </div>
+                                    </empowered-drop-down-portal>
+                                </div>
+                                <div>
+                                    <button
+                                        [empoweredPortalTrigger]="enrollDateFilterDropdown"
+                                        class="date-dropdown"
+                                        [ngClass]="{'filter-applied': isFilterApplied}"
+                                    >
+                                        <span *ngIf="!isMemberPortal">{{languageStrings['primary.portal.coverage.date']}}</span>
+                                        <span *ngIf="isMemberPortal"
+                                            >{{languageStrings['primary.portal.coverageSummary.filterByDate']}}</span
+                                        >
+                                        <span class="filter-label" *ngIf="selectedDateFilter">{{selectedDateFilter}}</span>
+                                    </button>
+                                    <empowered-drop-down-portal
+                                        #enrollDateFilterDropdown
+                                        [ariaTitle]="languageStrings['primary.portal.coverageSummary.viewCoverage']"
+                                        portalClass="enroll-date-filter"
+                                    >
+                                        <div class="view-coverage">{{languageStrings['primary.portal.coverageSummary.viewCoverage']}}</div>
+                                        <div class="filter-by-date">
+                                            <mat-radio-group (change)="changeDateFilter($event.value)">
+                                                <div class="specific-date-wrapper">
+                                                    <mat-radio-button value="specificDate" [checked]="isSpecificDateSelected">
+                                                        {{languageStrings['primary.portal.accountEnrollments.filterEnrollment.specificDate']}}
+                                                    </mat-radio-button>
+                                                    <div *ngIf="isSpecificDateSelected" class="specific-date">
+                                                        <mat-form-field class="mon-date-field">
+                                                            <input
+                                                                [matDatepicker]="specificDatePicker"
+                                                                formControlName="specificDate"
+                                                                matInput
+                                                                name="specificDatePicker"
+                                                                [attr.aria-label]='languageStrings["primary.portal.coverage.datePicker"]'
+                                                                (keyup)="transform($event)"
+                                                            />
+                                                            <mat-datepicker-toggle
+                                                                matSuffix
+                                                                (click)="specificDatePicker.open()"
+                                                                [for]="specificDatePicker"
+                                                            >
+                                                                <mon-icon iconName="calendar-date" iconSize="20" matDatepickerToggleIcon>
+                                                                </mon-icon>
+                                                            </mat-datepicker-toggle>
+                                                            <mat-datepicker #specificDatePicker></mat-datepicker>
+                                                            <mat-hint>{{languageStrings['primary.portal.common.dateHint']}}</mat-hint>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+                                                <div class="specific-date-wrapper">
+                                                    <mat-radio-button value="dateRange" [checked]="isDateRangeSelected">
+                                                        {{languageStrings['primary.portal.accountEnrollments.filterEnrollment.dateRange']}}
+                                                    </mat-radio-button>
+                                                    <div *ngIf="isDateRangeSelected" class="specific-date">
+                                                        <div class="date-range">
+                                                            <div class="start-date">
+                                                                <mat-label class="mat-label">
+                                                                    {{languageStrings['primary.portal.common.startDate']}}
+                                                                </mat-label>
+                                                                <mat-form-field class="mon-date-field">
+                                                                    <input
+                                                                        (dateInput)="setMinMaxDate('startDate')"
+                                                                        (keyup)="transform($event)"
+                                                                        [matDatepicker]="startDatePicker"
+                                                                        formControlName="startDate"
+                                                                        matInput
+                                                                        name="startDatePicker"
+                                                                        [max]="maxDate"
+                                                                        [attr.aria-label]='languageStrings["primary.portal.common.startDate"]'
+                                                                    />
+
+                                                                    <mat-datepicker-toggle
+                                                                        matSuffix
+                                                                        (click)="specificDatePicker.open()"
+                                                                        [for]="startDatePicker"
+                                                                    >
+                                                                        <mon-icon
+                                                                            iconName="calendar-date"
+                                                                            iconSize="20"
+                                                                            matDatepickerToggleIcon
+                                                                        >
+                                                                        </mon-icon>
+                                                                    </mat-datepicker-toggle>
+                                                                    <mat-datepicker #startDatePicker></mat-datepicker>
+                                                                    <mat-hint
+                                                                        >{{languageStrings['primary.portal.common.dateHint']}}</mat-hint
+                                                                    >
+                                                                    <mat-error
+                                                                        *ngIf="dateFilterForm.controls['startDate'].errors?.requirements"
+                                                                        >{{datePickerErrorMessage}}</mat-error
+                                                                    >
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div class="end-date">
+                                                                <mat-label class="mat-label">
+                                                                    {{languageStrings['primary.portal.pinSignature.endDate']}}
+                                                                </mat-label>
+                                                                <mat-form-field class="mon-date-field">
+                                                                    <input
+                                                                        (dateInput)="setMinMaxDate('endDate')"
+                                                                        (keyup)="transform($event)"
+                                                                        [matDatepicker]="endDatePicker"
+                                                                        formControlName="endDate"
+                                                                        matInput
+                                                                        name="endDatePicker"
+                                                                        [min]="minDate"
+                                                                        [attr.aria-label]="languageStrings['primary.portal.pinSignature.endDate']"
+                                                                    />
+
+                                                                    <mat-datepicker-toggle
+                                                                        matSuffix
+                                                                        (click)="endDatePicker.open()"
+                                                                        [for]="endDatePicker"
+                                                                    >
+                                                                        <mon-icon
+                                                                            iconName="calendar-date"
+                                                                            iconSize="20"
+                                                                            matDatepickerToggleIcon
+                                                                        >
+                                                                        </mon-icon>
+                                                                    </mat-datepicker-toggle>
+                                                                    <mat-datepicker #endDatePicker></mat-datepicker>
+                                                                    <mat-hint
+                                                                        >{{languageStrings['primary.portal.common.dateHint']}}</mat-hint
+                                                                    >
+                                                                </mat-form-field>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </mat-radio-group>
+                                        </div>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a href="javascript:void(0)" (click)="resetFilter('date')"
+                                                    >{{languageStrings['primary.portal.coverage.clear']}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a href="javascript:void(0)" (click)="applyDateRangeFilter()" class="mon-apply"
+                                                    >{{languageStrings['primary.portal.coverage.apply']}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </empowered-drop-down-portal>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <mon-alert *ngIf="((isEBSPaymentConfigEnabled) && (isEBSIndicator$ | async))" alertType="info" class="ebs-info-msg">
+            <span>
+                {{languageStrings["primary.portal.applicationFlow.ebs.infoMsg"]}}
+                <div>
+                    <a (click)="gotoAflacEBS()"
+                        >{{languageStrings["primary.portal.applicationFlow.ebs.link"]}}
+                        <mon-icon class="icon-primary" iconName="share-vector"></mon-icon>
+                    </a>
+                </div>
+            </span>
+        </mon-alert>
+        <div class="empty-state-section" *ngIf="isMemberPortal && !enrollData.data.length && zeroStateFlag">
+            <p>{{languageStrings['primary.portal.coverage.notenrolled']}}</p>
+        </div>
+        <div class="new-coverage" *ngIf="isDualPlanYear && (isQleDuringOeEnrollment || isQleAfterOeEnrollment) && isMemberPortal">
+            <div class="plan-years">
+                <div class="enrollment">
+                    <div class="name">{{qleTitle}}</div>
+                    <div class="coverage-details">{{qleDescription}}</div>
+                    <button class="mon-btn-primary" mat-flat-button (click)="updateQleCoverage()">{{qleShopUpdateButton}}</button>
+                </div>
+                <div class="enrollment">
+                    <div class="name">{{oeTitle}}</div>
+                    <div class="coverage-details">{{oeDescription}}</div>
+                    <div>
+                        <button class="mon-btn-primary" mat-flat-button (click)="shopNextPlanYearCoverage()">
+                            {{oeShopCoverageButton}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Zero state start -->
+        <ng-container *ngIf="!enrollData.data.length && zeroStateFlag">
+            <div *ngIf="isMemberPortal">
+                <div class="btn-shop" *ngIf="hasPrivilege$ | async">
+                    <button
+                        [attr.aria-label]="languageStrings['primary.portal.coverage.shop']"
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        type="submit"
+                        (click)="shopPageNavigation()"
+                        *ngIf="!contOutsideOEFlag && !qleOutsideOEFlag && !mmpInOE && !oeMmpFlag && isShopEnabled && !unpluggedFeatureFlag && !isLoading && !oeFlag && !qleFlag && !outsideOeQleFlag && !hideShopOptions && !hideShopButton && !isDualPlanYear"
+                    >
+                        <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                    </button>
+                </div>
+                <div class="zero-state-section" *ngIf="oeFlag && !isTPI && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.beneiftready']}}</h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.youhave']}} {{oeCoverageEndDate}} {{days}}
+                            {{languageStrings['primary.portal.coverage.enrollleft']}}
+                        </p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="zero-state-section" *ngIf="qleFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.specialenrollment']}}</h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.youhave']}} {{qleCoverageEndDate}} {{days}}
+                            {{languageStrings['primary.portal.coverage.makecoverage']}}
+                        </p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="zero-state-section" *ngIf="outsideOeQleFlag && continuousProductList.length && pyList.length">
+                    <div class="flex-item">
+                        <div *ngIf="continuousProductList.length > 0 && !isDualPlanYear">
+                            <h3>{{languageStrings['primary.portal.coverage.need']}}</h3>
+                            <p>{{languageStrings['primary.portal.coverage.benefitsenroll']}}</p>
+                            <ng-container *hasPermission="'core.enrollment.member.shop'">
+                                <button
+                                    class="mon-btn-primary"
+                                    mat-flat-button
+                                    type="submit"
+                                    *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                    (click)="shopPageNavigation()"
+                                >
+                                    <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                                </button>
+                            </ng-container>
+                        </div>
+                        <div *ngIf="pyList.length > 0">
+                            <h3>{{languageStrings['primary.portal.coverage.recentlychanges']}}</h3>
+                            <p>{{languageStrings['primary.portal.coverage.eligibleupdate']}}</p>
+                            <button class="mon-btn-primary" mat-flat-button>
+                                <span> {{languageStrings['primary.portal.coverage.addlifeevent']}}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="availProductsFlag">
+                <div class="flex-item">
+                    <p>{{firstName | titlecase}} {{languageStrings['primary.portal.coverage.notenrolledbenefit']}}</p>
+                </div>
+                <div class="available-state-section" *ngIf="continuousProductList.length || pyList.length">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.avalaibleproducts']}}</h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.currently.avaliable']}}
+                            {{languageStrings['primary.portal.coverage.justvisit']}}
+                            <span class="shop">{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            {{languageStrings['primary.portal.coverage.pageenroll']}}
+                        </p>
+                        <div class="product-list" *ngFor="let product of continuousProductList">{{product}}</div>
+
+                        <div class="product-list" *ngFor="let py of pyList">{{py}}*</div>
+
+                        <div class="addlift-btn" *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="(isShopEnabled && !unpluggedFeatureFlag) && !adminPortalFlag && !hideShopOptions &&!hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                            <p *ngIf="enrollEndDisplayFlag">{{languageStrings['primary.portal.coverage.enrollpy']}} {{maxAvailPYDate}}</p>
+                        </div>
+                        <div class="dotted-border-bottom"></div>
+                    </div>
+                    <div class="dotted-border-right"></div>
+                </div>
+            </div>
+            <ng-container *ngIf="isTPI">
+                <div class="btn-shop" *ngIf="hasPrivilege$ | async">
+                    <button
+                        [attr.aria-label]="languageStrings['primary.portal.coverage.shop']"
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        *ngIf="!hideShopOptions"
+                        (click)="shopPageNavigation()"
+                    >
+                        <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                    </button>
+                </div>
+            </ng-container>
+        </ng-container>
+        <!-- Zero state end -->
+        <ng-container *ngIf="enrollData.data.length">
+            <div class="empty-state-section" *ngIf="isPendingEnrollment">
+                <div *ngIf="isMemberPortal" class="warning">
+                    <mon-alert alertType="warning"
+                        >{{languageStrings['primary.portal.coverage.youhave']}}
+                        <span *ngIf="!applications">{{languageStrings['primary.portal.coverage.anapplication']}}</span>
+                        <span *ngIf="applications">{{languageStrings['primary.portal.coverage.application']}}</span>
+                        {{languageStrings['primary.portal.coverage.awaiting']}}
+                    </mon-alert>
+                </div>
+            </div>
+
+            <div class="deduction-wrapper" *ngIf="!onlyPreviousCoverage">
+                <mat-accordion class="card-list">
+                    <mat-expansion-panel (opened)="isExpanded = true" (closed)="isExpanded = false">
+                        <mat-expansion-panel-header [collapsedHeight]="'95px'" [expandedHeight]="'95px'">
+                            <mat-panel-title>
+                                <div class="flex-item">
+                                    <h3 class="title" *ngIf="!isEndedStatusFilterApplied">{{payrollDeductionTitle}}</h3>
+                                    <h3 class="title" *ngIf="isEndedStatusFilterApplied">
+                                        {{languageStrings['primary.portal.coverage.payroll.deduction']}}
+                                        {{selectedDateFilter.substring(selectedDateFilter.length - 10)}}
+                                    </h3>
+                                    <span class="ondate" *ngIf="showDateRangeOptions"> {{payrollDeductionSubTitle}} </span>
+                                </div>
+
+                                <div class="flex-item subtitle-section">
+                                    <span class="sub-title">
+                                        {{(preTaxTotalCost + postTaxTotalCost) | payrollFrequencyCalculator: payFrequencyObject | currency}}
+                                    </span>
+                                    <div *ngIf="!isMemberPortal || isTPI">
+                                        <span class="view"
+                                            ><a href="javascript:void(0)" *ngIf="!isExpanded"
+                                                >{{languageStrings['primary.portal.coverage.view']}}<mon-icon
+                                                    iconName="down"
+                                                    iconSize="15"
+                                                    class="icon-down"
+                                                >
+                                                </mon-icon> </a
+                                        ></span>
+                                        <span class="view">
+                                            <a href="javascript:void(0)" *ngIf="isExpanded">
+                                                {{languageStrings['primary.portal.coverage.hide']}}
+                                                <mon-icon iconName="down" iconSize="15" class="icon-up"> </mon-icon></a
+                                        ></span>
+                                    </div>
+                                </div>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="tax-section-wrapper">
+                            <div class="dotted-border-bottom"></div>
+                            <div class="tax-section">
+                                <div class="content-column">
+                                    <div>
+                                        <h3 class="header">{{languageStrings['primary.portal.coverage.pretax']}}</h3>
+                                    </div>
+                                    <div>
+                                        <span class="content-label base-adjustment-cost"
+                                            >{{languageStrings['primary.portal.coverage.basecost']}}</span
+                                        >
+                                        <span>{{preTaxBaseCost | payrollFrequencyCalculator: payFrequencyObject | currency}}</span>
+                                    </div>
+                                    <div>
+                                        <div class="content-label base-adjustment-cost">
+                                            {{languageStrings['primary.portal.coverage.adjustment']}}
+                                        </div>
+                                        <span> -{{preTaxAdjustment | payrollFrequencyCalculator: payFrequencyObject | currency}}</span>
+                                    </div>
+                                    <div class="dotted-border-bottom"></div>
+                                    <div class="final-cost">
+                                        <span class="content-label">
+                                            {{isMemberPortal ? languageStrings['primary.portal.shoppingExperience.yourCost'] :
+                                            languageStrings['primary.portal.coverage.cost']}}
+                                        </span>
+
+                                        <div class="final-cost-currency">
+                                            <span class="currency">
+                                                {{preTaxTotalCost | payrollFrequencyCalculator: payFrequencyObject | currency}}</span
+                                            >
+                                            <span
+                                                [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                            >
+                                                {{payFrequencyName}}</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="content-column align-right">
+                                    <div>
+                                        <h3 class="header">{{languageStrings['primary.portal.coverage.posttax']}}</h3>
+                                    </div>
+                                    <div>
+                                        <span class="content-label base-adjustment-cost">
+                                            {{languageStrings['primary.portal.coverage.basecost']}}</span
+                                        >
+                                        <span>{{postTaxBaseCost | payrollFrequencyCalculator: payFrequencyObject | currency}}</span>
+                                    </div>
+                                    <div>
+                                        <div class="content-label base-adjustment-cost">
+                                            {{languageStrings['primary.portal.coverage.adjustment']}}
+                                        </div>
+                                        <span> -{{postTaxAdjustment | payrollFrequencyCalculator: payFrequencyObject | currency}}</span>
+                                    </div>
+                                    <div class="dotted-border-bottom"></div>
+                                    <div class="final-cost">
+                                        <span class="content-label">
+                                            {{isMemberPortal ? languageStrings['primary.portal.shoppingExperience.yourCost'] :
+                                            languageStrings['primary.portal.coverage.cost']}}</span
+                                        >
+                                        <div class="final-cost-currency">
+                                            <span class="currency">
+                                                {{postTaxTotalCost | payrollFrequencyCalculator: payFrequencyObject | currency}}</span
+                                            >
+                                            <span
+                                                [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                            >
+                                                {{payFrequencyName}}</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+            <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_SEND_REMINDER">
+                <ng-container *ngIf="((isPdaSaved && isHeadset) || showContacts || isEnrolled) && !isMemberPortal ">
+                    <form [formGroup]="contactForm" class="contact-form" [ngClass]="{'tpi-contact-form': isTPI}">
+                        <h3>{{ firstName | titlecase }} {{ sendReminderHeaderText }}</h3>
+                        <p>{{ "primary.portal.coverage.notify" | replaceTag : { "#firstname" : firstName | titlecase } }}</p>
+                        <mat-radio-group ariaLabel="stepData.step.question.text" formControlName="contacts" class="contacts">
+                            <ng-container *ngFor="let option of contactList">
+                                <mat-radio-button [value]="option" [disabled]="option.disableField || requestSent">
+                                    <div *ngIf="option.type === email">
+                                        {{ languageStrings['primary.portal.headset.email'] }} {{ option.contact }}
+                                    </div>
+                                    <div *ngIf="option.type === phoneNumber">
+                                        {{ languageStrings['primary.portal.headset.text'] }} {{ option.formatted }}
+                                    </div>
+                                    <div *ngIf="!option.type">{{ option.contact }}</div>
+                                </mat-radio-button>
+                            </ng-container>
+                        </mat-radio-group>
+
+                        <button
+                            class="mon-btn-primary"
+                            *ngIf="hasMemberContact && !requestSent"
+                            mat-flat-button
+                            (click)="sendToCustomer()"
+                            [disabled]="requestSent"
+                        >
+                            {{ languageStrings['primary.portal.common.send'] }}
+                        </button>
+                        <button class="mon-btn-primary" *ngIf="!hasMemberContact" mat-flat-button (click)="addContactInfo()">
+                            {{ languageStrings['primary.portal.coverage.addcontactInfo'] }}
+                        </button>
+                        <button *ngIf="requestSent" class="mon-btn-success" mat-flat-button>
+                            <mon-icon class="tick-icon" iconName="check" iconSize="15"></mon-icon>
+                            {{ languageStrings['primary.portal.coverage.sent'] }}
+                        </button>
+                    </form>
+                </ng-container>
+            </ng-container>
+
+            <div *ngIf="onlyPreviousCoverage">
+                <div class="empty-state-section">
+                    <span>
+                        {{languageStrings['primary.portal.coverage.notenrolledbenefits'].replace("#firstName", this.firstName | titlecase )
+                        }}</span
+                    >
+                </div>
+            </div>
+
+            <div class="empty-state-section" *ngIf="isPendingEnrollment">
+                <div class="flex-item" *ngIf="!isMemberPortal">
+                    <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_MANAGE_PENDING_ENROLLMENT">
+                        <p>
+                            {{ languageStrings['primary.portal.coverage.awaitingapproval'].replace("#memberfirstName", this.firstName |
+                            titlecase ) }}
+                        </p>
+                        <button class="mon-btn-primary" type="submit" (click)="navigateToPendingEnrollments()">
+                            <span>{{ languageStrings['primary.portal.coverage.manage'] }}</span>
+                        </button>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="empty-state-section" *ngIf="isPendingEnrollment">
+                <div class="flex-item" *ngIf="oeFlag">
+                    <p>
+                        {{languageStrings['primary.portal.coverage.youhave']}} {{oeCoverageEndDate}} {{days}}
+                        {{languageStrings['primary.portal.coverage.leftenroll']}}
+                    </p>
+                    <ng-container *hasPermission="'core.enrollment.member.shop'">
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions &&!hideShopButton"
+                            (click)="shopPageNavigation()"
+                        >
+                            <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                        </button>
+                    </ng-container>
+                </div>
+                <div class="flex-item" *ngIf="qleFlag">
+                    <p>
+                        {{languageStrings['primary.portal.coverage.youhave']}} {{qleCoverageEndDate}} {{days}}
+                        {{languageStrings['primary.portal.coverage.lefttomake']}}
+                    </p>
+                    <ng-container *hasPermission="'core.enrollment.member.shop'">
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions &&!hideShopButton"
+                            (click)="shopPageNavigation()"
+                        >
+                            <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                        </button>
+                    </ng-container>
+                </div>
+            </div>
+            <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_DOWNLOAD_EAA">
+                <mon-alert *ngIf="isEAAMissing" class="message-block">
+                    <span
+                        >{{ languageStrings['primary.portal.accountEnrollments.incompleteMissingEAAMessage'] }}
+                        <a (click)="downloadFile()" href="javascript:void(0)">
+                            {{ languageStrings['primary.portal.accountEnrollments.incompleteMissingEAAMessage.anchor'] }}
+                        </a>
+                    </span>
+                </mon-alert>
+            </ng-container>
+            <!-- TODO - Checking if member portal to not show Aflac Always Card EVE-38426 -->
+            <ng-container *ngIf="isAflacAlways$ | async">
+                <div class="aflac-always">
+                    <ng-container [ngTemplateOutlet]="aflacAlwaysCard"></ng-container>
+                </div>
+            </ng-container>
+            <div *ngFor="let summary of benefitSummary">
+                <div class="empty-state-section">
+                    <h2>{{summary.title}}</h2>
+
+                    <button
+                        *ngIf="summary.isPreviousEnrollment"
+                        class="mon-btn-secondary"
+                        mat-flat-button
+                        type="submit"
+                        (click)="showPreviousCoverage()"
+                    >
+                        <span>{{buttonLabel}}</span>
+                    </button>
+                </div>
+
+                <div *ngIf="(!summary.isHide && !summary.isPreviousEnrollment) || (showPrevious && summary.isPreviousEnrollment)">
+                    <div class="coverage-wrapper">
+                        <mat-accordion class="card-list">
+                            <ng-template ngFor let-enrollment [ngForOf]="summary.data" let-i="index">
+                                <mat-expansion-panel
+                                    [class]="enrollment.plan.product.name"
+                                    [ngClass]="{'panel-disabled': enrollment.status === applicationDenied || enrollment.status === declinedStatus }"
+                                    [disabled]="enrollment.status === applicationDenied || enrollment.status === declinedStatus"
+                                    [ngStyle]="{'border-color': supExpPanel.expanded ? '#'+enrollment.prodDetails.cardColorCode : '#c6c6c6'}"
+                                    #supExpPanel
+                                >
+                                    <mat-expansion-panel-header [collapsedHeight]="'120px'" [expandedHeight]="'120px'">
+                                        <mat-panel-title>
+                                            <mon-icon
+                                                *ngIf="enrollment.prodDetails"
+                                                [iconName]="enrollment.plan.product.name"
+                                                [fetchedIconPath]="enrollment.iconPath"
+                                                class="plan-icon icon-black"
+                                                iconSize="32"
+                                            ></mon-icon>
+
+                                            <div>{{enrollment.plan.product.name}}</div>
+                                            <div
+                                                class="plan-name"
+                                                *ngIf="enrollment.status !== declinedStatus"
+                                                [innerHTML]="enrollment.plan.name"
+                                            ></div>
+                                            <div class="plan-coverage" *ngIf="enrollment.status !== declinedStatus">
+                                                <div *ngIf="enrollment.plan.product.id !== SHORT_TERM_DISABILITY; else displayIndividual">
+                                                    {{ enrollment.coverageLevel.name }}
+                                                </div>
+                                                <ng-template #displayIndividual><div>{{ DISPLAY_INDIVIDUAL }}</div></ng-template>
+                                            </div>
+                                            <div>
+                                                <div
+                                                    class="plan-coverage"
+                                                    *ngIf="enrollment.status !== applicationDenied && enrollment.status !== voidStatus"
+                                                >
+                                                    <span> {{ enrollment.coverageText }} </span>
+                                                    <span> {{enrollment.coverageDate}} </span>
+                                                </div>
+                                                <hr class="dotted-border-bottom bottom-spliter" />
+                                            </div>
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+                                            <div class="status">
+                                                <span class="status-icon">
+                                                    <mon-icon
+                                                        iconName="Filled-check"
+                                                        iconSize="20"
+                                                        *ngIf="((summary.title === CURRENT_COVERAGE || summary.data[i].statusCoverage === coverageType.current) && ((!currentCoverageQleStatuses[i] && enrollment.status===approvedStatus)
+                                                    || (currentCoverageQleStatuses[i] === QLE_STATUS_COVERAGE_CANCELLED && (enrollment.carrierStatus === ACTIVE || enrollment.plan.carrier.id === AFLAC_GROUP_CARRIER_ID)))) && !policiesExpired[i]"
+                                                        class="mon-icon-status icon-success"
+                                                    >
+                                                    </mon-icon>
+                                                    <mon-icon
+                                                        iconName="Filled-check"
+                                                        iconSize="20"
+                                                        *ngIf="(summary.title === FUTURE_COVERAGE || summary.data[i].statusCoverage === coverageType.future )&& ((!futureCoverageQleStatuses[i] && enrollment.status===approvedStatus)
+                                                    || (futureCoverageQleStatuses[i] === QLE_STATUS_COVERAGE_CANCELLED && (enrollment.carrierStatus === ACTIVE || enrollment.plan.carrier.id === AFLAC_GROUP_CARRIER_ID)))"
+                                                        class="mon-icon-status icon-success"
+                                                    >
+                                                    </mon-icon>
+                                                    <mon-icon
+                                                        iconName="Filled-dash"
+                                                        iconSize="20"
+                                                        *ngIf="((summary.title === CURRENT_COVERAGE || summary.data[i].statusCoverage === coverageType.current ) && ((enrollment.status && enrollment.status.startsWith(pendingStatus) && !qleStatus)
+                                                    || (currentCoverageQleStatuses[i]===QLE_STATUS_REQUEST_SUBMITTED || currentCoverageQleStatuses[i]===QLE_STATUS_PENDING_HR_APPROVAL))) && !policiesExpired[i]"
+                                                        class="mon-icon-status icon-warning"
+                                                    >
+                                                    </mon-icon>
+                                                    <mon-icon
+                                                        iconName="Filled-dash"
+                                                        iconSize="20"
+                                                        *ngIf="(summary.title === FUTURE_COVERAGE || summary.data[i].statusCoverage === coverageType.future ) && ((enrollment.status && enrollment.status.startsWith(pendingStatus) && !qleStatus)
+                                                    || (futureCoverageQleStatuses[i]===QLE_STATUS_REQUEST_SUBMITTED || futureCoverageQleStatuses[i]===QLE_STATUS_PENDING_HR_APPROVAL)) "
+                                                        class="mon-icon-status icon-warning"
+                                                    >
+                                                    </mon-icon>
+                                                    <mon-icon
+                                                        class="mon-icon-close icon-danger"
+                                                        *ngIf="((summary.title === CURRENT_COVERAGE || summary.data[i].statusCoverage === coverageType.current) && isCancelCurrentCoverages[i] &&  !currentCoverageQleStatuses[i]) || policiesExpired[i]"
+                                                        iconSize="20"
+                                                        iconName="Filled-X"
+                                                    ></mon-icon>
+                                                    <mon-icon
+                                                        class="mon-icon-close icon-danger"
+                                                        *ngIf="(summary.title === FUTURE_COVERAGE || summary.data[i].statusCoverage === coverageType.future ) && isCancelFutureCoverages[i] &&  !futureCoverageQleStatuses[i]"
+                                                        iconSize="20"
+                                                        iconName="Filled-X"
+                                                    ></mon-icon>
+                                                    <mon-icon
+                                                        class="mon-icon-close icon-danger"
+                                                        *ngIf="summary.isPreviousEnrollment"
+                                                        iconSize="20"
+                                                        iconName="Filled-X"
+                                                    ></mon-icon>
+                                                    <mon-icon
+                                                        class="mon-icon-close icon-danger"
+                                                        *ngIf="(enrollment.status===lapsedStatus && (summary.title === CURRENT_COVERAGE || summary.data[i].statusCoverage === coverageType.current) && !currentCoverageQleStatuses[i]) && !policiesExpired[i]"
+                                                        iconSize="20"
+                                                        iconName="Filled-X"
+                                                    >
+                                                    </mon-icon>
+                                                    <mon-icon
+                                                        class="mon-icon-close icon-danger"
+                                                        *ngIf="enrollment.status===lapsedStatus && (summary.title === FUTURE_COVERAGE || summary.data[i].statusCoverage === coverageType.future) && !futureCoverageQleStatuses[i]"
+                                                        iconSize="20"
+                                                        iconName="Filled-X"
+                                                    >
+                                                    </mon-icon>
+                                                </span>
+                                                <span
+                                                    *ngIf="(summary.title === CURRENT_COVERAGE || summary.data[i].statusCoverage === coverageType.current) && !currentCoverageQleStatuses[i]"
+                                                    >{{enrollment.status}}
+                                                </span>
+                                                <span
+                                                    *ngIf="(summary.title === FUTURE_COVERAGE || summary.data[i].statusCoverage === coverageType.future ) && !futureCoverageQleStatuses[i]"
+                                                    >{{enrollment.status}}
+                                                </span>
+                                                <span *ngIf="summary.isPreviousEnrollment">{{enrollment.status}} </span>
+                                                <div
+                                                    *ngIf="(summary.title === CURRENT_COVERAGE && currentCoverageQleStatuses[i] === QLE_STATUS_COVERAGE_CANCELLED && (enrollment.carrierStatus === ACTIVE || enrollment.plan.carrier.id === AFLAC_GROUP_CARRIER_ID)) && !policiesExpired[i]"
+                                                >
+                                                    <p class="approved-status">{{approvedStatus}}</p>
+                                                    <p class="approved-status" *ngIf="currentCoverageEndDates[i]">
+                                                        {{languageStrings['primary.portal.coverage.policyEnds']}}
+                                                        {{currentCoverageEndDates[i] | date: dateFormat}}
+                                                    </p>
+                                                </div>
+                                                <div
+                                                    *ngIf="summary.title === FUTURE_COVERAGE && futureCoverageQleStatuses[i] === QLE_STATUS_COVERAGE_CANCELLED && (enrollment.carrierStatus === ACTIVE || enrollment.plan.carrier.id === AFLAC_GROUP_CARRIER_ID)"
+                                                >
+                                                    <p class="approved-status">{{approvedStatus}}</p>
+                                                    <p class="approved-status" *ngIf="futureCoverageEndDates[i]">
+                                                        {{languageStrings['primary.portal.coverage.policyEnds']}}
+                                                        {{futureCoverageEndDates[i] | date: dateFormat}}
+                                                    </p>
+                                                </div>
+                                                <span
+                                                    *ngIf="(summary.title === CURRENT_COVERAGE && (currentCoverageQleStatuses[i]===QLE_STATUS_REQUEST_SUBMITTED || currentCoverageQleStatuses[i]===QLE_STATUS_PENDING_HR_APPROVAL)) && !policiesExpired[i]"
+                                                >
+                                                    {{languageStrings['primary.portal.coverage.endCoverageRequested']}}
+                                                </span>
+                                                <span
+                                                    *ngIf="summary.title === FUTURE_COVERAGE && (futureCoverageQleStatuses[i]===QLE_STATUS_REQUEST_SUBMITTED || futureCoverageQleStatuses[i]===QLE_STATUS_PENDING_HR_APPROVAL)"
+                                                >
+                                                    {{languageStrings['primary.portal.coverage.endCoverageRequested']}}
+                                                </span>
+                                                <span *ngIf="policiesExpired[i]"> {{statusEnded}} </span>
+                                            </div>
+
+                                            <div
+                                                class="plan-rates dotted-border-left"
+                                                *ngIf="enrollment.status !== declinedStatus && enrollment.status !== applicationDenied && enrollment.status !== voidStatus"
+                                            >
+                                                <div class="plan-rate">
+                                                    {{enrollment.memberCost | payrollFrequencyCalculator: payFrequencyObject | currency}}
+                                                </div>
+                                                <div
+                                                    [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                                >
+                                                    {{payFrequencyName}}
+                                                </div>
+                                            </div>
+                                        </mat-panel-description>
+                                    </mat-expansion-panel-header>
+                                    <div class="expansion-content your-selection">
+                                        <div class="content-column align-left">
+                                            <div *ngIf="enrollment.policyNumber">
+                                                <span class="content-label">{{languageStrings['primary.portal.coverage.policyno']}}</span>
+                                                <span>{{enrollment.policyNumber}}</span>
+                                            </div>
+                                            <div *ngIf="enrollment.carrierStatus">
+                                                <span class="content-label"
+                                                    >{{enrollment.plan.carrier.name}}'s
+                                                    {{languageStrings['primary.portal.coverage.status']}}
+                                                </span>
+                                                <span>{{enrollment.carrierStatus | titlecase}}</span>
+                                            </div>
+                                            <div *ngIf="enrollment.benefitAmount">
+                                                <span class="content-label"
+                                                    >{{languageStrings['primary.portal.editCoverage.benefitamount']}}</span
+                                                >
+
+                                                <span>{{enrollment.benefitAmount | currency}}</span>
+                                            </div>
+                                            <div *ngIf="enrollment.coverageLevel.eliminationPeriod !== undefined">
+                                                <span class="content-label"
+                                                    >{{languageStrings['primary.portal.coverage.eliminationperiod']}}
+                                                </span>
+                                                <span>{{enrollment.coverageLevel.eliminationPeriod}}</span>
+                                            </div>
+                                            <div *ngIf="enrollment.enrollmentRiders.length">
+                                                <span class="content-label">{{languageStrings['primary.portal.coverage.riders']}} </span>
+                                                <span class="riders-list">
+                                                    <ng-template ngFor let-rider [ngForOf]="enrollment.enrollmentRiders">
+                                                        <span>{{rider.plan.name}}</span>
+                                                    </ng-template>
+                                                </span>
+                                            </div>
+                                            <div *ngIf="enrollment.taxStatus">
+                                                <span class="content-label">{{languageStrings['primary.portal.coverage.taxstatus']}} </span>
+                                                <span *ngIf="enrollment.taxStatus === postTax"
+                                                    >{{languageStrings['primary.portal.coverage.posttax']}}</span
+                                                >
+                                                <span *ngIf="enrollment.taxStatus===preTax"
+                                                    >{{languageStrings['primary.portal.coverage.pretax']}}</span
+                                                >
+                                                <span *ngIf="enrollment.taxStatus===unknownTaxStatus"
+                                                    >{{languageStrings['primary.portal.coverage.unknown']}}</span
+                                                >
+                                            </div>
+                                            <div>
+                                                <span class="content-label"
+                                                    >{{languageStrings['primary.portal.coverage.coveredindividuals']}}</span
+                                                >
+                                                <div>
+                                                    <div *ngIf="!enrollment.plan.product.name.startsWith(Juvenile)">
+                                                        <span
+                                                            >{{memberFullName | titlecase}}
+                                                            <span class="primary">(primary insured)</span>
+                                                        </span>
+                                                        <div
+                                                            *ngIf="enrollment.enrollmentDependents.length === 0 && enrollment.isCoverageLevelNameMatch"
+                                                        >
+                                                            <span
+                                                                >{{languageStrings['primary.portal.coverage.allEligibleDependents']}}</span
+                                                            >
+                                                        </div>
+                                                    </div>
+                                                    <div class="covered-values" *ngIf="enrollment.enrollmentDependents.length">
+                                                        <ng-template ngFor let-dependent [ngForOf]="enrollment.enrollmentDependents">
+                                                            <span>{{dependent.name}} ({{dependent.relationType}})</span>
+                                                        </ng-template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="enrollment.beneficiaries?.length">
+                                                <span class="content-label"
+                                                    >{{languageStrings['primary.portal.coverage.beneficiary']}}</span
+                                                >
+                                                <div class="beneficiary-block">
+                                                    <ng-template ngFor let-beneficiary [ngForOf]="enrollment.beneficiaries">
+                                                        <span [ngSwitch]="beneficiary.beneficiary?.type">
+                                                            <span *ngSwitchCase="estate">
+                                                                {{languageStrings['primary.portal.coverage.estate']}}
+                                                            </span>
+                                                            <span *ngSwitchCase="trust">
+                                                                {{beneficiary.beneficiary.trustee.firstName | titlecase}}
+                                                                {{beneficiary.beneficiary.trustee.lastName | titlecase}}
+                                                            </span>
+                                                            <span *ngSwitchCase="charity">
+                                                                {{languageStrings['primary.portal.coverage.charity']}}
+                                                            </span>
+                                                            <span *ngSwitchCase="individual">
+                                                                {{beneficiary.beneficiary.name.firstName | titlecase}}
+                                                                {{beneficiary.beneficiary.name.lastName | titlecase}}
+                                                            </span>
+                                                            ({{ beneficiary.allocationType.toLowerCase() }}) - {{beneficiary.percent}}%
+                                                        </span>
+                                                    </ng-template>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="enrollment.paymentInformation">
+                                                <span class="content-label" *ngIf="enrollment.paymentInformation.aflacAlways"
+                                                    >{{languageStrings['primary.portal.coverage.aflacalways']}}</span
+                                                >
+                                                <span class="content-label" *ngIf="!enrollment.paymentInformation.aflacAlways"
+                                                    >{{languageStrings['primary.portal.applicationFlow.payments.billing']}}</span
+                                                >
+                                                <span *ngIf="enrollment.paymentInformation.paymentType === bankDraft"
+                                                    >{{languageStrings['primary.portal.coverage.accountNumberEnding']}}
+                                                </span>
+                                                <span
+                                                    *ngIf="enrollment.paymentInformation.paymentType === creditCard || enrollment.paymentInformation.paymentType === debitCard"
+                                                    >{{languageStrings['primary.portal.coverage.cardNumberEnding']}}</span
+                                                >&nbsp;
+                                                <span>{{enrollment.paymentInformation.lastFour}}</span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="enrollment.status !== 'Declined'" class="content-column align-right">
+                                            <div class="cost-calculation">
+                                                <div class="d-flex">
+                                                    <span class="content-label"
+                                                        >{{languageStrings['primary.portal.coverage.basecost']}}
+                                                    </span>
+                                                    <span>
+                                                        {{enrollment.totalCost | payrollFrequencyCalculator: payFrequencyObject | currency}}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex">
+                                                    <span class="label"> {{ enrollment.benefitDollars.flexDollarOrIncentiveName }} </span>
+                                                    <span class="flex-item">
+                                                        -{{ enrollment.benefitDollars.flexDollarOrIncentiveAmount |
+                                                        payrollFrequencyCalculator: payFrequencyObject | currency}}
+                                                    </span>
+                                                </div>
+                                                <div class="final-cost">
+                                                    <span
+                                                        >{{isMemberPortal ? languageStrings['primary.portal.shoppingExperience.yourCost'] :
+                                                        languageStrings['primary.portal.coverage.cost']}}</span
+                                                    >
+                                                    <span class="flex-item">
+                                                        {{enrollment.memberCost | payrollFrequencyCalculator: payFrequencyObject |
+                                                        currency}}
+                                                        <span class="payfrequency"> {{payFrequencyName}}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="content-action">
+                                                <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_EDIT">
+                                                    <div
+                                                        *ngIf="allowEditCoverageForPartnerId && ((isAdmin && enrollment.coverageLevel.name !== DISPLAY_INDIVIDUAL &&
+                                                    enrollment.coverageLevel.name !== ENROLLED) || !isAdmin) && (!isMemberPortal && (enrollment.status && !enrollment.status.startsWith(pendingStatus)) &&
+                                                    enrollment.status !== declinedStatus && enrollment.status !== applicationDenied && enrollment.status !== voidStatus)"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            mat-flat-button
+                                                            *ngIf="!isMemberPortal"
+                                                            class="btn-right mon-btn-secondary"
+                                                            (click)="openEditCoveragePopup(enrollment.id)"
+                                                        >
+                                                            {{ languageStrings['primary.portal.coverage.editcoverage'] }}
+                                                        </button>
+                                                    </div>
+                                                </ng-container>
+                                                <div>
+                                                    <ng-container
+                                                        *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_MANAGE_PENDING_ENROLLMENT"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            *ngIf="!isTPI && enrollment.status && enrollment.status.startsWith(pendingStatus) && !enrollment.pendingReason.startsWith(pendingEnrollmentReason.CUSTOMER_SIGNATURE) && !isMemberPortal && enrollment.pendingReason !== pendingEnrollmentReason.PDA_COMPLETION && enrollment.status !== PENDING_CARRIER_APPROVAL"
+                                                            class="mon-btn-secondary"
+                                                            mat-flat-button
+                                                            (click)="managePendingEnrollment()"
+                                                        >
+                                                            {{ languageStrings['primary.portal.coverage.manage'] }}
+                                                        </button>
+                                                    </ng-container>
+                                                    <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_COMPLETE_PDA">
+                                                        <button
+                                                            type="button"
+                                                            *ngIf="(isSelfEnrollment || !isMemberPortal) && enrollment.pendingReason === pendingEnrollmentReason.PDA_COMPLETION && !enrollment.isPdaCompleted"
+                                                            class="mon-btn-secondary"
+                                                            mat-flat-button
+                                                            (click)="openEnrollmentMethodModal(enrollment.id)"
+                                                        >
+                                                            {{ languageStrings['primary.portal.coverage.completePDA'] }}
+                                                        </button>
+                                                    </ng-container>
+                                                </div>
+
+                                                <div class="link" *ngIf="enrollment.status !== declinedStatus">
+                                                    <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_VIEW_APPLICATION">
+                                                        <div
+                                                            *ngIf="enrollment.isAflacPlan && (enrollment.policyNumber || enrollment.carrierStatus === activeCarrierStatus) && !enrollment.createdFromFeeds"
+                                                        >
+                                                            <a (click)="viewSignedApplication(enrollment.id)"
+                                                                >{{ languageStrings['primary.portal.coverage.downloadapplication'] }}
+                                                                <mon-icon iconName="download-2" iconSize="15" class="icon-primary">
+                                                                </mon-icon>
+                                                            </a>
+                                                        </div>
+                                                    </ng-container>
+                                                    <ng-container *isRestricted="UserPermissions.MEMBER_RESTRICT_COVERAGE_PLAN_DETAILS">
+                                                        <a (click)="openPlanDetails(enrollment)"
+                                                            >{{ languageStrings['primary.portal.planDetails.title'] }}</a
+                                                        >
+                                                    </ng-container>
+                                                </div>
+                                                <div *configEnabled="'general.feature.enable.aflac.policy.cancellation'">
+                                                    <div *ngIf="portal === member ; else diffPortal">
+                                                        <div *ngIf="summary.title === CURRENT_COVERAGE">
+                                                            <div class="end-coverage-link" *ngIf="isEndCoverage[i]; else voidCoverage">
+                                                                <div
+                                                                    *ngIf="(enrollment.plan.carrier.id !== AFLAC_GROUP_CARRIER_ID || currentCoverageQleStatuses[i] !== QLE_STATUS_COVERAGE_CANCELLED ) && currentCoverageQleStatuses[i] !== QLE_STATUS_REQUEST_SUBMITTED"
+                                                                >
+                                                                    <div
+                                                                        *ngIf="isMemberPortal && !hasAdmin && enrollment.taxStatus===preTax; else defaultEndCoverage"
+                                                                    >
+                                                                        <a
+                                                                            href="javascript:void(0);"
+                                                                            class="disable-link"
+                                                                            richTooltip="{{languageStrings['primary.portal.endCoverage.noAdminTooltip']}}"
+                                                                            matTooltipPosition="above"
+                                                                            matTooltipClass="pos-above"
+                                                                            >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                        </a>
+                                                                    </div>
+                                                                    <ng-template #defaultEndCoverage>
+                                                                        <a
+                                                                            (click)="openEndCoveragePopup(enrollment.id, memberFullName)"
+                                                                            class="danger"
+                                                                            >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                        </a>
+                                                                    </ng-template>
+                                                                </div>
+                                                            </div>
+                                                            <ng-template #voidCoverage>
+                                                                <div *ngIf="isVoidCurrentCoverage[i]" class="withdraw-application">
+                                                                    <a
+                                                                        class="danger"
+                                                                        *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION"
+                                                                        (click)="openVoidCoverage(enrollment.id , enrollment.plan.name)"
+                                                                    >
+                                                                        {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                                                                    </a>
+                                                                </div>
+                                                            </ng-template>
+                                                        </div>
+                                                        <div *ngIf="summary.title === FUTURE_COVERAGE">
+                                                            <div
+                                                                class="end-coverage-link"
+                                                                *ngIf="isAGFutureEndCoverage[i]; else editCoverage"
+                                                            >
+                                                                <ng-container
+                                                                    *ngIf="futureCoverageQleStatuses[i] !== QLE_STATUS_COVERAGE_CANCELLED || canDisplayEndCoverage[i]"
+                                                                >
+                                                                    <div *hasPermission="UserPermissions.ENROLLMENT_UPDATE_CANCEL">
+                                                                        <div
+                                                                            *ngIf="isMemberPortal && !hasAdmin && enrollment.taxStatus===preTax; else defaultEndCoverage"
+                                                                        >
+                                                                            <a
+                                                                                href="javascript:void(0);"
+                                                                                class="disable-link"
+                                                                                richTooltip="{{languageStrings['primary.portal.endCoverage.noAdminTooltip']}}"
+                                                                                matTooltipPosition="above"
+                                                                                matTooltipClass="pos-above"
+                                                                                >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                            </a>
+                                                                        </div>
+                                                                        <ng-template #defaultEndCoverage>
+                                                                            <a
+                                                                                (click)="openEndCoveragePopup(enrollment.id, memberFullName)"
+                                                                                class="danger"
+                                                                                >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                            </a>
+                                                                        </ng-template>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </div>
+                                                            <ng-template #editCoverage>
+                                                                <ng-container *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION">
+                                                                    <div *ngIf="isVoidFutureCoverage[i]" class="withdraw-application">
+                                                                        <a
+                                                                            class="danger"
+                                                                            (click)="openVoidCoverage(enrollment.id , enrollment.plan.name)"
+                                                                        >
+                                                                            {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                                                                        </a>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </ng-template>
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #diffPortal>
+                                                        <div *ngIf="summary.title === CURRENT_COVERAGE">
+                                                            <div class="end-coverage-link" *ngIf="isEndCoverage[i]; else voidCoverage">
+                                                                <div
+                                                                    *ngIf="(!isTPI || (tpiEndCoverageEnable$ | async)) && (enrollment.plan.carrier.id !== AFLAC_GROUP_CARRIER_ID || currentCoverageQleStatuses[i] !== QLE_STATUS_COVERAGE_CANCELLED ) && currentCoverageQleStatuses[i] !== QLE_STATUS_REQUEST_SUBMITTED"
+                                                                >
+                                                                    <div
+                                                                        *ngIf="(isMemberPortal && !hasAdmin && enrollment.taxStatus===preTax ) || (isTPI && !isTpiEndCoverageAllowed) ; else defaultEndCoverage"
+                                                                    >
+                                                                        <a
+                                                                            href="javascript:void(0);"
+                                                                            class="disable-link"
+                                                                            richTooltip="{{languageStrings['primary.portal.endCoverage.noAdminTooltip']}}"
+                                                                            matTooltipPosition="above"
+                                                                            matTooltipClass="pos-above"
+                                                                            >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                        </a>
+                                                                    </div>
+                                                                    <ng-template #defaultEndCoverage>
+                                                                        <a
+                                                                            *hasPermission="UserPermissions.ENROLLMENT_UPDATE_CANCEL"
+                                                                            (click)="openEndCoveragePopup(enrollment.id, memberFullName)"
+                                                                            class="danger"
+                                                                            >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                        </a>
+                                                                    </ng-template>
+                                                                </div>
+                                                            </div>
+                                                            <ng-template #voidCoverage>
+                                                                <div *ngIf="isVoidCurrentCoverage[i]" class="withdraw-application">
+                                                                    <a
+                                                                        class="danger"
+                                                                        *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION"
+                                                                        (click)="openVoidCoverage(enrollment.id , enrollment.plan.name)"
+                                                                    >
+                                                                        {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                                                                    </a>
+                                                                </div>
+                                                            </ng-template>
+                                                        </div>
+                                                        <div *ngIf="summary.title === FUTURE_COVERAGE">
+                                                            <div
+                                                                class="end-coverage-link"
+                                                                *ngIf="isAGFutureEndCoverage[i];else editCoverage"
+                                                            >
+                                                                <ng-container
+                                                                    *ngIf="futureCoverageQleStatuses[i] !== QLE_STATUS_COVERAGE_CANCELLED  || canDisplayEndCoverage[i]"
+                                                                >
+                                                                    <div *hasPermission="UserPermissions.ENROLLMENT_UPDATE_CANCEL">
+                                                                        <div
+                                                                            *ngIf="isMemberPortal && !hasAdmin && enrollment.taxStatus===preTax; else defaultEndCoverage"
+                                                                        >
+                                                                            <a
+                                                                                href="javascript:void(0);"
+                                                                                class="disable-link"
+                                                                                richTooltip="{{languageStrings['primary.portal.endCoverage.noAdminTooltip']}}"
+                                                                                matTooltipPosition="above"
+                                                                                matTooltipClass="pos-above"
+                                                                                >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                            </a>
+                                                                        </div>
+                                                                        <ng-template #defaultEndCoverage>
+                                                                            <a
+                                                                                (click)="openEndCoveragePopup(enrollment.id, memberFullName)"
+                                                                                class="danger"
+                                                                                >{{languageStrings['primary.portal.endCoverage.endCoverage']}}
+                                                                            </a>
+                                                                        </ng-template>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </div>
+                                                            <ng-template #editCoverage>
+                                                                <ng-container *hasPermission="UserPermissions.VOID_COVERAGE_PERMISSION">
+                                                                    <div *ngIf="isVoidFutureCoverage[i]" class="withdraw-application">
+                                                                        <a
+                                                                            class="danger"
+                                                                            (click)="openVoidCoverage(enrollment.id , enrollment.plan.name)"
+                                                                        >
+                                                                            {{languageStrings['primary.portal.editCoverage.voidCoverage']}}
+                                                                        </a>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </ng-template>
+                                                        </div>
+                                                    </ng-template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                            </ng-template>
+                        </mat-accordion>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!isTPI">
+            <div class="btn-shop" *ngIf="hasPrivilege$ | async">
+                <button
+                    [attr.aria-label]="languageStrings['primary.portal.coverage.shop']"
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    type="submit"
+                    *ngIf="!this.pyList.length && !contOutsideOEFlag && !this.continuousProductList.length && this.isShopEnabled && !this.unpluggedFeatureFlag && !this.adminPortalFlag && !this.isLoading && !mmpInOE && !oeFlag && !qleFlag && !hideShopOptions && !hideShopButton"
+                    (click)="shopPageNavigation()"
+                >
+                    <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                </button>
+            </div>
+            <!-- Start of Available products / shop MPP/MAP -->
+            <div *ngIf="outsideOEEnrollmentFlag">
+                <!-- Outside OE -->
+                <div class="available-state-section" *ngIf="(continuousProductsFlag || displayAllProducts) && continuousProductList.length">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.avalaibleproducts']}}</h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.currently.avaliable']}}
+                            {{languageStrings['primary.portal.coverage.justvisit']}}
+                            <span class="shop">{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            {{languageStrings['primary.portal.coverage.pageenroll']}}
+                        </p>
+                        <div class="product-list" *ngFor="let product of continuousProductList">{{product}}</div>
+                        <div class="btn-shop" *ngIf="hasPrivilege$ | async">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="(isShopEnabled && !unpluggedFeatureFlag) && !adminPortalFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </div>
+                        <div class="dotted-border-bottom"></div>
+                    </div>
+                    <div class="dotted-border-right"></div>
+                </div>
+
+                <div class="zero-state-section" *ngIf="(planYearProductsFlag || displayAllProducts) && pyList.length">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.lifeevent']}}</h3>
+                        <p>{{languageStrings['primary.portal.coverage.lifechange'].replace("#firstName", firstName | titlecase ) }}</p>
+                        <div class="product-list" *ngFor="let py of pyList">{{py}}</div>
+                        <div class="addlift-btn">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                routerLinkActive="router-link-active"
+                                (click)="routeToLifeEvent()"
+                            >
+                                <span>{{languageStrings['primary.portal.common.addLifeEvent']}}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Outside OE -->
+            <!-- In OE/QLE -->
+            <div class="available-state-section" *ngIf="availProductsFlagOE && (pyList.length || continuousProductList.length)">
+                <div class="flex-item">
+                    <h3>{{languageStrings['primary.portal.coverage.avalaibleproducts']}}</h3>
+                    <p class="mon-my-15">
+                        {{languageStrings['primary.portal.coverage.currently.avaliable']}}
+                        {{languageStrings['primary.portal.coverage.justvisit']}}
+                        <span class="shop">{{languageStrings['primary.portal.coverage.shop']}}</span>
+                        {{languageStrings['primary.portal.coverage.pageenroll']}}
+                    </p>
+                    <div class="product-list" *ngFor="let product of continuousProductList">{{product}}</div>
+                    <div class="product-list" *ngFor="let py of pyList">{{py}}*</div>
+                    <ng-container *hasPermission="'core.enrollment.member.shop'">
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            *ngIf="(isShopEnabled && !unpluggedFeatureFlag) && !adminPortalFlag && !hideShopOptions && !hideShopButton"
+                            (click)="shopPageNavigation()"
+                        >
+                            <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                        </button>
+                    </ng-container>
+                    <p class="" *ngIf="enrollByDate">
+                        {{languageStrings['primary.portal.coverage.enrollpy']}} <span>{{enrollByDate}}</span>
+                    </p>
+
+                    <div class="dotted-border-bottom"></div>
+                </div>
+                <div class="dotted-border-right"></div>
+            </div>
+            <!-- In OE/QLE -->
+            <!-- End of Available products / shop MPP/MAP -->
+
+            <!-- Start of Available products / shop MMP -->
+            <!-- No cart items -->
+            <div *ngIf="zeroCartFlag && !zeroStateFlag">
+                <!-- <p>Outside open enrollment</p> -->
+                <div class="zero-state-section" *ngIf="contOutsideOEFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.need']}}</h3>
+                        <p class="mon-my-15">{{languageStrings['primary.portal.coverage.benefitsenroll']}}</p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="isShopEnabled && !unpluggedFeatureFlag &&!hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="zero-state-section" *ngIf="qleOutsideOEFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3>{{languageStrings['primary.portal.coverage.enrollment']}}</h3>
+                        <p class="mon-my-15">
+                            {{languageStrings['primary.portal.coverage.youhave']}} {{qleCoverageEndDate}} {{days}}
+                            {{languageStrings['primary.portal.coverage.makecoverage']}}
+                        </p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="zero-state-section" *ngIf="mmpInOE && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3 class="mon-my-15">{{languageStrings['primary.portal.coverage.beneiftready']}}</h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.youhave']}}
+                            <span>{{noOfDaysLeft}}</span> {{days}} {{languageStrings['primary.portal.coverage.coveragedateoeleft']}}
+                        </p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="(!isTpiAccount || isShopEnabled) && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <!-- Cart Items -->
+            <div *ngIf="cartFlag && !zeroStateFlag">
+                <!-- Outside OE start -->
+                <div class="zero-state-section" *ngIf="qleFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3 class="mon-my-15">
+                            {{languageStrings['primary.portal.coverage.progressupdate'].replace("#firstName", firstName | titlecase) }}
+                        </h3>
+                        <p>{{languageStrings['primary.portal.coverage.specailend']}} {{qleCoverageEndDate}} {{days}}</p>
+
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                            (click)="shopPageNavigation()"
+                        >
+                            <span> {{languageStrings['primary.portal.coverage.continueupdate']}}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="zero-state-section" *ngIf="oeMmpFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3 class="mon-my-15">
+                            {{languageStrings['primary.portal.coverage.progress'].replace("#firstName", firstName | titlecase) }}
+                        </h3>
+                        <p>{{languageStrings['primary.portal.coverage.finish']}}</p>
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                            (click)="shopPageNavigation()"
+                        >
+                            <span>{{languageStrings['primary.portal.coverage.continueenroll']}}</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Outside OE end -->
+                <!-- Inside OE start -->
+                <div class="zero-state-section" *ngIf="oeFlag && !isDualPlanYear">
+                    <div class="flex-item">
+                        <h3 class="mon-my-15">
+                            {{languageStrings['primary.portal.coverage.welcomemsg'].replace("#firstName", this.firstName ) }}
+                        </h3>
+                        <p>
+                            {{languageStrings['primary.portal.coverage.just']}} {{oeCoverageEndDate}} {{days}}
+                            {{languageStrings['primary.portal.coverage.enrollin']}} {{year}} coverage
+                        </p>
+                        <ng-container *hasPermission="'core.enrollment.member.shop'">
+                            <button
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                type="submit"
+                                *ngIf="isShopEnabled && !unpluggedFeatureFlag && !hideShopOptions && !hideShopButton"
+                                (click)="shopPageNavigation()"
+                            >
+                                <span>{{languageStrings['primary.portal.coverage.shop']}}</span>
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+                <!-- Inside OE end -->
+            </div>
+            <!-- End of Available products / shop MMP -->
+        </ng-container>
+        <ng-container *configEnabled="'general.feature.enable.benefitDollars.tpi'">
+            <ng-container *configEnabled="'general.feature.enable.benefitDollars'">
+                <div
+                    class="flex-form-wrapper"
+                    *ngIf="isMemberPortal && !isTPI && flexDollars.length && abbreviation !== NEW_YORK_ABBR && abbreviation !== OHIO_ABBR"
+                >
+                    <div class="d-md-flex">
+                        <div class="flex-item offerlist-list-popup">
+                            <div class="offerlist-content">
+                                <h3>{{languageStrings['primary.portal.coverage.benefitDollars']}}</h3>
+                                <p>{{offerListDescription}}</p>
+                                <div class="text-center">
+                                    <button
+                                        (click)="openOfferingListPopup()"
+                                        mat-flat-button
+                                        class="mon-btn-secondary btn-view"
+                                        [disabled]="!isBenefitDollarConfigEnabled"
+                                    >
+                                        {{languageStrings['primary.portal.coverage.view']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+        <!-- TODO - Checking if member portal to not show Aflac Always Card EVE-38426 -->
+        <ng-container *ngIf="isAflacAlways$ | async">
+            <div *ngIf="!enrollData.data.length" class="aflac-always">
+                <ng-container [ngTemplateOutlet]="aflacAlwaysCard"></ng-container>
+            </div>
+        </ng-container>
+    </div>
+</div>
+<ng-template #aflacAlwaysCard>
+    <empowered-aflac-always-card
+        bodyLanguageString="primary.portal.coverage.AflacAlwaysCard.content"
+        [mpGroupId]="mpGroupId"
+        [memberId]="memberId"
+        [isMemberPortal]="isMemberPortal"
+        [isTpi]="isTPI"
+    ></empowered-aflac-always-card>
+</ng-template>

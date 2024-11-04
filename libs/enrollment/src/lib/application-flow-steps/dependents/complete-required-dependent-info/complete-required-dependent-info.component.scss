@@ -1,0 +1,24 @@
+@import "shared";
+
+.dependent-wrapper,
+.dependent-wrapper > * {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    padding: map-get($spacers, 30) map-get($spacers, 50);
+
+    h2 {
+        margin: map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 10);
+    }
+
+    .flex-form-wrapper {
+        margin-top: map-get($spacers, 30);
+
+        .form-fields {
+            margin-top: map-get($spacers, 30);
+        }
+    }
+}

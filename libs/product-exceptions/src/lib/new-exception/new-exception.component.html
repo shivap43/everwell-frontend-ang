@@ -1,0 +1,256 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close (click)="closeDialog()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form *ngIf="exceptionForm && products" [formGroup]="exceptionForm" (ngSubmit)="submit.focus(); submitException()">
+        <div mat-dialog-content>
+            <div>
+                <h1 mat-dialog-title>
+                    <span *ngIf="isVasExceptionUser || exceptionForm.controls.planDetails?.value.length === 1">
+                        {{languageStrings["primary.portal.productExceptions.newException.title"]}}</span
+                    >
+                    <span *ngIf="exceptionForm.controls.planDetails?.value.length > 1 && !isVasExceptionUser">
+                        {{languageStrings["primary.portal.productExceptions.newException.plural.title"]}}</span
+                    >
+                </h1>
+            </div>
+            <!-- code for the form-->
+            <div class="exception-wrapper">
+                <mat-label class="mat-label">{{languageStrings["primary.portal.productExceptions.newException.exceptionType"]}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="exceptionType"
+                        (selectionChange)="onChangeVas($event)"
+                        [disableOptionCentering]="true"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                    >
+                        <ng-container *ngIf="isRole12">
+                            <mat-option *ngFor="let plan of withDrawnPlan" [value]="plan">{{plan}}</mat-option>
+                        </ng-container>
+                        <ng-container *ngIf="!isRole12">
+                            <mat-option *ngFor="let exceptionType of exceptionTypes" [value]="exceptionType.value"
+                                >{{ exceptionType.name }}</mat-option
+                            >
+                        </ng-container>
+                    </mat-select>
+                    <mat-error *ngIf="exceptionForm.controls.exceptionType.hasError('required')"
+                        >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                    >
+                </mat-form-field>
+                <div class="d-md-flex">
+                    <div class="field-wrapper">
+                        <mat-label class="mat-label"
+                            >{{languageStrings["primary.portal.productExceptions.newException.startDate"]}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="startDate"
+                                matInput
+                                [matDatepicker]="pickerStartDate"
+                                [min]="TODAY"
+                                [max]="startDateMax"
+                                autocomplete="off"
+                                [attr.aria-label]="languageStrings['primary.portal.productExceptions.newException.startDate']"
+                                empoweredDateTransform
+                                (dateChange)="resetStartDateError()"
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-error
+                                *ngIf="exceptionForm.controls.startDate.hasError('required') && !exceptionForm.controls.startDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls['startDate'].hasError('invalidStartDate')">
+                                {{languageStrings["primary.portal.productExceptions.newException.startDateOverlap"]}}
+                            </mat-error>
+                            <mat-error *ngIf="exceptionForm.controls.startDate.hasError('matDatepickerMin')"
+                                >{{languageStrings["primary.portal.productExceptions.newException.cantBeInPast"]}}
+                            </mat-error>
+                            <mat-error *ngIf="exceptionForm.controls.startDate.hasError('matDatepickerMax')"
+                                >{{startDateMaxError}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.startDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.census.errorMessage.general.error.date_format"]}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="pickerStartDate">
+                                <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerStartDate.open()"></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerStartDate></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="field-wrapper">
+                        <mat-label class="mat-label"
+                            >{{languageStrings["primary.portal.productExceptions.newException.endDate"]}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="endDate"
+                                matInput
+                                [matDatepicker]="pickerEndDate"
+                                [min]="endDateMin"
+                                [max]="endDateMax"
+                                autocomplete="off"
+                                [attr.aria-label]="languageStrings['primary.portal.productExceptions.newException.endDate']"
+                                empoweredDateTransform
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-error
+                                *ngIf="exceptionForm.controls.endDate.hasError('required') && !exceptionForm.controls.endDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.endDate.hasError('matDatepickerMin')">{{endDateMinError}} </mat-error>
+                            <mat-error *ngIf="exceptionForm.controls.endDate.hasError('matDatepickerMax')"
+                                >{{languageStrings["primary.portal.productExceptions.newException.mustBeBefore"]}} {{endDateMax | date:
+                                dateFormat}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.endDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.census.errorMessage.general.error.date_format"]}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="pickerEndDate">
+                                <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerEndDate.open()"></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerEndDate></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="field-wrapper" *ngIf="exceptionForm.controls.exceptionType.value ==='VAS_MULTIPLE_AFLAC_FUNDED'">
+                    <mat-label class="mat-label">{{languageStrings["primary.portal.productExceptions.newException.maxPlans"]}}</mat-label>
+                    <mat-form-field>
+                        <input type="text" formControlName="maxValue" matInput />
+                        <mat-error *ngIf="exceptionForm.controls.maxValue.hasError('required')"
+                            >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                        >
+                        <mat-error
+                            *ngIf="exceptionForm.controls.maxValue.hasError('max') && !exceptionForm.controls.maxValue.hasError('pattern')"
+                            >{{languageStrings["primary.portal.productExceptions.newException.cannotExceed"]}}</mat-error
+                        >
+                        <mat-error
+                            *ngIf="exceptionForm.controls.maxValue.hasError('min') && !exceptionForm.controls.maxValue.hasError('pattern')"
+                            >{{languageStrings["primary.portal.productExceptions.newException.minimumZero"]}}</mat-error
+                        >
+                        <mat-error *ngIf="exceptionForm.controls.maxValue.hasError('pattern')">
+                            {{languageStrings["primary.portal.census.editEstimate.onlyNumbers"]}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div *ngIf="exceptionForm.controls.exceptionType.value === allowWithdrawnPlan.ALLOW_WITHDRAWN_API">
+                <div
+                    formArrayName="planDetails"
+                    *ngFor="let planDetail of exceptionForm.get('planDetails').controls; let i = index;"
+                    class="add-plan-wrapper"
+                >
+                    <div class="add-plan" [formGroupName]="i">
+                        <div class="plan-form">
+                            <div class="d-md-flex">
+                                <div class="field-wrapper">
+                                    <mat-label>{{languageStrings["primary.portal.productExceptions.newException.product"]}}</mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            (selectionChange)="getSelectedProduct(i)"
+                                            (click)="$event.preventDefault(); getSelectedProduct(i);"
+                                            formControlName="product"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                        >
+                                            <mat-option
+                                                *ngFor="let product of planDetail.controls.availableProducts.value"
+                                                [value]="product.product.name"
+                                                >{{product.product.name}}</mat-option
+                                            >
+                                        </mat-select>
+                                        <mat-error *ngIf="planDetail.get('product').hasError('required')"
+                                            >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                <div class="field-wrapper">
+                                    <mat-label>{{languageStrings["primary.portal.productExceptions.newException.policySeries"]}}</mat-label>
+                                    <mat-form-field>
+                                        <mat-select
+                                            formControlName="policySeries"
+                                            [disableOptionCentering]="true"
+                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                            [disableControl]="!planDetail.get('product')?.value"
+                                            (selectionChange)="onPolicySeriesSelectionChange($event.value, i)"
+                                            (click)="$event.preventDefault()"
+                                        >
+                                            <mat-option
+                                                *ngFor="let policy of planDetail.controls.availablePolicySeries.value"
+                                                [value]="policy"
+                                                >{{policy.replace('DUMMY-','')}}</mat-option
+                                            >
+                                        </mat-select>
+                                        <mat-error *ngIf="planDetail.get('policySeries').hasError('required')"
+                                            >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <mat-label>{{languageStrings["primary.portal.productExceptions.newException.planName"]}}</mat-label>
+
+                            <mat-form-field class="plan-name">
+                                <mat-select
+                                    formControlName="planName"
+                                    [disableOptionCentering]="true"
+                                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    [disableControl]="!planDetail.get('policySeries')?.value || disablePlanState[i]"
+                                    (selectionChange)="onPlanChange()"
+                                >
+                                    <mat-option
+                                        *ngFor="let plan of planDetail.controls.availablePlans.value"
+                                        [value]="plan.id"
+                                        (click)="onPlanNameChange(plan.states, i)"
+                                    >
+                                        {{plan.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="planDetail.get('planName').hasError('required')"
+                                    >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                                >
+                            </mat-form-field>
+                            <div class="state-select">
+                                <mat-label>{{languageStrings["primary.portal.productExceptions.newException.states"]}}</mat-label>
+                                <empowered-chip-select
+                                    [chipOptions$]="allStates$[i]"
+                                    [hasSelectAll]="true"
+                                    [valuesChipControl]="stateValueChipSelects[i]"
+                                    [changeStrategy]="changeStrategies$[i]"
+                                    (chipChange)="changeStateControlValue($event, i)"
+                                    [attr.id]="'stateChipSelect${i}'"
+                                >
+                                </empowered-chip-select>
+                                <mat-error *ngIf="planDetail.get('states').hasError('required')"
+                                    >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                                >
+                            </div>
+                        </div>
+                        <a
+                            *ngIf="exceptionForm.get('planDetails')?.length > 1"
+                            href="javascript:void(0)"
+                            class="link-danger"
+                            (click)="removePlan(i)"
+                            >{{languageStrings["primary.portal.common.remove"]}}</a
+                        >
+                    </div>
+                    <mat-error *ngIf="currentResultSnapShot[+i]?.success === false"
+                        >{{getError(currentResultSnapShot[+i].error)}}</mat-error
+                    >
+                </div>
+                <span
+                    ><button mat-button class="mon-btn-link" type="submit" (click)="addPlan()">
+                        {{languageStrings["primary.portal.productExceptions.newException.addAnotherPlan"]}}
+                    </button></span
+                >
+            </div>
+        </div>
+        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <button type="button" class="mon-btn-link cancel-button" mat-flat-button (click)="closeDialog()">
+                {{languageStrings["primary.portal.common.cancel"]}}
+            </button>
+            <button class="mon-btn-primary" mat-flat-button type="submit" #submit>{{languageStrings["primary.portal.common.save"]}}</button>
+        </div>
+    </form>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>

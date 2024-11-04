@@ -1,0 +1,39 @@
+<div class="emp_tab">
+    <div class="emp_tab-column">
+        <div
+            class="emp_tab-circle_icon"
+            [ngClass]="{'emp_tab-active': tabMeta.active || activeChild(), 'emp_tab-complete': !(tabMeta.active || activeChild()) && tabMeta.state === 'COMPLETED', 'emp_tab-inactive': !(tabMeta.active || activeChild()) && tabMeta.state !== 'COMPLETED'}"
+        >
+            <div class="emp_tab-icon" *ngIf="!tabMeta.active">
+                <ng-container *ngIf="tabMeta.state==='COMPLETED'; else stepNumberLabel">
+                    <mon-icon class="icon-white" iconName="check" [iconSize]="10"></mon-icon>
+                </ng-container>
+                <ng-template #stepNumberLabel>
+                    {{ stepNumber }}
+                </ng-template>
+            </div>
+        </div>
+        <div class="emp_tab-vertical_divider"></div>
+    </div>
+    <div class="emp_tab-column">
+        <p
+            [ngClass]="{'emp_tab-active_title': tabMeta.active || activeChild(),  'emp_tab-inactive_title': !(tabMeta.active || activeChild()), 'step-completed' : tabMeta.state === 'COMPLETED'}"
+            [attr.aria-label]="tabTitle + ' ' + languageStrings['primary.portal.empStepper.tab']"
+            (click)="jumpToStep()"
+        >
+            {{ tabTitle }}
+            <span *ngIf="tabMeta.active || activeChild()" class="cdk-visually-hidden"
+                >{{languageStrings['primary.portal.empStepper.currentTab']}}</span
+            >
+        </p>
+        <p
+            [attr.aria-label]="subTabTitles[i] + ' ' + languageStrings['primary.portal.empStepper.subTab']"
+            class="emp_tab-subtab"
+            [ngClass]="{'emp_tab-subtab_active_title': subTab.active, 'emp_tab-subtab_inactive_title': (!subTab.active && subTab.state != 'COMPLETED')}"
+            *ngFor="let subTab of subTabs; let i = index;"
+            (click)="jumpToStep(stepNumber+i)"
+        >
+            {{ subTabTitles[i] }}
+        </p>
+    </div>
+</div>

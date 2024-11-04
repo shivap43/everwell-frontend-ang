@@ -1,0 +1,14 @@
+<mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.paymentDate]">
+    {{ languageStrings[languageKeys.paymentDate] }}
+</mat-label>
+<mat-form-field>
+    <input
+        matInput
+        type="number"
+        [formControl]="control"
+        (input)="onInput($event.target.value)"
+        [attr.aria-label]="languageStrings[languageKeys.paymentDate]"
+    />
+    <mat-error> <ng-content></ng-content></mat-error>
+    <mat-hint class="mat-hint-date"> {{ languageStrings[languageKeys.paymentDateHint] }} </mat-hint>
+</mat-form-field>

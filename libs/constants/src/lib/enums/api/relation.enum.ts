@@ -1,0 +1,6 @@
+export enum Relation {
+    SPOUSE = "SPOUSE",
+    DOMESTIC_PARTNER = "DOMESTIC PARTNER",
+    CHILD = "CHILD",
+    INELIGIBLE = "INELIGIBLE",
+}

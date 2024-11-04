@@ -1,0 +1,284 @@
+<form [formGroup]="removePlanForm" (ngSubmit)="onNext()">
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <mat-dialog-content>
+            <div class="header">
+                <h1 mat-dialog-title>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.productTitle']
+                    .replace("#productname", carrierName + " " + productName) }}
+                </h1>
+            </div>
+            <div class="scroll-content">
+                <div>
+                    <p class="mon-mb-20" *ngIf="!planYearType">
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.productContinuous']}}
+                    </p>
+                    <div class="w-200" *ngIf="!planYearType">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.enrollmentEndDate']}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.enrollmentEndDate']"
+                                [matDatepicker]="enrollmentEndDate"
+                                matInput
+                                formControlName="enrollmentEndDate"
+                                [min]="modifiedEnrollmentStartDate"
+                                empoweredDateTransform
+                                [min]="today"
+                                (blur)="onBlur($event.target.value,this.removePlanForm.controls['enrollmentEndDate'])"
+                                (input)="checkDateInput($event.target.value, this.removePlanForm.controls['enrollmentEndDate'])"
+                            />
+                            <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                            <mat-datepicker-toggle matSuffix (click)="enrollmentEndDate.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-error>
+                                <span
+                                    *ngIf="removePlanForm.controls['enrollmentEndDate'].errors?.required && 
+                                        !removePlanForm.controls['enrollmentEndDate'].errors?.requirements && 
+                                        !removePlanForm.controls['enrollmentEndDate'].errors?.invalid"
+                                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                >
+                                <span *ngIf="removePlanForm.controls['enrollmentEndDate'].errors?.requirements"
+                                    >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                                >
+                                <span *ngIf="removePlanForm.controls['enrollmentEndDate'].errors?.invalid"
+                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                >
+                                <span *ngIf="removePlanForm.controls['enrollmentEndDate'].errors?.pastDate"
+                                    >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="divider mon-mb-20"></div>
+                </div>
+
+                <div class="stop-offering-plan">
+                    <p class="mon-mb-20">
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.coverageDescription']}}
+                    </p>
+                    <mat-radio-group
+                        [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                        #radioGroup="matRadioGroup"
+                        (change)="onChange($event)"
+                    >
+                        <div>
+                            <mat-radio-button class="mon-mb-10" [checked]="true" value="continueCoverage">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.continueCoverage']}}
+                            </mat-radio-button>
+                        </div>
+                        <div>
+                            <mat-radio-button (change)="onChange($event)" value="endCoverage" class="mon-mb-10">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.endCoverage']}}
+                            </mat-radio-button>
+                            <div class="w-200 mon-ml-30">
+                                <div *ngIf="showCoverageEndDate">
+                                    <mat-label class="mat-label"
+                                        >{{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.coverageEndDate']}}</mat-label
+                                    >
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.coverageEndDate']"
+                                            [matDatepicker]="coverageEndDate"
+                                            matInput
+                                            formControlName="coverageEndDate"
+                                            (change)="$event.stopPropagation()"
+                                            empoweredDateTransform
+                                            [min]="today"
+                                            (blur)="onBlur($event.target.value,this.removePlanForm.controls['coverageEndDate'])"
+                                            (input)="checkDateInput($event.target.value, this.removePlanForm.controls['coverageEndDate'])"
+                                        />
+                                        <mat-datepicker #coverageEndDate></mat-datepicker>
+                                        <mat-datepicker-toggle matSuffix (click)="coverageEndDate.open()">
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-error>
+                                            <span
+                                                *ngIf="removePlanForm.controls['coverageEndDate'].errors?.required && 
+                                                    !removePlanForm.controls['coverageEndDate'].errors?.requirements && 
+                                                    !removePlanForm.controls['coverageEndDate'].errors?.invalid"
+                                                >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                            >
+                                            <span
+                                                *ngIf="removePlanForm.controls['coverageEndDate'].errors?.requirements"
+                                                >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                                            >
+                                            <span *ngIf="removePlanForm.controls['coverageEndDate'].errors?.invalid"
+                                                >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                            >
+                                            <span *ngIf="removePlanForm.controls['coverageEndDate'].errors?.pastDate"
+                                                >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                            >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <mat-radio-button value="Replace" class="mon-mb-20">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.replaceNewCoverage']}}
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </div>
+                <div *ngIf="planYearType">
+                    <div class="divider mon-mb-20 mon-pt-10"></div>
+                    <p class="mon-mb-20">
+                        {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.planYearTypeDescription']}}
+                    </p>
+                    <mat-radio-group
+                        [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                        (change)="onChangePlanYear($event)"
+                    >
+                        <div>
+                            <mat-radio-button value="yes" [checked]="true" class="mon-mb-10">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.optionYes']}}
+                            </mat-radio-button>
+                            <div class="flex-form-wrapper">
+                                <div class="d-md-flex mon-ml-30">
+                                    <div class="flex-item w-200">
+                                        <mat-label class="mat-label"
+                                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.startDate']}}</mat-label
+                                        >
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.startDate']"
+                                                [matDatepicker]="startDate"
+                                                formControlName="startDate"
+                                                matInput
+                                                empoweredDateTransform
+                                                [min]="today"
+                                                (blur)="onBlur($event.target.value,this.removePlanForm.controls['startDate'])"
+                                                (input)="checkDateInput($event.target.value, this.removePlanForm.controls['startDate'])"
+                                            />
+                                            <mat-datepicker #startDate></mat-datepicker>
+                                            <mat-datepicker-toggle matSuffix (click)="startDate.open()">
+                                                <mon-icon
+                                                    iconName="calendar-date"
+                                                    [iconSize]="20"
+                                                    matDatepickerToggleIcon
+                                                >
+                                                </mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="removePlanForm.controls['startDate'].errors?.required && 
+                                                        !removePlanForm.controls['startDate'].errors?.requirements && 
+                                                        !removePlanForm.controls['startDate'].errors?.invalid"
+                                                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['startDate'].errors?.requirements"
+                                                    >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['startDate'].errors?.invalid"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['startDate'].errors?.pastDate"
+                                                    >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                                >
+                                                <span
+                                                    *ngIf="removePlanForm.controls['startDate'].errors?.invalidStartDate"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.stopOffering.startDate.invalid']}}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex-item w-200">
+                                        <mat-label class="mat-label"
+                                            >{{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.endDate']}}</mat-label
+                                        >
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.endDate']"
+                                                [matDatepicker]="endDate"
+                                                formControlName="endDate"
+                                                matInput
+                                                (change)="$event.stopPropagation()"
+                                                empoweredDateTransform
+                                                [min]="today"
+                                                (blur)="onBlur($event.target.value,this.removePlanForm.controls['endDate'])"
+                                                (input)="checkDateInput($event.target.value, this.removePlanForm.controls['endDate'])"
+                                            />
+                                            <mat-datepicker #endDate></mat-datepicker>
+                                            <mat-datepicker-toggle matSuffix (click)="endDate.open()">
+                                                <mon-icon
+                                                    iconName="calendar-date"
+                                                    [iconSize]="20"
+                                                    matDatepickerToggleIcon
+                                                >
+                                                </mon-icon>
+                                            </mat-datepicker-toggle>
+
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="removePlanForm.controls['endDate'].errors?.required && 
+                                                        !removePlanForm.controls['endDate'].errors?.requirements && 
+                                                        !removePlanForm.controls['endDate'].errors?.invalid"
+                                                    >{{languageStrings['primary.portal.common.requiredField']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['endDate'].errors?.requirements"
+                                                    >{{languageStrings['primary.portal.common.invalidDateFormat']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['endDate'].errors?.invalid"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.coveragedates.invalidDate']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['endDate'].errors?.pastDate"
+                                                    >{{languageStrings['primary.portal.coverage.cannotBePast']}}</span
+                                                >
+                                                <span *ngIf="removePlanForm.controls['endDate'].errors?.invalidEndDate"
+                                                    >{{languageSecondStringsArray['secondary.portal.benefitsOffering.stopOffering.endDate.invalid']}}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <mat-radio-button value="no" class="mon-mb-20">
+                                {{languageStrings['primary.portal.maintenanceBenefitsOffering.stopOffering.optionNo']}}
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </mat-dialog-content>
+
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-dialog-close
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <div>
+                <button
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    *ngIf="!showReplacePlan"
+                    [attr.aria-label]="languageStrings['primary.portal.common.stopOfferingProduct']"
+                >
+                    {{languageStrings['primary.portal.common.stopOfferingProduct']}}
+                </button>
+                <button
+                    type="submit"
+                    mat-flat-button
+                    class="mon-btn-primary"
+                    *ngIf="showReplacePlan"
+                    [attr.aria-label]="languageStrings['primary.portal.common.replaceCoverage']"
+                >
+                    {{languageStrings['primary.portal.common.replaceCoverage']}}
+                </button>
+            </div>
+        </mat-dialog-actions>
+    </div>
+</form>

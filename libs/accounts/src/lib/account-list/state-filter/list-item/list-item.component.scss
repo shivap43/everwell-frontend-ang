@@ -1,0 +1,31 @@
+@import "shared";
+
+:host {
+    .list-item {
+        display: block;
+        padding: map-get($spacers, 10) map-get($spacers, 20);
+        cursor: pointer;
+    }
+
+    &.active,
+    &:hover {
+        .list-item {
+            background-color: get("color.gray.200");
+        }
+    }
+    &.disabled {
+        opacity: 0.3;
+    }
+    &.selected {
+        .list-item {
+            background-color: get("color.primary.600");
+            color: #fff;
+        }
+
+        &:hover {
+            .list-item {
+                background-color: get("color.primary.700");
+            }
+        }
+    }
+}

@@ -1,0 +1,36 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <ng-container *ngIf="data.dualPlanYearData && data.dualPlanYearData.isDualPlanYear else closeSepHeading">
+            <span
+                >{{languageStrings['primary.portal.shop.confirmation.dualPlanYear.lifeEventEnrollmentPeriod']}}</span
+            ></ng-container
+        >
+        <ng-template #closeSepHeading>
+            <span>{{languageStrings['primary.portal.enrollment.complete.close']}}</span>
+        </ng-template>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div>
+            <ng-container *ngIf="data.dualPlanYearData && data.dualPlanYearData.isDualPlanYear else closeSepButton">
+                <button mat-flat-button class="mon-btn-primary" (click)="closeSEP()">
+                    {{languageStrings['primary.portal.shop.confirmation.dualPlanYear.closePeriodExit']}}
+                </button>
+            </ng-container>
+            <ng-template #closeSepButton>
+                <button class="mon-btn-primary" (click)="closeSEP()">
+                    {{languageStrings['primary.portal.enrollment.complete.closeSep']}}
+                </button>
+            </ng-template>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <ng-container *ngIf="data.dualPlanYearData && data.dualPlanYearData.isDualPlanYear">
+            {{languageStrings['primary.portal.shop.confirmation.dualPlanYear.closeLifeEventContent']}}
+        </ng-container>
+
+        <ng-container *ngIf="((qleFlag && !oeFlag) || dualRollover) && !data.dualPlanYearData">
+            {{languageStrings['primary.portal.enrollment.complete.qleFlagOeFlag']}}&nbsp;
+            <span *ngIf="dualRollover">{{languageStrings['primary.portal.enrollment.complete.dualRollover']}}</span>
+        </ng-container>
+    </div>
+</empowered-modal>

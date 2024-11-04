@@ -1,0 +1,38 @@
+@import "shared";
+
+.description {
+    font-size: convert-unit(14px, "rem");
+    @include fontFace("primary.bold");
+    padding-bottom: map-get($map: $spacers, $key: 10);
+}
+
+::ng-deep .address-verification .info-modal {
+    .mat-dialog-content {
+        padding-top: map-get($map: $spacers, $key: 0);
+    }
+    .mat-dialog-title {
+        margin-bottom: map-get($map: $spacers, $key: 0);
+    }
+}
+
+.address-verification {
+    ::ng-deep {
+        .mon-alert {
+            margin-bottom: map-get($map: $spacers, $key: 20);
+        }
+    }
+
+    .address-details {
+        margin-left: map-get($map: $spacers, $key: 30);
+    }
+
+    .address-block {
+        margin-bottom: map-get($map: $spacers, $key: 10);
+
+        &.confirm-address-block {
+            .address-details {
+                margin-left: map-get($spacers, 0);
+            }
+        }
+    }
+}

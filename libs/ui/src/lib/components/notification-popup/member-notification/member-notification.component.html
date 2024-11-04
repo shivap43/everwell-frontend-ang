@@ -1,0 +1,46 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="member-notification-panel">
+    <h1>
+        {{languageStrings['primary.portal.notification.member.notification']}}
+        <span *ngIf="totalCount > 0" class="notification-total-count"> ({{totalCount}}) </span>
+    </h1>
+    <div *ngIf="notificationsMembertList && notificationsMembertList.length > 0">
+        <div class="notification-list">
+            <div *ngFor="let notification of notificationsMembertList" class="notification-information">
+                <div class="notification-info" *ngFor="let item of notification.categorizedObj">
+                    <div class="notification-count-block">
+                        <p *ngIf="item.count === 1 || !item.count"></p>
+                        <p class="notification-count" *ngIf="item.count > 1 && item.count < 100">{{item.count}}</p>
+                    </div>
+                    <div class="notification-info-block">
+                        <div class="notification-info-text">
+                            <p>{{item.displayText}}</p>
+                        </div>
+                        <div class="notification-action-block">
+                            <a *ngIf="item.dismissable" (click)="clearNotification(item)" class="mon-pr-5">
+                                {{languageStrings['primary.portal.notification.member.clear']}}
+                            </a>
+                            <ng-container *configEnabled="'general.notifications.link_display'">
+                                <span *ngIf="item.link && item.linkText && item.dismissable" class="seperator">
+                                    {{languageStrings['primary.portal.notificationMember.seperator']}}
+                                </span>
+                                <a
+                                    *ngIf="notification.link && notification.linkText"
+                                    (click)="viewNotifications(notification)"
+                                    class="mon-pl-5"
+                                >
+                                    {{notification.linkText}}
+                                </a>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="notificationsMembertList && notificationsMembertList.length === 0">
+        <div class="notification-list">
+            <p mon-pt-10>{{languageStrings['primary.portal.notification.member.noMessages']}}</p>
+        </div>
+    </div>
+</div>

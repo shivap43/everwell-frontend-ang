@@ -1,0 +1,16 @@
+import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
+import { EffectsModule } from "@ngrx/effects";
+import { StoreModule } from "@ngrx/store";
+import * as from<%= classify(name) %> from "./<%= dasherize(name) %>.reducer";
+import { <%= classify(name) %>Effects } from "./<%= dasherize(name) %>.effects";
+
+@NgModule({
+    imports: [
+        CommonModule,
+        StoreModule.forFeature(from<%= classify(name) %>.<%= underscore(name).toUpperCase() %>_FEATURE_KEY, from<%= classify(name) %>.reducer),
+        EffectsModule.forFeature([<%= classify(name) %>Effects]),
+    ],
+    providers: [<%= classify(name) %>Effects],
+})
+export class <%= classify(name) %>StoreModule {}

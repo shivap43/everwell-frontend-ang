@@ -1,0 +1,53 @@
+@import "shared";
+
+:host {
+    .layout-header-2column {
+        height: calc(100vh - 100px);
+
+        .columns {
+            overflow: hidden;
+
+            .sidenav-area {
+                overflow-y: auto;
+                min-width: convert-unit(220px, "rem");
+                max-width: convert-unit(220px, "rem");
+                ::ng-deep {
+                    .mat-vertical-stepper-header {
+                        &.mat-step-header {
+                            padding-left: convert-unit(43px, "rem");
+                        }
+                        .mat-stepper-vertical .sub-step {
+                            margin-left: convert-unit(38px, "rem");
+                        }
+                    }
+                    .mat-stepper-vertical-line::before {
+                        left: convert-unit(18px, "rem");
+                    }
+                }
+            }
+
+            .content-area {
+                display: flex;
+                flex-direction: column;
+
+                .footer {
+                    display: flex;
+                    justify-content: space-between;
+                    background-color: get("color.gray.100");
+                    border-top: convert-unit(1px, "rem") solid get("color.gray.500");
+                    margin: map-get($spacers, 0);
+                    padding: map-get($spacers, 25) map-get($spacers, 30);
+
+                    .mon-btn-link {
+                        text-align: left;
+                    }
+
+                    .mon-btn-link,
+                    .mon-btn-primary {
+                        font-size: convert-unit(16px, "rem");
+                    }
+                }
+            }
+        }
+    }
+}

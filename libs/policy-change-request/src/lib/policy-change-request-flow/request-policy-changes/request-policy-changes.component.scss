@@ -1,0 +1,34 @@
+@import "shared";
+
+.find-policyholder-content {
+    margin-bottom: map-get($spacers, 20);
+    .list {
+        display: flex;
+        flex-wrap: wrap;
+
+        .item {
+            flex: 50%;
+        }
+    }
+
+    ::ng-deep {
+        .mat-checkbox {
+            .mat-checkbox-layout {
+                display: flex;
+                align-items: flex-start;
+                white-space: normal;
+                height: auto;
+            }
+            .mat-checkbox-inner-container {
+                margin: map-get($spacers, 5) map-get($spacers, 5) map-get($spacers, 0) map-get($spacers, 0);
+            }
+        }
+    }
+}
+
+.request-policy-change {
+    padding: map-get($spacers, 30);
+    .errormsg {
+        color: get("color.info.danger.500");
+    }
+}

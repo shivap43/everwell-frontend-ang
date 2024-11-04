@@ -1,0 +1,12 @@
+<form [formGroup]="employeeStatusSelectionForm">
+    <empowered-chip-select
+        [chipOptions$]="allEmployeeIdsChips$"
+        (chipChange)="monitorChipChange($event)"
+        [valuesChipControl]="employeeStatusSelection"
+        [changeStrategy]="submitEvent$"
+    >
+    </empowered-chip-select>
+    <mat-error *ngIf="(validOnSubmit$ | async) === false"
+        ><span language="primary.portal.common.selectionRequired"></span
+    ></mat-error>
+</form>

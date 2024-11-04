@@ -1,0 +1,40 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title>
+            {{languageStrings['primary.portal.myHouseHoldTab.qleConfirmationDialog.confirmationTitle']}}
+        </h1>
+        <p>{{languageStrings['primary.portal.myHouseHoldTab.qleConfirmationDialog.confirmationDescription']}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <button [mat-dialog-close]="true" mat-button (click)="closePopup()" class="mon-btn-link">
+            {{languageStrings['primary.portal.common.cancel']}}
+        </button>
+        <div>
+            <button
+                [mat-dialog-close]="true"
+                mat-flat-button
+                (click)="secondaryButtonClick()"
+                class="mon-btn-secondary mon-px-30 mon-mr-20"
+            >
+                {{languageStrings['primary.portal.myHouseHoldTab.qleConfirmationDialog.noContinue']}
+            </button>
+            <button
+                [mat-dialog-close]="true"
+                mat-flat-button
+                (click)="primaryButtonClick()"
+                class="mon-btn-primary mon-px-30"
+            >
+                {{languageStrings['primary.portal.myHouseHoldTab.qleConfirmationDialog.yesComplete']}}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

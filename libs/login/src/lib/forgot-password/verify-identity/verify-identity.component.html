@@ -1,0 +1,59 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-25" role="form">
+    <mat-card>
+        <mat-card-content>
+            <mon-alert *ngIf="error" alertType="danger" role="alert">
+                <span [language]="errorMessage"></span>
+            </mon-alert>
+            <mat-card-title language="primary.portal.forgotPassword.verifyIdentityTitle"> </mat-card-title>
+            <mat-label class="mat-label" for="verifyMethod">
+                {{languageStrings['primary.portal.forgotPassword.chooseVerificationMethod']}}</mat-label
+            >
+            <mat-radio-group
+                formControlName="verifyMethod"
+                [attr.aria-label]="languageStrings['primary.portal.forgotPassword.chooseVerificationMethod']"
+            >
+                <div class="mon-my-10">
+                    <mat-radio-button
+                        (input)="this.fieldErrorFlag = false"
+                        id="verifyMethod-2"
+                        value="EMAIL"
+                        [attr.aria-label]="languageStrings['primary.portal.forgotPassword.email']"
+                    >
+                        <span>{{languageStrings['primary.portal.forgotPassword.email']}}</span>
+                    </mat-radio-button>
+                </div>
+                <div class="mon-my-10">
+                    <mat-radio-button
+                        (input)="this.fieldErrorFlag = false"
+                        id="verifyMethod-1"
+                        value="PHONE"
+                        [attr.aria-label]="languageStrings['primary.portal.forgotPassword.text']"
+                    >
+                        <span>{{languageStrings['primary.portal.forgotPassword.text']}}</span>
+                    </mat-radio-button>
+                </div>
+            </mat-radio-group>
+            <mat-error *ngIf="fieldErrorFlag" language="primary.portal.common.selectionRequired"></mat-error>
+        </mat-card-content>
+        <mat-card-footer class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-btn-primary"
+                mat-flat-button
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.common.next']"
+            >
+                {{languageStrings['primary.portal.common.next']}}
+            </button>
+            <mat-divider class="seperator mon-my-20"></mat-divider>
+            <p>
+                <a
+                    href="javascript:void(0)"
+                    routerLink="../../login"
+                    [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                >
+                    {{languageStrings['primary.portal.common.back']}}</a
+                >
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

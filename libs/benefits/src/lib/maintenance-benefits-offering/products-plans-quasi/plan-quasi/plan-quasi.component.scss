@@ -1,0 +1,205 @@
+@import "shared";
+
+.mat-card-subtitle {
+    color: get("color.gray.600");
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.filter-wrapper {
+    display: inline-block;
+    width: 50%;
+
+    .filter-sub-wrapper {
+        .mat-form-field {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.results-grid {
+    margin-top: convert-unit(20px, "rem");
+}
+
+.mat-option-text {
+    text-overflow: none;
+}
+
+::ng-deep .mat-icon {
+    margin-top: 0;
+}
+
+:host ::ng-deep .mat-select-panel-wrap {
+    .mat-select-plan {
+        &.mat-primary {
+            width: 0 !important;
+        }
+    }
+
+    .filter-riders {
+        right: convert-unit(-70px, "rem");
+        width: convert-unit(240px, "rem");
+    }
+}
+
+.mon-clear {
+    border-top: 1px solid get("color.gray.500");
+    padding-top: convert-unit(7px, "rem");
+}
+
+.remove-clear {
+    border-top: none;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: convert-unit(7px, "rem") convert-unit(20px, "rem") convert-unit(20px, "rem");
+    font-size: convert-unit(14px, "rem");
+}
+
+.mat-column-riders,
+.mat-column-states {
+    > a {
+        vertical-align: text-bottom;
+    }
+}
+
+::ng-deep .results-grid {
+    .infoicon {
+        .mat-icon {
+            vertical-align: top;
+        }
+    }
+}
+
+::ng-deep .rider-tooltip {
+    width: auto !important;
+    right: 25%;
+    filter: drop-shadow(0px convert-unit(1px, "rem") 0 rgba(0, 0, 0, 0.3));
+
+    &::after {
+        content: "";
+        right: 20%;
+        bottom: convert-unit(-8px, "rem");
+        position: absolute;
+        border-top: convert-unit(8px, "rem") solid get("color.white");
+        border-left: convert-unit(8px, "rem") solid transparent;
+        border-right: convert-unit(8px, "rem") solid transparent;
+        filter: drop-shadow(0px 1px 0 rgba(0, 0, 0, 0.3));
+    }
+}
+
+td.mat-column-selected,
+th.mat-column-selected {
+    width: 4% !important;
+    text-align: center;
+}
+
+td.mat-column-states,
+th.mat-column-states {
+    width: 14% !important;
+}
+
+td.mat-column-riders,
+th.mat-column-riders {
+    width: 12% !important;
+}
+
+::ng-deep .filter-checkbox {
+    padding-top: convert-unit(10px, "rem") !important;
+
+    .filter-options {
+        padding-top: 0 !important;
+
+        .mat-option {
+            height: convert-unit(18px, "rem");
+            margin-top: 0;
+            padding: convert-unit(20px, "rem") 0;
+        }
+    }
+}
+
+.text-wrap {
+    white-space: nowrap;
+    display: inline-flex;
+    width: 100%;
+}
+
+.carrierfilterwrp {
+    width: 50%;
+    display: inline-block;
+}
+
+.carrieroptionwrp {
+    padding-bottom: map-get($spacers, 15);
+
+    .carrieroptionlabel {
+        @include fontFace("primary.bold");
+        margin: map-get($spacers, 15) 0;
+        text-align: left;
+    }
+
+    .form-radio-button {
+        margin-right: map-get($spacers, 20);
+    }
+}
+
+.planTypeWrp {
+    width: 50%;
+    display: inline-block;
+    margin-left: map-get($spacers, 10);
+}
+
+.planTypeoptionwrp {
+    padding-bottom: map-get($spacers, 25);
+}
+
+.planTypeoptionlabel {
+    @include fontFace("primary.bold");
+    margin: map-get($spacers, 15) 0;
+    text-align: left;
+}
+
+.form-radio-button {
+    margin-right: convert-unit(10px, "rem");
+}
+
+.form-radio-grp {
+    display: flex;
+    flex-direction: row;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.message-block {
+    margin-top: map-get($spacers, 20);
+    display: block;
+}
+
+.form-radio-button-stacked {
+    margin: map-get($map: $spacers, $key: 10) map-get($map: $spacers, $key: 20) map-get($map: $spacers, $key: 0)
+        map-get($map: $spacers, $key: 0);
+}
+
+.plan-option {
+    margin: map-get($map: $spacers, $key: 20) map-get($map: $spacers, $key: 0) map-get($map: $spacers, $key: 0)
+        map-get($map: $spacers, $key: 30);
+
+    .status {
+        @include fontFace("primary.bold");
+    }
+}
+
+.agent-section {
+    margin-top: map-get($map: $spacers, $key: 20);
+}
+
+.alert-wrapper {
+    margin: map-get($spacers, 20);
+}
+
+::ng-deep .available-riders-tooltip {
+    max-height: convert-unit(400px, "rem");
+    max-width: convert-unit(600px, "rem") !important;
+}

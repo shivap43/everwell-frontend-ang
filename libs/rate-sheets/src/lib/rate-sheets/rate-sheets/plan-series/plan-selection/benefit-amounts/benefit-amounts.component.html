@@ -1,0 +1,73 @@
+<ng-container *ngIf="isOtherProductSelected$ | async">
+    <div class="benefit-amount-checkbox" [formGroup]="benefitAmountFormControl">
+        <mat-selection-list formControlName="benefitAmountSelected" ngDefaultControl>
+            <mat-list-option
+                checkboxPosition="before"
+                *ngFor="let benefitAmountsData of benefitAmountOptions; let i=index"
+                [value]="benefitAmountsData"
+                [richTooltip]="disableBenefitAmountOptions && disableBenefitAmountOptions[i] ? toolTipMessage : '' "
+                matTooltipPosition="above"
+                matTooltipClass="pos-above"
+                [disabled]="disableBenefitAmountOptions ? disableBenefitAmountOptions[i] : false"
+                [ngClass]="{'error': requiredBenefitAmountsSelection[i]}"
+            >
+                {{ benefitAmountsData.amount | currency: 'USD':'symbol':'1.0-0' }}
+            </mat-list-option>
+        </mat-selection-list>
+    </div>
+</ng-container>
+<!-- STD products -->
+<ng-container *ngIf="isStdProduct$ | async">
+    <div class="d-flex" [formGroup]="benefitAmountFormControl">
+        <div class="benefit-amount-multiple-dropdown">
+            <mat-label>
+                <span language="primary.portal.rateSheets.minBenefitAmount"></span>
+            </mat-label>
+            <mat-form-field>
+                <mat-select [placeholder]="languageStrings['primary.portal.common.placeholderSelect']" formControlName="minBenefitAmount">
+                    <mat-option *ngFor="let benefitAmountsData of minimumBenefitAmounts; let i=index" [value]="benefitAmountsData">
+                        <!-- TODO: EVE-15428 - language -->
+                        {{benefitAmountsData.units}} units ({{ benefitAmountsData.amount | currency: 'USD':'symbol':'1.0-0' }})
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="benefit-amount-multiple-dropdown">
+            <mat-label>
+                <span language="primary.portal.rateSheets.maxBenefitAmount"></span>
+            </mat-label>
+            <mat-form-field>
+                <mat-select
+                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                    formControlName="maxBenefitAmount"
+                    [richTooltip]="isMaxBenefitAmountDisabled ? toolTipMessage : '' "
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                    [disabled]="isMaxBenefitAmountDisabled"
+                    ><mat-option *ngFor="let benefitAmountsData of maxBenefitAmountOptions; let i=index" [value]="benefitAmountsData">
+                        <!-- TODO: EVE-15428 - language -->
+                        {{benefitAmountsData.units}} units ({{ benefitAmountsData.amount | currency: 'USD':'symbol':'1.0-0' }})</mat-option
+                    ></mat-select
+                >
+            </mat-form-field>
+            <!-- {{ this.benefitAmountFormControl.get("maxBenefitAmount").value | json}} -->
+        </div>
+    </div>
+</ng-container>
+<!-- Whole and term life Products -->
+<ng-container *ngIf="isWholeAndTermLifeProduct$ | async">
+    <div class="d-flex benefit-amount-multiple-dropdown" [formGroup]="benefitAmountFormControl">
+        <mat-form-field>
+            <mat-select [placeholder]="languageStrings['primary.portal.common.placeholderSelect']" formControlName="benefitAmountSelected">
+                <mat-option *ngFor="let benefitAmountsData of benefitAmountOptions; let i=index" [value]="benefitAmountsData">
+                    <!-- TODO: EVE-15428 - language -->
+                    <span *ngIf="benefitAmountsData.units"
+                        >{{benefitAmountsData.units}} units ({{ benefitAmountsData.amount | currency: 'USD':'symbol':'1.0-0' }})</span
+                    >
+                    <span *ngIf="!(benefitAmountsData.units)">({{ benefitAmountsData.amount | currency: 'USD':'symbol':'1.0-0' }})</span>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</ng-container>
+<mat-error><ng-content></ng-content></mat-error>

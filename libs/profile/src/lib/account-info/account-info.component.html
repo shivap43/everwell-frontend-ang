@@ -1,0 +1,49 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+
+<mon-alert alertType="danger" *ngIf="showErrorMessage" class="account-info-error">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+
+<section class="mon-mx-20">
+    <h2>{{langStrings["primary.portal.profile.accountInfo.title"]}}</h2>
+
+    <div class="admin-info-wrapper">
+        <div>
+            <div class="account-details-wrapper">
+                <p class="text-bold">{{langStrings["primary.portal.profile.accountInfo.name"]}}</p>
+                <p>{{accountDetails?.name}}</p>
+            </div>
+
+            <div class="account-details-wrapper">
+                <p class="text-bold">{{langStrings["primary.portal.profile.accountInfo.number"]}}</p>
+                <p>{{accountDetails?.accountNumber}}</p>
+            </div>
+
+            <div class="account-details-wrapper">
+                <p class="text-bold">{{langStrings["primary.portal.profile.accountInfo.situs"]}}</p>
+                <p>{{accountDetails?.situs.state.name}} {{accountDetails?.situs.zip}}</p>
+            </div>
+
+            <div class="account-details-wrapper">
+                <p class="text-bold">{{langStrings["primary.portal.profile.accountInfo.status"]}}</p>
+                <p>{{accountDetails?.status}}</p>
+            </div>
+
+            <div class="account-details-wrapper">
+                <p class="text-bold">{{langStrings["primary.portal.profile.accountInfo.eaaStatus"]}}</p>
+                <p *ngIf="accountDetails?.enrollmentAssistanceAgreement; else failed">
+                    {{ langStrings["primary.portal.profile.accountInfo.eaaStatus.available"] }}
+                </p>
+                <ng-template #failed>
+                    <p>{{ langStrings["primary.portal.profile.accountInfo.eaaStatus.notAvailable"] }}</p>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="mon-ml-30" *ngIf="allowNameEdit || allowSitusEdit">
+            <a href="javascript:void(0)" (click)="openEditPopup()"
+                >{{langStrings["primary.portal.profile.accountInfo.edit"]}}</a
+            >
+        </div>
+    </div>
+</section>

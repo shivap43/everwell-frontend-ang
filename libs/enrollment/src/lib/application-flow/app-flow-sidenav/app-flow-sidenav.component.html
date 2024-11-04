@@ -1,0 +1,156 @@
+<mat-vertical-stepper class="side-nav-stepper" linear="true" (selectionChange)="onPlanChange($event)" #progressIndicator>
+    <mat-step
+        *ngFor="let application of applicationData; let i=index"
+        [completed]="completedCartIds.indexOf(this.application.cartData.id) >= 0"
+        [editable]="isStepperEditable"
+    >
+        <ng-template matStepLabel>
+            <span
+                richTooltip="{{application.productName }} : {{ application.planName }}"
+                matTooltipClass="pos-above"
+                matTooltipPosition="above"
+                >{{ application.productName }} : {{ application.planName }}
+            </span>
+        </ng-template>
+        <empowered-section-sidenav
+            *ngIf="progressIndicator.selectedIndex === i"
+            [currentSectionIndex]="activeSectionIndex"
+            [planData]="application"
+            [lastCompletedSectionIndex]="lastCompletedSectionIndex"
+            [unLockAllSteps]="unblurFlag"
+            (sectionChangeEvent)="onSectionChange($event)"
+        >
+        </empowered-section-sidenav>
+    </mat-step>
+    <ng-container *ngIf="showEBSBilling">
+        <mat-step [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_ONE)" [editable]="isStepperEditable">
+            <ng-template matStepLabel>{{languageStrings['primary.portal.applicationFlow.payments.billing']}}</ng-template>
+        </mat-step>
+    </ng-container>
+    <ng-container *ngIf="showBilling">
+        <mat-step
+            *ngFor="let id of carrierIds; index as i"
+            [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_ONE+ebsPaymentIndex+i)"
+            [editable]="isStepperEditable"
+        >
+            <ng-template matStepLabel
+                >{{languageStrings['primary.portal.applicationFlow.payments.billing']}} {{(carrierDetails[id] || {}).name}}</ng-template
+            >
+            <mat-vertical-stepper
+                *ngIf="isPayment"
+                class="payment-stepper"
+                (selectionChange)="onBillingChange($event)"
+                linear="true"
+                #billingIndicator
+            >
+                <mat-step [completed]="lastCompletedBillingStep >sideNavStaticStep.STEP_ONE">
+                    <ng-template matStepLabel> {{languageStrings['primary.portal.applicationFlow.payments.paymentMethod']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="lastCompletedBillingStep >sideNavStaticStep.STEP_TWO">
+                    <ng-template matStepLabel> {{languageStrings['primary.portal.applicationFlow.payments.billingAddress']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="lastCompletedBillingStep >sideNavStaticStep.STEP_THREE">
+                    <ng-template matStepLabel> {{languageStrings['primary.portal.applicationFlow.payments.paymentSettings']}}</ng-template>
+                </mat-step>
+            </mat-vertical-stepper>
+        </mat-step>
+    </ng-container>
+    <ng-container *ngIf="showAflacAlways">
+        <mat-step
+            [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_TWO+ebsPaymentIndex+(carrierIds?.length - 1))"
+            [editable]="isStepperEditable"
+        >
+            <!-- Languages yet to be implemented -->
+            <ng-template matStepLabel>Aflac Always</ng-template>
+            <mat-vertical-stepper
+                class="payment-stepper"
+                *ngIf="isAflacAlways"
+                (selectionChange)="onPaymentChange($event)"
+                linear="true"
+                #paymentIndicator
+            >
+                <mat-step [completed]="lastCompletedPaymentStep >1 ">
+                    <ng-template matStepLabel>Enroll</ng-template>
+                </mat-step>
+                <mat-step [completed]="lastCompletedPaymentStep >2">
+                    <ng-template matStepLabel>Payment</ng-template>
+                </mat-step>
+                <mat-step [completed]="lastCompletedPaymentStep >3">
+                    <ng-template matStepLabel>{{languageStrings['primary.portal.applicationFlow.payments.billingAddress']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="lastCompletedPaymentStep >4">
+                    <ng-template matStepLabel>Payment settings</ng-template>
+                </mat-step>
+            </mat-vertical-stepper>
+        </mat-step>
+    </ng-container>
+    <ng-container *ngIf="showPreliminaryStatement">
+        <mat-step
+            [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_THREE+ebsPaymentIndex+(carrierIds?.length - 1))"
+            [editable]="isStepperEditable"
+        >
+            <ng-template matStepLabel>{{languageStrings['primary.portal.applicationFlow.preliminaryStatement1']}}</ng-template>
+        </mat-step>
+    </ng-container>
+    <ng-container *ngIf="enrollmentMethod !== enrollments.VIRTUAL_FACE_TO_FACE">
+        <mat-step
+            [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_THREE+ebsPaymentIndex+(carrierIds?.length - 1))"
+            [editable]="isStepperEditable"
+        >
+            <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.finishApp']}}</ng-template>
+        </mat-step>
+    </ng-container>
+    <ng-container *ngIf="enrollmentMethod === enrollments.VIRTUAL_FACE_TO_FACE">
+        <mat-step
+            [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_THREE+ebsPaymentIndex+(carrierIds?.length - 1))"
+            [editable]="isStepperEditable"
+        >
+            <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.finishApp']}}</ng-template>
+            <mat-vertical-stepper
+                class="payment-stepper"
+                (selectionChange)="onVf2fSubStepChange($event.selectedIndex)"
+                linear="true"
+                #finishApplicationSteps
+            >
+                <mat-step [completed]="completedVf2fSteps > 0 ">
+                    <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.review']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="completedVf2fSteps > 1 ">
+                    <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.verificationCode']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="completedVf2fSteps > 2">
+                    <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.enter.code']}}</ng-template>
+                </mat-step>
+                <mat-step [completed]="completedVf2fSteps > 3">
+                    <ng-template matStepLabel>{{languageStrings['primary.portal.vf2f.sign.applications']}}</ng-template>
+                </mat-step>
+            </mat-vertical-stepper>
+        </mat-step>
+    </ng-container>
+    <mat-step
+        *ngIf="showPda && !showBilling && !showAflacAlways && !onlyVASandPCPlans"
+        [completed]="lastCompletedStaticStep >= (pdaStepNo + (carrierIds?.length - 1))"
+        [editable]="isStepperEditable"
+    >
+        <ng-template matStepLabel>PDA</ng-template>
+    </mat-step>
+    <mat-step
+        *ngIf="showPda && (showBilling || showAflacAlways || showEBSBilling) && !onlyVASandPCPlans"
+        [completed]="lastCompletedStaticStep >=(sideNavStaticStep.STEP_THREE+ebsPaymentIndex +(carrierIds?.length - 1))"
+        [editable]="isStepperEditable"
+    >
+        <ng-template matStepLabel>PDA</ng-template>
+    </mat-step>
+    <mat-step
+        [completed]="lastCompletedStaticStep >= (sideNavStaticStep.STEP_FOUR+ebsPaymentIndex+(carrierIds?.length - 1))"
+        [editable]="isStepperEditable"
+    >
+        <ng-template matStepLabel>Confirmation</ng-template>
+    </mat-step>
+    <ng-template matStepperIcon="edit">
+        <mon-icon class="edit-check" [iconSize]="10" iconName="check"></mon-icon>
+    </ng-template>
+    <ng-template matStepperIcon="done">
+        <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+    </ng-template>
+</mat-vertical-stepper>

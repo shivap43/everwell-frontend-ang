@@ -1,0 +1,126 @@
+<empowered-mon-spinner
+    [enableSpinner]="true"
+    backdrop="true"
+    *ngIf="isLoading || isSpinnerLoading"
+></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            mat-dialog-close
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            (click)="closeForm()"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="form" *ngIf="!isLoading">
+        <mat-dialog-content>
+            <div>
+                <h1 mat-dialog-title class="mon-mb-0">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.editEstimate']}}
+                </h1>
+
+                <mon-alert alertType="danger" *ngIf="error" class="message-block">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+                <p>
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.aboutEligibleEmployees']}}
+                </p>
+                <p class="mon-mb-30">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.affectsPlan']}}
+                </p>
+                <div class="flex-form-wrapper" *ngIf="!this.enableCensusField">
+                    <div class="d-md-flex">
+                        <div class="flex-item">
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="employeeEstimate"
+                                    [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.estimatedNumber']"
+                                />
+                                <mat-error
+                                    *ngIf="this.form.controls['employeeEstimate'].hasError('required')"
+                                    language="primary.portal.common.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="this.form.controls['employeeEstimate'].hasError('pattern')"
+                                    language="primary.portal.census.editEstimate.onlyNumbers"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="form.get('employeeEstimate').hasError('requirement')"
+                                    language="primary.portal.census.editEstimate.nonZero"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <mat-radio-group
+                    aria-label="Select an option"
+                    *ngIf="this.enableCensusField"
+                    [value]="1"
+                    (change)="radioChange($event)"
+                >
+                    <div>
+                        <mat-radio-button id="estimatedNumber" class="mon-mb-10" value="1" checked="checked">
+                            <span
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.estimatedNumber']}}</span
+                            >
+                        </mat-radio-button>
+                        <div class="flex-form-wrapper mon-ml-30">
+                            <div class="d-md-flex">
+                                <div class="flex-item">
+                                    <mat-form-field>
+                                        <input
+                                            matInput
+                                            formControlName="employeeEstimate"
+                                            [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.estimatedNumber']"
+                                        />
+                                        <mat-error
+                                            *ngIf="this.form.controls['employeeEstimate'].hasError('required')"
+                                            language="primary.portal.common.requiredField"
+                                        ></mat-error>
+                                        <mat-error
+                                            *ngIf="this.form.controls['employeeEstimate'].hasError('pattern')"
+                                            language="primary.portal.census.editEstimate.onlyNumbers"
+                                        ></mat-error>
+                                        <mat-error
+                                            *ngIf="form.get('employeeEstimate').hasError('requirement')"
+                                            language="primary.portal.census.editEstimate.nonZero"
+                                        ></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <mat-radio-button id="statesCensus" class="mon-mb-10" value="2">
+                            <span
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.useNoCensus']}}</span
+                            >
+                        </mat-radio-button>
+                        <div class="mon-ml-30">
+                            <p>
+                                <span
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.censusLists']}}
+                                </span>
+                                <span>[{{this.data.recentcensusData.count}}]</span>
+                                <span>
+                                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.editEmployeesPopup.employees']}}</span
+                                >
+                            </p>
+                        </div>
+                    </div>
+                </mat-radio-group>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <a href="javascript:void(0)" class="mon-btn-link" mat-dialog-close (click)="closeForm()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button type="submit" mat-flat-button class="mon-btn-primary" (click)="submitForm()">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

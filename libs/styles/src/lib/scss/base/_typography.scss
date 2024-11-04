@@ -1,0 +1,106 @@
+@import "shared";
+
+@font-face {
+    font-family: Roboto;
+    src: url("/assets/fonts/roboto/Roboto-Regular.woff");
+}
+
+@font-face {
+    font-family: Roboto-Light;
+    src: url("/assets/fonts/roboto/Roboto-Light.woff");
+}
+
+@font-face {
+    font-family: Roboto-Bold;
+    src: url("/assets/fonts/roboto/Roboto-Bold.woff");
+}
+
+@font-face {
+    font-family: Roboto-Medium;
+    src: url("/assets/fonts/roboto/Roboto-Medium.woff");
+}
+
+@font-face {
+    font-family: RobotoSlab-Regular;
+    src: url("/assets/fonts/roboto-slab/RobotoSlab-Regular.woff");
+}
+
+@font-face {
+    font-family: RobotoSlab-Light;
+    src: url("/assets/fonts/roboto-slab/RobotoSlab-Light.woff");
+}
+
+h1 {
+    color: get("color.gray.600");
+    font-weight: 300;
+    font-size: convert-unit(36px, "rem");
+    @include fontFace("primary.light");
+}
+
+h2 {
+    font-weight: 400;
+    font-size: convert-unit(28px, "rem");
+    color: get("color.gray.600");
+}
+
+h3 {
+    font-weight: 400;
+    font-size: convert-unit(22px, "rem");
+    color: get("color.gray.600");
+}
+
+a {
+    color: get("color.primary.500");
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        color: get("color.primary.500");
+        text-decoration: underline;
+    }
+
+    &.nodec-link {
+        color: get("color.gray.600");
+
+        &:hover {
+            color: get("color.gray.600");
+        }
+    }
+    &.disabled {
+        color: get("color.gray.600");
+        cursor: not-allowed;
+        text-decoration: underline;
+    }
+}
+p {
+    line-height: convert-unit(24px, "rem");
+    margin: 0;
+}
+
+.text-primary {
+    color: get("color.primary.500");
+}
+
+.text-danger {
+    color: get("color.info.danger.500");
+    &:hover {
+        color: get("color.info.danger.500");
+    }
+}
+
+.font-medium {
+    @include fontFace("primary.medium");
+}
+
+.copyright-icon {
+    color: red;
+    border: 1px solid red;
+    height: convert-unit(14px, "rem");
+    font-size: convert-unit(12px, "rem");
+    line-height: convert-unit(12px, "rem");
+    width: convert-unit(13px, "rem");
+    display: inline-block;
+    @include fontFace("primary.bold");
+    padding: 0 convert-unit(1px, "rem");
+    margin-left: convert-unit(5px, "rem");
+}

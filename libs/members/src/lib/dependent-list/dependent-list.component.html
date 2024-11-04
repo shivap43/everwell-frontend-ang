@@ -1,0 +1,160 @@
+<div class="mon-p-30">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <h1 class="mon-mt-0 mon-mb-20">{{languageStrings["primary.portal.members.dependentList.title"]}}</h1>
+    <div class="mon-mb-20">
+        <mon-alert *ngIf="showErrorMessage" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div class="d-flex justify-content-end mon-mb-20" *ngIf="datasource?.filteredData.length">
+        <ng-container *ngIf="canAccessAflacHQAc">
+            <button
+                *ngIf="(hasPrivilege$ | async) && (!isTpiAccount || showAddDependents)"
+                mat-flat-button
+                class="mon-btn-secondary mon-px-30"
+                type="button"
+                (click)="addDependent()"
+                [attr.aria-label]="languageStrings['primary.portal.common.addDependent']"
+            >
+                {{languageStrings["primary.portal.common.addDependent"]}}
+            </button>
+        </ng-container>
+    </div>
+    <mon-alert *ngIf="datasource?.data?.length > 0" alertType="info" closeButton="true">
+        <span language="primary.portal.members.dependentList.infoCurrentEnrollments"></span>
+    </mon-alert>
+    <table
+        *ngIf="datasource?.filteredData.length"
+        [dataSource]="datasource"
+        mat-table
+        matSort
+        matSortDisableClear
+        [ngClass]="{'grid-overlay' : 'filterOpen'}"
+        (matSortChange)="sortData($event)"
+    >
+        <ng-container matColumnDef="name">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.nameColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'name'}">
+                {{ element.name }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="relation">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.relationshipColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'relation'}">
+                {{ element.relation | titlecase}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="birthDate">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.dobColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'birthDate'}">
+                {{ element.birthDate | date: customDateFormat}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="age">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.ageColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell>
+                {{ element.age }}
+                <a
+                    href="javascript:void(0)"
+                    [attr.aria-label]="languageStrings['primary.portal.members.dependentList.ageColumn']"
+                    richTooltip="DOB: {{element.birthDate | date: customDateFormat}}"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                >
+                    <mon-icon iconName="Filled-info" class="infoicon icon-primary" iconSize="15"></mon-icon>
+                </a>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="gender">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.genderColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'gender'}">
+                {{ element.gender | titlecase}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="verificationStatus">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                <span language="primary.portal.members.dependentList.verifiedColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'verificationStatus'}">
+                <mon-icon
+                    *ngIf="element.verificationStatus === verificationStatus.REJECTED"
+                    iconSize="15"
+                    iconName="close"
+                    [attr.aria-label]="languageStrings['primary.portal.members.dependentList.unverifiedDependent']"
+                >
+                </mon-icon>
+                <mon-icon
+                    *ngIf="element.verificationStatus === verificationStatus.VERIFIED"
+                    iconSize="15"
+                    iconName="check"
+                    [attr.aria-label]="languageStrings['primary.portal.members.dependentList.verifiedDependent']"
+                >
+                </mon-icon>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="manage">
+            <th *matHeaderCellDef mat-header-cell class="w-80 text-center">
+                <span language="primary.portal.members.dependentList.manageColumn"></span>
+            </th>
+            <td *matCellDef="let element" mat-cell class="text-center">
+                <button *ngIf="canAccessAflacHQAc" mat-icon-button [matMenuTriggerFor]="beforeMenu">
+                    <mon-icon
+                        *ngIf="hasPrivilege$ | async"
+                        iconName="ellipsis"
+                        iconSize="20"
+                        class="more-option icon-primary"
+                        [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                    >
+                    </mon-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button
+                        mat-menu-item
+                        *ngFor="let action of getManageAction(element)"
+                        (click)="onActionClick(action, element)"
+                        [ngClass]="{'text-danger' : dependentManageAction.REMOVE === action}"
+                        [language]="getAriaLabelandLanguageForActions(action, true)"
+                        [attr.aria-label]="getAriaLabelandLanguageForActions(action, false)"
+                    ></button>
+                </mat-menu>
+            </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+    </table>
+
+    <ng-template [ngIf]="data.length === 0 && memberFullName">
+        <p>
+            <span>{{ memberFullName | titlecase }}</span>
+            <span language="primary.portal.members.dependentList.noDependent"></span>
+        </p>
+        <div class="mon-mt-20" *ngIf="(hasPrivilege$ | async) && (!isTpiAccount || showAddDependents)">
+            <button
+                *ngIf="canAccessAflacHQAc"
+                mat-flat-button
+                class="mon-btn-primary mon-px-30"
+                type="button"
+                (click)="addDependent()"
+                [attr.aria-label]="languageStrings['primary.portal.common.addDependent']"
+            >
+                {{languageStrings["primary.portal.common.addDependent"]}}
+            </button>
+        </div>
+    </ng-template>
+</div>

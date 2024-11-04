@@ -1,0 +1,411 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <span *ngIf="data.edit && (data.selectedPaymentMethod === paymentType.BANKDRAFT)"
+            >{{languageStrings['primary.portal.applicationFlow.payments.editAccount']}}</span
+        >
+        <span *ngIf="!data.edit">{{languageStrings['primary.portal.applicationFlow.payments.deletePaymentMethod']}}</span>
+        <span
+            *ngIf="data.edit && (data.selectedPaymentMethod === paymentType.CREDITCARD || data.selectedPaymentMethod ===  paymentType.DEBITCARD ) "
+            >{{languageStrings['primary.portal.applicationFlow.payments.editCard']}}
+        </span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div
+            *ngIf="data.selectedPaymentMethod === paymentType.BANKDRAFT || data.selectedPaymentMethod === paymentType.CREDITCARD || data.selectedPaymentMethod === paymentType.DEBITCARD"
+        >
+            <button type="button" mat-flat-button class="mon-btn-danger" *ngIf="data.delete" (click)="deletePaymentData()">
+                {{languageStrings['primary.portal.common.delete']}}
+            </button>
+        </div>
+        <div *ngIf="data.selectedPaymentMethod === paymentType.BANKDRAFT">
+            <button mat-flat-button class="mon-btn-primary" *ngIf="data.edit" (click)="bankDraftSubmit()">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+        <div *ngIf="data.selectedPaymentMethod === paymentType.CREDITCARD">
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                *ngIf="data.edit"
+                (click)="onSaveOfCardDetails(creditCardForm, paymentType.CREDITCARD)"
+            >
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+        <div *ngIf="data.selectedPaymentMethod === paymentType.DEBITCARD">
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                *ngIf="data.edit"
+                (click)="onSaveOfCardDetails(debitCardForm, paymentType.DEBITCARD)"
+            >
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <!-- Bank Draft Form -->
+    <form [formGroup]="bankDraftForm" (ngSubmit)="bankDraftSubmit()" *ngIf="data.selectedPaymentMethod === paymentType.BANKDRAFT">
+        <mon-alert *ngIf="apiError" alertType="danger">
+            <span>{{apiErrorMessage}}</span>
+        </mon-alert>
+        <div class="content-area">
+            <!--Bank draft edit start here-->
+            <div class="remove-account">
+                <div *ngIf="data.delete && (data.selectedPaymentMethod === paymentType.BANKDRAFT)">
+                    {{selectedAccountNickName + languageStrings['primary.portal.applicationFlow.payments.accountNameRemoved']}}
+                </div>
+            </div>
+            <div class="edit-bank-draft" *ngIf="(data.selectedPaymentMethod === paymentType.BANKDRAFT) && data.delete !== true">
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.accountName']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <input [readonly]="isBankInfoReadOnly" matInput type="text" formControlName="accountName" maxlength="30" />
+                            <mat-error>{{languageStrings['primary.portal.common.requiredField']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.applicationFlow.payments.bankName']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                [readonly]="isBankInfoReadOnly"
+                                matInput
+                                type="text"
+                                maxlength="30"
+                                formControlName="bankName"
+                                (keypress)="validateBankName($event)"
+                                (change)="removeSpaces()"
+                            />
+                            <mat-error
+                                *ngIf="bankDraftForm.controls.bankName.errors?.pattern"
+                                language="primary.portal.applicationFLow.payments.bankNameInvalid"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.routingNumber']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                [readonly]="isBankInfoReadOnly"
+                                matInput
+                                type="text"
+                                formControlName="routingNumber"
+                                (keypress)="validateNumber($event)"
+                                maxlength="9"
+                                (focus)="routingNumberfocused = true"
+                                (blur)="routingNumberfocused = false"
+                                [value]="routingNumberfocused || data.isACHPartnerAccountType ? bankDraftForm.controls?.routingNumber?.value : bankDraftForm.controls?.routingNumber?.value | maskPayment: 4"
+                            />
+                            <mat-error *ngIf="bankDraftForm.controls['routingNumber'].errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error
+                                *ngIf="bankDraftForm.controls['routingNumber'].value && (bankDraftForm.controls['routingNumber'].errors?.minlength || bankDraftForm.controls['routingNumber'].errors?.invalid)"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidRoutingNumber']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.accountNumber']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                type="text"
+                                formControlName="accountNumber"
+                                [maxLength]="ACCOUNT_NUMBER_MAX_LENGTH"
+                                (keypress)="validateNumber($event)"
+                                (focus)="focused = true"
+                                (blur)="focused = false"
+                                (change)="onChangeOfAccountNumber()"
+                                [value]="focused? bankDraftForm.controls['accountNumber'].value :bankDraftForm.controls['accountNumber'].value | maskPayment: 6"
+                            />
+                            <mat-error *ngIf="bankDraftForm.controls['accountNumber'].errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error *ngIf="bankDraftForm.controls['accountNumber'].errors?.minlength">
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidAccountNumber']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.reenterAccountNumber']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                empoweredPreventPasteOnHtmlElements
+                                formControlName="reAccountNumber"
+                                type="text"
+                                [maxlength]="ACCOUNT_NUMBER_MAX_LENGTH"
+                                (focus)="reEnterFocused = true"
+                                (blur)="reEnterFocused = false"
+                                [value]="reEnterFocused? bankDraftForm.controls['reAccountNumber'].value :bankDraftForm.controls['reAccountNumber'].value | maskPayment: 6"
+                            />
+                            <mat-error *ngIf="bankDraftForm.controls['reAccountNumber'].errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error *ngIf="bankDraftForm.controls['reAccountNumber'].errors?.minlength">
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidAccountNumber']}}
+                            </mat-error>
+                            <mat-error *ngIf="bankDraftForm.controls['reAccountNumber'].errors?.notEquivalent">
+                                {{languageStrings['primary.portal.applicationFlow.payments.accountNoDontMatch']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="bank-draft">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.accountType']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                formControlName="accountType"
+                                [disabled]="isBankInfoReadOnly"
+                                disableOptionCentering="true"
+                                panelClass="directPayment-select"
+                                aria-labelledby="accountType"
+                            >
+                                <mat-option [value]="accountType.CHECKING">
+                                    {{languageStrings['primary.portal.applicationFlow.payments.accountTypeChecking']}}
+                                </mat-option>
+                                <mat-option [value]="accountType.SAVINGS">
+                                    {{languageStrings['primary.portal.applicationFlow.payments.accountTypeSaving']}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- Credit Card Form -->
+    <form
+        [formGroup]="creditCardForm"
+        (ngSubmit)="onSaveOfCardDetails(creditCardForm, paymentType.CREDITCARD)"
+        *ngIf="data.selectedPaymentMethod === paymentType.CREDITCARD"
+    >
+        <mon-alert *ngIf="apiError" alertType="danger">
+            <span>{{apiErrorMessage}}</span>
+        </mon-alert>
+        <div class="content-area">
+            <div class="remove-account">
+                <div *ngIf="data.delete && data.selectedPaymentMethod === paymentType.CREDITCARD">{{removedCardHeader}}</div>
+            </div>
+            <div class="edit-credit-card" *ngIf="data.selectedPaymentMethod === paymentType.CREDITCARD && data.delete!== true">
+                <div class="credit-card">
+                    <div>
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.applicationFlow.payments.cardNumber']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                type="text"
+                                formControlName="cardNumber"
+                                (keypress)="validateNumber($event)"
+                                [maxLength]="CARD_NUMBER_MAX_LENGTH"
+                                (focus)="creditCardFocused = true"
+                                (blur)="creditCardFocused = false"
+                                [value]="creditCardFocused? creditCardForm.controls['cardNumber'].value :creditCardForm.controls['cardNumber'].value | maskPayment: AppSettings.CARD_NUMBER_MIN_LENGTH"
+                            />
+                            <mat-error *ngIf="creditCardForm.controls['cardNumber'].errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-hint [innerHTML]="languageStrings['primary.portal.applicationFlow.payments.cardTypeHint']"> </mat-hint>
+                            <mat-error
+                                *ngIf="(creditCardForm.controls['cardNumber'].errors?.minlength || creditCardForm.controls['cardNumber'].errors?.invalid)
+                            && !creditCardForm.controls['cardNumber'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidCardNumber']}}
+                            </mat-error>
+                            <mat-error *ngIf="creditCardForm.controls['cardNumber'].errors?.alreadyExist"
+                                >{{languageStrings['primary.portal.applicationFlow.payments.cardExist']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="credit-card">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.expirationDate']}}
+                        </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                matInput
+                                [min]="currentDate"
+                                (keypress)="validateDateFormat($event)"
+                                (blur)="updateDate(paymentType.CREDITCARD)"
+                                formControlName="expirationDate"
+                                [matDatepicker]="dp"
+                                empoweredDateTransform
+                                [notCalenderFormat]="true"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="dp">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker
+                                #dp
+                                startView="multi-year"
+                                (opened)="isEmptyField(paymentType.CREDITCARD)"
+                                (yearSelected)="chosenYearHandler($event, paymentType.CREDITCARD)"
+                                (monthSelected)="chosenMonthHandler($event, dp, paymentType.CREDITCARD)"
+                            >
+                            </mat-datepicker>
+                            <mat-hint>
+                                <span>{{languageStrings['primary.portal.applicationFlow.payments.expDate.dateFormat']}}</span>
+                            </mat-hint>
+                            <mat-error
+                                *ngIf="creditCardForm.controls['expirationDate'].errors?.required
+                            && !creditCardForm.controls['expirationDate'].errors?.matDatepickerParse"
+                            >
+                                {{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error
+                                *ngIf="creditCardForm.controls['expirationDate'].errors?.matDatepickerParse
+                            && !creditCardForm.controls['expirationDate'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidExpirationDate']}}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="creditCardForm.controls['expirationDate'].errors?.matDatepickerParse
+                            && creditCardForm.controls['expirationDate'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidExpirationDate']}}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="creditCardForm.controls['expirationDate'].errors?.matDatepickerMin
+                            && !creditCardForm.controls['expirationDate'].errors?.matDatepickerParse
+                            && !creditCardForm.controls['expirationDate'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.pastDate']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- Debit Card Form -->
+    <form
+        [formGroup]="debitCardForm"
+        (ngSubmit)="onSaveOfCardDetails(debitCardForm, paymentType.DEBITCARD)"
+        *ngIf="data.selectedPaymentMethod === paymentType.DEBITCARD"
+    >
+        <mon-alert *ngIf="apiError" alertType="danger">
+            <span>{{apiErrorMessage}}</span>
+        </mon-alert>
+        <div class="content-area">
+            <div class="remove-account">
+                <div *ngIf="data.delete && data.selectedPaymentMethod === paymentType.DEBITCARD">{{removedCardHeader}}</div>
+            </div>
+            <div class="edit-debit-card" *ngIf="data.selectedPaymentMethod ===  paymentType.DEBITCARD && data.delete!== true">
+                <div class="debit-card">
+                    <div>
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.applicationFlow.payments.cardNumber']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                type="text"
+                                formControlName="cardNumber"
+                                (keypress)="validateNumber($event)"
+                                [maxLength]="CARD_NUMBER_MAX_LENGTH"
+                                (focus)="debitCardFocused = true"
+                                (blur)="debitCardFocused = false"
+                                [value]="debitCardFocused? debitCardForm.controls['cardNumber'].value :debitCardForm.controls['cardNumber'].value | maskPayment: AppSettings.CARD_NUMBER_MIN_LENGTH"
+                            />
+                            <mat-error *ngIf="debitCardForm.controls['cardNumber'].errors?.required"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-hint [innerHTML]="languageStrings['primary.portal.applicationFlow.payments.cardTypeHint']"> </mat-hint>
+                            <mat-error
+                                *ngIf="(debitCardForm.controls['cardNumber'].errors?.minlength || debitCardForm.controls['cardNumber'].errors?.invalid)
+                            && !debitCardForm.controls['cardNumber'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidCardNumber']}}
+                            </mat-error>
+                            <mat-error *ngIf="debitCardForm.controls['cardNumber'].errors?.alreadyExist"
+                                >{{languageStrings['primary.portal.applicationFlow.payments.cardExist']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <!--Debit card edit start here-->
+                <div class="debit-card">
+                    <div>
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.applicationFlow.payments.expirationDate']}}
+                        </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                matInput
+                                [min]="currentDate"
+                                [matDatepicker]="dpDc"
+                                empoweredDateTransform
+                                [notCalenderFormat]="true"
+                                formControlName="expirationDate"
+                                (keypress)="validateDateFormat($event)"
+                                (blur)="updateDate(paymentType.DEBITCARD)"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="dpDc">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker
+                                #dpDc
+                                startView="multi-year"
+                                (opened)="isEmptyField(paymentType.DEBITCARD)"
+                                (yearSelected)="chosenYearHandler($event, paymentType.DEBITCARD)"
+                                (monthSelected)="chosenMonthHandler($event, dpDc, paymentType.DEBITCARD)"
+                            >
+                            </mat-datepicker>
+                            <mat-hint>
+                                <span>{{languageStrings['primary.portal.applicationFlow.payments.expDate.dateFormat']}}</span>
+                            </mat-hint>
+                            <mat-error
+                                *ngIf="debitCardForm.controls['expirationDate'].errors?.required
+                            && !debitCardForm.controls['expirationDate'].errors?.matDatepickerParse"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                            >
+                            <mat-error
+                                *ngIf="debitCardForm.controls['expirationDate'].errors?.matDatepickerParse
+                            && !debitCardForm.controls['expirationDate'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidExpirationDate']}}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="debitCardForm.controls['expirationDate'].errors?.matDatepickerParse
+                            && debitCardForm.controls['expirationDate'].errors?.required"
+                            >
+                                {{languageStrings['primary.portal.applicationFlow.payments.invalidExpirationDate']}}
+                            </mat-error>
+                            <mat-error
+                                *ngIf="(debitCardForm.controls['expirationDate'].errors?.matDatepickerMin
+                            && !debitCardForm.controls['expirationDate'].errors?.matDatepickerParse)
+                            && !debitCardForm.controls['expirationDate'].errors?.required"
+                                >{{languageStrings['primary.portal.applicationFlow.payments.pastDate']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</empowered-modal>

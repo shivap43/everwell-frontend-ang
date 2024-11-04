@@ -1,0 +1,16 @@
+export enum ApplicationStatusTypes {
+    Approved = "Approved",
+    Declined = "Declined",
+    Pending_3rd_party_approval = "Pending 3rd-party approval",
+    Pending_admin_approval = "Pending admin approval",
+    Pending_carrier_approval = "Pending carrier approval",
+    Pending_customer_signature = "Pending customer signature",
+    Pending_PDA_completion = "Pending PDA completion",
+    Void = "Void",
+    Ended = "Ended",
+    Application_denied = "Application denied",
+    Lapsed = "Lapsed",
+    Pending = "Pending",
+    Active = "Active",
+    Enrolled = "Enrolled",
+}

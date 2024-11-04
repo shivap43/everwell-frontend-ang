@@ -1,0 +1,87 @@
+<div mat-dialog-content class="ag-new-hire">
+    <mat-label class="mon-mt-0 mon-mb-0">{{languageStrings['primary.portal.prospects.stepThreeOfThree']}}</mat-label>
+    <h2 role="heading" mat-dialog-title>
+        {{languageStrings['primary.portals.accounts.importAccount.newhireEligibility']}}
+    </h2>
+    <p>{{languageStrings['primary.portals.accounts.importAccount.settingsDetermine']}}</p>
+    <div class="content-wrapper">
+        <form [formGroup]="agNewHireForm">
+            <mat-label>{{languageStrings['primary.portals.accounts.importAccount.enrollmentPeriod']}} </mat-label>
+            <div class="new-enroll">
+                {{languageStrings['primary.portals.accounts.importAccount.newEmployees']}}
+                <mat-form-field class="days-input">
+                    <input
+                        formControlName="enrollmentPeriod"
+                        [maxLength]="DAYS_MAX_LENGTH"
+                        empoweredNumberValidation
+                        matInput
+                    />
+                </mat-form-field>
+                {{languageStrings['primary.portals.accounts.importAccount.daystoEnroll']}}
+            </div>
+            <div
+                class="enrollperiod-error"
+                *ngIf="agNewHireForm.get('enrollmentPeriod').touched && agNewHireForm.get('enrollmentPeriod').errors?.required"
+            >
+                <mat-error>
+                    <span language="primary.portal.common.requiredField"></span>
+                </mat-error>
+            </div>
+
+            <div class="coverage-start">
+                <mat-label>{{languageStrings['primary.portals.accounts.importAccount.coveragestartDate']}}</mat-label>
+                <mat-radio-group
+                    [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                    formControlName="coverageStartDate"
+                >
+                    <mat-radio-button value="IMMEDIATELY"
+                        >{{languageStrings['primary.portals.accounts.importAccount.immediatelySigned']}}</mat-radio-button
+                    >
+
+                    <mat-radio-button value="AFTER_EVENT"
+                        ><div class="radio-input">
+                            {{languageStrings['primary.portals.accounts.importAccount.immediatelyAfter']}}
+                            <mat-form-field class="days-input">
+                                <input
+                                    formControlName="daysBeforeCoverageStart"
+                                    [maxLength]="DAYS_MAX_LENGTH"
+                                    empoweredNumberValidation
+                                    matInput
+                                /> </mat-form-field
+                            >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                        </div></mat-radio-button
+                    >
+                    <div
+                        class="after-error"
+                        *ngIf="agNewHireForm.get('daysBeforeCoverageStart').enabled && agNewHireForm.get('daysBeforeCoverageStart').touched && agNewHireForm.get('daysBeforeCoverageStart').errors?.required"
+                    >
+                        <mat-error>
+                            <span language="primary.portal.common.requiredField"></span>
+                        </mat-error>
+                    </div>
+
+                    <mat-radio-button value="FIRST_OF_THE_MONTH_AFTER_EVENT"
+                        ><div class="radio-input">
+                            {{languageStrings['primary.portals.accounts.importAccount.firstDay']}}
+                            <mat-form-field class="days-input">
+                                <input
+                                    formControlName="monthsBeforeCoverageStart"
+                                    empoweredNumberValidation
+                                    matInput
+                                    [maxLength]="DAYS_MAX_LENGTH"
+                                /> </mat-form-field
+                            >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                        </div></mat-radio-button
+                    >
+                    <div class="before-error">
+                        <mat-error
+                            *ngIf="agNewHireForm.get('monthsBeforeCoverageStart').enabled && agNewHireForm.get('monthsBeforeCoverageStart').touched && agNewHireForm.get('monthsBeforeCoverageStart').errors?.required"
+                        >
+                            <span language="primary.portal.common.requiredField"></span>
+                        </mat-error>
+                    </div>
+                </mat-radio-group>
+            </div>
+        </form>
+    </div>
+</div>

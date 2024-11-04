@@ -1,0 +1,357 @@
+### CI Commit to any branch ###
+trigger:
+  batch: true
+  branches:
+    include:
+    - 'develop'
+    - 'sprint/*'
+    - 'main'
+
+pr:
+  branches:
+    include:
+    - main
+
+pool: AflacAWSLinuxAgentPool
+
+resources:
+  repositories:
+  - repository: templates
+    type: github
+    name: Aflac-Prod/DevopsTemplates
+    endpoint: Aflac-Prod
+  - repository: generic-templates
+    type: github
+    name: Aflac-Prod/DevOps-GenericPipeline-Templates
+    endpoint: Aflac-Prod
+
+parameters:
+  - name: nodeVersion
+    type: string
+    default: '14.17.1'
+  - name: npmVersion
+    type: string
+    default: '6.14.8'
+  - name: cleanProjectName
+    type: string
+    default: '7516051_Everwell'
+  - name: componentName
+    type: string
+    default: 'everwell-frontend-ang'
+  - name: projectKey
+    type: string
+    default: '7516051-everwell-frontend-ang'
+
+variables:
+  - name: isPR
+    value: eq(variables['Build.Reason'], 'PullRequest')
+  - name: isMain
+    value: in(variables['Build.SourceBranchName'], 'main')
+  - name: isSprint
+    value: in(variables['Build.SourceBranchName'], 'sprint')
+  - name: isDev
+    value: in(variables['Build.SourceBranchName'], 'develop')
+  - name: saveAssets
+    value: or(variables['isPR'], variables['isMain'], variables['isSprint'], variables['isDev'])
+  - name: runTests
+    value: true
+  - name: isDevPR
+    value: eq(variables['System.PullRequest.TargetBranch'], 'develop')
+  - name: isSprintPR
+    value: eq(variables['System.PullRequest.TargetBranch'], 'sprint')
+
+stages:
+  - stage: Build
+    displayName: Build and Validate
+    jobs:
+    # - job: RunTests
+    #   timeoutInMinutes: 180
+    #   condition: and(succeeded(), variables['runTests'], variables['isPR'], eq(variables['System.PullRequest.TargetBranch'], 'develop'))
+    #   steps:
+    #     - checkout: self
+    #       clean: true
+    #     - task: NodeTool@0
+    #       displayName: Install Node Version
+    #       inputs:
+    #         versionSpec: ${{ parameters.nodeVersion }}
+    #     - script: |
+    #         npm install npm@${{ parameters.npmVersion }}
+    #         npm run test -- $(git diff --name-only origin/develop)
+    #       displayName: Run NPM Test
+ 
+    # - job: RunScans
+    #   timeoutInMinutes: 180
+    #   dependsOn: RunTests
+    #   condition: and(succeeded(), variables['isPR'], eq(variables['System.PullRequest.TargetBranch'], 'develop'))
+    #   variables:
+    #     - name: SONAR_SCANNER_OPTS
+    #       value: -Xmx2048m
+    #   steps:
+    #     - checkout: self
+    #       clean: true
+ 
+    #     - task: SonarQubePrepare@4
+    #       inputs:
+    #         SonarQube: 'SonarHTTPSConnection'
+    #         scannerMode: 'CLI'
+    #         configMode: 'manual'
+    #         cliProjectName: '${{ parameters.componentName }}'
+    #         cliProjectKey: '${{ parameters.projectKey }}'
+    #         cliSources: './'
+    #         extraProperties: |
+    #             sonar.sourceEncoding=UTF-8
+    #             sonar.sources=apps,libs
+    #             sonar.tests=apps/client/src/app,libs/account-enrollments/src/lib,libs/accounts/src/lib,libs/aflac-forms-repository/src/lib,libs/angular-material/src/lib,libs/api/src/lib,libs/api-service/src/lib,libs/assign-admin/src/lib,libs/audience-group-builder/src/lib,libs/benefits/src/lib,libs/branding/src/lib,libs/commissions/src/lib,libs/common-services/src/lib,libs/company-structure/src/lib,libs/constants/src/lib,libs/core/src/lib,libs/dashboard/src/lib,libs/date/src/lib,libs/direct-enrollment/src/lib,libs/documents/src/lib,libs/email-tracking/src/lib,libs/emp-stepper/src/lib,libs/enrollment/src/lib,libs/enrollment-options/src/lib,libs/language/src/lib,libs/login/src/lib,libs/member-home/src/lib,libs/member-wizard/src/lib,libs/members/src/lib,libs/message-center/src/lib,libs/ngrx-store/src/lib,libs/ngxs-store/src/lib,libs/overview/src/lib,libs/pended-business-resolution/src/lib,libs/policy-change-request/src/lib,libs/portals/admin/src/lib,libs/portals/group-registration/src/lib,libs/portals/member/src/lib,libs/portals/producer/src/lib,libs/product-exceptions/src/lib,libs/profile/src/lib,libs/proposals/src/lib,libs/qle/src/lib,libs/rate-sheets/src/lib,libs/registration/src/lib,libs/resources/src/lib,libs/review-headset-enrollment/src/lib,libs/shared/src/lib,libs/styles/src/lib,libs/support/src/lib,libs/team/src/lib,libs/testing/src/lib,libs/tpi/src/lib,libs/ui/src/lib,libs/universal-quote/src/lib,libs/user/src/lib
+    #             sonar.exclusions=**/node_modules/**
+    #             sonar.test.inclusions=**/*.spec.ts
+    #             sonar.javascript.lcov.reportPaths=coverage/libs/account-enrollments/lcov.info,coverage/libs/accounts/lcov.info,coverage/libs/aflac-forms-repository/lcov.info,coverage/libs/angular-material/lcov.info,coverage/libs/api/lcov.info,coverage/libs/api-service/lcov.info,coverage/libs/assign-admin/lcov.info,coverage/libs/audience-group-builder/lcov.info,coverage/libs/benefits/lcov.info,coverage/libs/branding/lcov.info,coverage/libs/commissions/lcov.info,coverage/libs/common-services/lcov.info,coverage/libs/company-structure/lcov.info,coverage/libs/constants/lcov.info,coverage/libs/core/lcov.info,coverage/libs/dashboard/lcov.info,coverage/libs/date/lcov.info,coverage/libs/direct-enrollment/lcov.info,coverage/libs/documents/lcov.info,coverage/libs/email-tracking/lcov.info,coverage/libs/emp-stepper/lcov.info,coverage/libs/enrollment/lcov.info,coverage/libs/enrollment-options/lcov.info,coverage/libs/language/lcov.info,coverage/libs/login/lcov.info,coverage/libs/member-home/lcov.info,coverage/libs/member-wizard/lcov.info,coverage/libs/members/lcov.info,coverage/libs/message-center/lcov.info,coverage/libs/ngrx-store/lcov.info,coverage/libs/overview/lcov.info,coverage/libs/pended-business-resolution/lcov.info,coverage/libs/policy-change-request/lcov.info,coverage/libs/portals/admin/lcov.info,coverage/libs/portals/member/lcov.info,coverage/libs/portals/producer/lcov.info,coverage/libs/product-exceptions/lcov.info,coverage/libs/profile/lcov.info,coverage/libs/qle/lcov.info,coverage/libs/rate-sheets/lcov.info,coverage/libs/registration/lcov.info,coverage/libs/resources/lcov.info,coverage/libs/review-headset-enrollment/lcov.info,coverage/libs/shared/lcov.info,coverage/libs/styles/lcov.info,coverage/libs/support/lcov.info,coverage/libs/team/lcov.info,coverage/libs/testing/lcov.info,coverage/libs/tpi/lcov.info,coverage/libs/ui/lcov.info,coverage/libs/universal-quote/lcov.info,coverage/libs/user/lcov.info
+    #             sonar.language=ts
+    #       displayName: SonarQube Prepare
+ 
+    #     - task: SonarQubeAnalyze@4
+    #       displayName: SonarQube Analysis
+ 
+    #     - task: SonarQubePublish@4
+    #       displayName: SonarQube Publish
+       
+        #- task: sonar-buildbreaker@8
+        #  inputs:
+        #    SonarQube: 'SonarHTTPSConnection'
+
+    - job: RunBuilds
+      timeoutInMinutes: 180
+      steps:
+      - checkout: self
+        clean: true
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)_sources.zip'
+
+      - template: pipelines/security-scan-ci-template.yml@generic-templates
+        parameters:
+          createNewProfile: false
+          veracodeApplicationProfile: '${{ parameters.projectKey }}-ADO'
+          binaryFilePath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)_sources.zip'
+          waitForResults: false
+
+      - ${{ if ne(parameters.nodeVersion, '') }}:
+        - task: NodeTool@0
+          displayName: Install Node Version
+          inputs:
+            versionSpec: ${{ parameters.nodeVersion }}
+      
+      - ${{ if ne(parameters.npmVersion, '') }}:
+        - script: |
+            npm install npm@${{ parameters.npmVersion }}
+          displayName: Set NPM Version
+
+        - script: |
+            npm install
+            npm run build
+            cd dist/client
+            rm *.js
+            rm *.txt
+            rm *.css
+            for f in *.js.br; do mv -- "$f" "${f%.js.br}.js"; done
+            for f in *.txt.br; do mv -- "$f" "${f%.txt.br}.txt"; done
+            for f in *.css.br; do mv -- "$f" "${f%.css.br}.css"; done
+          displayName: Run NPM Build
+
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/client/'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        
+        - task: ArtifactoryGenericUpload@2
+          condition: and(succeeded(), variables['saveAssets'])
+          displayName: Publish to Artifactory
+          inputs:
+            artifactoryService: 'ArtifactoryServiceConnection'
+            specSource: 'taskConfiguration'
+            fileSpec: |
+              {
+                "files": [
+                  {
+                    "pattern": "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip",
+                    "target": "Everwell-7516051-Binaries/Frontend/$(Build.BuildNumber).zip"
+                  }
+                ]
+              }
+            collectBuildInfo: true
+            buildName: '$(Build.DefinitionName)'
+            buildNumber: '$(Build.BuildNumber)'
+            failNoOp: true
+            insecureTls: true
+
+        - task: ArtifactoryPublishBuildInfo@1
+          condition: and(succeeded(), variables['saveAssets'])
+          inputs:
+            artifactoryService: 'ArtifactoryServiceConnection'
+            buildName: '$(Build.DefinitionName)'
+            buildNumber: '$(Build.BuildNumber)'
+
+  - stage: UAT
+    displayName: Deploy to UAT
+    # On PR to main deploy to UAT as a PR check
+    condition: and(succeeded(), variables['isPR'], eq(variables['System.PullRequest.TargetBranch'], 'main'))
+    jobs:
+      - deployment: Uat_Deploy_Primary
+        displayName: 'Uat Deployment - Primary (us-east-1)'
+        environment: UAT
+        workspace:
+          clean: "all"
+        variables:
+          - group: 'EverwellUat'
+          - group: 'EverwellUatPrimary'
+        pool: AflacEverwellLinuxAgentPool
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: ArtifactoryGenericDownload@3 
+                  inputs:
+                    connection: 'ArtifactoryServiceConnection'
+                    specSource: 'taskConfiguration'
+                    fileSpec: |
+                      {
+                        "files": [
+                          {
+                            "pattern": "Everwell-7516051-Binaries/Frontend/$(Build.BuildNumber).zip",
+                            "target": "$(System.DefaultWorkingDirectory)/"
+                          }
+                        ]
+                      }
+                - task: ExtractFiles@1
+                  inputs:
+                    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/Frontend/$(Build.BuildNumber).zip'
+                    destinationFolder: '$(System.DefaultWorkingDirectory)/deploy/'
+                    cleanDestinationFolder: true
+                    overwriteExistingFiles: true
+                - task: AWSCLI@1
+                  displayName: "Upload Website"
+                  inputs:
+                    awsCredentials: '512987735408_aws-deployment-user'
+                    awsCommand: 's3'
+                    awsSubCommand: 'sync'
+                    awsArguments: '"$(System.DefaultWorkingDirectory)/deploy/" "s3://$(StaticResourcesBucketName)" --delete'
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '512987735408_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.js" --exclude="assets/*" --content-type text/javascript --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '512987735408_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.css" --content-type text/css --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '512987735408_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.txt" --content-type text/plain --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSCLI@1
+                  displayName: "Invalidate Cloudfront Cache"
+                  inputs:
+                    awsCredentials: '512987735408_aws-deployment-user'
+                    awsCommand: 'cloudfront'
+                    awsSubCommand: 'create-invalidation'
+                    awsArguments: '--distribution-id $(CloudfrontDistributionId) --paths /*'
+  
+  - stage: Staging
+    displayName: Deploy to Staging
+    # On PR to main deploy to UAT as a PR check
+    condition: and(succeeded(), variables['isPR'], eq(variables['System.PullRequest.TargetBranch'], 'main'))
+    jobs:
+      - deployment: Staging_Deploy_Primary
+        displayName: 'Staging Deployment - Primary (us-east-1)'
+        environment: Staging
+        workspace:
+          clean: "all"
+        variables:
+          - group: 'EverwellStaging'
+          - group: 'EverwellStagingPrimary'
+        pool: AflacAWSLinuxAgentPool
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: ArtifactoryGenericDownload@3 
+                  inputs:
+                    connection: 'ArtifactoryServiceConnection'
+                    specSource: 'taskConfiguration'
+                    fileSpec: |
+                      {
+                        "files": [
+                          {
+                            "pattern": "Everwell-7516051-Binaries/Frontend/$(Build.BuildNumber).zip",
+                            "target": "$(System.DefaultWorkingDirectory)/"
+                          }
+                        ]
+                      }
+                - task: ExtractFiles@1
+                  inputs:
+                    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/Frontend/$(Build.BuildNumber).zip'
+                    destinationFolder: '$(System.DefaultWorkingDirectory)/deploy/'
+                    cleanDestinationFolder: true
+                    overwriteExistingFiles: true
+                - task: AWSCLI@1
+                  displayName: "Upload Website"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 's3'
+                    awsSubCommand: 'sync'
+                    awsArguments: '"$(System.DefaultWorkingDirectory)/deploy/" "s3://$(StaticResourcesBucketName)" --delete'
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.js" --exclude="assets/*" --content-type text/javascript --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.css" --content-type text/css --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSShellScript@1
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    disableAutoCwd : true
+                    scriptType: inline
+                    inlineScript: |
+                      aws s3 cp "s3://$(StaticResourcesBucketName)" "s3://$(StaticResourcesBucketName)" --recursive --exclude=** --include="*.txt" --content-type text/plain --content-encoding br --metadata-directive REPLACE
+                    workingDirectory: "$(System.DefaultWorkingDirectory)/deploy/"
+
+                - task: AWSCLI@1
+                  displayName: "Invalidate Cloudfront Cache"
+                  inputs:
+                    awsCredentials: '328985595625_aws-deployment-user'
+                    awsCommand: 'cloudfront'
+                    awsSubCommand: 'create-invalidation'
+                    awsArguments: '--distribution-id $(CloudfrontDistributionId) --paths /*'

@@ -1,0 +1,124 @@
+<div class="info-modal">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <div *ngIf="selectedQLE.requestedCoverageEndDate; else elseBlock">
+            <h2 *ngIf="this.selectedQLE.status===STATUS_APPROVED" mat-dialog-title>
+                {{languageStrings['primary.portal.qle.approved.endCoverageRequest']}}
+            </h2>
+            <h2 *ngIf="this.selectedQLE.status===STATUS_DENIED" mat-dialog-title>
+                {{languageStrings['primary.portal.qle.denied.endCoverageRequest']}}
+            </h2>
+            <h2
+                *ngIf="this.selectedQLE.status===STATUS_PENDING || this.selectedQLE.status===STATUS_PENDING_AFLAC_APPROVAL || this.selectedQLE.status===STATUS_PENDING_HR_APPROVAL"
+                mat-dialog-title
+            >
+                {{languageStrings['primary.portal.qle.pending.endCoverageRequest']}}
+            </h2>
+        </div>
+        <ng-template #elseBlock
+            ><h2 mat-dialog-title [language]="formTitle" [attr.aria-label]="formTitle"></h2>
+            <p class="subtitle" *ngIf="isPending">
+                {{ "primary.portal.qle.reviewPendingEnrollment.subTitle" | replaceTag: { "#name": this.name } }}
+            </p>
+        </ng-template>
+        <div class="scroll-content">
+            <mon-alert *ngIf="errorResponse" alertType="danger">
+                <span>{{errorMessage}}</span>
+            </mon-alert>
+            <div class="read-only-control" *ngIf="!selectedQLE.requestedCoverageEndDate">
+                <mat-label class="mat-label" language="primary.portal.qle.eventTypeLabel"></mat-label>
+                <p class="content">{{eventType}}</p>
+            </div>
+            <div class="read-only-control">
+                <mat-label
+                    class="mat-label"
+                    *ngIf="selectedQLE.requestedCoverageEndDate; else eventDateLabel"
+                    language="primary.portal.qle.eventAdded"
+                ></mat-label>
+                <ng-template #eventDateLabel>
+                    <mat-label class="mat-label" language="primary.portal.qle.eventDateLabel"></mat-label
+                ></ng-template>
+                <p class="content">{{eventDate}}</p>
+            </div>
+            <div class="read-only-control" *ngIf="selectedQLE.requestedCoverageEndDate; else qleAddedLabel">
+                <mat-label class="mat-label" language="primary.portal.qle.requestedEndDate"></mat-label>
+                <p class="content">{{selectedQLE.requestedCoverageEndDate | date:REQUESTED_END_DATE_FORMAT}}</p>
+            </div>
+
+            <ng-template #qleAddedLabel>
+                <div class="read-only-control">
+                    <mat-label class="mat-label" language="primary.portal.qle.eventAdded"></mat-label>
+                    <p class="content">{{qleAdded}}</p>
+                </div>
+            </ng-template>
+
+            <div class="read-only-control" *ngIf="adminComment && !isAdminCommentValid">
+                <mat-label class="mat-label" language="primary.portal.qle.adminNotes"></mat-label>
+                <p class="content">{{adminComment}}</p>
+            </div>
+            <div class="read-only-control" *ngIf="memberComment && !isMemberCommentValid">
+                <mat-label *ngIf="selectedQLE.createdBy === PRODUCER" class="mat-label"
+                    >{{languageStrings['primary.portal.qle.producerComments']}}</mat-label
+                >
+                <p class="content" *ngIf="selectedQLE.createdBy !== ADMIN">{{memberComment}}</p>
+            </div>
+            <div class="read-only-control" *ngIf="isDocument">
+                <mat-label class="mat-label" language="primary.portal.qle.documentsLabel"></mat-label>
+                <div class="content">
+                    <div class="document-list" *ngFor="let document of documents">
+                        <div class="doc-icon">
+                            <mon-icon [iconSize]="34" iconName="file"></mon-icon>
+                        </div>
+                        <div class="doc-info">
+                            <strong [attr.aria-label]="document.fileName">{{document.fileName | titlecase}}</strong>
+                            <p>
+                                <mat-hint>
+                                    <span language="primary.portal.qle.uploadedOnLabel"></span> {{document.uploadDate |
+                                    date:'MM/dd/yyyy hh:mm:ss'}}
+                                </mat-hint>
+                            </p>
+                            <a
+                                href="javascript:void(0)"
+                                class="mon-btn-link"
+                                (click)="viewFile(document.id, document.fileName)"
+                                [attr.aria-label]='languageStrings["primary.portal.qle.viewLabel"] + " " + document.fileName'
+                            >
+                                <span class="sr-only">{{document.fileName}}</span>
+                                <span>{{languageStrings['primary.portal.qle.viewLabel']}}</span>
+                                {{document.fileName.split(".").pop()}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-dialog-actions
+        *ngIf="!isPending || selectedQLE.requestedCoverageEndDate"
+        class="dialog-footer justify-content-end"
+    >
+        <button class="mon-btn-primary" mat-flat-button (click)="closeForm()">
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </mat-dialog-actions>
+    <mat-dialog-actions
+        *ngIf="isPending && !selectedQLE.requestedCoverageEndDate"
+        class="dialog-footer justify-content-between"
+    >
+        <a href="javascript:void(0)" class="mon-btn-link mon-mr-20" mat-dialog-close (click)="closeForm()"
+            >{{languageStrings['primary.portal.common.cancel']}}</a
+        >
+        <button class="mon-btn-primary" mat-flat-button (click)="openPendingEnrollmentDialog()">
+            {{languageStrings['primary.portal.qle.goToPendingEnrollment.btnLabel']}}
+        </button>
+    </mat-dialog-actions>
+</div>

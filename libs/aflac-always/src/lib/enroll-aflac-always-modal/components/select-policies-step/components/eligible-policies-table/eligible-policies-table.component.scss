@@ -1,0 +1,97 @@
+@import "../../../../spacer-mixin";
+@import "../../../../variables";
+@include generate-spacers;
+
+.aflac-always-eligible-policies-table-border {
+    border-top: 0.125rem solid #6e6e6e;
+}
+
+.import-policy-instructions {
+    p {
+        line-height: $import-policy-instructions-line-height;
+        padding: $import-policy-instructions-top-padding 0 $import-policy-header-bottom-padding 0;
+    }
+}
+
+h5 {
+    font-weight: $font-weight;
+    color: black;
+}
+
+.mat-table {
+    table-layout: auto;
+
+    .mat-header-cell,
+    .mat-cell,
+    .mat-footer-cell {
+        flex: none;
+    }
+
+    .mat-header-cell:nth-child(2),
+    .mat-cell:nth-child(2) {
+        flex: auto;
+        white-space: pre-wrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mat-header-cell:nth-child(n + 3),
+    .mat-cell:nth-child(n + 3),
+    .mat-footer-cell:nth-child(n + 3) {
+        width: $plan-table-cell-length;
+        max-width: $plan-table-cell-length;
+    }
+
+    .mat-header-cell:last-child,
+    .mat-cell:last-child,
+    .mat-footer-cell:last-child {
+        max-width: $plan-table-last-column-width;
+        width: $plan-table-last-column-width;
+        min-width: convert-unit(1px, "rem");
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre-wrap;
+    }
+
+    .mat-footer-cell {
+        border-bottom: 0;
+        font-weight: $font-weight;
+        line-height: $plan-table-help-text-line-height;
+    }
+
+    .mat-footer-row {
+        border-top: $plan-table-border-top $border-style $plan-table-border-color;
+    }
+}
+
+.tpi-plan-name {
+    min-width: convert-unit(336px, "rem") !important;
+    white-space: initial !important;
+}
+
+@media (min-width: 1300px) {
+    .mat-header-cell:nth-child(2),
+    .mat-cell:nth-child(2) {
+        min-width: convert-unit(449px, "rem");
+    }
+
+    .mat-header-cell:first-child,
+    .mat-cell:first-child {
+        max-width: $plan-table-top-padding;
+        width: $plan-table-top-padding;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1300px) {
+    .mat-header-cell:nth-child(2),
+    .mat-cell:nth-child(2) {
+        min-width: convert-unit(325px, "rem");
+    }
+
+    .mat-header-cell:first-child,
+    .mat-cell:first-child {
+        max-width: $plan-table-checkbox-header-length;
+        width: $plan-table-checkbox-header-length;
+    }
+}

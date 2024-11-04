@@ -1,0 +1,35 @@
+<div class="layout-header-2column pc-request">
+    <div class="header">
+        <h2 class="header-content">
+            <span mat-dialog-title>
+                <span language="primary.portal.dashboard.policyChangeRequestList.policyChangeRequest"></span>
+                <span *ngIf="policyHolderName && !isPolicyFlowIndex(0)"
+                    ><span language="primary.portal.dashboard.policyChangeRequest.for"></span>
+                    {{policyHolderName}}</span
+                >
+            </span>
+            <button
+                mat-icon-button
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                (click)="closeModal()"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"> </mon-icon>
+            </button>
+        </h2>
+    </div>
+    <div class="columns">
+        <div class="sidenav-area">
+            <empowered-side-nav></empowered-side-nav>
+        </div>
+        <div class="content-area">
+            <empowered-find-policy-holder *ngIf="!memberId && isPolicyFlowIndex(0)" class="quasi-modal">
+            </empowered-find-policy-holder>
+            <empowered-affected-policies *ngIf="memberId && isPolicyFlowIndex(0)" class="quasi-modal">
+            </empowered-affected-policies>
+            <empowered-request-policy-changes *ngIf="isPolicyFlowIndex(1)" class="quasi-modal">
+            </empowered-request-policy-changes>
+            <empowered-policy-changes *ngIf="isPolicyFlowIndex(2)" class="quasi-modal"></empowered-policy-changes>
+            <empowered-review-and-submit *ngIf="isPolicyFlowIndex(3)" class="quasi-modal"></empowered-review-and-submit>
+        </div>
+    </div>
+</div>

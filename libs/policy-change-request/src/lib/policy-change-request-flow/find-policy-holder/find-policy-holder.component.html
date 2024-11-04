@@ -1,0 +1,231 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="dialog-content settings-page-wrapper">
+    <h3 class="transaction-header">
+        {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.findPolicyHolder"]}}
+    </h3>
+    <div class="find-policyholder-content mon-ml-30">
+        <form
+            (ngSubmit)="onSubmit(findPolicyholderForm.value,findPolicyholderForm.valid)"
+            (keydown.enter)="$event.preventDefault()"
+            novalidate
+            [formGroup]="findPolicyholderForm"
+        >
+            <div class="flex-form-wrapper">
+                <div class="flex-form-item">
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.firstName"]}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="firstName"
+                                        class="mon-input"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.firstName']"
+                                        empoweredTrimSpace
+                                    />
+                                    <mat-error *ngIf="findPolicyholderForm.get('firstName').hasError('required')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.requiredField"]}}</mat-error
+                                    >
+                                    <mat-error *ngIf="findPolicyholderForm.get('firstName').hasError('pattern')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidFirstName"]}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.lastName"]}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="lastName"
+                                        class="mon-input"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.lastName']"
+                                        empoweredTrimSpace
+                                    />
+                                    <mat-error *ngIf="findPolicyholderForm.get('lastName').hasError('required')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.requiredField"]}}</mat-error
+                                    >
+                                    <mat-error *ngIf="findPolicyholderForm.get('lastName').hasError('pattern')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidLastName"]}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.birthDate"]}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="picker"
+                                        formControlName="birthDate"
+                                        [readonly]="false"
+                                        [max]="maxDate"
+                                        matInput
+                                        #datePickerInput
+                                        (keyup)="transform($event)"
+                                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.birthDate']"
+                                    />
+                                    <mat-hint> {{languageStrings["primary.portal.members.workLabel.dateFormat"]}}</mat-hint>
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                        <mon-icon
+                                            matDatepickerToggleIcon
+                                            class="calendar-icon"
+                                            iconName="calendar-date"
+                                            (click)="picker.open()"
+                                        ></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="findPolicyholderForm.get('birthDate').hasError('matDatepickerMax')">
+                                        <span>
+                                            {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.futureDateError"]}}
+                                        </span>
+                                    </mat-error>
+                                    <mat-error *ngIf="isDateInvalid"> {{validateDate('birthDate', datePickerInput.value)}}</mat-error>
+                                    <mat-error *ngIf="findPolicyholderForm.get('birthDate').hasError('invalid') && birthDateIsFutureDate">
+                                        {{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidFutureDate"]}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="d-md-flex">
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.zip"]}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="zip"
+                                        class="mon-input"
+                                        matInput
+                                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.zip']"
+                                        (keypress)="numberValidation($event);"
+                                    />
+                                    <mat-error *ngIf="findPolicyholderForm.get('zip').hasError('pattern')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidZipCode"]}}</mat-error
+                                    >
+                                    <mat-error *ngIf="findPolicyholderForm.get('zip').hasError('noZipFound')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.zipCodeNotFound"]}}</mat-error
+                                    >
+                                    <mat-error *ngIf="isDateInvalid">{{validateZipPolicy()}}</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item condition">
+                                <mat-label class="mat-label">
+                                    <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.or"]}}</span>
+                                </mat-label>
+                            </div>
+                        </ng-container>
+                        <ng-container>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.policyCertificateNumber"]}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="policyNumber"
+                                        class="mon-input"
+                                        matInput
+                                        [maxlength]="maxlengthPolicyNumber"
+                                        [attr.aria-label]="languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.policyCertificateNumber']"
+                                    />
+                                    <mat-error *ngIf="findPolicyholderForm.get('policyNumber').hasError('required')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.requiredField"]}}</mat-error
+                                    >
+                                    <mat-error *ngIf="findPolicyholderForm.get('policyNumber').hasError('pattern')"
+                                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidPolicyNumber"]}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+
+                        <ng-container>
+                            <div class="flex-item searchbtn">
+                                <button
+                                    mat-flat-button
+                                    class="mon-btn-search mon-btn-primary"
+                                    type="submit"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                >
+                                    <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"> </mon-icon>
+                                </button>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="pcralert-section">
+        <div [hidden]="searchResult">
+            <h3>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.results"]}}</h3>
+            <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.noPolicyMatch"]}}</span>
+        </div>
+        <div class="pcralert-section-danger">
+            <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+        </div>
+
+        <mon-alert alertType="danger" *ngIf="showErrorMessageEmptyPolicy">
+            <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.noPolicyMatchAndClickNext"]}}</span>
+        </mon-alert>
+    </div>
+
+    <div [hidden]="!displayResults" class="results">
+        <h3>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.results"]}}</h3>
+        <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container [matColumnDef]="findPolicyHolderColumnsMap[0].propertyName">
+                <th mat-header-cell *matHeaderCellDef scope="col">
+                    <span
+                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.table.column.policyHolder"]}}</span
+                    >
+                </th>
+                <td mat-cell *matCellDef="let affectedPolicy">{{propertyHolder}}</td>
+            </ng-container>
+
+            <ng-container [matColumnDef]="findPolicyHolderColumnsMap[1].propertyName">
+                <th mat-header-cell *matHeaderCellDef scope="col">
+                    <span
+                        >{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.table.column.affectedPolicies"]}}</span
+                    >
+                </th>
+                <td mat-cell *matCellDef="let affectedPolicy">{{affectedPolicy.policyName}} - {{affectedPolicy.policyNumber}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsArray"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsArray"></tr>
+        </table>
+    </div>
+</div>
+
+<div class="dialog-footer">
+    <button class="mon-btn-link" aria-label="Cancel" (click)="onCancel()" mat-flat-button>
+        <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.cancel"]}}</span>
+    </button>
+    <button type="submit" class="btn-right mon-btn-primary" (click)="onNext()" aria-label="Next" mat-flat-button>
+        <span>{{languageStrings["primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.next"]}}</span>
+    </button>
+</div>
+<div class="app-overlay-container"></div>

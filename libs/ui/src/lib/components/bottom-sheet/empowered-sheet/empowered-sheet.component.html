@@ -1,0 +1,28 @@
+<div class="outer-container" cdkTrapFocus>
+    <div class="inner-container">
+        <!--Header-->
+        <ng-content select="empowered-sheet-header"></ng-content>
+
+        <!--Content-->
+        <div class="scrollable-content">
+            <ng-content></ng-content>
+        </div>
+
+        <!--Footer-->
+        <mat-divider></mat-divider>
+        <div class="footer">
+            <a
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-button
+                mat-dialog-close
+                (click)="close()"
+            >
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+
+            <ng-content select="empowered-sheet-footer"></ng-content>
+        </div>
+    </div>
+</div>

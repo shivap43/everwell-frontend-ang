@@ -1,0 +1,22 @@
+<empowered-modal type="POPUP" size="LG" [showCancel]="true">
+    <empowered-modal-header>
+        <span language="primary.portal.rateSheets.editPlanOrder"></span>
+    </empowered-modal-header>
+    <div class="">
+        <span language="primary.portal.rateSheets.dragAndDrop"></span>
+    </div>
+    <div cdkDropList class="plan-list" (cdkDropListDropped)="onDrop($event)">
+        <div class="plan-box" *ngFor="let plan of plans" cdkDrag>
+            <div class="plan-custom-placeholder" *cdkDragPlaceholder></div>
+            <mon-icon class="icon-black" iconName="arrow-cross" [iconSize]="15"></mon-icon>
+            <div class="plan-text">{{ plan.plan }}</div>
+        </div>
+    </div>
+    <empowered-modal-footer>
+        <div>
+            <button class="mon-btn-primary" mat-flat-button (click)="savePlanOrder()">
+                <span language="primary.portal.rateSheets.savePlanOrder"></span>
+            </button>
+        </div>
+    </empowered-modal-footer>
+</empowered-modal>

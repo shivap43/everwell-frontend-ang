@@ -1,0 +1,87 @@
+.section-container {
+    line-height: convert-unit(24px, "rem");
+    margin: map-get($spacers, 30) map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 0);
+
+    .question-container {
+        margin-top: convert-unit(30px, "rem");
+    }
+
+    .question-block {
+        //style goes here
+    }
+
+    .response-block {
+        margin-top: convert-unit(20px, "rem");
+        &.inline {
+            display: flex;
+            .mat-form-field {
+                margin-right: 15px;
+            }
+        }
+
+        .sign-in {
+            border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+            padding-bottom: convert-unit(20px, "rem");
+            padding-top: convert-unit(20px, "rem");
+        }
+        .response-type {
+            margin-left: convert-unit(20px, "rem");
+
+            &.radio {
+                .mat-radio-group {
+                    display: flex;
+                    flex-direction: column;
+
+                    .mat-radio-button {
+                        display: flex;
+                        margin-bottom: convert-unit(10px, "rem");
+
+                        .mat-radio-label {
+                            align-items: flex-start;
+
+                            .mat-radio-container {
+                                margin-top: convert-unit(2px, "rem");
+                            }
+                        }
+                    }
+                }
+            }
+            &.input {
+                .matInput {
+                    //style goes here
+                }
+            }
+            &.textarea {
+                .matinput {
+                    //style goes here
+                }
+            }
+            &.checkbox {
+                .mat-checkbox {
+                    margin-bottom: convert-unit(5px, "rem");
+                    display: block;
+
+                    .mat-checkbox-inner-container {
+                        margin: 0;
+                        top: convert-unit(3px, "rem");
+                        margin-right: convert-unit(8px, "rem");
+                    }
+
+                    .mat-checkbox-layout {
+                        margin-bottom: convert-unit(5px, "rem");
+                    }
+                }
+            }
+        }
+    }
+    .text-danger {
+        margin-top: convert-unit(10px, "rem");
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .next-product-button {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

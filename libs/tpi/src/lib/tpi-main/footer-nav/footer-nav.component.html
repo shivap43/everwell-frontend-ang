@@ -1,0 +1,64 @@
+<div class="row content-common-header">
+    <h1 class="footer-text">
+        {{languageStrings['primary.portal.footer.title']}}
+    </h1>
+</div>
+<mat-sidenav-container [hasBackdrop]="false">
+    <mat-sidenav-content class="footer-content">
+        <div class="col-md-10">
+            <div class="row header">
+                <h3 class="content-header" [ngClass]="{'footer-header-privacy': (currentRoute === 'privacy-policy')}">
+                    {{title}}
+                </h3>
+            </div>
+            <div>
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </mat-sidenav-content>
+    <mat-sidenav
+        #sideNav
+        position="start"
+        [mode]="'side'"
+        [fixedInViewport]="false"
+        [disableClose]="true"
+        class="sideNav"
+    >
+        <div class="side-nav-link">
+            <a href="javascript:void(0)" (click)="backClick()" class="mon-btn-link" tabindex="0"
+                ><mon-icon [iconSize]="10" iconName="left" class="icon-primary"></mon-icon
+                ><span> {{languageStrings['primary.portal.common.back']}}</span></a
+            >
+            <p>
+                <a
+                    class="secondaryFooter-link"
+                    [routerLink]="['terms-conditions']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    skipLocationChange
+                    tabindex="0"
+                    >{{languageStrings['primary.portal.termsConditions.title']}}</a
+                >
+            </p>
+            <p>
+                <a
+                    class="secondaryFooter-link"
+                    [routerLink]="['privacy-policy']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    skipLocationChange
+                    tabindex="0"
+                    >{{languageStrings['primary.portal.privacyPolicy.title']}}</a
+                >
+            </p>
+            <p>
+                <a
+                    class="secondaryFooter-link"
+                    [routerLink]="['consent-statement']"
+                    routerLinkActive="secondaryFooter-link--active"
+                    skipLocationChange
+                    tabindex="0"
+                    >{{languageStrings['primary.portal.consentStatement.title']}}</a
+                >
+            </p>
+        </div>
+    </mat-sidenav>
+</mat-sidenav-container>

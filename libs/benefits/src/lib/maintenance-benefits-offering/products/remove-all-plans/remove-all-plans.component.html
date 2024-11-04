@@ -1,0 +1,88 @@
+<form [formGroup]="removeAllPlansForm" (ngSubmit)="removeAllPlans()">
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <mat-dialog-content>
+            <div>
+                <h1 mat-dialog-title *ngIf="!planYear && continuousPlan">
+                    {{"primary.portal.maintenanceBenefitsOffering.removeAllPlans.title" | replaceTag: { "##product##":
+                    carrierName + " " + productName } }}
+                </h1>
+                <h1 mat-dialog-title *ngIf="planYear && !continuousPlan">
+                    {{"primary.portal.maintenanceBenefitsOffering.removeAllPlans.planYearTitle" | replaceTag: {
+                    "##product##": carrierName + " " + productName, "##planyear##": planYearName } }}
+                </h1>
+                <p *ngIf="isDisplayDate && !planYear && continuousPlan">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.removeAllContinuousPlans.openEnrollment']}}
+                </p>
+                <p *ngIf="isDisplayDate && planYear && !continuousPlan">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.removeAllPlans.openEnrollment']}}
+                </p>
+                <div class="flex-form-wrapper">
+                    <div class="d-md-flex">
+                        <div class="flex-item" *ngIf="isDisplayDate">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.common.stopOfferingPlan']}}</mat-label
+                            >
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="enrollmentEndDate"
+                                    matInput
+                                    empoweredDateTransform
+                                    [min]="todaysDate"
+                                    [max]="setMaxDate()"
+                                    formControlName="enrollmentEndDate"
+                                    [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.removeAllPlans.enrollmentEndDate']"
+                                />
+                                <mat-datepicker #enrollmentEndDate></mat-datepicker>
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="enrollmentEndDate"
+                                    (click)="enrollmentEndDate.open()"
+                                >
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-error
+                                    *ngIf="(removeAllPlansForm.controls['enrollmentEndDate'].status !== INVALID) && removeAllPlansForm.controls['enrollmentEndDate'].errors?.required"
+                                >
+                                    {{languageStrings['primary.portal.common.requiredField']}}
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="(removeAllPlansForm.controls['enrollmentEndDate'].status === INVALID) && removeAllPlansForm.controls['enrollmentEndDate'].errors?.required"
+                                >
+                                    {{languageStrings['primary.portal.thirdParty.invalidDates']}}
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="(removeAllPlansForm.controls['enrollmentEndDate'].status === INVALID) && !removeAllPlansForm.controls['enrollmentEndDate'].errors?.required"
+                                >
+                                    {{languageStrings['primary.portal.thirdParty.pastDate']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="closePopup()"
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button
+                type="submit"
+                mat-flat-button
+                class="mon-btn-danger"
+                [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+            >
+                {{languageStrings['primary.portal.common.remove']}}
+            </button>
+        </mat-dialog-actions>
+    </div>
+</form>

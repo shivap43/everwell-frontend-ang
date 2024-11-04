@@ -1,0 +1,576 @@
+<div class="mon-mb-20" *ngIf="errorMessage">
+    <mon-alert alertType="danger">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+</div>
+<div class="mon-mb-20" *ngIf="displayCrossBorderDisclaimer">
+    <mon-alert alertType="info">
+        <span language="primary.portal.quoteShop.plansDisplay.crossBorderRestriction"></span>
+    </mon-alert>
+</div>
+<div class="product-header" *ngIf="productOffering">
+    <mon-icon [iconName]="productName" [fetchedIconPath]="productIcon" class="product-icon icon-black" [iconSize]="46"></mon-icon>
+    <div class="product-info">
+        <h1 *ngIf="isSsoToProduct || isSsoToPlan || tpiLnlMode">{{productName}}</h1>
+        <span class="carrier-name" *ngIf="isTpi">
+            <ng-container *ngIf="virginiaFeatureEnabled$ | async; else virginiaFeatureNotEnabled">
+                <span *ngIf="multipleCarriers" language="primary.portal.members.planOptions"></span>
+                <ng-container class="product-carrier">
+                    {{productOffering?.product?.carrierName | aflacLegalName: productOffering?.product?.legalName}}
+                </ng-container>
+            </ng-container>
+            <ng-template #virginiaFeatureNotEnabled> {{productOffering?.product?.carrierName}} </ng-template>
+        </span>
+        <p *ngIf="isTpi" class="mon-mt-10">{{productOffering?.product?.description}}</p>
+        <div
+            *ngIf="isTpi && !isAgentAssisted && !productOffering.product.valueAddedService && planOfferings?.length"
+            class="mon-mt-10"
+            language="primary.portal.tpi.coverageStartsOn"
+        >
+            {{productOffering?.tppSelfServiceCoverageStartDate | date:dateFormat}}
+        </div>
+        <div *ngIf="isAgentAssisted && !productOffering.product.valueAddedService && !planOfferingError" class="mon-mt-20">
+            <mat-label language="primary.portal.benefitsOffering.coverageStartDate"></mat-label>
+            <mat-form-field class="mon-date-field">
+                <input
+                    [(ngModel)]="coverageDate"
+                    [matDatepicker]="productCoverageDate"
+                    matInput
+                    [min]="minCoverageDate"
+                    [max]="productOffering?.maxCoverageDate"
+                    (dateChange)="dateChangeCustom()"
+                    (input)="dateChange($event, coverageDate)"
+                    [attr.aria-label]='languageStrings["primary.portal.coverage.datePicker"]'
+                    empoweredDateTransform
+                    [disabled]="productOffering?.inCart|| isAGPlans || disableCoverageDate"
+                />
+                <mat-datepicker-toggle matSuffix [for]="productCoverageDate">
+                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #productCoverageDate></mat-datepicker>
+                <mat-error>
+                    <span *ngIf="isMinDate && !isMaxDate && !inValidDate">
+                        <ng-container *ngIf="productOffering?.minCoverageDate; else cannotBeInPast">
+                            {{"primary.portal.coverage.minDate" | replaceTag : {"##mindate##": minDate} }}
+                        </ng-container>
+                        <ng-template #cannotBeInPast>
+                            <span language="primary.portal.coverage.cannotBePast"></span>
+                        </ng-template>
+                    </span>
+                    <span *ngIf="isMaxDate && !isMinDate && !inValidDate">
+                        <ng-container *ngIf="productOffering?.maxDays; else cannotBeInFuture">
+                            {{"primary.portal.qle.addNewQle.dateCantBeMoreInFuture" | replaceTag : {"##days##": productOffering?.maxDays}
+                            }}</ng-container
+                        >
+                        <ng-template #cannotBeInFuture>
+                            <span language="primary.portal.coverage.cannotBeFuture"></span>
+                        </ng-template>
+                    </span>
+                    <span *ngIf="inValidDate && !isMaxDate && !isMinDate ">{{languageStrings["primary.portal.coverage.invalidDate"]}}</span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <span class="product-carrier" *ngIf="!isMedical && !isTpi">
+            <h1 class="mon-pb-5">{{headerName}}</h1>
+            <span class="carrier-name">
+                <ng-container *ngIf="virginiaFeatureEnabled$ | async; else virginiaFeatureNotEnabled">
+                    <span *ngIf="multipleCarriers" language="primary.portal.members.planOptions"></span>
+                    <ng-container>
+                        {{productOffering?.product?.carrierName | aflacLegalName: productOffering?.product?.legalName}}
+                    </ng-container>
+                </ng-container>
+                <ng-template #virginiaFeatureNotEnabled> {{productOffering?.product?.carrierName}} </ng-template>
+            </span>
+        </span>
+        <div class="product-description" *ngIf="isMedical && !isTpi">
+            <p class="mon-my-15">
+                <span language="primary.portal.quoteShop.individualMedicalDescription1"></span>
+                <span language="primary.portal.quoteShop.individualMedicalDescription2"></span>
+                <span language="primary.portal.quoteShop.individualMedicalDescription3"></span>
+                <span language="primary.portal.quoteShop.individualMedicalDescription4"></span>
+            </p>
+            <p>{{productOffering?.product?.description}}</p>
+        </div>
+        <ng-container *configEnabled="'general.feature.enable.benefitDollars'">
+            <div *ngIf="!isTpi && flexDollars.length && enrollmentState !== NEW_YORK_ABBR && enrollmentState !== OHIO_ABBR">
+                <strong language="primary.portal.shoppingExperience.benefitDollars"></strong>
+                <span language="primary.portal.shoppingExperience.employerCouponsOffer"></span>
+                <button
+                    class="mon-btn-link"
+                    (click)="openOfferingListPopup()"
+                    [disabled]="!isBenefitDollarConfigEnabled"
+                    language="primary.portal.shoppingExperience.learnMore"
+                ></button>
+            </div>
+        </ng-container>
+        <div *ngIf="isMedical && !isTpi" class="mon-mt-20">
+            <mon-alert class="message-block mon-my-20" alertType="info">
+                <span language="primary.portal.shoppingExperience.agentAssistance"></span>
+                <span *ngIf="agentFirstName && agentLastName && agentEmail">
+                    {{ "primary.portal.shoppingExperience.agentDetails" | replaceTag: { "##agentfirstname##": agentFirstName,
+                    "##agentlastname##": agentLastName, "##agentemail##": agentEmail } }}
+                </span>
+            </mon-alert>
+        </div>
+        <div *ngIf="(isMedical || displayPlanMessage?.length) && (isTpi && !isAgentAssisted) " class="mon-mt-20">
+            <mon-alert class="message-block mon-my-20" alertType="info">
+                <span language="primary.portal.tpiEnrollment.helpEnrollment"></span>
+                <span *ngIf="agentDetails">{{agentDetails}}</span>
+            </mon-alert>
+        </div>
+        <div *ngIf="disabilityEnrollmentRestrictionInfo$ | async as disabilityEnrollmentRestrictionInfo" class="mon-mt-20">
+            <mon-alert class="message-block mon-my-20" alertType="info">
+                <span>
+                    <span language="primary.portal.callCenter.8x8.form.alert.cannotEnrollDisability"></span>
+                    <a href="mailto:{{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail }}">
+                        {{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail }}
+                    </a>
+                </span>
+            </mon-alert>
+        </div>
+        <mon-alert class="message-block common-alert" alertType="info" *ngIf="displayPlanMessage?.length && !isTpi">
+            <span>{{displayPlanMessage}}</span>
+        </mon-alert>
+    </div>
+</div>
+<mon-alert *ngIf="planOfferingError" alertType="info" class="product-error" closeButton="true">
+    <span>{{planOfferingError}}</span>
+</mon-alert>
+
+<empowered-grand-father-plan-mmp *ngIf="grandFatherPlan" [grandFatherPlan]="grandFatherPlan"> </empowered-grand-father-plan-mmp>
+<div class="mon-mb-20 mon-mt-20" *ngIf="hasMissingInfo">
+    <mon-alert alertType="info">
+        <span language="primary.portal.planDetails.planMissingDetail"></span>
+        <a (click)="showMissingInfoPopup($event)" language="primary.portal.planDetails.addWorkDetails"></a>
+    </mon-alert>
+</div>
+<div class="mon-mb-20 mon-mt-20" *ngIf="!isVASPlanEligibleForWorkState">
+    <mon-alert alertType="info">
+        <ng-container *ngIf="isAgentAssisted;else memberSelfEnrollment">
+            <span language="primary.portal.tpiEnrollment.agentAssisted.productNotAvailable"></span>
+        </ng-container>
+        <ng-template #memberSelfEnrollment>
+            <span language="primary.portal.tpi.MemberPortalInfoMessage"></span>
+        </ng-template>
+    </mon-alert>
+</div>
+
+<ng-container *ngIf="coverageDateBoldConfigEnabled$ | async">
+    <div *ngIf="coverageStartDate$ | async as coverageStartDate">
+        <div
+            *ngIf="!isTpi && !isAgentAssisted && !productOffering.product.valueAddedService && planOfferings?.length"
+            class="mon-mt-10"
+            language="primary.portal.tpi.coverageStartsOn"
+        >
+            {{ coverageStartDate | date:dateFormat }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Accordion to display all selected Plans -->
+<ng-container *ngIf="displayPlans && selectedPlanData?.length && productOffering.enrollStatus !== statusEnded">
+    <div *ngFor="let planData of selectedPlanData; index as parentIndex">
+        <div>
+            <h2 class="module-title">{{planData.title}}</h2>
+            <div class="mon-mb-10" *ngIf="showPlanDescription(planData)">{{planData.description}}</div>
+        </div>
+        <div>
+            <mat-accordion class="card-list">
+                <ng-template ngFor let-planOffering [ngForOf]="planData.data" let-index="index">
+                    <div
+                        *ngIf="planData.name == planStatus.in_cart && ((planOffering?.cartItem && planOffering?.enrollment) || isDualPlan)"
+                        class="d-flex justify-content-start"
+                    >
+                        <h4>{{planData.description}}</h4>
+                        <a (click)="resetActiveEnrollment(planOffering)" class="plan-summary-link mon-btn-link">{{planData.link}}</a>
+                    </div>
+                    <div *ngIf="planData.name == planStatus.enrolled && planOffering.enrollmentStatus === 'Lapsed'">
+                        {{ planData.description | replaceTag: { "#productname": productName, "#lapseddate":
+                        getLapsedDate(planOffering?.enrollment) } }}
+                    </div>
+                    <mat-expansion-panel
+                        *ngIf="!planOffering.expired"
+                        [disabled]="planOffering.crossBorderRestrict || hasMissingInfo || callCenterDisabilityEnrollmentRestricted"
+                        [ngClass]="{ 'disabled': planOffering.crossBorderRestrict || hasMissingInfo || callCenterDisabilityEnrollmentRestricted }"
+                        [expanded]="totalSelectedPlans==1 || (planData.name==planStatus.in_cart && index==expandItemIndex)"
+                        (afterExpand)="setPlanExpanded(true)"
+                        (afterCollapse)="setPlanExpanded (false)"
+                        [ngStyle]="{'border-color': isPlanExpanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                    >
+                        <mat-expansion-panel-header class="coverage-panel-header">
+                            <mat-panel-title>
+                                <mon-icon
+                                    [iconName]="productName"
+                                    [fetchedIconPath]="productOffering.product.iconSelectedLocation"
+                                    class="plan-icon icon-black"
+                                    [iconSize]="32"
+                                ></mon-icon>
+                                <div *ngIf="planOffering?.supplementary">
+                                    <span language="primary.portal.shoppingExperience.buyUp"></span>
+                                    <span>
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            iconSize="16"
+                                            richTooltip="{{languageStrings['primary.portal.shoppingExperience.buyUpPara']}}"
+                                            matTooltipPosition="above"
+                                            class="icon-primary"
+                                        ></mon-icon>
+                                    </span>
+                                </div>
+                                <div [innerHTML]="planOffering.plan.name"></div>
+                                <div class="plan-coverage" *ngIf="isHsa || isFsa">
+                                    {{ "primary.portal.shoppingExperience.contributionYear" | replaceTag: { "#plansummarycontributionyear":
+                                    planOffering?.contributionYear, "#plansummarycontributions": planOffering?.hsaFsaAmount | currency } }}
+                                </div>
+                                <div class="plan-coverage" *ngIf="!isJuvenile">
+                                    {{selectedPlansInfo[planData.name][index]?.coverage | coverageName}}
+                                </div>
+                                <div class="plan-coverage" *ngIf="isJuvenile" language="primary.portal.census.manualEntry.child">
+                                    {{index+1}}
+                                </div>
+                                <a
+                                    (click)="showPlanDetailsPopup($event, planOffering)"
+                                    *ngIf="planData.name !== 'in_cart' && !isPlanExpanded"
+                                    language="primary.portal.planDetails.title"
+                                >
+                                </a>
+                                <hr class="dotted-border-bottom bottom-spliter" />
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                <span
+                                    [ngClass]="isTpi && !tpiLnlMode ? 'status-icon-tpi' : 'status-icon'"
+                                    *ngIf="planData.name===planStatus.enrolled"
+                                >
+                                    <mon-icon
+                                        iconName="Filled-check"
+                                        class="icon-success"
+                                        iconSize="16"
+                                        *ngIf="((!qualifyingEventStatuses[index] && planOffering.enrollmentStatus === 'Approved')
+                                        || (qualifyingEventStatuses[index] === QLE_STATUS_COVERAGE_CANCELLED && planOffering.enrollment.carrierStatus === ACTIVE) && !policiesExpired[index])"
+                                    ></mon-icon>
+                                    <mon-icon
+                                        iconName="Filled-check"
+                                        class="icon-warning"
+                                        iconSize="16"
+                                        *ngIf="(planOffering.enrollmentStatus === 'Lapsed') && !policiesExpired[index]"
+                                    ></mon-icon>
+                                    <mon-icon
+                                        iconName="Filled-dash"
+                                        iconSize="16"
+                                        class="icon-warning"
+                                        *ngIf="((planOffering.enrollmentStatus?.startsWith('Pending') && !qualifyingEventStatuses[index])
+                                        || (isWarnings[index]) && !policiesExpired[index])"
+                                    >
+                                    </mon-icon>
+                                    <mon-icon
+                                        iconName="In-cart-decline"
+                                        iconSize="16"
+                                        class="icon-danger"
+                                        *ngIf="(isVoid[index] && !qualifyingEventStatuses[index]) || policiesExpired[index]"
+                                    >
+                                    </mon-icon>
+                                    <span *ngIf="!qualifyingEventStatuses[index]">{{ planOffering?.enrollmentStatus }}</span>
+                                    <div
+                                        *ngIf="(qualifyingEventStatuses[index]===QLE_STATUS_COVERAGE_CANCELLED && planOffering.enrollment.carrierStatus === ACTIVE) && !policiesExpired[index]"
+                                    >
+                                        <p class="approved-status">{{APPROVED_STATUS}}</p>
+                                        <p
+                                            class="approved-status"
+                                            *ngIf="policyEndDates[index]"
+                                            language="primary.portal.coverage.policyEnds"
+                                        >
+                                            {{policyEndDates[index] | date : dateFormat}}
+                                        </p>
+                                    </div>
+                                    <span
+                                        *ngIf="(qualifyingEventStatuses[index]===QLE_STATUS_REQUEST_SUBMITTED || qualifyingEventStatuses[index]===QLE_STATUS_PENDING_HR_APPROVAL) && !policiesExpired[index]"
+                                        language="primary.portal.coverage.endCoverageRequested"
+                                    >
+                                    </span>
+                                    <span *ngIf="policiesExpired[index]"> {{statusEnded}} </span>
+                                </span>
+                                <div class="plan-rates dotted-border-left">
+                                    <div class="plan-rate" *ngIf="planData.name===planStatus.enrolled">
+                                        {{selectedPlansInfo[planData.name][index]?.cost -
+                                        selectedPlansInfo[planData.name][index]?.adjustment | currency}}
+                                    </div>
+                                    <div class="plan-rate" *ngIf="planData.name!==planStatus.enrolled">
+                                        {{selectedPlansInfo[planData.name][index]?.cost | currency }}
+                                    </div>
+
+                                    <div
+                                        [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                    >
+                                        {{payFrequency.name}}
+                                    </div>
+                                </div>
+                            </mat-panel-description>
+                            <div
+                                class="expansion-arrow"
+                                [ngStyle]="{'border-color': isPlanExpanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                            ></div>
+                        </mat-expansion-panel-header>
+                        <!-- Display plan card -->
+                        <ng-template [ngIf]="planOffering.showSummary">
+                            <empowered-plan-summary
+                                [isWageWorksCompanyProvided]="isWageWorksCompanyProvided"
+                                [product]="productOffering"
+                                [planOffering]="planOffering"
+                                [payFrequencyObject]="payFrequencyObject"
+                                (editPlanEvent)="planOffering.showSummary=false"
+                                (updateAmountEvent)="updateSelectedPlanInfo($event, planData.name, index)"
+                            >
+                            </empowered-plan-summary>
+                        </ng-template>
+                        <!-- Edit existing plan -->
+                        <ng-template [ngIf]="!planOffering.showSummary">
+                            <empowered-plan-selection
+                                [planOffering]="planOffering"
+                                [productOffering]="productOffering"
+                                [editMode]="true"
+                                [expanded]="true"
+                                [cartItems]="cartItems"
+                                (addPlanEvent)="updatePlan($event)"
+                                (updateAmountEvent)="updateSelectedPlanInfo($event, planData.name, index)"
+                                (editCancelEvent)="cancelEdit(planOffering, planData.name, index)"
+                                [memberAgeOnCoverageEffectiveDate]="planInfo.get(planOffering.id)?.memberAgeOnCoverageEffectiveDate"
+                            >
+                            </empowered-plan-selection>
+                        </ng-template>
+                    </mat-expansion-panel>
+                </ng-template>
+            </mat-accordion>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="productOffering?.declined">
+    <div>
+        <h2 class="module-title" language="primary.portal.shoppingExperience.yourSelection"></h2>
+        <div class="product-coverage-decline">
+            <mon-icon iconName="In-cart-decline" class="icon-danger" [iconSize]="20"></mon-icon>
+            <span language="primary.portal.shoppingExperience.iDontWant"></span> {{productName}}
+            <span language="primary.portal.shoppingExperience.coverage"></span>
+        </div>
+    </div>
+</ng-container>
+
+<!-- Accordion to display more plan options -->
+<ng-container
+    *ngIf="displayPlans && (planOfferings?.length > totalSelectedPlans ||
+        this.productOffering.productType === 'STACKABLE' || productOffering.enrollStatus === statusEnded)"
+>
+    <div *ngIf="!isTpi">
+        <h2 class="module-title" *ngIf="productName && totalSelectedPlans">
+            {{"primary.portal.shoppingExperience.morePlanOptions" | replaceTag: {"#productname": productName } }}
+        </h2>
+        <h2 class="module-title" *ngIf="productName && !totalSelectedPlans">
+            {{"primary.portal.shoppingExperience.yourPlanOptions" | replaceTag: {"#productname": productName } }}
+        </h2>
+    </div>
+    <div *ngIf="isTpi">
+        <h2 class="module-title" language="primary.portal.shoppingExperience.selectplan"></h2>
+    </div>
+    <ng-container>
+        <mat-accordion class="card-list">
+            <ng-template ngFor let-supPlanOffering [ngForOf]="supplementaryPlanOfferings">
+                <mat-expansion-panel
+                    [ngClass]="{'disabled': disablePlanSelection(supPlanOffering)}"
+                    [disabled]="disablePlanSelection(supPlanOffering, supExpPanel)"
+                    *ngIf="!supPlanOffering.inCart && supPlanOffering.planPricing?.length > 0"
+                    (afterExpand)="updatePlanInfo({'expanded': true}, supPlanOffering.id)"
+                    (afterCollapse)="updatePlanInfo({'expanded': false}, supPlanOffering.id)"
+                    [ngStyle]="{'border-color': supExpPanel.expanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                    #supExpPanel
+                >
+                    <mat-expansion-panel-header class="coverage-panel-header">
+                        <mat-panel-title>
+                            <div>
+                                <mon-icon
+                                    [iconName]="planInfo.get(supPlanOffering.id)?.expanded ? productName : (productName + '-disabled')"
+                                    [fetchedIconPath]="planInfo.get(supPlanOffering.id)?.expanded ? productOffering.product.iconSelectedLocation :productOffering.product.iconLocation"
+                                    class="plan-icon icon-black"
+                                    [iconSize]="32"
+                                ></mon-icon>
+                                <div>
+                                    <span language="primary.portal.shoppingExperience.buyUp"></span>
+                                    <span>
+                                        <mon-icon
+                                            iconName="Filled-info"
+                                            iconSize="16"
+                                            richTooltip="{{languageStrings['primary.portal.shoppingExperience.buyUpPara']}}"
+                                            matTooltipPosition="above"
+                                            class="icon-primary"
+                                        ></mon-icon>
+                                    </span>
+                                </div>
+                                <div [innerHTML]="supPlanOffering.plan.name"></div>
+                                <div *ngIf="planInfo.get(supPlanOffering.id)?.expanded">
+                                    {{planInfo.get(supPlanOffering.id)?.coverage | coverageName}}
+                                </div>
+                                <a (click)="showPlanDetailsPopup($event, supPlanOffering)" language="primary.portal.planDetails.title"></a>
+                                <hr class="dotted-border-bottom bottom-spliter" />
+                            </div>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            <div class="plan-brief" *ngIf="supPlanOffering?.tooltipMessage  && !displayPlanMessage?.length">
+                                {{supPlanOffering.tooltipMessage}}
+                            </div>
+                            <div class="plan-rates dotted-border-left">
+                                <div
+                                    *ngIf="!planInfo.get(supPlanOffering.id)?.expanded"
+                                    language="primary.portal.shoppingExperience.startingAt"
+                                ></div>
+                                <div class="plan-rate">
+                                    {{planInfo.get(supPlanOffering.id)?.cost | flexDollar : productOffering.flexDollars : payFrequency :
+                                    enrollmentState | currency}}
+                                    <span *ngIf="planInfo.get(supPlanOffering.id)?.expanded">*</span>
+                                </div>
+
+                                <div
+                                    [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                >
+                                    {{payFrequency.name}}
+                                </div>
+                            </div>
+                        </mat-panel-description>
+                        <div
+                            class="expansion-arrow"
+                            [ngStyle]="{'border-color': supExpPanel.expanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                        ></div>
+                    </mat-expansion-panel-header>
+                    <empowered-plan-selection
+                        [planOffering]="supPlanOffering"
+                        [productOffering]="productOffering"
+                        [editMode]="false"
+                        [cartItems]="cartItems"
+                        [expanded]="planInfo.get(supPlanOffering?.id)?.expanded"
+                        (addPlanEvent)="addSupplementaryPlan($event)"
+                        (updateAmountEvent)="updatePlanInfo($event, supPlanOffering?.id)"
+                        [eligibilityCheck]="eligibilityCheck"
+                        [memberAgeOnCoverageEffectiveDate]="planInfo.get(planOffering?.id)?.memberAgeOnCoverageEffectiveDate"
+                    >
+                    </empowered-plan-selection>
+                </mat-expansion-panel>
+            </ng-template>
+            <ng-template ngFor let-planOffering [ngForOf]="planOfferings" let-i="index">
+                <mat-expansion-panel
+                    *ngIf="displayPlanOffering(planOffering)"
+                    [disabled]="expansionPanelArray[i] ? expansionPanelArray[i] : false"
+                    [expanded]="isJuvenile && planInfo.get(planOffering.id)?.expanded"
+                    [ngClass]="{'disabled': expansionPanelArray[i] ? expansionPanelArray[i] : false}"
+                    (afterExpand)="updatePlanInfo({'expanded': true}, planOffering.id)"
+                    (afterCollapse)="updatePlanInfo({'expanded': false}, planOffering.id)"
+                    [ngClass]="{'disabled': (isLapsedRequiredReinstate)}"
+                    [ngStyle]="{'border-color': expPanel.expanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                    #expPanel
+                >
+                    <mat-expansion-panel-header class="coverage-panel-header">
+                        <mat-panel-title>
+                            <div>
+                                <mon-icon
+                                    [iconName]="planInfo.get(planOffering.id)?.expanded ? productName : (productName + '-disabled')"
+                                    [fetchedIconPath]="planInfo.get(planOffering.id)?.expanded ? productOffering.product.iconSelectedLocation :productOffering.product.iconLocation"
+                                    class="plan-icon icon-black"
+                                    [iconSize]="32"
+                                ></mon-icon>
+                                <div [innerHTML]="planOffering.plan?.name"></div>
+                                <div *ngIf="planInfo.get(planOffering.id)?.expanded && !isJuvenile">
+                                    {{planInfo.get(planOffering.id)?.coverage | coverageName}}
+                                </div>
+                                <div
+                                    *ngIf="!planInfo.get(planOffering.id)?.expanded && isJuvenile && showAdditionalChild"
+                                    class="additional-child"
+                                >
+                                    <span language="primary.portal.planDetails.additionalChild"></span>
+                                    <a
+                                        [richTooltip]="languageStrings['primary.portal.planDetails.planCostInfo']"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        [attr.aria-label]="languageStrings['primary.portal.planDetails.planCostInfo']"
+                                    >
+                                        <mon-icon iconName="Filled-info" iconSize="14"> </mon-icon>
+                                    </a>
+                                </div>
+                                <a (click)="showPlanDetailsPopup($event, planOffering)" language="primary.portal.planDetails.title"></a>
+                                <hr class="dotted-border-bottom bottom-spliter" />
+                            </div>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            <div
+                                class="plan-brief"
+                                *ngIf="isLapsedRequiredReinstate"
+                                language="primary.portal.shoppingExperience.enrollLapseMessage"
+                            ></div>
+                            <div class="plan-brief" *ngIf="!displayPlanMessage?.length && planOffering?.tooltipMessage">
+                                {{planOffering.tooltipMessage}}
+                            </div>
+                            <div class="plan-rates dotted-border-left">
+                                <div
+                                    *ngIf="!planInfo.get(planOffering.id)?.expanded && !this.shortTermDisablilityCheck"
+                                    language="primary.portal.shoppingExperience.startingAt"
+                                ></div>
+                                <div
+                                    class="clickToViewPricing"
+                                    *ngIf="!planInfo.get(planOffering.id)?.expanded && this.shortTermDisablilityCheck"
+                                >
+                                    {{languageStrings['primary.portal.shoppingExperience.clickToViewPricing']}}
+                                </div>
+                                <div class="plan-rate">
+                                    <ng-container
+                                        *ngIf="(!isJuvenile && !this.shortTermDisablilityCheck) || (this.shortTermDisablilityCheck && planInfo.get(planOffering.id)?.expanded)"
+                                        >{{planInfo.get(planOffering.id)?.cost | flexDollar : productOffering.flexDollars : payFrequency |
+                                        currency}}</ng-container
+                                    >
+                                    <ng-container *ngIf="isJuvenile">{{planInfo.get(planOffering.id)?.cost | currency}}</ng-container>
+                                    <span *ngIf="planInfo.get(planOffering.id)?.expanded">*</span>
+                                </div>
+                                <div
+                                    *ngIf="!this.shortTermDisablilityCheck || (this.shortTermDisablilityCheck && planInfo.get(planOffering.id)?.expanded)"
+                                    [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                >
+                                    {{payFrequency.name}}
+                                </div>
+                            </div>
+                        </mat-panel-description>
+                        <div
+                            class="expansion-arrow"
+                            [ngStyle]="{'border-color': expPanel.expanded ? '#'+productOffering.product.cardColorCode : COLOR_DEFAULT}"
+                        ></div>
+                    </mat-expansion-panel-header>
+                    <empowered-plan-selection
+                        [planOffering]="planOffering"
+                        [productOffering]="productOffering"
+                        [editMode]="false"
+                        [cartItems]="cartItems"
+                        [expanded]="planInfo.get(planOffering.id)?.expanded"
+                        [memberAgeOnCoverageEffectiveDate]="planInfo.get(planOffering.id)?.memberAgeOnCoverageEffectiveDate"
+                        (addPlanEvent)="addPlan($event)"
+                        (updateAmountEvent)="updatePlanInfo($event, planOffering.id)"
+                        [eligibilityCheck]="eligibilityCheck"
+                        (childAgeChangedEvent)="onChildAgeChanged($event)"
+                    >
+                    </empowered-plan-selection>
+                </mat-expansion-panel>
+            </ng-template>
+        </mat-accordion>
+    </ng-container>
+</ng-container>
+
+<div class="product-coverage-decline" *ngIf="isProductDeclinable && displayPlans && !isMedical && !productOffering?.declined">
+    <mon-icon iconName="In-cart-decline" class="icon-danger" [iconSize]="20"></mon-icon>
+    <div>
+        <span language="primary.portal.shoppingExperience.iDontWant"></span> {{productName}}
+        <span language="primary.portal.shoppingExperience.coverage" *ngIf="!isTpi"></span>
+        <span class="splitter"> | </span>
+    </div>
+    <a [ngClass]="{'disabled': displayCrossBorderDisclaimer }" href="javascript:void(0)" (click)="declineProductFromList()"
+        >{{languageStrings['primary.portal.shoppingExperience.declineCoverage']}}</a
+    >
+</div>
+
+<mat-divider *ngIf="planOfferings?.length" class="mon-my-20"></mat-divider>
+
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>

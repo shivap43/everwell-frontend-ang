@@ -1,0 +1,28 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header> {{languageStrings['primary.portal.pda.form.addPdaHeader']}} </empowered-modal-header>
+    <p class="mon-mb-20">{{languageStrings['primary.portal.pda.form.addPdaDescription']}}</p>
+    <mat-radio-group [formControl]="selectedOption" [value]="companyCode.US">
+        <div class="mon-mb-10">
+            <mat-radio-button [value]="companyCode.US" class="primary-radio">
+                {{languageStrings['primary.portal.pda.form.addPdaOptionUs']}}
+            </mat-radio-button>
+        </div>
+        <div class="mon-mb-10">
+            <mat-radio-button [value]="companyCode.PR" class="primary-radio">
+                {{languageStrings['primary.portal.pda.form.addPdaOptionPuertoRico']}}
+            </mat-radio-button>
+        </div>
+        <mat-error *ngIf="selectedOption.errors?.require"> {{languageStrings["primary.portal.common.selectionRequired"]}} </mat-error>
+    </mat-radio-group>
+    <empowered-modal-footer>
+        <button
+            mat-raised-button
+            (click)="onNext()"
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

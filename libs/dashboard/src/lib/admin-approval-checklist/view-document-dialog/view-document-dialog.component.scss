@@ -1,0 +1,50 @@
+@import "shared";
+
+.mat-dialog-content {
+    .mat-dialog-title {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+
+    .admin-info {
+        margin-top: convert-unit(10px, "rem");
+
+        .info-wrapper {
+            display: flex;
+            margin-top: convert-unit(10px, "rem");
+
+            span:first-child {
+                flex: 1;
+                @include fontFace("primary.bold");
+            }
+
+            span:last-child {
+                flex: 3;
+            }
+        }
+    }
+
+    .signature {
+        mat-label,
+        .mat-label {
+            margin-top: convert-unit(20px, "rem");
+        }
+
+        .mat-form-field {
+            width: convert-unit(300px, "rem");
+        }
+    }
+
+    .form {
+        width: 100%;
+        height: convert-unit(400px, "rem");
+    }
+    .pdf-previewer {
+        padding-left: map-get($spacers, 20);
+        width: 100%;
+        height: convert-unit(400px, "rem");
+        overflow-y: auto;
+        text-align: justify;
+        overflow-x: hidden;
+        border: convert-unit(2px, "rem") solid get("color.gray.500");
+    }
+}

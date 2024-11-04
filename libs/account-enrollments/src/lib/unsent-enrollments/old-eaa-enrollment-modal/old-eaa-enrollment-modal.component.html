@@ -1,0 +1,39 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span [attr.aria-label]="languageStrings[SEND_OLDER_HEADER]">{{languageStrings[SEND_OLDER_HEADER]}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button
+            mat-flat-button
+            color="primary"
+            class="confirm-button"
+            (click)="onSubmit(sendOlderEnrollmentsForm)"
+            [attr.aria-label]="languageStrings[CONFIRM_BUTTON]"
+        >
+            {{languageStrings[CONFIRM_BUTTON]}}
+        </button>
+    </empowered-modal-footer>
+
+    <div class="subheader-text" [attr.aria-label]="headerContent">{{headerContent}}</div>
+
+    <form [formGroup]="sendOlderEnrollmentsForm">
+        <div class="form-field-container col-md-6">
+            <mat-radio-group formControlName="sendReject">
+                <mat-radio-button
+                    [value]="SEND_ACTION"
+                    class="form-radio-button-stacked"
+                    [attr.aria-label]="languageStrings[SEND_OLDER_CONFIRM]"
+                >
+                    <span>{{languageStrings[SEND_OLDER_CONFIRM]}}</span>
+                </mat-radio-button>
+                <mat-radio-button
+                    [value]="REJECT_ACTION"
+                    class="form-radio-button-stacked"
+                    [attr.aria-label]="languageStrings[SEND_OLDER_REJECT]"
+                >
+                    <span>{{languageStrings[SEND_OLDER_REJECT]}}</span>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+    </form>
+</empowered-modal>

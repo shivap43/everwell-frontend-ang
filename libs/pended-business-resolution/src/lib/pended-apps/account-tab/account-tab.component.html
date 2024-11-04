@@ -1,0 +1,20 @@
+<div class="account-tab-header">
+    <a href="javascript:void(0)" *ngIf="showGroupDetails" (click)="showGroupDetails = false"
+        ><{{" " + languageStrings["primary.portal.shoppingExperience.backTo"]}} {{ " " +
+        languageStrings["primary.portal.pendedBusiness.accountApps.header"]}}</a
+    >
+</div>
+<empowered-group-details
+    *ngIf="showGroupDetails && !isSpinnerLoading"
+    [accountNumber]="selectedAccountNumber"
+    [accountName]="selectedAccountName"
+    [data]="groupDetailsData"
+    (viewAccounts)="onViewAccounts()"
+></empowered-group-details>
+<empowered-account-apps
+    *ngIf="!showGroupDetails && !isSpinnerLoading"
+    [data]="data"
+    [headerTitle]="languageStrings['primary.portal.pendedBusiness.accountApps.header']"
+    (accountNumberClick)="onAccountNumberClick($event)"
+></empowered-account-apps>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

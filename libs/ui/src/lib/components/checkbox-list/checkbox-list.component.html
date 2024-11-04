@@ -1,0 +1,12 @@
+<mat-checkbox
+    *ngIf="showSelectAll"
+    [formControl]="selectAll"
+    [indeterminate]="control?.value?.length > 0 && control.value.length < options.length"
+>
+    <span language="primary.portal.benefitsOffering.product.selectAll"></span>
+</mat-checkbox>
+<mat-divider *ngIf="showSelectAll"></mat-divider
+><mat-selection-list [formControl]="control" disableOptionCentering="true">
+    <mat-list-option checkboxPosition="before" *ngFor="let option of options" [value]="option.value"> {{ option.text }} </mat-list-option>
+</mat-selection-list>
+<mat-error> <ng-content></ng-content></mat-error>

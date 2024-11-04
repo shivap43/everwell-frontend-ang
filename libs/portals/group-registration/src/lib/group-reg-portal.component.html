@@ -1,0 +1,32 @@
+<div *ngIf="!loader">
+    <mon-alert *ngIf="showAlert" alertType="danger" class="mon-alert">
+        <span>{{ errorMsg}}</span>
+    </mon-alert>
+    <mon-alert *ngIf="showSuccessAlert" alertType="success">
+        <span>{{ successMessage}}</span>
+    </mon-alert>
+    <form (ngSubmit)="onSubmit()" [formGroup]="groupRegForm" class="mon-card-wrapper mon-my-25" role="form">
+        <div class="mon-common-form mon-tab-sub-wrapper">
+            <h2>
+                {{languageStrings['primary.portal.groupreg.title']}}
+            </h2>
+            <mat-label class="mat-label">
+                <span>{{languageStrings['primary.portal.groupreg.groupnum.label']}}</span>
+            </mat-label>
+            <mat-form-field>
+                <input formControlName="groupNumber" matInput type="text" />
+                <mat-error *ngIf="!isGroupNumValid" class="mon-pt-6 mon-mat-hint">
+                    {{ getErrorGroup('groupNumber')}}
+                </mat-error>
+            </mat-form-field>
+            <button
+                [disabled]="loaderFlag"
+                class="mon-button-full-width mon-mb-30 mon-btn-primary"
+                mat-flat-button
+                type="submit"
+            >
+                {{languageStrings['primary.portal.groupreg.button.submit']}}
+            </button>
+        </div>
+    </form>
+</div>

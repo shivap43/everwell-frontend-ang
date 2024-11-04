@@ -1,0 +1,115 @@
+/* IAC widget sizing and helper classes */
+
+#OnlineHelp {
+    position: fixed;
+    right: -10000px;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    z-index: 2147483644;
+    background: #fff;
+    border: 1px solid white;
+    border-radius: 4px;
+    -moz-box-shadow: 0px 0px 14px rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 0px 0px 14px rgba(0, 0, 0, 0.4);
+    /* Custom06 - ADA Compliance */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.4);
+}
+
+#OnlineHelp {
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+
+#OnlineHelp.standard {
+    height: 100%;
+}
+
+#OnlineHelp.compacted {
+    height: 450px;
+}
+
+#OnlineHelp.minimized {
+    right: -10000px;
+}
+
+#OnlineHelp.alerting {
+    right: 2px;
+    top: 0px;
+}
+
+#launcherminimized,
+#launcher {
+    font-family: Arial;
+    background-color: #f89728;
+    text-align: center;
+    transform: rotate(-90deg) translateX(50%);
+    transform-origin: right bottom 0px;
+    margin-right: 0px;
+    border-radius: 6px 6px 0 0;
+    position: fixed;
+    bottom: 50%;
+    right: -3px;
+    padding: 7px;
+    font-size: 20px;
+    z-index: 9998;
+    color: #ffffff;
+    cursor: pointer;
+    border: 1px solid #ffffff;
+    display: none;
+}
+
+iframe#pegaChatWidget {
+    z-index: 2147483647;
+}
+
+#launcher:hover {
+    right: 0;
+}
+
+#unreadCounter {
+    position: absolute;
+    top: -13px;
+    right: -9px;
+    background-color: red;
+    height: 23px;
+    width: 22px;
+    font-size: 16px;
+    border-radius: 14px;
+    transform: rotate(90deg);
+    color: white;
+    display: none;
+    z-index: 2147483645;
+}
+
+@media (min-width: 768px) {
+    #OnlineHelp {
+        width: 450px;
+        top: 50%;
+        margin: -275px 0;
+        /* Custom06 - ADA Compliance */
+        border-radius: 4px;
+    }
+    #OnlineHelp.standard {
+        /* Custom01 - Update height from original value of 550px */
+        height: 95%;
+    }
+    #OnlineHelp.compacted {
+        height: 450px;
+    }
+    #OnlineHelp.alerting {
+        right: 2px;
+        /* Custom01 - Add margin and top properties */
+        margin: -275px 0;
+        top: 275px;
+    }
+    #OnlineHelp.showLeftPanel {
+        width: 900px;
+        transition: width 1s;
+    }
+    #OnlineHelp.hideLeftPanel {
+        width: 450px;
+        transition: width 1s;
+    }
+}

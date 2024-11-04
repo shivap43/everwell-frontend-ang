@@ -1,0 +1,18 @@
+<div class="header-wrapper">
+    <ng-content></ng-content>
+    <div class="company-code">
+        <div *ngIf="showCompanyCodeSelect">
+            <mat-label class="mat-label">{{languageStrings["primary.portal.pendedBusiness.companyCode"]}}</mat-label>
+            <mat-form-field>
+                <mat-select
+                    [placeholder]="languageStrings['primary.portal.common.select']"
+                    (selectionChange)="onSelectionChange($event)"
+                    [formControl]="companyCodeCtrl"
+                    disableOptionCentering="true"
+                >
+                    <mat-option *ngFor="let code of companyCodes" [value]="code.value">{{code.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

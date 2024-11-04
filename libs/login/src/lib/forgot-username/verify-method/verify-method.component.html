@@ -1,0 +1,87 @@
+<ng-container *ngIf="form">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-25" role="form">
+        <mat-card>
+            <mat-card-content>
+                <div *ngIf="verifyMethod == 'email'">
+                    <mat-card-title language="primary.portal.forgotUsername.verifyMethod.titleEmail"></mat-card-title>
+                    <mat-label class="mat-label">
+                        <span>{{languageStrings['primary.portal.forgotUsername.emailAddress']}}</span>
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            (input)="handleEmptyInput($event)"
+                            formControlName="email"
+                            id="email"
+                            matInput
+                            name="value"
+                            name="email"
+                            type="email"
+                            [attr.aria-label]="languageStrings['primary.portal.forgotUsername.emailAddress']"
+                        />
+                        <mat-hint language="primary.portal.forgotUsername.emailHint"></mat-hint>
+                        <mat-error class="mon-mat-hint">
+                            <span
+                                *ngIf="form.controls.email.errors?.required"
+                                language="secondary.portal.forgotUsername.requiredField"
+                            ></span>
+                            <span
+                                *ngIf="form.controls.email.errors?.pattern"
+                                language="secondary.portal.forgotUsername.errorEmail"
+                            >
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div *ngIf="verifyMethod == 'phone'">
+                    <mat-card-title language="primary.portal.forgotUsername.verifyMethod.titlePhone"></mat-card-title>
+                    <mat-label class="mat-label mon-mt-15"
+                        >{{languageStrings['primary.portal.forgotUsername.phone']}}</mat-label
+                    >
+                    <mat-form-field class="mon-pt-6">
+                        <input
+                            (input)="handleEmptyInput($event)"
+                            empoweredNumberValidation
+                            [allowDashes]="true"
+                            empoweredPhoneNumberFormat
+                            formControlName="phone"
+                            id="phone"
+                            matInput
+                            [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                            name="phone"
+                            name="value"
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.forgotUsername.phone']"
+                        />
+                        <mat-hint language="primary.portal.forgotUsername.phoneHint"></mat-hint>
+                        <mat-error class="mon-mat-hint">
+                            <span
+                                *ngIf="form.controls.phone.errors?.required"
+                                language="secondary.portal.forgotUsername.requiredField"
+                            ></span>
+                            <span
+                                *ngIf="form.controls.phone.errors?.pattern"
+                                language="secondary.portal.forgotUsername.errorPhone"
+                            >
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </mat-card-content>
+
+            <mat-card-footer class="text-center bg-gray-100">
+                <button
+                    class="mon-button-full-width mon-mb-30 mon-btn-primary"
+                    language="primary.portal.common.submit"
+                    mat-flat-button
+                    type="submit"
+                ></button>
+                <mat-divider class="mon-mb-20"></mat-divider>
+
+                <p class="mon-m-0">
+                    <a routerLink="../../verifyIdentity">{{languageStrings['primary.portal.common.back']}}</a>
+                </p>
+            </mat-card-footer>
+        </mat-card>
+    </form>
+</ng-container>

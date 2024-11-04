@@ -1,0 +1,156 @@
+@import "shared";
+
+:host ::ng-deep {
+    .mat-table {
+        .mat-header-row {
+            height: 0;
+        }
+    }
+}
+.removebene {
+    padding-top: convert-unit(5px, "rem");
+    display: flex;
+    & .link-danger {
+        color: get("color.info.danger.500");
+    }
+}
+.bmarginbottom {
+    margin-bottom: convert-unit(10px, "rem");
+}
+.innerwrapper {
+    width: convert-unit(765px, "rem");
+    margin-left: convert-unit(100px, "rem");
+    @include media-max("l") {
+        width: 100%;
+        margin-left: 0;
+    }
+    & .beneficiarlabel {
+        width: convert-unit(220px, "rem");
+    }
+    &.future-hint {
+        margin-top: convert-unit(20px, "rem");
+        margin-bottom: convert-unit(10px, "rem");
+    }
+}
+.beneicon {
+    padding-left: convert-unit(20px, "rem");
+}
+.coveragedetails {
+    @include media-max("l") {
+        flex: auto;
+        max-width: none;
+    }
+    flex: 0 0 70%;
+    max-width: 70%;
+    margin-left: convert-unit(24px, "rem");
+    color: get("color.gray.500");
+    > div {
+        font-family: Roboto-Medium, sans-serif;
+        color: get("color.gray.1000");
+    }
+}
+.status {
+    @include media-max("l") {
+        flex: auto;
+        max-width: none;
+        margin-right: convert-unit(20px, "rem");
+    }
+    flex: 0 0 10%;
+    max-width: 10%;
+    background-image: linear-gradient(to bottom, get("color.gray.600") 20%, rgba(255, 255, 255, 0) 0%);
+    background-position: right;
+    background-size: convert-unit(4px, "rem") convert-unit(1px, "rem");
+    background-repeat: repeat-y;
+    & .statustxt {
+        display: flex;
+        span {
+            padding-top: convert-unit(6px, "rem");
+        }
+    }
+}
+.totalcost {
+    @include media-max("l") {
+        width: auto;
+    }
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    font-size: convert-unit(25px, "rem");
+    span {
+        font-size: convert-unit(16px, "rem");
+        text-align: right;
+        color: get("color.gray.700");
+    }
+}
+.coveragewrapper {
+    padding: convert-unit(25px, "rem") convert-unit(0px, "rem");
+    @include media-max("l") {
+        justify-content: space-between;
+    }
+}
+.voidcoverage {
+    justify-content: flex-end;
+    display: flex;
+    a {
+        @include media-max("l") {
+            position: relative;
+        }
+        color: get("color.info.danger.500");
+        position: absolute;
+        margin-top: convert-unit(20px, "rem");
+    }
+}
+.normaltxt {
+    font-family: Roboto, "Helvetica Neue", sans-serif !important;
+    width: 70% !important;
+}
+.employeecost {
+    display: flex;
+    padding: convert-unit(30px, "rem") convert-unit(0px, "rem");
+    justify-content: space-between;
+    margin-top: convert-unit(20px, "rem");
+    border-top: 1px dotted get("color.gray.500");
+    font-size: convert-unit(22px, "rem");
+    & .emptotalcost {
+        span {
+            display: block;
+            color: get("color.gray.700");
+            font-size: convert-unit(16px, "rem");
+            text-align: right;
+        }
+    }
+}
+.mon-btn-search {
+    margin-top: convert-unit(20px, "rem");
+}
+.marginbottom-zero {
+    margin-bottom: convert-unit(0px, "rem");
+}
+::ng-deep {
+    .editcoverage-back-btn {
+        margin-left: convert-unit(216px, "rem");
+    }
+    .editcoverage-btn-hover {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .add-beneficiary-disabled {
+        .mat-option-text {
+            color: get("color.gray.500") !important;
+            cursor: default;
+        }
+        &:hover {
+            background-color: get("color.white") !important;
+        }
+    }
+    @include media-max("l") {
+        .beneficiariscont {
+            .mat-form-field {
+                .mat-form-field-flex {
+                    width: convert-unit(170px, "rem");
+                }
+            }
+        }
+    }
+}

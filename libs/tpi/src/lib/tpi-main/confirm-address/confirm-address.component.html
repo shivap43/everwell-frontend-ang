@@ -1,0 +1,157 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+<empowered-tpi-secondary-header>{{languageStrings['primary.portal.tpiEnrollment.confirmAddress']}}</empowered-tpi-secondary-header>
+<form [formGroup]="addressForm" *ngIf="address" (ngSubmit)="onSubmit()" class="tpi-content-wrapper">
+    <div class="tpi-content">
+        <div class="flex-form-wrapper">
+            <h2 class="mon-mt-0">
+                {{languageStrings['primary.portal.tpiEnrollment.reviewResidentAddress']}}
+                <span *ngIf="isMemberCIF && isStandaloneDemographicEnabled">
+                    <ng-container *ngIf="enrollmentMethod === SELF_SERVICE else agentAssisted"
+                        >{{languageStrings['primary.portal.tpiEnrollment.selfService.addressConfirmation']}}</ng-container
+                    ><ng-template #agentAssisted>
+                        {{languageStrings['primary.portal.tpiEnrollment.addressChangeConfirmation']}}
+                    </ng-template></span
+                >
+            </h2>
+            <div class="address-wrapper">
+                <div class="address flex-item">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.streetAddressOne']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="street1Control"
+                            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressOne']"
+                        />
+                        <mat-error
+                            *ngIf="(showError || addressForm.controls['street1Control'].touched) && addressForm.controls['street1Control'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.controls['street1Control'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.tpiEnrollment.tpiValidationMsg.streetAddres1']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="address flex-item">
+                    <mat-label
+                        >{{languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']}}<span class="optional-text"
+                            >{{languageStrings['primary.portal.common.optional']}}</span
+                        ></mat-label
+                    >
+
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="street2Control"
+                            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.streetAddressTwo']"
+                        />
+                        <mat-hint>{{languageStrings['primary.portal.callCenter.aptUnit']}}</mat-hint>
+                        <mat-error *ngIf="addressForm.controls['street2Control'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.tpiEnrollment.tpiValidationMsg.streetAddres1']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="address-wrapper">
+                <div class="flex-item">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.city']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            formControlName="cityControl"
+                            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.city']"
+                        />
+                        <mat-error *ngIf="addressForm.get('cityControl').hasError('required')"
+                            >{{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.get('cityControl').hasError('maxlength')"
+                            >{{languageStrings['primary.portal.members.personalValidationMsg.maxlength100']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.get('cityControl').hasError('pattern')"
+                            >{{languageStrings['primary.portal.members.personalValidationMsg.city']}}</mat-error
+                        >
+                    </mat-form-field>
+                </div>
+
+                <div class="state flex-item">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.state']}}</mat-label>
+                    <mat-form-field>
+                        <mat-select panelClass="select-states-confirm-address" formControlName="stateControl" disableOptionCentering="true">
+                            <ng-container *ngIf="states$">
+                                <mat-option *ngFor="let state of states$" [value]="state.abbreviation"> {{state.abbreviation}} </mat-option>
+                            </ng-container>
+                        </mat-select>
+                        <mat-error
+                            *ngIf="(showError || addressForm.controls['stateControl'].touched) && addressForm.controls['stateControl'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.callCenter.selectionRequired']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <span class="zip-code flex-item">
+                    <mat-label>{{languageStrings['primary.portal.tpiEnrollment.zip']}}</mat-label>
+                    <mat-form-field class="mon-mb-0">
+                        <input
+                            matInput
+                            formControlName="zipControl"
+                            maxlength="10"
+                            empoweredZipCodeFormat
+                            [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.zip']"
+                        />
+                        <mat-error
+                            *ngIf="(showError || addressForm.controls['zipControl'].touched) && addressForm.controls['zipControl'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                    </mat-form-field>
+                    <span
+                        *ngIf="((showError || addressForm.controls['zipControl'].touched) && addressForm.controls['zipControl'].hasError('pattern'))"
+                    >
+                        <mat-error>{{languageStrings['primary.portal.tpiConfirmAddress.invalidZip']}}</mat-error>
+                    </span>
+                </span>
+            </div>
+            <div class="acknowledge-txt" *ngIf="displayConsent">
+                <mat-checkbox formControlName="acknowledgeControl">
+                    <span *ngIf="enrollmentMethod === HEADSET_METHOD">{{languageStrings['primary.portal.callCenter.acknowledge']}}</span>
+                    <span *ngIf="enrollmentMethod !== HEADSET_METHOD">
+                        {{languageStrings['primary.portal.enrollment.acknowledgement']}}</span
+                    >
+                </mat-checkbox>
+                <mat-error *ngIf="showError && addressForm.controls['acknowledgeControl'].invalid">
+                    {{languageStrings['primary.portal.common.selectionRequired']}}
+                </mat-error>
+            </div>
+        </div>
+    </div>
+    <empowered-tpi-footer class="tpi-footer">
+        <div *ngIf="!tpiLnlMode">
+            <a
+                [attr.aria-label]="languageStrings['primary.portal.tpiEnrollment.exit']"
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                mat-flat-button
+                (click)="onExit()"
+            >
+                {{languageStrings['primary.portal.tpiEnrollment.exit']}}
+            </a>
+        </div>
+        <div>
+            <button
+                mat-button
+                type="button"
+                class="mon-btn-secondary"
+                [ngClass]="{'mon-ml-20': !tpiLnlMode}"
+                *ngIf="!hideBackButton"
+                (click)="back()"
+            >
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+
+            <button mat-button type="submit" class="mon-btn-primary mon-ml-20">
+                {{languageStrings['primary.portal.common.continue']}}
+            </button>
+        </div>
+    </empowered-tpi-footer>
+</form>

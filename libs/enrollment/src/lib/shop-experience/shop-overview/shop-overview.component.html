@@ -1,0 +1,114 @@
+<mon-alert alertType="danger" *ngIf="showErrorMessage && !invalidEnrollmentStateErrorMessage">
+    <span
+        >{{ errorMessage | replaceTag: {"##employeeorcustomer##": languageStrings['primary.portal.shopQuote.specificPayroll.employee']}
+        }}</span
+    >
+</mon-alert>
+<mon-alert *ngIf="invalidEnrollmentStateErrorMessage" class="message-block">
+    <span>{{ invalidEnrollmentStateErrorMessage }}</span>
+</mon-alert>
+<div *ngIf="errorInfo && !showErrorMessage && !isReviewPage && isShoppingOverview">
+    <mon-alert alertType="info">
+        <span
+            >{{ errorInfo | replaceTag: {"##employeeorcustomer##": languageStrings['primary.portal.shopQuote.specificPayroll.employee']}
+            }}</span
+        >
+    </mon-alert>
+</div>
+<ng-template [ngIf]="showSpinner || loadTPI">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template [ngIf]="loadComponents && isShoppingOverview && !isReviewPage && !showErrorMessage">
+    <div [ngClass]="{'tpi-content' : isTpi}">
+        <div [ngClass]="{'shopping-experience' : !isTpi}">
+            <div [ngClass]="{'benefit-dropdown dotted-border-bottom' : isTpi && !tpiLnlMode}">
+                <div *ngIf="(isSsoToShop || isTpi) &&  !tpiLnlMode" class="dropdown-pos">
+                    <mat-form-field class="product-dropdown">
+                        <mat-select
+                            panelClass="shop-overview-plans"
+                            [formControl]="selectedProductControl"
+                            (selectionChange)="onSelectionChange()"
+                            disableOptionCentering="true"
+                        >
+                            <mat-option *ngFor="let product of productsOfferings" [value]="product">
+                                <div>
+                                    <mon-icon [iconName]="product.product.name" [iconSize]="50"></mon-icon>
+                                    {{product.product.name}}
+                                    <mon-icon iconName="circle-check" class="icon-success" [iconSize]="19" *ngIf="product.inCart">
+                                    </mon-icon>
+                                </div>
+                            </mat-option>
+                        </mat-select>
+                        <mon-icon matSuffix iconName="arrow-down" class="icon-gray" [iconSize]="22"></mon-icon>
+                    </mat-form-field>
+                </div>
+                <div class="title">
+                    <h1 class="page-title" language="primary.portal.shoppingExperience.optionLabel" *ngIf="!isTpi || tpiLnlMode"></h1>
+                    <h1 class="page-title" language="primary.portal.tpi.optionLabel" *ngIf="isTpi && !tpiLnlMode"></h1>
+                </div>
+            </div>
+            <mon-alert alertType="warning" *ngIf="importFailed">
+                <span>{{languageStrings['primary.portal.shopQuote.specificPayroll.existingCoverageNotDisplayed'] }}</span>
+            </mon-alert>
+            <p class="page-description" language="primary.portal.shoppingExperience.optionDescription" *ngIf="!isTpi"></p>
+            <p class="page-description" language="primary.portal.tpi.optionDescription" *ngIf="isTpi"></p>
+            <div
+                *ngIf="!isTpi && flexDollars.length && enrollmentState !== NEW_YORK_ABBR && enrollmentState !== OHIO_ABBR"
+                class="mon-mt-10"
+            >
+                <ng-container *configEnabled="'general.feature.enable.benefitDollars'">
+                    <strong>{{languageStrings['primary.portal.shoppingExperience.benefitDollars']}}</strong>
+                    {{languageStrings['primary.portal.shoppingExperience.employerCouponsOffer']}}
+                    <button class="mon-btn-link" (click)="openOfferingListPopup()">
+                        {{languageStrings['primary.portal.shoppingExperience.learnMore']}}
+                    </button>
+                </ng-container>
+            </div>
+            <empowered-product-info (products)="getProductId($event)"></empowered-product-info>
+            <div class="button-bar" *ngIf="!isTpi || tpiLnlMode">
+                <button
+                    mat-flat-button
+                    class="mon-btn-secondary mon-mr-20"
+                    color="primary"
+                    type="button"
+                    (click)="goToPrevTab()"
+                    *ngIf="isWizard"
+                >
+                    <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+                    <!-- TODO : HTML Language Changes -->
+                    <!-- <span language="primary.portal.shoppingExperience.returnToCoverage"></span> -->
+                    <span> {{prevTab.backButtonLabel}}</span>
+                </button>
+                <button class="mon-btn-primary" mat-flat-button (click)="goToProductNav()" *ngIf="productsOfferings?.length > 0">
+                    <span>{{languageStrings['primary.portal.shoppingExperience.selectPlans']}}</span>
+                    <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="isTpi && !tpiLnlMode" class="tpi-footer">
+        <div>
+            <a aria-label="cancel" href="javascript:void(0)" class="mon-btn-link" mat-flat-button (click)="onExit()">
+                {{languageStrings['primary.portal.brandingModalExit.buttonExit']}}
+            </a>
+        </div>
+        <div>
+            <button mat-flat-button class="mon-btn-primary" (click)="goToProductNav()" *ngIf="productsOfferings?.length > 0">
+                {{languageStrings['primary.portal.tpi.beginShopping']}}
+                <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+            </button>
+        </div>
+    </div>
+</ng-template>
+<ng-template [ngIf]="loadComponents && !isShoppingOverview && !isReviewPage">
+    <empowered-product-nav
+        [productId]="productId"
+        [productOfferings]="productsOfferings"
+        (showShop)="showShopOverview($event)"
+        (reviewEvent)="navigateToReviewPage()"
+        class="tpi-shop-nav"
+    ></empowered-product-nav>
+</ng-template>
+<ng-template #shoppingReviewPageView [ngIf]="!showSpinner && isReviewPage">
+    <empowered-shop-review (backEvent)="onBack()" class="tpi-content-wrapper"></empowered-shop-review>
+</ng-template>

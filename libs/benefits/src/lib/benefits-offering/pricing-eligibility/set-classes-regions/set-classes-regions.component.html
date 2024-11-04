@@ -1,0 +1,330 @@
+<div class="set-regions-wrapper" [ngClass]="{'panel-white-out' : isEditPricing}">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <mat-divider></mat-divider>
+    <div class="set-regions">
+        <div *ngIf="!isReadonly">
+            <h3>
+                {{languageStrings['primary.portal.setClassRegions.title']}}
+            </h3>
+
+            <div class="region-instructions">
+                {{languageStrings['primary.portal.setClassRegions.instructions']}}
+                <div *ngIf="isRegionClassHidden">
+                    {{languageStrings['primary.portal.setClassRegions.isRegionHidden']}}
+                    <a
+                        [routerLink]="['../../../../', 'profile', 'structure']"
+                        routerLinkActive="router-link-active"
+                        [attr.aria-label]="languageStrings['primary.portal.setClassRegions.addClasses']"
+                    >
+                        {{languageStrings['primary.portal.setClassRegions.addClasses']}}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div *ngIf="isNoClassRegionSetup" class="choose-Eligibles">
+                <div class="risk-instructions">
+                    <mon-alert alertType="info">
+                        <span>
+                            {{languageStrings['primary.portal.setClassRegions.youHaveNotCreated']}}
+                            <a
+                                [routerLink]="['../../../../', 'profile', 'structure']"
+                                routerLinkActive="router-link-active"
+                                [attr.aria-label]="languageStrings['primary.portal.setClassRegions.addClasses']"
+                            >
+                                {{languageStrings['primary.portal.setClassRegions.createClasses']}}
+                            </a></span
+                        >
+                    </mon-alert>
+                </div>
+            </div>
+
+            <div *ngIf="isSkiped" class="choose-Eligibles">
+                <div>
+                    <button
+                        type="button"
+                        (click)="displayOption('Select')"
+                        class="mon-btn-primary  mon-mr-30"
+                        mat-flat-button
+                    >
+                        {{languageStrings['primary.portal.setClassRegions.selectClasses']}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form [formGroup]="setclassregionForm" (ngSubmit)="createEmployeeCategories()">
+        <div *ngIf="isDisplayForm">
+            <div class="search-eligible-class">
+                <div class="d-flex">
+                    <mat-checkbox (change)="checkboxChecked($event, 'Region')" [checked]="isRegionChecked">
+                        {{languageStrings['primary.portal.setClassRegions.regions']}}
+                    </mat-checkbox>
+                    <span *ngIf="regionList.length>0" class="region-count">
+                        ({{selectedRegionList.length}} {{languageStrings['primary.portal.setClassRegions.of']}}
+                        {{regionList.length-1}})
+                    </span>
+                </div>
+                <div class="state-wrapper">
+                    <mat-form-field class="state-input">
+                        <mat-chip-list
+                            #chipList
+                            formControlName="regionControl"
+                            [disableControl]="!isRegionChecked"
+                            placeholder="Choose Region(s)"
+                        >
+                            <mat-chip
+                                *ngFor="let region of selectedRegionList"
+                                [removable]="true"
+                                (removed)="addRemoveRegion(region)"
+                            >
+                                {{region.name}}
+                                <a
+                                    href="javascript:void(0)"
+                                    [attr.aria-label]="languageStrings['primary.portal.setClassRegions.removeRegion']"
+                                >
+                                    <mon-icon iconName="close" class="icon-close" [iconSize]="10" matChipRemove>
+                                    </mon-icon>
+                                </a>
+                            </mat-chip>
+                            <input
+                                type="text"
+                                matInput
+                                [matAutocomplete]="auto"
+                                #regioninput
+                                formControlName="regionControl"
+                                [matChipInputFor]="chipList"
+                                (blur)="removeText()"
+                                [disableControl]="!isRegionChecked"
+                                [attr.aria-label]="languageStrings['primary.portal.setClassRegions.removeRegion']"
+                            />
+                        </mat-chip-list>
+                        <mon-icon class="search-icon" iconName="search" [iconSize]="20" matSuffix> </mon-icon>
+                        <mat-error
+                            *ngIf="setclassregionForm.get('regionControl').hasError('required') && !(selectedRegionList.length>0)"
+                        >
+                            {{languageStrings['primary.portal.setClassRegions.atleast1region']}}
+                        </mat-error>
+                        <mat-autocomplete #auto="matAutocomplete" multiple autoActiveFirstOption>
+                            <mat-option *ngFor="let region of filteredRegion | async ">
+                                <div (click)="$event.stopPropagation(); regioninput.value=''">
+                                    <mat-checkbox [checked]="region.isselected" (change)="addRemoveRegion(region)">
+                                        {{region.name}}
+                                    </mat-checkbox>
+                                </div>
+                            </mat-option>
+                            <mat-divider></mat-divider>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+                <mat-label class="mat-label region-helpertext">
+                    {{languageStrings['primary.portal.setClassRegions.searchAndSetRegion']}}
+                </mat-label>
+            </div>
+
+            <div class="search-eligible-class">
+                <div class="d-flex">
+                    <mat-checkbox (change)="checkboxChecked($event,'Class')" [checked]="isClassChecked">
+                        {{languageStrings['primary.portal.setClassRegions.employmentClass']}}
+                    </mat-checkbox>
+                    <span *ngIf="classList.length>0" class="region-count">
+                        ({{selectedClassList.length}} {{languageStrings['primary.portal.setClassRegions.of']}}
+                        {{classList.length-1}})</span
+                    >
+                </div>
+                <div class="state-wrapper">
+                    <mat-form-field class="state-input">
+                        <!-- <mat-label>
+                            {{languageStrings['primary.portal.setClassRegions.chooseEmployment']}}
+                        </mat-label> -->
+                        <mat-chip-list #chipListClass formControlName="classControl" [disableControl]="!isClassChecked">
+                            <mat-chip
+                                *ngFor="let selectedClass of selectedClassList"
+                                [removable]="true"
+                                (removed)="addRemoveClasses(selectedClass)"
+                            >
+                                {{selectedClass.name}}
+                                <a
+                                    href="javascript:void(0)"
+                                    [attr.aria-label]="languageStrings['primary.portal.setClassRegions.removeClass']"
+                                >
+                                    <mon-icon iconName="close" class="icon-close" [iconSize]="10" matChipRemove>
+                                    </mon-icon>
+                                </a>
+                            </mat-chip>
+                            <input
+                                type="text"
+                                matInput
+                                [matAutocomplete]="autoclass"
+                                #classinput
+                                formControlName="classControl"
+                                [matChipInputFor]="chipListClass"
+                                (blur)="removeClassText()"
+                                [disableControl]="!isClassChecked"
+                                [attr.aria-label]="languageStrings['primary.portal.setClassRegions.removeClass']"
+                            />
+                        </mat-chip-list>
+                        <mon-icon class="search-icon" iconName="search" [iconSize]="20" matSuffix> </mon-icon>
+                        <mat-error
+                            *ngIf="setclassregionForm.get('classControl').hasError('required') && !(selectedClassList.length>0)"
+                        >
+                            {{languageStrings['primary.portal.setClassRegions.atleast1Class']}}
+                        </mat-error>
+                        <mat-autocomplete #autoclass="matAutocomplete" multiple autoActiveFirstOption>
+                            <mat-option *ngFor="let filterdclass of filteredClasses | async ">
+                                <div (click)="$event.stopPropagation(); classinput.value=''">
+                                    <mat-checkbox
+                                        [checked]="filterdclass.isselected"
+                                        (change)="addRemoveClasses(filterdclass)"
+                                        [attr.aria-label]="filterdclass.name"
+                                    >
+                                        {{filterdclass.name}}</mat-checkbox
+                                    >
+                                </div>
+                            </mat-option>
+                            <mat-divider></mat-divider>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+                <mat-label class="mat-label region-helpertext">
+                    {{languageStrings['primary.portal.setClassRegions.searchAndSetClass']}}
+                </mat-label>
+            </div>
+            <div class="search-eligible-class">
+                <mat-checkbox [disabled]="true">
+                    {{languageStrings['primary.portal.setClassRegions.unionClasses']}}
+                </mat-checkbox>
+                <div class="state-wrapper">
+                    <mat-form-field class="state-input">
+                        <mat-chip-list #chipListUnion formControlName="unionControl" [disableControl]="true">
+                            <input
+                                type="text"
+                                matInput
+                                #unioninput
+                                formControlName="unionControl"
+                                [matChipInputFor]="chipListUnion"
+                                (blur)="removeText()"
+                                [disableControl]="true"
+                                [attr.aria-label]="languageStrings['primary.portal.setClassRegions.unionClasses']"
+                            />
+                        </mat-chip-list>
+                        <mon-icon class="search-icon" iconName="search" [iconSize]="20" matSuffix> </mon-icon>
+                    </mat-form-field>
+                </div>
+
+                <mat-label class="mat-label region-helpertext">
+                    {{languageStrings['primary.portal.setClassRegions.searchAndSetClass']}}
+                </mat-label>
+            </div>
+            <div *ngIf="riskClassList.length>0" class="risk-classes">
+                <div class="risk-name">
+                    <span class="risk-heading">
+                        {{languageStrings['primary.portal.setClassRegions.riskClaases']}}
+                    </span>
+                    <span *ngFor="let risk of riskClassList; index as i">
+                        {{risk.riskClass}}<span *ngIf="i !== (riskClassList.length-1)">,&nbsp;</span>
+                    </span>
+                </div>
+                <div class="risk-instructions">
+                    <mon-alert alertType="info">
+                        <span>
+                            {{languageStrings['primary.portal.setClassRegions.riskinfoDetermine']}} {{carrierName}}
+                            {{languageStrings['primary.portal.setClassRegions.riskinfoIncluded']}}
+                        </span>
+                    </mon-alert>
+                </div>
+            </div>
+            <div class="select-region-btn">
+                <button
+                    type="button"
+                    (click)="cancel()"
+                    *ngIf="!isInitialLoad"
+                    class="mon-btn-secondary  mon-mr-30"
+                    mat-flat-button
+                    [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                >
+                    {{languageStrings['primary.portal.common.cancel']}}
+                </button>
+                <button
+                    type="button"
+                    (click)="createEmployeeCategories()"
+                    *ngIf="!isInitialLoad"
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    [attr.aria-label]="languageStrings['primary.portal.common.update']"
+                >
+                    {{languageStrings['primary.portal.common.update']}}
+                </button>
+
+                <button
+                    type="button"
+                    *ngIf="isInitialLoad"
+                    (click)="showSkipPopup()"
+                    class="mon-btn-secondary  mon-mr-30"
+                    mat-flat-button
+                    [attr.aria-label]="languageStrings['primary.portal.common.skip']"
+                >
+                    {{languageStrings['primary.portal.common.skip']}}
+                </button>
+                <button
+                    type="submit"
+                    *ngIf="isInitialLoad"
+                    class="mon-btn-primary"
+                    aria-label="languageStrings['primary.portal.setClassRegions.createEmployee']"
+                    mat-flat-button
+                >
+                    {{languageStrings['primary.portal.setClassRegions.createEmployee']}}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div *ngIf="isReadonly" class="your-selection risk-classes">
+        <div class="selection-content">
+            <h3>
+                {{languageStrings['primary.portal.setClassRegions.yourSelections']}}
+            </h3>
+            <div *ngIf="selectedRegionList.length>0" class="risk-name">
+                <span class="risk-heading">
+                    {{languageStrings['primary.portal.setClassRegions.regions']}}
+                </span>
+                <span class *ngFor="let selectedRegion of selectedRegionList; index as i">
+                    {{selectedRegion.name}}<span *ngIf="i !== (selectedRegionList.length-1)">,&nbsp;</span>
+                </span>
+            </div>
+            <div *ngIf="selectedClassList.length>0" class="risk-name">
+                <span class="risk-heading">
+                    {{languageStrings['primary.portal.setClassRegions.Employment']}}
+                </span>
+                <span *ngFor="let selectedClass of selectedClassList; index as i">
+                    {{selectedClass.name}}<span *ngIf="i !== (selectedClassList.length-1)">,&nbsp;</span>
+                </span>
+            </div>
+
+            <div *ngIf="riskClassList.length>0" class="risk-name">
+                <span class="risk-heading">
+                    {{languageStrings['primary.portal.setClassRegions.riskClaases']}}
+                </span>
+                <span *ngFor="let risk of riskClassList; index as i">
+                    {{risk.riskClass}}<span *ngIf="i !== (riskClassList.length-1)">,&nbsp;</span>
+                </span>
+            </div>
+        </div>
+        <div class="select-region-btn">
+            <a
+                value="name"
+                mat-flat-button
+                (click)="displayOption('Edit')"
+                class="mon-btn-secondary  mon-mr-30"
+                [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+            >
+                {{languageStrings['primary.portal.common.edit']}}
+                <span class="sr-only">
+                    {{languageStrings['primary.portal.common.edit']}}
+                    {{languageStrings['primary.portal.setClassRegions.classesAndRegions']}}
+                </span>
+            </a>
+        </div>
+    </div>
+    <mat-divider></mat-divider>
+</div>

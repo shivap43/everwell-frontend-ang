@@ -1,0 +1,53 @@
+<empowered-modal type="POPUP">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <empowered-modal-header>
+        {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.thirdPartyTitle']}}
+    </empowered-modal-header>
+    <form [formGroup]="addTPPForm" class="edit-tpp">
+        <p class="sub-title">
+            {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.choosePlans']}}
+        </p>
+        <mat-radio-group formControlName="tppOptionSelected" (change)="onChange()">
+            <mat-radio-button value="tppPlans">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.tppAvailablePlans']}}
+            </mat-radio-button>
+            <div class="tpp-wrapper" *ngIf="addTPPForm.controls.tppOptionSelected.value === 'tppPlans'">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.tppName']}}
+                </mat-label>
+                <mat-form-field class="tpp-plans">
+                    <mat-select
+                        formControlName="selectedThirdParty"
+                        [placeholder]="addTPPForm.controls.selectedThirdParty.value?.name"
+                    >
+                        <mat-option *ngFor="let thirdParty of thirdPartyPlatforms" [value]="thirdParty">
+                            {{ thirdParty.name }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>{{languageStrings['primary.portal.common.selectionRequired']}} </mat-error>
+                </mat-form-field>
+            </div>
+            <mat-radio-button value="allPlans">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.tppAllPlans']}}
+            </mat-radio-button>
+        </mat-radio-group>
+        <div class="alert-wrapper">
+            <mon-alert alertType="info" *ngIf="addTPPForm.controls.tppOptionSelected.value === 'tppPlans'">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.tppInfoMessage']}}
+                <a href="javascript:void(0)" (click)="navigateToEnrollment()">
+                    {{languageStrings['primary.portal.maintenanceBenefitsOffering.settingsTab.tppAccountProfile']}}
+                </a>
+            </mon-alert>
+        </div>
+    </form>
+    <empowered-modal-footer>
+        <button
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.save']"
+            mat-button
+            (click)="onSave()"
+        >
+            {{languageStrings['primary.portal.common.save']}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

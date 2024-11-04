@@ -1,0 +1,325 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="review-submit-container dialog-content">
+    <div class="mon-mb-20" *ngIf="errorResponse">
+        <mon-alert *ngIf="errorResponse" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <span *ngIf="this.isAutoApproved">
+        <h2>{{languageString["primary.portal.reviewSubmit.mainTitle"]}}</h2>
+        <p>{{ languageString["primary.portal.reviewSubmit.subTitle"]}}</p>
+    </span>
+    <span *ngIf="!this.isAutoApproved">
+        <h2>{{languageString["primary.portal.reviewSubmit.mainHRTitle"]}}</h2>
+        <p>{{languageString["primary.portal.reviewSubmit.subHRTitle"]}}</p>
+    </span>
+    <div class="review-settings-container">
+        <div class="settings-header">
+            <h3>
+                <strong> {{languageString["primary.portal.reviewSubmit.benefitsOffered"]}} </strong>
+                <span *ngIf="this.data.opensFrom!=='plans'">{{languageString["primary.portal.reviewSubmit.benefitsOfferedSection"]}} </span>
+                <span *ngIf="this.data.opensFrom==='plans'">{{languageString['primary.portal.reviewSubmit.plansAndCoverageDates']}}</span>
+            </h3>
+            <div>
+                <button
+                    mat-flat-button
+                    class="mon-btn-secondary btn-sm pull-down-sm"
+                    [matMenuTriggerFor]="beforeMenu"
+                    [attr.aria-label]="languageString['primary.portal.common.edit']"
+                >
+                    <span> {{languageString["primary.portal.common.edit"]}} </span>
+                    <mon-icon iconName="down" [iconSize]="8" class="icon-right"></mon-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button
+                        mat-menu-item
+                        *ngIf="data.opensFrom!=='plans'"
+                        (click)="editProducts()"
+                        [attr.aria-label]="languageString['primary.portal.reviewSubmit.benefitsOffered.products']"
+                    >
+                        {{languageString['primary.portal.reviewSubmit.benefitsOffered.products']}}
+                    </button>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="languageString['primary.portal.reviewSubmit.benefitsOffered.plans']"
+                        (click)="editPlans()"
+                    >
+                        {{languageString['primary.portal.reviewSubmit.benefitsOffered.plans']}}
+                    </button>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="languageString['primary.portal.reviewSubmit.benefitsOffered.coverageDates']"
+                        (click)="editCoverageDates()"
+                    >
+                        {{languageString['primary.portal.reviewSubmit.benefitsOffered.coverageDates']}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+
+        <mat-accordion>
+            <div *ngIf="coveragePeriodPRPlansPanelList.length !== 0">
+                <div class="mat-accordion-wrapper" *ngFor="let coveragePanel of coveragePeriodPRPlansPanelList;let i=index">
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> {{coveragePanel.product.name}} | {{coveragePanel.carrier.name}} </mat-panel-title>
+                            <mat-panel-description>
+                                <p>{{coveragePanel.planYear[0].name}}</p>
+                                <a
+                                    [richTooltip]="coveragePanel.planYearTooltip"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    attr.aria-label="{{coveragePanel.planYear[0].name}}"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="16" class="infoicon icon-primary"> </mon-icon>
+                                </a>
+
+                                <p class="plan-count" *ngIf="this.coveragePanel.plans.length>1">
+                                    {{ "primary.portal.reviewSubmit.planCount" | replaceTag: { "#numberofplan":
+                                    this.coveragePanel.plans.length } }}
+                                </p>
+                                <p class="plan-count" *ngIf="this.coveragePanel.plans.length<2">
+                                    {{ "primary.portal.reviewSubmit.planCountOne" | replaceTag: { "#numberofplan":
+                                    this.coveragePanel.plans.length } }}
+                                </p>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <table mat-table [dataSource]="coveragePanel.plans">
+                            <ng-container matColumnDef="plan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titlePlan"></th>
+                                <td mat-cell *matCellDef="let element" [innerHTML]="element.plan.name"></td>
+                            </ng-container>
+                            <ng-container matColumnDef="state">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titleStates"></th>
+                                <td mat-cell *matCellDef="let element">{{displayValues(element.states)}}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="taxStatus">
+                                <th mat-header-cell *matHeaderCellDef class="text-center w-50">
+                                    {{languageString['primary.portal.benefitsOffering.taxStatus']}}
+                                </th>
+                                <td mat-cell *matCellDef="let element" class="text-center">
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.PRETAX">
+                                        {{languageString['primary.portal.benefitsOffering.preTax']}}
+                                    </span>
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.POSTTAX">
+                                        {{languageString['primary.portal.benefitsOffering.postTax']}}
+                                    </span>
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.VARIABLE">
+                                        {{languageString['primary.portal.benefitsOffering.both']}}
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="agentAssitanceRequired">
+                                <th
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    language="primary.portal.reviewSubmit.titleAgentAssitanceRequired"
+                                    class="text-center"
+                                ></th>
+                                <td mat-cell *matCellDef="let element" class="text-center">
+                                    <span *ngIf="element.planChoice.agentAssisted">
+                                        <mon-icon iconName="check" [iconSize]="16"></mon-icon>
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </mat-expansion-panel>
+                </div>
+            </div>
+            <div *ngIf="coveragePeriodContinuousPlansPanelList.length !== 0">
+                <div class="mat-accordion-wrapper" *ngFor="let coveragePanel of coveragePeriodContinuousPlansPanelList;let i=index">
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> {{coveragePanel.product.name}} | {{coveragePanel.carrier.name}} </mat-panel-title>
+                            <mat-panel-description>
+                                <p>{{languageString['primary.portal.reviewSubmit.continousPlan']}}</p>
+                                <a
+                                    [richTooltip]="coveragePanel.planYearDatesTooltip"
+                                    matTooltipClass="pos-above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageString['primary.portal.reviewSubmit.continousPlan']"
+                                >
+                                    <mon-icon iconName="Filled-info" [iconSize]="16" class="infoicon icon-primary"> </mon-icon>
+                                </a>
+
+                                <p class="plan-count" *ngIf="this.coveragePanel.plans.length>1">
+                                    {{ "primary.portal.reviewSubmit.planCount" | replaceTag: { "#numberofplan":
+                                    this.coveragePanel.plans.length } }}
+                                </p>
+                                <p class="plan-count" *ngIf="this.coveragePanel.plans.length<2">
+                                    {{ "primary.portal.reviewSubmit.planCountOne" | replaceTag: { "#numberofplan":
+                                    this.coveragePanel.plans.length } }}
+                                </p>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <table mat-table [dataSource]="coveragePanel.plans">
+                            <ng-container matColumnDef="plan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titlePlan">
+                                    {{languageString['primary.portal.reviewSubmit.plan']}}
+                                </th>
+                                <td mat-cell *matCellDef="let element" [innerHTML]="element.plan.name"></td>
+                            </ng-container>
+                            <ng-container matColumnDef="state">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titleStates"></th>
+                                <td mat-cell *matCellDef="let element">{{displayValues(element.states)}}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="taxStatus">
+                                <th mat-header-cell *matHeaderCellDef class="text-center w-50">
+                                    {{languageString['primary.portal.benefitsOffering.taxStatus']}}
+                                </th>
+                                <td mat-cell *matCellDef="let element" class="text-center">
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.PRETAX">
+                                        {{languageString['primary.portal.benefitsOffering.preTax']}}
+                                    </span>
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.POSTTAX">
+                                        {{languageString['primary.portal.benefitsOffering.postTax']}}
+                                    </span>
+                                    <span *ngIf="element.planChoice.taxStatus===TaxStatus.VARIABLE">
+                                        {{languageString['primary.portal.benefitsOffering.both']}}
+                                    </span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="agentAssitanceRequired">
+                                <th
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    language="primary.portal.reviewSubmit.titleAgentAssitanceRequired"
+                                    class="text-center"
+                                ></th>
+                                <td mat-cell *matCellDef="let element" class="text-center">
+                                    <mon-icon iconName="check" [iconSize]="16" *ngIf="element.planChoice.agentAssisted"></mon-icon>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </mat-expansion-panel>
+                </div>
+            </div>
+        </mat-accordion>
+    </div>
+    <div class="review-settings-container">
+        <div class="settings-header">
+            <h3>{{ languageString["primary.portal.reviewSubmit.titlePrice"]}}</h3>
+            <span *ngIf="this.enableEditPrice===true"
+                ><button
+                    mat-flat-button
+                    (click)="editPrices()"
+                    class="mon-btn-secondary btn-sm"
+                    [attr.aria-label]="languageString['primary.portal.common.edit']"
+                >
+                    {{ languageString["primary.portal.common.edit"]}}
+                </button></span
+            >
+        </div>
+        <p language="primary.portal.reviewSubmit.priceSection"></p>
+    </div>
+    <div class="review-settings-container">
+        <div class="settings-header">
+            <h3>{{ languageString["primary.portal.reviewSubmit.carrierForms"]}}</h3>
+            <button
+                mat-flat-button
+                (click)="editCarrierForms()"
+                class="mon-btn-secondary btn-sm"
+                [attr.aria-label]="languageString['primary.portal.common.edit']"
+            >
+                {{ languageString["primary.portal.common.edit"]}}
+            </button>
+        </div>
+        <div *ngFor="let carrier of carrierFormStatus">
+            <p>{{carrier}}</p>
+        </div>
+    </div>
+    <!-- modal pop-up on click of Submit to HR -->
+    <div>
+        <ng-template #submitToHR>
+            <div class="info-modal">
+                <div class="modal-header">
+                    <button mat-icon-button (click)="closeModal()" [attr.aria-label]="languageString['primary.portal.common.close']">
+                        <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                    </button>
+                </div>
+                <!-- TODO Hardcode values should come from langauges -->
+                <div mat-dialog-content>
+                    <h2 mat-dialog-title>{{languageString['primary.portal.reviewSubmit.submitToHR.title']}}</h2>
+                    <span> {{languageString['primary.portal.reviewSubmit.submitToHR.subTitle']}}</span>
+                </div>
+                <div mat-dialog-actions class="dialog-footer justify-content-end">
+                    <button
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="closeModal()"
+                        [attr.aria-label]="languageString['primary.portal.common.close']"
+                    >
+                        {{languageString['primary.portal.common.gotIt']}}
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #submitOffering>
+            <div class="info-modal">
+                <div class="modal-header">
+                    <button mat-icon-button (click)="closeModal()" [attr.aria-label]="languageString['primary.portal.common.close']">
+                        <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+                    </button>
+                </div>
+                <div mat-dialog-content>
+                    <h2 mat-dialog-title>{{languageString['primary.portal.reviewSubmit.hQVas.adminAdded.message']}}</h2>
+                </div>
+                <div mat-dialog-actions class="dialog-footer justify-content-end">
+                    <button
+                        class="mon-btn-primary"
+                        mat-flat-button
+                        (click)="closeModal()"
+                        [attr.aria-label]="languageString['primary.portal.common.close']"
+                    >
+                        {{languageString['primary.portal.common.gotIt']}}
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+    <!-- modal pop-up on click of Submit to HR -->
+</div>
+<div class="dialog-footer justify-content-end">
+    <button
+        mat-flat-button
+        class="mon-btn-secondary mon-mr-20"
+        (click)="onBack()"
+        [attr.aria-label]="languageString['primary.portal.common.back']"
+    >
+        <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+        <span> {{languageString['primary.portal.common.back']}} </span>
+    </button>
+    <button
+        *ngIf="this.isAutoApproved"
+        mat-flat-button
+        class="mon-btn-primary"
+        [attr.aria-label]="languageString['primary.portal.reviewSubmit.submitOffering']"
+        (click)="onSaveBenefitsOffering(false)"
+    >
+        {{languageString['primary.portal.reviewSubmit.submitOffering']}}
+    </button>
+    <button
+        *ngIf="!this.isAutoApproved && areAllFormsComplete()"
+        type="submit"
+        class="mon-btn-primary mon-mr-20"
+        (click)="onSaveBenefitsOffering(true)"
+        mat-flat-button
+    >
+        {{languageString['primary.portal.reviewSubmit.sendForApproval']}}
+    </button>
+    <button
+        *ngIf="!this.isAutoApproved"
+        mat-flat-button
+        class="mon-btn-primary"
+        [attr.aria-label]="languageString['primary.portal.common.save']"
+        (click)="onSaveBenefitsOffering(false)"
+    >
+        {{languageString['primary.portal.common.save']}}
+    </button>
+</div>

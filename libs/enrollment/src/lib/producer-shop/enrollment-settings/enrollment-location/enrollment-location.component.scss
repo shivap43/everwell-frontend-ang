@@ -1,0 +1,28 @@
+@import "shared";
+
+:host {
+    display: block;
+}
+
+.location-content-wrapper {
+    .state-info-text {
+        margin-bottom: map-get($spacers, 20);
+    }
+    .select-arrow {
+        margin: 0;
+        vertical-align: bottom;
+    }
+}
+
+mat-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    font-size: convert-unit(14px, "rem");
+    line-height: convert-unit(16px, "rem");
+    font-weight: bold;
+    @include fontFace("primary.bold");
+    color: get("color.black");
+    margin-bottom: map-get($spacers, 5);
+}

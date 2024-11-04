@@ -1,0 +1,6 @@
+<ng-container *ngIf="selectionModel$ | async as selectionModel">
+    <mat-label class="mat-label" *ngIf="combined">{{ selectionModel.title }}</mat-label>
+    <mat-radio-group [value]="selectedOption$ | async" (change)="onSelectOption($event)">
+        <mat-radio-button *ngFor="let option of selectionModel.single.options" [value]="option.value">{{ option.label }}</mat-radio-button>
+    </mat-radio-group>
+</ng-container>

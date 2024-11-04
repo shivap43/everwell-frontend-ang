@@ -1,0 +1,13 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header>
+        {{"primary.portal.deleteProspect.title" | replaceTag: { "##name##": data} }}
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-danger" (click)="dialogRef.close(true)">
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </empowered-modal-footer>
+    <p>
+        {{"primary.portal.deleteProspect.description" | replaceTag: { "##name##": data} }}
+    </p>
+</empowered-modal>

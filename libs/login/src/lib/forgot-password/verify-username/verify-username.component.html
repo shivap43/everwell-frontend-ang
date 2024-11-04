@@ -1,0 +1,65 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-25" role="form">
+    <mat-card>
+        <!-- Content -->
+        <mat-card-content>
+            <mat-card-title language="primary.portal.forgotPassword.verifyUsernameTitle"> </mat-card-title>
+            <p class="mon-mb-0" language="primary.portal.forgotPassword.verifyUsernameSubTitle"></p>
+            <mon-alert *ngIf="error" alertType="danger" role="alert">
+                <span [language]="errorMessage"></span>
+            </mon-alert>
+            <div class="mon-common-form mon-pt-15">
+                <mat-label class="mat-label">
+                    <span language="primary.portal.forgotPassword.username"></span>
+                    <a
+                        href="javascript:void(0)"
+                        [richTooltip]="languageStrings.usernameToolTip"
+                        matTooltipPosition="above"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings.usernameInfo"
+                    >
+                        <mon-icon iconName="Filled-info" [iconSize]="15" class="icon-primary"> </mon-icon>
+                    </a>
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        formControlName="username"
+                        id="username"
+                        matInput
+                        empoweredTrimSpace
+                        type="text"
+                        [attr.aria-label]="languageStrings.username"
+                    />
+                    <mat-error language="primary.portal.forgotPassword.required"></mat-error>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-mb-30 mon-btn-primary"
+                language="primary.portal.common.next"
+                mat-flat-button
+                type="submit"
+                [attr.aria-label]="languageStrings.buttonNext"
+            ></button>
+
+            <p class="mon-m-0">
+                <a
+                    href="javascript:void(0)"
+                    language="primary.portal.forgotPassword.forgotMyUsername"
+                    routerLink="../../forgot-username"
+                    [attr.aria-label]="languageStrings.forgotMyUsername"
+                ></a>
+            </p>
+            <mat-divider class="mon-my-20"></mat-divider>
+            <p>
+                <a
+                    href="javascript:void(0)"
+                    language="primary.portal.common.back"
+                    routerLink="../../login"
+                    [attr.aria-label]="languageStrings.buttonBack"
+                ></a>
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

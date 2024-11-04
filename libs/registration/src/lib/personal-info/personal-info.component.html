@@ -1,0 +1,231 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<form (ngSubmit)="onSubmit()" [formGroup]="personalForm" class="mon-card-wrapper mon-my-50 w-600" *ngIf="!loadSpinner">
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title
+                [language]="(multipleAccountMode$ | async) ? 'primary.portal.register.personalInfo.confirmInfo' : 'primary.portal.register.personalInfo.title'"
+            ></mat-card-title>
+            <div class="mon-mb-20">
+                <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                    <span>{{ errorMessage }}</span>
+                </mon-alert>
+                <mon-alert alertType="danger" *ngIf="isAflacReadOnly && formInitInvalid">
+                    <span language="secondary.portal.register.requiredRegistrationInfoMissing"></span>
+                </mon-alert>
+            </div>
+            <div formGroupName="name">
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.register.personalInfo.firstName']}}</mat-label
+                    >
+                    <mat-form-field class="w-300">
+                        <input
+                            formControlName="firstName"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.firstName']"
+                            matInput
+                            type="text"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="isFormSubmit && personalForm.get('name').get('firstName').hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div>
+                    <mat-label class="mat-label">
+                        <span>{{languageStrings['primary.portal.register.personalInfo.middleName']}}</span>
+                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                    </mat-label>
+                    <mat-form-field class=" w-200">
+                        <input
+                            formControlName="middleName"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.middleName']"
+                            matInput
+                            type="text"
+                            [readonly]="isAflacReadOnly"
+                        />
+                    </mat-form-field>
+                </div>
+
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.register.personalInfo.lastName']}}</mat-label
+                    >
+                    <mat-form-field class=" w-300">
+                        <input
+                            formControlName="lastName"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.lastName']"
+                            matInput
+                            type="text"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="isFormSubmit && personalForm.get('name').get('lastName').hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-5">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.register.personalInfo.birthDate']}}</mat-label
+                    >
+                    <mat-form-field class="mon-date-field  w-200">
+                        <input
+                            [matDatepicker]="picker"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.birthDate']"
+                            formControlName="birthDate"
+                            (keyup)="transform($event)"
+                            matInput
+                            [readonly]="isAflacReadOnly"
+                            [disabled]="isAflacReadOnly"
+                        />
+                        <mat-datepicker-toggle
+                            matSuffix
+                            [for]="picker"
+                            [disabled]="isAflacReadOnly"
+                            (click)="picker.open()"
+                        >
+                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #picker [disabled]="isAflacReadOnly"></mat-datepicker>
+                        <mat-error
+                            *ngIf="
+              !personalForm.controls['birthDate'].valid &&
+              (personalForm.controls['birthDate'].touched  )
+            "
+                            language="secondary.portal.register.personalInfo.birthDateRequired"
+                        >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                    <mat-label class="mat-label">
+                        <span>{{languageStrings['primary.portal.register.personalInfo.SSN']}}</span>
+                        <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                    </mat-label>
+                    <mat-form-field class="w-200">
+                        <input
+                            formControlName="ssn"
+                            (paste)="numberValidation($event)"
+                            (keypress)="numberValidation($event)"
+                            matInput
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.SSN']"
+                            [mask]="ssnFormat"
+                            hiddenInput="true"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="personalForm.controls['ssn'].hasError('pattern') && (invalidSSNValidation.test(personalForm.controls['ssn'].value))"
+                            language="primary.portal.members.beneficiaryValidationMsg.SSNMsg2"
+                        ></mat-error>
+                        <mat-error
+                            *ngIf="personalForm.controls['ssn'].hasError('pattern') && !(invalidSSNValidation.test(personalForm.controls['ssn'].value))"
+                            language="primary.portal.members.beneficiaryValidationMsg.SSNMsg1"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div>
+                <mat-label class="mat-label" language="primary.portal.register.personalInfo.gender"></mat-label>
+                <mat-form-field class="w-300">
+                    <mat-select
+                        formControlName="gender"
+                        matNativeControl
+                        required
+                        placeholder="Select"
+                        disableOptionCentering="true"
+                        [disabled]="isAflacReadOnly"
+                    >
+                        <mat-option value="FEMALE" language="primary.portal.register.personalInfo.female"></mat-option>
+                        <mat-option value="MALE" language="primary.portal.register.personalInfo.male"></mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="isFormSubmit && !personalForm.controls['gender'].valid && (personalForm.controls['gender'].touched)"
+                        language="secondary.portal.register.requiredField"
+                    >
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div formGroupName="workInformation">
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.register.personalInfo.jobTitle']}}</mat-label
+                    >
+                    <mat-form-field class="w-300">
+                        <input
+                            formControlName="occupation"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.jobTitle']"
+                            matInput
+                            type="text"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="isFormSubmit && personalForm.get('workInformation').get('occupation').hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="personalForm.controls.workInformation.controls.occupation?.errors?.maxlength"
+                            language="secondary.portal.common.maxLength50"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div>
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.register.personalInfo.jobDuties']}}</mat-label
+                    >
+                    <mat-form-field class="w-300">
+                        <textarea
+                            formControlName="occupationDescription"
+                            [attr.aria-label]="languageStrings['primary.portal.register.personalInfo.jobDuties']"
+                            matInput
+                            rows="5"
+                            type="text"
+                            [readonly]="isAflacReadOnly"
+                        ></textarea>
+                        <mat-error
+                            *ngIf="isFormSubmit && personalForm.get('workInformation').get('occupationDescription').hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        >
+                        </mat-error>
+                        <mat-error
+                            *ngIf="personalForm.controls.workInformation.controls.occupationDescription?.errors?.maxlength"
+                            language="secondary.portal.common.maxLength200"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a class="mon-btn-link  mon-pt-10" [routerLink]="'../../login'"
+                >{{languageStrings[(multipleAccountMode$ | async) ? 'primary.portal.common.cancel' :
+                'primary.portal.common.back']}}</a
+            >
+            <button
+                class="mon-px-30 mon-btn-primary"
+                mat-button
+                mat-flat-button
+                type="submit"
+                [disabled]="formInitInvalid"
+            >
+                <span *ngIf="isAflacReadOnly || !hideContactTab || !hideDependentTab">
+                    {{languageStrings['primary.portal.common.next']}}</span
+                >
+                <span *ngIf="hideContactTab && hideDependentTab">
+                    {{languageStrings['primary.portal.common.finishRegistration']}}</span
+                >
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</form>

@@ -1,0 +1,104 @@
+@import "shared";
+
+:host:last-child .emp_tab-vertical_divider {
+    padding-bottom: map-get($spacers, 0);
+    border: none;
+}
+
+.emp_tab {
+    display: flex;
+    flex-direction: row;
+    line-height: convert-unit(22px, "rem");
+}
+
+.emp_tab-column {
+    display: flex;
+    flex-direction: column;
+    margin-right: convert-unit(10px, "rem");
+}
+
+.emp_tab-circle_icon {
+    height: convert-unit(16px, "rem");
+    width: convert-unit(16px, "rem");
+    -webkit-border-radius: convert-unit(8px, "rem");
+    -moz-border-radius: convert-unit(8px, "rem");
+    border-radius: convert-unit(8px, "rem");
+    margin-top: 0.25rem;
+
+    .emp_tab-icon {
+        text-align: center;
+        margin-top: convert-unit(-2px, "rem");
+
+        .mon-icon {
+            margin: 0px;
+
+            svg {
+                .cls-1 {
+                    fill: get("color.white");
+                }
+            }
+        }
+    }
+}
+
+.emp_tab-active {
+    background-color: get("color.primary.500");
+    color: get("color.primary.500");
+}
+
+.emp_tab-complete {
+    background-color: get("color.info.success");
+    color: get("color.white");
+}
+
+.emp_tab-inactive {
+    color: get("color.gray.700");
+}
+
+.emp_tab-vertical_divider {
+    flex: 1 1 auto;
+    width: 50%;
+    border-right: dotted get("color.gray.700") convert-unit(2px, "rem");
+    margin-top: convert-unit(5px, "rem");
+    padding-bottom: convert-unit(20px, "rem");
+}
+
+.emp_tab-active_title {
+    @include fontFace("primary.bold");
+    font-size: convert-unit(16px, "rem");
+    font-weight: bold;
+}
+
+.emp_tab-inactive_title {
+    color: get("color.gray.700");
+    font-size: convert-unit(16px, "rem");
+}
+
+.emp_tab-subtab_active_title {
+    @include fontFace("primary.bold");
+}
+
+.emp_tab-subtab {
+    font-size: 0.75rem;
+    color: get("color.black");
+    line-height: convert-unit(12px, "rem");
+    margin-top: map-get($spacers, 20);
+
+    &.emp_tab-subtab_inactive_title {
+        color: get("color.gray.700");
+    }
+
+    &:last-child {
+        margin-bottom: map-get($spacers, 20);
+    }
+}
+
+empowered-tab:last-child {
+    .emp_tab-vertical_divider {
+        display: none;
+    }
+}
+
+.step-completed {
+    color: get("color.black");
+}

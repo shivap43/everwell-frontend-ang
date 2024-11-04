@@ -1,0 +1,17 @@
+<div class="info-modal">
+    <mat-dialog-content>
+        <h1 mat-dialog-title>
+            {{ "primary.portal.regions.removeRegion" | replaceTag: { "#regionname": replaceUnderscore(data?.name) } }}
+        </h1>
+        <!--Replacepipe need work-->
+        <!-- Remove {{data?.name}} and all related regions? -->
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-between">
+        <button mat-button mat-dialog-close class="mon-btn-link" class="mon-btn-link mon-mr-30">
+            {{languageStrings['primary.portal.common.cancel']}}
+        </button>
+        <button mat-button (click)="removeRegionType()" class="mon-btn-danger">
+            {{languageStrings['primary.portal.common.remove']}}
+        </button>
+    </mat-dialog-actions>
+</div>

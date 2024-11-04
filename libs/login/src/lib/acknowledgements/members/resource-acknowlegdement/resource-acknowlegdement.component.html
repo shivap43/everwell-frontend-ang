@@ -1,0 +1,73 @@
+<div class="info-modal">
+    <div mat-dialog-content>
+        <form [formGroup]="acknowledgementForm">
+            <h2 language="primary.portal.members.resourceAcknowledgeModal.newResource">
+                {{languageStrings['primary.portal.members.resourceAcknowledgeModal.newResource']}}
+            </h2>
+            <div *ngIf="resourceList.length > 1; else singleResource">
+                <p>
+                    {{languageStrings['primary.portal.members.resourceAcknowledgeModal.multipleResourceAdded']}}
+                </p>
+                <br />
+                <ul>
+                    <li *ngFor="let resource of resourceList" [value]="resource">
+                        {{resource.resourceType}}:{{resource.name}}
+                        <a (click)="onViewResource(resource)">
+                            {{languageStrings['primary.portal.common.view']}}
+                        </a>
+                    </li>
+                </ul>
+                <br />
+                <!-- TODO :: Once we get phone number need to add in language variable DB-->
+                <p>
+                    {{languageStrings['primary.portal.members.resourceAcknowledgeModal.benefitDepartmentContect']}}
+                </p>
+            </div>
+
+            <ng-template #singleResource>
+                <div>
+                    <p>
+                        {{ "primary.portal.members.resourceAcknowledgeModal.singleResourceAdded" | replaceTag: {
+                        "#resourcetype": this.resourceType } }}
+                        <a (click)="onViewResource(resourceList[0])">
+                            {{languageStrings['primary.portal.common.view']}}
+                        </a>
+                    </p>
+                    <br />
+                    <!-- TODO :: Once we get phone number need to add in language variable DB-->
+                    <p>
+                        {{languageStrings['primary.portal.members.resourceAcknowledgeModal.benefitDepartmentContect']}}
+                    </p>
+                </div>
+            </ng-template>
+
+            <br />
+            <mat-checkbox formControlName="acknowledge"
+                ><span
+                    *ngIf="!multipleResources"
+                    language="primary.portal.members.resourceAcknowledgeModal.singleAcknowledgeResource"
+                ></span>
+                <span
+                    *ngIf="multipleResources"
+                    language="primary.portal.members.resourceAcknowledgeModal.multipleAcknowledgeResource"
+                ></span
+            ></mat-checkbox>
+            <mat-error
+                *ngIf="acknowledgementForm.controls['acknowledge'].errors?.requirement "
+                language="primary.portal.common.selectionRequired"
+            >
+                {{languageStrings['primary.portal.common.selectionRequired']}}
+            </mat-error>
+        </form>
+    </div>
+    <br />
+    <mat-divider></mat-divider>
+    <div mat-dialog-actions class="dialog-footer d-md-flex justify-content-between">
+        <a mat-button mat-dialog-close class="mon-btn-link" aria-label="Log out" (click)="onLogoutClick()">
+            {{languageStrings['primary.portal.members.resourceAcknowledgeModal.logOut']}}
+        </a>
+        <button mat-button mat-flat-button class="mon-btn-primary" aria-label="Submit" (click)="onGoToHomePage()">
+            {{languageStrings['primary.portal.members.resourceAcknowledgeModal.onGoToHomePage']}}
+        </button>
+    </div>
+</div>

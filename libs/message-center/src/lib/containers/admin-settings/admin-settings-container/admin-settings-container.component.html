@@ -1,0 +1,45 @@
+<div>
+    <h2 [language]="MessageCenterLanguage.ADMIN_SETTINGS_HEADER"></h2>
+
+    <p>
+        <span [language]="MessageCenterLanguage.ADMIN_SETTINGS_CONTENT"></span>
+        <button class="mon-btn-link" 
+                (click)="onClickShowAdminRolesModal()"
+                [language]="MessageCenterLanguage.ADMIN_SETTINGS_SHOW_ADMIN_ROLES">
+        </button>
+    </p>
+
+    <div class="container supervisor-input">
+        <div class="row">
+            <div class="col-4">
+                <mat-label [language]="MessageCenterLanguage.ADMIN_SETTINGS_SUPERVISOR"></mat-label>
+                <mat-form-field>
+                    <mat-select [formControl]="supervisoryAdminControl" [disableOptionCentering]="true">
+                        <ng-container *ngFor="let admin of admins$ | async">
+                            <mat-option [value]="admin.id">
+                                {{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}
+                            </mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <empowered-category-admin-assignment
+        *ngFor="let categoryAdminAssignment of categoryAdminAssignments$ | async"
+        [category]="categoryAdminAssignment.category"
+        [assignments]="categoryAdminAssignment.assignment"
+        (currentAssignments)="onEmitCurrentAssignments(categoryAdminAssignment.category.id, $event)">
+    </empowered-category-admin-assignment>
+</div>
+
+<div>
+    <button mat-button 
+            mat-raised-button
+            color="primary"
+            class="mon-btn-primary"
+            #saveAssignments
+            [language]="MessageCenterLanguage.ADMIN_SETTINGS_SAVE">
+    </button>
+</div>

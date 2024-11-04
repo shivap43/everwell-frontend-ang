@@ -1,0 +1,29 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <h2 language="primary.portal.confirmQ60Popup.confirmInfo"></h2>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button (click)="goTo()" language="primary.portal.confirmQ60Popup.confirm" class="mon-btn-primary" mat-flat-button></button>
+    </empowered-modal-footer>
+    <p language="primary.portal.confirmQ60Popup.checkDetails"></p>
+    <p class="details">
+        <span class="bold details__25" language="primary.portal.confirmQ60Popup.eligibleEmployees"></span>
+        <span class="details__75">{{ eligibleEmployees }}</span>
+    </p>
+    <p class="details">
+        <span class="bold details__25" language="primary.portal.confirmQ60Popup.ridersSelected"></span>
+        <span class="details__75">
+            <ul class="riders-selected">
+                <li *ngFor="let rider of ridersSelected">{{ rider }}</li>
+            </ul>
+        </span>
+    </p>
+    <p>
+        <span language="primary.portal.confirmQ60Popup.ifCorrect1"></span>
+        <span class="bold" language="primary.portal.reviewSubmit.settings"></span>
+        <span language="primary.portal.confirmQ60Popup.ifCorrect2"></span>
+        <span class="bold" language="primary.portal.reviewSubmit.carrierForms"></span>
+        <span language="primary.portal.confirmQ60Popup.ifCorrect3"></span>
+    </p>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+</empowered-modal>

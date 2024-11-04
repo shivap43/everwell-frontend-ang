@@ -1,0 +1,173 @@
+<div class="dialog-content">
+    <div class="d-flex">
+        <h3 class="mon-pl-30">{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.header']}}</h3>
+    </div>
+    <div class="gender-discription">
+        <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.description']}}</span>
+    </div>
+    <form [formGroup]="changeGenderForm">
+        <div class="flex-form-wrapper" style="margin-left: 30px; margin-top: 20px">
+            <div class="flex-form-item">
+                <div class="d-md-flex">
+                    <ng-container>
+                        <div class="gender-radiogroup">
+                            <mat-label class="mat-label">
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.changeGenderOf']}}</span
+                                >
+                            </mat-label>
+                            <mat-radio-group formControlName="changeFor" aria-label="Change the gender of" class="flex-column">
+                                <mat-radio-button
+                                    (input)="this.isChangeGenderRequired = false"
+                                    *ngFor="let item of changeGenderOfList"
+                                    [value]="item.id"
+                                    [name]="item.name"
+                                    class="radiobutton"
+                                    >{{item.name}}</mat-radio-button
+                                >
+                                <mat-error *ngIf="isChangeGenderRequired && isSubmitted">
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                            </mat-radio-group>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="d-md-flex">
+                    <ng-container>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.genderRequested']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select placeholder="Select" formControlName="gender" class="mon-input" disableOptionCentering="true">
+                                    <mat-option *ngFor="let item of genders" value="{{item.id}}" title="{{item.name}}">
+                                        {{item.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="genderFormControls['gender'].errors?.required">
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.selectionRequired']}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="d-md-flex">
+                    <ng-container>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.effectiveDate']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field class="mon-date-field w-200">
+                                <input
+                                    [matDatepicker]="picker"
+                                    matInput
+                                    formControlName="genderChangeDate"
+                                    [max]="maxDate"
+                                    (keyup)="transform($event)"
+                                    [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.effectiveDate']"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-error *ngIf="genderFormControls['genderChangeDate'].errors?.required">
+                                    <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.requiredField']}}</span>
+                                </mat-error>
+                                <mat-error *ngIf="genderFormControls['genderChangeDate'].hasError('matDatepickerMax')">
+                                    <span
+                                        >{{languageStrings['primary.portal.dashboard.policyChangeRequestFlow.findPolicyHolder.invalidFutureDate']}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="d-md-flex">
+                    <ng-container>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.docsToProvide']}}</span
+                                >
+                            </mat-label>
+                            <mat-radio-group
+                                formControlName="documentationType"
+                                attr.aria-label="{{languageStrings['primary.portal.policyChangeRequest.transactions.changeGender.docsToProvide']}}"
+                                class="d-md-flex flex-column"
+                            >
+                                <div *ngFor="let item of documentationList; let i = index">
+                                    <mat-radio-button
+                                        [checked]="item.id == selectedDocument"
+                                        (input)="this.isDocumentRequired = false"
+                                        name="{{item.name}}"
+                                        class="mon-mb-10"
+                                        value="{{item.id}}"
+                                        title="{{item.name}}"
+                                        (change)="showUploadDocument(i, item.id)"
+                                    >
+                                        {{item.name}}
+                                    </mat-radio-button>
+                                    <ng-container *ngIf="i === selectedDoc || item.id == selectedDocument ">
+                                        <div class="pcr-fileupload">
+                                            <empowered-pcr-file-upload
+                                                [isFileUploadFromTransaction]="true"
+                                                [documentIds]="documentIds"
+                                                [mpGroup]="mpGroup"
+                                                [memberId]="memberId"
+                                                [cifNumber]="cifNumber"
+                                                (getDocumentId)="getDocumentId($event)"
+                                            >
+                                            </empowered-pcr-file-upload>
+                                        </div>
+                                        <mat-error *ngIf="isSupportiveDocumentsRequired && (formControl['documentIds'].errors?.required)">
+                                            <span
+                                                >{{languageStrings['primary.portal.policyChangeRequest.transactions.changeName.validationError.supportiveDocsRequired']}}</span
+                                            >
+                                        </mat-error>
+                                    </ng-container>
+                                </div>
+                            </mat-radio-group>
+                            <mat-error *ngIf="isDocumentRequired &&  isSubmitted">
+                                <span>{{languageStrings['primary.portal.policyChangeRequest.transactions.selectionRequired']}}</span>
+                            </mat-error>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button class="mon-btn-link" aria-label="Cancel" mat-flat-button (click)="cancel()">
+            <span>{{languageStrings['primary.portal.common.cancel']}}</span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="submitChangeGenderRequest()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

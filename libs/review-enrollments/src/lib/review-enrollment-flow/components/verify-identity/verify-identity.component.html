@@ -1,0 +1,154 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<mon-alert alertType="danger" *ngIf="showErrorMessage">
+    <span>{{ errorMessage }}</span>
+</mon-alert>
+<div class="verify-section">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="header">
+            <h1>{{languageStrings['primary.portal.enrollment.review.verify']}}</h1>
+            <p>{{languageStrings['primary.portal.enrollment.review.confirmidentiy']}}</p>
+        </div>
+
+        <div class="verify-name">
+            <div class="flex-item">
+                <empowered-input displayOrder="1" [formName]="formName">
+                    <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollment.review.firstname']}} </mat-label>
+                    <mat-form-field>
+                        <input
+                            formControlName="firstName"
+                            required
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollment.review.firstname']"
+                        />
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['firstName'].hasError('required')">
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                        <mat-error
+                            class="mon-pt-6 mon-mat-hint"
+                            *ngIf="loginForm.controls['firstName'].hasError('pattern') && !loginForm.controls['firstName'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.headset.fpo.firstname']}}
+                        </mat-error>
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['firstName'].hasError('apiError')">
+                            {{languageStrings['primary.portal.records.unmatch']}}</mat-error
+                        >
+                    </mat-form-field>
+                </empowered-input>
+            </div>
+            <div class="flex-item">
+                <empowered-input displayOrder="2" [formName]="formName">
+                    <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollment.review.lastname']}} </mat-label>
+                    <mat-form-field>
+                        <input
+                            formControlName="lastName"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollment.review.lastname']"
+                        />
+
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['lastName'].hasError('required')">
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                        <mat-error
+                            class="mon-pt-6 mon-mat-hint"
+                            *ngIf="loginForm.controls['lastName'].hasError('pattern') && !loginForm.controls['lastName'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.headset.fpo.lastname']}}
+                        </mat-error>
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['lastName'].hasError('apiError')">
+                            {{languageStrings['primary.portal.headset.notmatch']}}</mat-error
+                        >
+                    </mat-form-field>
+                </empowered-input>
+            </div>
+        </div>
+
+        <div class="verify-date">
+            <div class="flex-item">
+                <mat-label class="mat-label" id="birthDate"> {{languageStrings['primary.portal.enrollment.review.birthdate']}} </mat-label>
+                <mat-form-field class="mon-date-field">
+                    <input
+                        formControlName="birthDate"
+                        [max]="maxDate"
+                        matInput
+                        empoweredInput
+                        displayOrder="3"
+                        empoweredDateTransform
+                        (input)="checkDateInput($event,this.loginForm.controls.birthDate)"
+                        [matDatepicker]="datePicker"
+                        [attr.aria-label]="languageStrings['primary.portal.enrollment.review.birthdate']"
+                    />
+                    <mat-datepicker #datePicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix (click)="datePicker.open()">
+                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                    </mat-datepicker-toggle>
+                    <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['birthDate'].hasError('required')">
+                        {{languageStrings['primary.portal.common.requiredField']}}
+                    </mat-error>
+                    <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['birthDate'].hasError('invalid')">
+                        {{languageStrings['primary.portal.enrollment.review.invalidDate']}}
+                    </mat-error>
+                    <mat-error
+                        class="mon-pt-6 mon-mat-hint"
+                        *ngIf="loginForm.controls['birthDate'].hasError('futureDate') && !loginForm.controls['birthDate'].hasError('required')"
+                    >
+                        {{languageStrings['primary.portal.headset.fpo.birth']}}
+                    </mat-error>
+                    <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['birthDate'].hasError('apiError')">
+                        {{languageStrings['primary.portal.headset.fpo.birth.notmatch']}}</mat-error
+                    >
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="verify-email">
+            <div class="flex-item">
+                <empowered-input displayOrder="4" [formName]="formName">
+                    <mat-label class="mat-label">
+                        <span> {{languageStrings['primary.portal.enrollment.review.email']}}</span>
+                    </mat-label>
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            formControlName="contactValue"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollment.review.email']"
+                        />
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['contactValue'].hasError('required')">
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                        <mat-error
+                            class="mon-pt-6 mon-mat-hint"
+                            *ngIf="loginForm.controls['contactValue'].hasError('contactValueError') && !loginForm.controls['contactValue'].hasError('required')"
+                        >
+                            {{languageStrings['primary.portal.headset.fpo.contact']}}
+                        </mat-error>
+                        <mat-error class="mon-pt-6 mon-mat-hint" *ngIf="loginForm.controls['contactValue'].hasError('apiError')">
+                            {{languageStrings['primary.portal.headset.contact.valid']}}</mat-error
+                        >
+                    </mat-form-field>
+                </empowered-input>
+            </div>
+        </div>
+        <div class="consent">
+            <div class="statement">
+                <mat-checkbox formControlName="consentValue" [(ngModel)]="checked">
+                    <div>
+                        <p>{{languageStrings['primary.portal.enrollment.review.agree']}}</p>
+                    </div>
+                </mat-checkbox>
+                <a (click)="consentStatement()"> {{languageStrings['primary.portal.enrollment.review.consent']}}</a>
+            </div>
+            <mat-error *ngIf="!loginForm.controls['consentValue'].value && agreeCheckbox">
+                {{languageStrings['primary.portal.review.selectionrequired']}}
+            </mat-error>
+        </div>
+
+        <div class="action-btn">
+            <button class="mon-btn-primary" mat-flat-button type="submit">
+                <span> {{languageStrings['primary.portal.common.next']}}</span>
+                <mon-icon class="mon-icon mon-directions-btn-icon icon-right mon-mt-0 mon-mr-0" iconSize="12" iconName="right"></mon-icon>
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,44 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="false" class="dropVas-modal">
+    <empowered-modal-header>
+        <span *ngIf="data.vasPlans.length === dataLengthOne">
+            {{languageStrings['primary.portal.quoteShop.planNotAvailable']}}</span
+        >
+        <span *ngIf="data.vasPlans.length > dataLengthOne">
+            {{languageStrings['primary.portal.quoteShop.plansNotAvailable']}}</span
+        >
+    </empowered-modal-header>
+
+    <div class="description" *ngIf="data.portal!==memberPortal">
+        <span *ngIf="data.vasPlans.length === dataLengthOne"
+            >{{languageStrings['primary.portal.dropVas.descriptionOne'] | replaceTag: {"##firstname##" : data.firstName}
+            }}</span
+        >
+        <span *ngIf="data.vasPlans.length > dataLengthOne"
+            >{{languageStrings['primary.portal.dropVas.descriptionTwo'] | replaceTag: {"##firstname##" : data.firstName}
+            }}</span
+        >
+    </div>
+    <div class="description" *ngIf="data.portal===memberPortal">
+        <span *ngIf="data.vasPlans.length === dataLengthOne"
+            >{{languageStrings['primary.portal.member.dropVas.descriptionOne']}}</span
+        >
+        <span *ngIf="data.vasPlans.length > dataLengthOne"
+            >{{languageStrings['primary.portal.member.dropVas.descriptionTwo']}}</span
+        >
+    </div>
+    <ul class="plan-detail" *ngFor="let plan of data.vasPlans">
+        <li>{{plan}}</li>
+    </ul>
+
+    <empowered-modal-footer>
+        <button
+            class="mon-btn-primary"
+            mat-raised-button
+            color="primary"
+            [mat-dialog-close]="true"
+            cdkFocusInitial
+            language="primary.portal.common.gotIt"
+            mat-flat-button
+        ></button>
+    </empowered-modal-footer>
+</empowered-modal>

@@ -1,0 +1,63 @@
+<ng-container>
+    <mat-accordion class="accordion-default">
+        <ng-container *ngFor="let offering of offeringList">
+            <mat-expansion-panel class="group-expand" [disabled]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <div class="offering-list">
+                            <h4 [ngClass]="{'gray-out': offering.pendingAction === PendingActionType.DELETE}">
+                                <ng-container *ngIf="!offering.isApproved">
+                                    <a
+                                        href="javascript:void(0)"
+                                        [richTooltip]="offering.pendingAction === PendingActionType.DELETE ? removalPendingAdminApprovalMessage : pendingAdminApprovalMessage"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                    >
+                                        <mon-icon iconSize="16" iconName="Filled-warning" class="icon-warning">
+                                        </mon-icon>
+                                    </a>
+                                </ng-container>
+                                {{offering.name}} | {{offering.contributionType===amountFlat?(offering.amount |
+                                currency) :offering.amount}} {{offering.contributionType===amountFlat?payFrequency:""}}
+                                {{offering.contributionType===amountPercentage?percentageSuffix:""}}
+                                <span *ngIf="offering.pendingAction === PendingActionType.DELETE"
+                                    >{{
+                                    languageStrings["primary.portal.maintenanceBenefitsOffering.benefitDollar.removed"]
+                                    }}</span
+                                >
+                            </h4>
+                            <p [ngClass]="{'gray-out': offering.pendingAction === PendingActionType.DELETE}">
+                                {{offering.description}}
+                            </p>
+                        </div>
+                        <div
+                            *hasAnyPermission="['core.account.create.benefitbank','core.account.update.benefitbank','core.account.delete.benefitbank']"
+                        >
+                            <ng-container
+                                *ngIf="!isEditRemoveNotAllowed && offering.pendingAction !== PendingActionType.DELETE"
+                            >
+                                <button
+                                    class="mon-btn-link text-danger"
+                                    (click)="removeOffering(offering.id)"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+                                    [disabled]="isVestedAgent"
+                                >
+                                    {{languageStrings['primary.portal.common.remove']}}
+                                    <span class="sr-only">{{offering.name}}</span>
+                                </button>
+                                <button
+                                    class="mon-btn-link"
+                                    (click)="editOffering(offering.id)"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                                    [disabled]="isVestedAgent"
+                                >
+                                    {{languageStrings['primary.portal.common.edit']}}
+                                </button>
+                            </ng-container>
+                        </div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+        </ng-container>
+    </mat-accordion>
+</ng-container>

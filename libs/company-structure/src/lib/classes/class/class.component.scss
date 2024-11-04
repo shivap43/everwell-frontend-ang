@@ -1,0 +1,97 @@
+@import "shared";
+
+:host {
+    .mat-expansion-panel {
+        margin: 0 convert-unit(50px, "rem") !important;
+        background-color: get("color.gray.200");
+
+        &.group-title-expand {
+            margin-bottom: convert-unit(15px, "rem") !important;
+
+            ::ng-deep {
+                .mat-expansion-panel-body {
+                    padding: 0;
+                }
+            }
+
+            &.mat-expanded {
+                padding-left: 0;
+            }
+
+            .mat-expansion-panel-header {
+                .mat-expansion-panel-header-description {
+                    white-space: normal;
+                    word-break: break-all;
+                }
+            }
+        }
+        &:not(.mat-expanded) {
+            .mat-expansion-panel-header {
+                &.add-class-title {
+                    background-color: get("color.white");
+                    height: auto !important;
+                    padding: convert-unit(3px, "rem") 0;
+                }
+            }
+        }
+        &:hover {
+            .link-danger {
+                opacity: 1;
+            }
+        }
+    }
+
+    .mat-expansion-panel-header {
+        padding-left: convert-unit(15px, "rem");
+        padding-right: convert-unit(15px, "rem");
+
+        &.class-title {
+            padding-left: convert-unit(30px, "rem");
+            height: auto !important;
+            min-height: convert-unit(50px, "rem");
+        }
+        ::ng-deep .mat-expansion-panel-header-description {
+            color: get("color.gray.700");
+            font-size: 16px;
+            font-weight: normal;
+        }
+        .panel-class-title {
+            //CSS to target only IE-11 browser
+            @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+                min-width: convert-unit(300px, "rem");
+            }
+            @include fontFace("primary.regular");
+            font-size: convert-unit(18px, "rem");
+            color: get("color.black");
+            margin: 0 convert-unit(10px, "rem") 0 0;
+            h4 {
+                font-weight: normal;
+            }
+        }
+        .panel-class-desc {
+            @include fontFace("primary.regular");
+            font-size: convert-unit(16px, "rem");
+            color: get("color.gray.700");
+            overflow-wrap: normal;
+            margin-top: convert-unit(1px, "rem");
+        }
+    }
+}
+.authorize-click {
+    font-size: convert-unit(16px, "rem");
+    font-weight: normal;
+}
+.class-newclass-title {
+    margin-top: convert-unit(20px, "rem") !important;
+    @include fontFace("primary.regular");
+    font-size: convert-unit(22px, "rem");
+    font-weight: normal;
+    color: get("color.black");
+}
+
+.action-buttons {
+    //CSS to target only IE-11 browser
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+        min-width: convert-unit(120px, "rem");
+    }
+}

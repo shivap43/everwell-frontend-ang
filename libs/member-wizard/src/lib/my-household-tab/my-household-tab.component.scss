@@ -1,0 +1,58 @@
+@import "shared";
+
+.wizard-content {
+    padding: convert-unit(30px, "rem");
+    overflow: auto;
+    height: calc(100vh - 270px);
+
+    .wizard-title {
+        margin: 0 0 convert-unit(20px, "rem");
+        color: get("color.black");
+        @include fontFace("secondary.light");
+        font-size: convert-unit(36px, "rem");
+        font-weight: 300;
+        line-height: convert-unit(40px, "rem");
+    }
+
+    .table-footer {
+        padding: convert-unit(20px, "rem") 0 convert-unit(30px, "rem");
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    }
+
+    .wizard-note {
+        padding: convert-unit(20px, "rem") 0 convert-unit(30px, "rem") 0;
+        max-width: convert-unit(600px, "rem");
+
+        .wizard-actions {
+            margin: convert-unit(20px, "rem") 0;
+        }
+    }
+}
+
+.wizard-footer {
+    background-color: get("color.gray.100");
+    border-top: convert-unit(2px, "rem") solid get("color.gray.400");
+    padding: convert-unit(40px, "rem") convert-unit(30px, "rem");
+    text-align: right;
+}
+
+th.is-age {
+    padding-right: convert-unit(30px, "rem") !important;
+}
+
+td.is-age {
+    padding-right: convert-unit(0px, "rem") !important;
+
+    .has-tooltip {
+        display: flex;
+        align-items: center;
+
+        span::ng-deep {
+            margin-left: 5px;
+
+            .infoicon {
+                height: 20px;
+            }
+        }
+    }
+}

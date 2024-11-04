@@ -1,0 +1,48 @@
+@import "shared";
+
+.client-info {
+    width: convert-unit(400px, "rem") !important;
+}
+::ng-deep .carrier-select.mat-select-panel {
+    min-width: calc(100% + 22px) !important;
+}
+.mat-radio-group {
+    display: flex;
+    flex-flow: column wrap;
+    margin-bottom: convert-unit(20px, "rem");
+    .mat-radio-button {
+        &:first-child {
+            margin-top: convert-unit(5px, "rem");
+        }
+        margin-top: convert-unit(10px, "rem");
+    }
+}
+.carrier-checkbox {
+    .mat-list-item {
+        ::ng-deep {
+            .mat-list-item-content {
+                align-items: flex-start;
+                .mat-pseudo-checkbox {
+                    top: convert-unit(4px, "rem");
+                }
+            }
+        }
+    }
+}
+.flex-item.carrierforms-checkbox {
+    width: 100%;
+    .mat-list-option {
+        height: auto;
+        padding-bottom: map-get($spacers, 15);
+    }
+}
+::ng-deep .carrier-forms-radio {
+    .mat-radio-label {
+        white-space: normal;
+        align-items: flex-start;
+    }
+}
+
+.mon-date-field {
+    width: convert-unit(200px, "rem");
+}

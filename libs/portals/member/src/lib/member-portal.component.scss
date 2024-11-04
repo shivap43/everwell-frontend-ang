@@ -1,0 +1,21 @@
+////
+/// Member Portal Styles
+///
+/// Since `MemberPortalComponent` has ViewEncapsulation.None, this stylesheet can be used to style any child component in Member portal.
+@import "shared";
+
+.member-portal {
+    /// Ensure all child components fill the available space by default.
+    empowered-member-portal {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+
+        & > *:not(.router-outlet) {
+            // flex: 1 0 auto;
+
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

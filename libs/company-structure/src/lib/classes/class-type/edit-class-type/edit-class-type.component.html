@@ -1,0 +1,117 @@
+<div class="edit-class-type-wrapper">
+    <form *ngIf="editClassTypeForm" [formGroup]="editClassTypeForm" (ngSubmit)="submit.focus(); editClassType()">
+        <div class="flex-item">
+            <!-- FIXME - Use language. -->
+            <p *ngIf="data.actionType === 'CLASS_TYPE.CREATE'" class="editclass-para">
+                This class type's settings will automatically apply to its classes
+            </p>
+            <mat-label class="mat-label">{{languageStrings['primary.portal.classes.classTypeName']}}</mat-label>
+            <mat-form-field class="class-name">
+                <input
+                    formControlName="name"
+                    matInput
+                    autocomplete="off"
+                    [attr.aria-label]="languageStrings['primary.portal.classes.classTypeName']"
+                />
+                <mat-error
+                    *ngIf="editClassTypeForm.controls.name.errors?.duplicateName"
+                    language="secondary.portal.classes.classTypeNameError"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editClassTypeForm.controls.name.errors?.required"
+                    language="primary.portal.common.requiredField"
+                ></mat-error>
+                <mat-error *ngIf="editClassTypeForm.controls.name.errors?.pattern" language="secondary.portal.common.pattern"></mat-error>
+                <mat-error
+                    *ngIf="editClassTypeForm.controls.name.errors?.maxlength"
+                    language="secondary.portal.common.maxLength"
+                ></mat-error>
+            </mat-form-field>
+        </div>
+        <div class="flex-item class-desc">
+            <mat-label class="mat-label">
+                <span>{{languageStrings['primary.portal.classes.classDescription']}}</span>
+                <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+            </mat-label>
+            <mat-form-field>
+                <input
+                    formControlName="description"
+                    matInput
+                    autocomplete="off"
+                    [attr.aria-label]="languageStrings['primary.portal.classes.classDescription']"
+                />
+                <mat-error
+                    *ngIf="editClassTypeForm.controls.description.errors?.pattern"
+                    language="secondary.portal.common.pattern"
+                ></mat-error>
+                <mat-error
+                    *ngIf="editClassTypeForm.controls.description.errors?.maxlength"
+                    language="secondary.portal.common.maxLength200"
+                ></mat-error>
+                <mat-error *ngIf="editClassTypeForm.controls.description.errors?.minlength">
+                    {{secondaryLanguages['secondary.portal.classes.classDescription.minLength']}}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <mat-label class="mat-label">{{languageStrings['primary.portal.common.settings']}}</mat-label>
+        <div class="mon-mb-5">
+            <mat-checkbox *ngIf="!zeroState && !data.classType?.determinesPayFrequency" formControlName="determinesPayFrequency">
+                <span>{{languageStrings['primary.portal.classes.payFrequencyCategory']}}</span>
+            </mat-checkbox>
+            <div *ngIf="zeroState || editClassTypeForm.controls.determinesPayFrequency.value">
+                <div *ngIf="(!zeroState && (!data.classType || !data.classType?.determinesPayFrequency))">
+                    <span class="pay-frequency-notification">
+                        {{ "primary.portal.classes.replacePayFrequency" | replaceTag: { "#defaultclasstype": (defaultClassType)?.name} }}
+                    </span>
+                </div>
+                <div class="pay-frequency-wrapper">
+                    <div class="w-250 paroll-frequency">
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.classes.defaultPayFrequency']}}</mat-label>
+
+                        <mat-form-field>
+                            <mat-select
+                                placeholder="Select"
+                                formControlName="payFrequencyId"
+                                disableOptionCentering="true"
+                                panelClass="ediclass-type-select-dropdown"
+                                [disableControl]="(hasPermissionDeductionFrequencyUpdate$ | async) === false || 
+                                ((hasTPPrestrictionForDeductionFrequencyUpdate$ | async) && isTpiAccount)"
+                            >
+                                <mat-option *ngFor="let payFrequency of payFrequencies" [value]="payFrequency.id">
+                                    {{payFrequency.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="editClassTypeForm.controls.payFrequencyId?.errors?.required"
+                                language="primary.portal.common.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <a
+                        *ngIf="zeroState"
+                        href="javascript:void(0)"
+                        [richTooltip]="languageStrings['primary.portal.classes.tooltipPayFrequency']"
+                        matTooltipClass="pos-above"
+                        matTooltipPosition="above"
+                        [attr.aria-label]="languageStrings['primary.portal.classes.tooltipPayFrequency']"
+                    >
+                        <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="18"></mon-icon>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <mat-checkbox class="mon-mt-5" formControlName="determinesPlanAvailabilityOrPricing" *ngIf="showDeterminesPlanAvailabilityOption">
+            <span language="primary.portal.classes.determinePlanAvailability"></span>
+        </mat-checkbox>
+
+        <div class="form-footer">
+            <button mat-button type="button" (click)="cancel()" class="mon-btn-secondary">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </button>
+            <button #submit mat-button type="submit" class="mon-btn-primary">
+                {{data.actionType ===
+                'CLASS_TYPE.CREATE'?languageStrings['primary.portal.regions.create']:languageStrings['primary.portal.common.save']}}
+            </button>
+        </div>
+    </form>
+</div>

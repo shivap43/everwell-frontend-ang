@@ -1,0 +1,212 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closePopup()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div *ngIf="!showEnrollmentInfoPopup">
+        <form [formGroup]="enrollmentForm" (ngSubmit)="checkMethodAndSubmit()">
+            <mat-dialog-content>
+                <h5 *ngIf="stepHeaderDisplay">{{languageStrings['primary.portal.enrollmentMethod.step1']}}</h5>
+                <h2 mat-dialog-title *ngIf="!isDirect">{{languageStrings['primary.portal.shoppingExperience.header']}}</h2>
+                <h2 mat-dialog-title *ngIf="isDirect">{{languageStrings['primary.portal.enrollmentMethod.shoppingMethod']}}</h2>
+                <mon-alert *ngIf="isDisable" alertType="danger">
+                    <span>{{languageStrings['primary.portal.enrollmentMethod.notPermittedForEnrollment']}}</span>
+                </mon-alert>
+                <mon-alert *ngIf="isDirectDisablePR || isDirectDisableClearlinkPR" alertType="danger">
+                    <span>{{languageStrings['primary.portal.enrollmentMethod.eFinancialProducerNotLicensedInPR']}}</span>
+                </mon-alert>
+                <mon-alert *ngIf="isDirectDisableClearlinkVI" alertType="danger">
+                    <span>{{languageStrings['primary.portal.enrollmentMethod.eFinancialProducerNotLicensedInVI']}}</span>
+                </mon-alert>
+                <mon-alert *ngIf="isDirectDisableClearlinkGU" alertType="danger">
+                    <span>{{languageStrings['primary.portal.enrollmentMethod.eFinancialProducerNotLicensedInGU']}}</span>
+                </mon-alert>
+                <p class="mon-mb-15 mon-mt-10" language="primary.portal.shoppingExperience.enrollmentParagraph"></p>
+                <div>
+                    <mat-label class="mat-label" language="primary.portal.members.dependent.contactInfo.method"></mat-label>
+                    <mat-form-field class="shopping-method">
+                        <mat-select
+                            formControlName="enrollmentMethod"
+                            matNativeControl
+                            required
+                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                            disableOptionCentering="true"
+                            (selectionChange)="changeEnrollment($event)"
+                            panelClass="select-enrollment-method"
+                        >
+                            <mat-option *ngFor="let method of enrollMethods" [value]="method.name"> {{method.description}} </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span
+                                *ngIf="enrollmentForm.controls['enrollmentMethod'].hasError('required')"
+                                language="primary.portal.common.selectionRequired"
+                            ></span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="d-flex">
+                    <div *ngIf="!isCallCenterAgent && stateDisplay">
+                        <mat-label class="mat-label" language="primary.portal.accounts.state"></mat-label>
+                        <mat-form-field class="select-state-enrollment">
+                            <input
+                                type="text"
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentMethod.number']"
+                                matInput
+                                #stateinput
+                                formControlName="state"
+                                [formControl]="filterState"
+                                [matAutocomplete]="auto"
+                                required
+                                (blur)="removeStateText()"
+                                (keyup)="removeCity()"
+                                (input)="disableAutoComplete()"
+                                autocomplete="off"
+                            />
+                            <mon-icon class="select-arrow" iconSize="10" iconName="down"></mon-icon>
+                            <mat-autocomplete
+                                #auto="matAutocomplete"
+                                (optionSelected)="getStateOptionSelected($event.option.value)"
+                                autoActiveFirstOption
+                            >
+                                <mat-option *ngFor="let state of stateList" [value]="state"> {{state}} </mat-option>
+                            </mat-autocomplete>
+                            <mat-hint *ngIf="!headSet" language="primary.portal.selectEnrollment.hintStateEnrollment"></mat-hint>
+                            <mat-hint *ngIf="headSet" language="primary.portal.selectEnrollment.hintEnrollee"></mat-hint>
+                            <mat-error language="primary.portal.common.selectionRequired"> </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="!isCallCenterAgent && cityDisplay" class="mon-pl-20">
+                        <mat-label class="mat-label" language="primary.portal.accounts.city"></mat-label>
+                        <mat-form-field class="w-200">
+                            <input
+                                required
+                                type="text"
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentMethod.number']"
+                                matInput
+                                #cityinput
+                                formControlName="city"
+                                [formControl]="filterCity"
+                                [matAutocomplete]="auto1"
+                                (blur)="removeCityText()"
+                                (input)="captureTypedCity()"
+                                autocomplete="off"
+                            />
+                            <mat-autocomplete
+                                #auto1="matAutocomplete"
+                                (optionSelected)="getCityOptionSelected($event.option.value)"
+                                autoActiveFirstOption
+                            >
+                                <mat-option *ngFor="let city of filteredCityOptions | async" [value]="city"> {{city}} </mat-option>
+                            </mat-autocomplete>
+
+                            <mat-error language="primary.portal.common.selectionRequired"> </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="enrollment-method-alert">
+                    <div
+                        class="d-flex infocont mon-mb-20"
+                        *ngIf="enrollmentForm.controls['enrollmentMethod'].value === 'CALL_CENTER' && isCallCenterError"
+                    >
+                        <mon-alert class="message-block" alertType="danger">
+                            <span>
+                                <span>{{userCallCenter.name}}</span
+                                ><span>
+                                    {{languageStrings['primary.portal.enrollmentMethod.requireMinEmp'].replace("#minSubscriberCount",userCallCenter.minSubscriberCount)}}</span
+                                >
+                            </span>
+                        </mon-alert>
+                    </div>
+                    <mon-alert
+                        *ngIf="(methodChangeNYacc || displayNyMsg) && !isNYGroupProducerNotLicensedInNY && !isDirectDisablePR && !isDirectClearlinkStateError"
+                    >
+                        <span> {{languageStrings['primary.portal.situsState.nyGroupMessage']}} </span>
+                    </mon-alert>
+                    <ng-container *configEnabled="VIRTUAL_FACE_TO_FACE_ENABLED">
+                        <mon-alert *ngIf="isVirtualF2FInfoDisplay" alertType="info">
+                            <span> {{languageStrings['primary.portal.enrollmentMethod.virtualFaceToFace']}} </span>
+                        </mon-alert>
+                        <mon-alert
+                            *ngIf="(disabilityEnrollmentRestrictionInfo$ | async) as disabilityEnrollmentRestrictionInfo"
+                            alertType="info"
+                        >
+                            <span>
+                                {{languageStrings['primary.portal.callCenter.8x8.form.alert.cannotEnrollDisability']}}
+                                <a href="mailto:{{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail }}"
+                                    >{{ disabilityEnrollmentRestrictionInfo.callCenterDisabilitySupportEmail}}</a
+                                >
+                            </span>
+                        </mon-alert>
+                        <mon-alert *ngIf="showWebexWarning" alertType="danger">
+                            <span> {{languageStrings['primary.portal.enrollmentMethod.virtualFaceToFace.webexText']}} </span>
+                            <a target="_blank" [href]="webexMeetingLink"
+                                >{{languageStrings['primary.portal.enrollmentMethod.virtualFaceToFace.webexLink']}}</a
+                            >
+                        </mon-alert>
+                    </ng-container>
+                    <mon-alert
+                        *ngIf="methodChangeNonNYAcc && !isUSGroupProducerNotLicensedInUS && !isDirectDisablePR && !isDirectClearlinkStateError"
+                    >
+                        <span> {{languageStrings['primary.portal.situsState.non-nyGroupMessage']}} </span>
+                    </mon-alert>
+                    <mon-alert
+                        *ngIf="(isNYGroupProducerNotLicensedInNY || (isProducerNotLicensedInCustomerState)) && !isDirectDisablePR && !isDirectClearlinkStateError && !isEfinancialAgent && !isClearlinkAgent && !isStrideAgent"
+                        alertType="danger"
+                    >
+                        <span>{{languageStrings['primary.portal.enrollmentMethod.nyGroupProducerNotLicensedInNY']}} </span>
+                    </mon-alert>
+                    <mon-alert
+                        *ngIf="(isUSGroupProducerNotLicensedInUS || producerOnlyNYCustomerNonNY) && !isDirectDisablePR && !isDirectClearlinkStateError"
+                        alertType="danger"
+                    >
+                        <span> {{languageStrings['primary.portal.enrollmentMethod.usGroupProducerLicensedOnlyInNY']}} </span>
+                    </mon-alert>
+                    <mon-alert
+                        *ngIf="producerNonNYCustomerNonNY && !isNYGroupProducerNotLicensedInNY && !isDirectDisablePR && !isDirectClearlinkStateError"
+                    >
+                        <span> {{languageStrings['primary.portal.enrollmentMethod.producerNotLicensedInCustomerState']}} </span>
+                    </mon-alert>
+                    <mon-alert
+                        *ngIf="isProducerNotLicensedInCustomerState && (isEfinancialAgent || isClearlinkAgent || isStrideAgent) && !isDirectDisablePR && !isDirectClearlinkStateError"
+                    >
+                        <span> {{languageStrings['primary.portal.enrollmentMethod.producerNotLicensedInCustomerState']}} </span>
+                    </mon-alert>
+                    <mon-alert
+                        *ngIf="!methodChangeNonNYAcc && isProducerNotLicensedInEmployeeState && !isUSGroupProducerNotLicensedInUS && !isDirectDisablePR && !isDirectClearlinkStateError && !displayNyMsg"
+                    >
+                        <span> {{languageStrings['primary.portal.enrollmentMethod.producerNotLicensedInEmployeeState']}} </span>
+                    </mon-alert>
+                    <mon-alert *ngIf="eaaResponse?.isMissingEAAError" alertType="danger">
+                        <span>{{languageStrings['primary.portal.quoteShop.plansDisplay.crossBorderRestriction']}}</span>
+                    </mon-alert>
+                    <mon-alert *ngIf="eaaResponse?.isMissingEAAWarning" alertType="warning">
+                        <span>{{languageStrings['primary.portal.enrollmentMethod.missingEAAWarning']}}</span>
+                    </mon-alert>
+                </div>
+            </mat-dialog-content>
+
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between mon-py-25">
+                <a class="mon-btn-link mon-px-0" mat-button mat-dialog-close (click)="closePopup()"
+                    >{{ languageStrings["primary.portal.common.cancel"] }}</a
+                >
+                <button
+                    class="mon-btn-primary mon-dialog-button mon-px-30"
+                    mat-flat-button
+                    type="submit"
+                    [disabled]="isDisable || isDirectDisablePR || isDirectClearlinkStateError || isNYGroupProducerNotLicensedInNY || isUSGroupProducerNotLicensedInUS || disableNext || isProducerNotLicensedInCustomerState || (isInvalidCity && enrollmentForm.controls['enrollmentMethod'].value === facetoFaceAPIValue)"
+                >
+                    {{ languageStrings["primary.portal.common.next"] }}
+                </button>
+            </mat-dialog-actions>
+        </form>
+    </div>
+
+    <div *ngIf="showEnrollmentInfoPopup">
+        <empowered-enrollment-info-popup (backClickEvent)="onBackInfoModalClick($event)"></empowered-enrollment-info-popup>
+    </div>
+</div>

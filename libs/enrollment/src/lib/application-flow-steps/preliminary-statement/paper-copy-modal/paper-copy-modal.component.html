@@ -1,0 +1,57 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isSpinnerLoading"> </empowered-mon-spinner>
+<empowered-modal type="POPUP" size="XXL" [showCancel]="true" class="exit-site-modal">
+    <empowered-modal-header>
+        <p *ngIf="data.preliminaryFormPaths.length > 1" class="paper-copy-header">
+            {{ "primary.portal.applicationFlow.preliminaryStatement.paperCopy.header" | replaceTag: { "{formindex}": formIndex + 1,
+            "{totalforms}": data.preliminaryFormPaths.length } }}
+        </p>
+        <span language="primary.portal.applicationFlow.preliminaryStatement1"></span>
+    </empowered-modal-header>
+    <ng-container>
+        <p language="primary.portal.applicationFlow.preliminaryStatement2" class="preliminary-container"></p>
+        <div class="preliminary-container">
+            <mat-checkbox [formControl]="preliminaryStatementAcknowledgement">
+                <span language="primary.portal.applicationFlow.preliminaryStatement3"></span>
+            </mat-checkbox>
+            <mat-error
+                *ngIf="preliminaryStatementAcknowledgement.errors?.required"
+                language="primary.portal.applicationFlow.preliminaryStatement.acknowledgement.required"
+            ></mat-error>
+        </div>
+        <div class="iframe-wrapper">
+            <iframe
+                id="myIframe"
+                [src]="safeUrl"
+                name="targetframe"
+                allowTransparency="true"
+                width="100%"
+                scrolling="no"
+                frameborder="0"
+                class="plan-form"
+                title="targetframe"
+            >
+            </iframe>
+        </div>
+    </ng-container>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-secondary" (click)="onPrint()">
+            <span language="primary.portal.common.print"></span>
+        </button>
+        <button *ngIf="formIndex > 0" class="mon-btn-primary" mat-flat-button (click)="onBack()">
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button mat-button class="mon-btn-primary" *ngIf="data.preliminaryFormPaths.length === formIndex + 1" (click)="onContinue()">
+            <span language="primary.portal.common.continue"></span>
+        </button>
+        <button
+            *ngIf="data.preliminaryFormPaths.length > 1 && formIndex < data.preliminaryFormPaths.length - 1"
+            class="mon-btn-primary"
+            mat-flat-button
+            (click)="onNext()"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

@@ -1,0 +1,83 @@
+@import "shared";
+
+.edit-form-wrapper {
+    .class-name {
+        width: 285px;
+    }
+
+    .class-desc {
+        width: 600px;
+
+        .optional-text {
+            color: get("color.black");
+            @include fontFace("primary.regular");
+            font-size: 14px;
+            font-weight: normal;
+        }
+    }
+
+    .mat-form-field-appearance-outline .mat-error {
+        margin-top: 0px;
+    }
+
+    .pay-frequency-wrapper {
+        display: flex;
+
+        .pay-freq {
+            .mat-form-field {
+                width: convert-unit(175px, "rem");
+            }
+        }
+
+        mat-label,
+        .mat-label {
+            margin-top: convert-unit(10px, "rem");
+        }
+    }
+
+    .default-class-checkbox {
+        font-weight: normal;
+
+        .mat-checkbox {
+            color: get("color.gray.900");
+            font-size: convert-unit(16px, "rem");
+
+            ::ng-deep .mat-checkbox-inner-container {
+                background-color: get("color.white");
+
+                .mat-checkbox-frame {
+                    border-radius: convert-unit(1px, "rem");
+                    border-width: convert-unit(1px, "rem");
+                }
+            }
+        }
+
+        div {
+            color: get("color.gray.700");
+            font-size: convert-unit(13px, "rem");
+        }
+
+        .pay-frequency-notification {
+            color: get("color.gray.700");
+            @include fontFace("primary.regular");
+            font-size: convert-unit(12px, "rem");
+            font-weight: normal;
+            height: 14px;
+            letter-spacing: 0px;
+            margin-left: convert-unit(27px, "rem");
+        }
+    }
+
+    .form-footer {
+        .mon-btn-secondary {
+            margin-right: convert-unit(20px, "rem");
+        }
+    }
+}
+
+::ng-deep {
+    .edit-class-select-dropdown.mat-select-panel {
+        margin-top: convert-unit(27px, "rem") !important;
+        max-width: convert-unit(150px, "rem") !important;
+    }
+}

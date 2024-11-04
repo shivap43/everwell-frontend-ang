@@ -1,0 +1,124 @@
+@import "shared";
+
+.member-list-wrapper {
+    padding: 0px convert-unit(30px, "rem");
+    overflow-y: auto;
+    .member-list-header {
+        margin-top: convert-unit(40px, "rem");
+        margin-bottom: convert-unit(30px, "rem");
+    }
+    .mat-table {
+        .mat-row {
+            .mat-cell {
+                vertical-align: top;
+            }
+        }
+    }
+    .no-data {
+        border-bottom: convert-unit(2px, "rem") solid get("color.gray.600");
+        display: flex;
+        justify-content: center;
+        padding-top: convert-unit(50px, "rem");
+        padding-bottom: convert-unit(50px, "rem");
+    }
+}
+:host ::ng-deep .mon-btn-secondary {
+    &:focus {
+        .mat-button-wrapper {
+            .icon-right {
+                .mat-icon .cls-1 {
+                    fill: get("color.primary.500") !important;
+                }
+            }
+        }
+    }
+}
+::ng-deep .mat-select-panel-wrap {
+    .list-grid-filter.mat-select-panel {
+        &.filter-adminlist {
+            .mat-option {
+                &:first-child {
+                    margin-top: convert-unit(7px, "rem");
+                }
+            }
+            .mon-clear {
+                padding: convert-unit(20px, "rem") 0 convert-unit(8px, "rem");
+            }
+            &.filter-role {
+                margin-left: convert-unit(-25px, "rem") !important;
+            }
+        }
+    }
+}
+::ng-deep .mat-menu-panel {
+    .mat-menu-content {
+        .mat-menu-item.remove-item {
+            color: get("color.info.danger.500");
+            &:hover {
+                background-color: get("color.info.danger.500");
+            }
+        }
+    }
+}
+:host ::ng-deep .filter-wrapper {
+    .filter-sub-wrapper {
+        .mat-form-field {
+            .mat-form-field-flex {
+                padding: convert-unit(7px, "rem") convert-unit(20px, "rem") !important;
+            }
+        }
+    }
+}
+.search-filter-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .search-wrapper {
+        padding-right: convert-unit(20px, "rem");
+    }
+
+    .search-action-buttons {
+        margin-top: convert-unit(20px, "rem");
+        display: flex;
+    }
+}
+
+empowered-pill-filter-group {
+    width: convert-unit(250px, "rem");
+}
+
+.more-button {
+    padding: convert-unit(7px, "rem") convert-unit(20px, "rem");
+    margin-right: convert-unit(10px, "rem");
+    border-radius: convert-unit(20px, "rem");
+    background-color: get("color.gray.200");
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    font-size: convert-unit(14px, "rem");
+    color: get("color.gray.900");
+    cursor: pointer;
+    vertical-align: top;
+
+    &:hover {
+        background: get("color.gray.300");
+        color: get("color.gray.900");
+    }
+    &:active,
+    &:focus,
+    &:focus-within {
+        background: get("color.gray.800");
+        border-color: get("color.gray.800");
+        color: get("color.white");
+        @include fontFace("primary.bold");
+    }
+}
+
+::ng-deep .account-list-more-view {
+    display: flex;
+    flex-direction: column;
+    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    border-radius: convert-unit(4px, "rem");
+    background-color: get("color.white");
+    margin-top: convert-unit(10px, "rem");
+}

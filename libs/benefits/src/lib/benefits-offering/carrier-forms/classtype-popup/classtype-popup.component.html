@@ -1,0 +1,349 @@
+<div class="info-modal classtype-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-horizontal-stepper
+        class="dialog-horizontal-stepper mon-pt-30"
+        (selectionChange)="stepChanged($event, matStepper)"
+    >
+        <mat-step *ngIf="stepOneForm" [stepControl]="stepOneForm">
+            <div mat-dialog-content>
+                <h2>{{languageStrings['primary.portal.classtypePopup.selectClasstype']}}</h2>
+                <p>{{languageStrings['primary.portal.classTypePopup.assignIndustryCodes']}}</p>
+                <form [formGroup]="stepOneForm">
+                    <mat-radio-group (change)="getRadioValue($event)" formControlName="classType">
+                        <mat-radio-button value="Standard"
+                            >{{languageStrings['primary.portal.classtypePopup.setupStandard']}}</mat-radio-button
+                        >
+                        <mat-radio-button value="PEO" [checked]="true"
+                            >{{languageStrings['primary.portal.classtypePopup.classtypePeo']}}</mat-radio-button
+                        >
+                        <mat-checkbox
+                            class="import-peo"
+                            [checked]="isPeoImportChecked"
+                            [disabled]="isPeoImportChecked && showPeoImport"
+                            (change)="togglePeoData($event)"
+                            *ngIf="peoFeatureEnabled && showPeoImport"
+                        >
+                            <span language="primary.portal.classtypePopup.importPeoData"></span
+                        ></mat-checkbox>
+                        <mat-radio-button value="Dual"
+                            >{{languageStrings['primary.portal.classtypePopup.classtypeDual']}}</mat-radio-button
+                        >
+                    </mat-radio-group>
+                </form>
+            </div>
+            <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                <a href="javascript:void(0)" class="mon-btn-link" (click)="onCancelClick()"
+                    >{{languageStrings['primary.portal.common.cancel']}}</a
+                >
+                <button
+                    (click)="goTo()"
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    [attr.aria-label]="languageStrings['primary.portal.common.next']"
+                >
+                    {{languageStrings['primary.portal.common.next']}}
+                </button>
+            </mat-dialog-actions>
+        </mat-step>
+        <mat-step [stepControl]="stepTwoForm">
+            <form *ngIf="stepTwoForm" [formGroup]="stepTwoForm" (ngSubmit)="stepTwoForm.valid && submitPeo()">
+                <div class="modal-header">
+                    <div>
+                        <h2 mat-dialog-title>{{languageStrings['primary.portal.classtypePopup.setupPeo']}}</h2>
+                    </div>
+                </div>
+                <div class="dialog-content">
+                    <mat-dialog-content>
+                        <div class="mon-my-20" *ngIf="errorMessage">
+                            <mon-alert alertType="danger">
+                                <span>{{errorMessage}}</span>
+                            </mon-alert>
+                        </div>
+                        <div
+                            formArrayName="classes"
+                            *ngFor="let class of stepTwoForm.get('classes').controls; let i = index;"
+                        >
+                            <div [formGroupName]="i" class="flex-form-wrapper steptwo-fields">
+                                <div class="d-md-flex">
+                                    <div class="flex-item classtype-name">
+                                        <mat-label class="mat-label"
+                                            >{{languageStrings['primary.portal.classtypePopup.className']}}
+                                        </mat-label>
+                                        <mat-form-field>
+                                            <textarea
+                                                matInput
+                                                formControlName="name"
+                                                cdkTextareaAutosize
+                                                #autosize="cdkTextareaAutosize"
+                                                [attr.aria-label]="languageStrings['primary.portal.classtypePopup.defaultClassName']"
+                                                [maxlength]="PEO_CLASS_NAME_MAX_LENGTH"
+                                            ></textarea>
+                                            <mat-hint
+                                                >{{languageStrings["primary.portal.members.document.addUpdate.MaxChar"].replace("##no##",
+                                                PEO_CLASS_NAME_MAX_LENGTH)}}</mat-hint
+                                            >
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.classes.controls[i].get('name').hasError('required')"
+                                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                            >
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.classes.controls[i].get('name').hasError('pattern')"
+                                                >{{secondaryLanguageStrings["secondary.portal.common.pattern"]}}</mat-error
+                                            >
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.classes.controls[i].get('name').errors?.minlength"
+                                                >{{secondaryLanguageStrings["secondary.portal.departmentNumber.minLength"]}}
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.classes.controls[i].get('name').errors?.duplicate"
+                                                >{{secondaryLanguageStrings["secondary.portal.departmentNumber.duplicate"]}}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex-item classtype-industrycode">
+                                        <mat-label class="mat-label"
+                                            >{{languageStrings['primary.portal.classtypePopup.industryCode']}}</mat-label
+                                        >
+                                        <mat-form-field>
+                                            <mat-select
+                                                formControlName="riskClassId"
+                                                [disableOptionCentering]="true"
+                                                panelClass="classtype-select"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let industryCode of industryCodesPeo"
+                                                    [value]="industryCode.id"
+                                                    >{{industryCode.name}}</mat-option
+                                                >
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="stepTwoForm.controls.classes.controls[i].get('riskClassId').hasError('required')"
+                                                >{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error
+                                            >
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="flex-item remove-link">
+                                        <a
+                                            *ngIf="i !== 0 && !stepTwoForm.controls.classes.controls[i].get('default').value"
+                                            (click)="RemoveClass(i)"
+                                            class="text-danger"
+                                            >{{languageStrings['primary.portal.common.remove']}}</a
+                                        >
+                                    </div>
+                                </div>
+                                <div class="d-md-flex">
+                                    <div class="flex-item classtype-name">
+                                        <mat-label class="mat-label">
+                                            <span
+                                                >{{languageStrings["primary.portal.classtypePopup.classDescriptionOptional"]}}</span
+                                            >
+                                            <span class="optional-text"
+                                                >{{languageStrings["primary.portal.common.optional"]}}</span
+                                            >
+                                        </mat-label>
+                                        <mat-form-field>
+                                            <textarea
+                                                matInput
+                                                formControlName="description"
+                                                #classDescription
+                                                cdkTextareaAutosize
+                                                #autosize="cdkTextareaAutosize"
+                                                [maxlength]="200"
+                                                [attr.aria-label]="languageStrings['primary.portal.classtypePopup.classDescriptionOptional']"
+                                            ></textarea>
+                                            <mat-hint
+                                                >{{languageStrings["primary.portal.classtypePopup.maximumCharacters"].replace("#minCharacters",200-classDescription.value.length)}}</mat-hint
+                                            >
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="steptwo-actions">
+                            <span
+                                ><a (click)="addClass()" class="mon-btn-link"
+                                    >{{languageStrings['primary.portal.classTypePopup.addDepartment']}}</a
+                                ></span
+                            >
+                        </div>
+                    </mat-dialog-content>
+                </div>
+                <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a
+                        href="javascript:void(0)"
+                        mat-dialog-close
+                        (click)="onCancelClick()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                    <div class="add-life-event-btn">
+                        <button
+                            type="button"
+                            class="mon-btn-secondary mon-mr-20"
+                            mat-flat-button
+                            (click)="goToSelection()"
+                            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                        >
+                            {{languageStrings['primary.portal.common.back']}}
+                        </button>
+                        <button class="mon-btn-primary" mat-flat-button type="submit">
+                            {{languageStrings[stepTwoForm.value?.classes?.length === 1 ?
+                            'primary.portal.classTypePopup.createClass' :
+                            'primary.portal.classTypePopup.createClasses']}}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="stepThreeForm">
+            <form
+                *ngIf="stepThreeForm"
+                [formGroup]="stepThreeForm"
+                (ngSubmit)="stepThreeForm.valid && submitStandard()"
+            >
+                <div mat-dialog-content>
+                    <h2>{{languageStrings['primary.portal.classtypePopup.setupStandard']}}</h2>
+                    <div class="flex-form-wrapper step-fields">
+                        <div class="d-md-flex">
+                            <div class="flex-item classtype-industrycode">
+                                <mat-label class="mat-label"
+                                    >{{languageStrings['primary.portal.classtypePopup.industryCode']}}</mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="industryCode"
+                                        [disableOptionCentering]="true"
+                                        panelClass="classtype-select"
+                                    >
+                                        <mat-option
+                                            *ngFor="let industryCode of industryCodesStandard"
+                                            [value]="industryCode.name"
+                                            >{{industryCode.name}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error *ngIf="stepThreeForm.controls['industryCode'].hasError('required')"
+                                        >{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a
+                        href="javascript:void(0)"
+                        mat-dialog-close
+                        (click)="onCancelClick()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                    <div class="add-life-event-btn">
+                        <button
+                            type="button"
+                            class="mon-btn-secondary mon-mr-20"
+                            mat-flat-button
+                            (click)="goToSelection()"
+                            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                        >
+                            {{languageStrings['primary.portal.common.back']}}
+                        </button>
+                        <button class="mon-btn-primary" mat-flat-button type="submit">
+                            {{languageStrings['primary.portal.classtypePopup.assignCode']}}
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="stepFourForm">
+            <form *ngIf="stepFourForm" [formGroup]="stepFourForm" (ngSubmit)=" stepFourForm.valid && submitDual()">
+                <div mat-dialog-content>
+                    <h2>{{languageStrings['primary.portal.classtypePopup.setupDual']}}</h2>
+                    <div class="flex-form-wrapper step-fields">
+                        <div class="d-md-flex">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    {{Product1}}
+                                    {{languageStrings['primary.portal.classtypePopup.industryCode']}}</mat-label
+                                >
+                                <mat-form-field class="classtype-industrycode">
+                                    <mat-select
+                                        formControlName="productOne"
+                                        [disableOptionCentering]="true"
+                                        panelClass="classtype-select"
+                                    >
+                                        <mat-option
+                                            *ngFor="let industryCode of industryCodesPeo"
+                                            [value]="industryCode.name"
+                                            >{{industryCode.name}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error *ngIf="stepFourForm.controls['productOne'].hasError('required')"
+                                        >{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    {{Product2}}
+                                    {{languageStrings['primary.portal.classtypePopup.industryCode']}}</mat-label
+                                >
+                                <mat-form-field class="classtype-industrycode">
+                                    <mat-select
+                                        formControlName="productTwo"
+                                        [disableOptionCentering]="true"
+                                        panelClass="classtype-select"
+                                    >
+                                        <mat-option
+                                            *ngFor="let industryCode of industryCodesPeo"
+                                            [value]="industryCode.name"
+                                            >{{industryCode.name}}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error *ngIf="stepFourForm.controls['productTwo'].hasError('required')"
+                                        >{{languageStrings['primary.portal.common.selectionRequired']}}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                    <a
+                        href="javascript:void(0)"
+                        mat-dialog-close
+                        (click)="onCancelClick()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                    <div class="add-life-event-btn">
+                        <button
+                            type="button"
+                            class="mon-btn-secondary mon-mr-20"
+                            mat-flat-button
+                            (click)="goToSelection()"
+                            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                        >
+                            {{languageStrings['primary.portal.common.back']}}
+                        </button>
+                        <button
+                            class="mon-btn-primary"
+                            mat-flat-button
+                            type="submit"
+                            [attr.aria-label]="languageStrings['primary.portal.classtypePopup.assignCode']"
+                        >
+                            {{languageStrings['primary.portal.classtypePopup.assignCode']}}
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </form>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>

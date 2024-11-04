@@ -1,0 +1,35 @@
+@import "shared";
+
+.view-detail-wrapper {
+    .plan-details {
+        margin-bottom: map-get($spacers, 40);
+    }
+
+    mat-label {
+        font-size: convert-unit(16px, "rem");
+    }
+
+    .plan-details,
+    .cost-wrapper {
+        .label-column {
+            display: flex;
+            .label,
+            mat-label {
+                width: convert-unit(200px, "rem");
+            }
+        }
+    }
+    .cost-wrapper {
+        margin-bottom: map-get($spacers, 30);
+        width: convert-unit(300px, "rem");
+        .value {
+            text-align: right;
+            width: convert-unit(100px, "rem");
+        }
+        .your-cost {
+            border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+            padding-top: map-get($spacers, 10);
+            margin-top: map-get($spacers, 10);
+        }
+    }
+}

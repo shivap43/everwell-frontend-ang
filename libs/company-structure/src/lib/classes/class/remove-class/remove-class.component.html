@@ -1,0 +1,57 @@
+<!-- TODO - Use language. -->
+<div class="info-modal">
+    <div class="flex-item class-desc">
+        <form *ngIf="data" [formGroup]="classNameForm" (ngSubmit)="submit.focus(); removeClass()">
+            <mat-dialog-content>
+                <h1 mat-dialog-title>
+                    {{ "primary.portal.classes.removeClass" | replaceTag: { "#classname": data.className.name } }}
+                </h1>
+                <!--Replacepipe needs check-->
+                <!-- Remove {{data.className.name}}? -->
+                <div *ngIf="data.className.default">
+                    <p class="bottom-space" language="primary.portal.classes.defaultClass"></p>
+                    <mat-label class="mat-label" language="primary.portal.classes.newDefaultClass"></mat-label>
+                    <div class="flex-item class-select">
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="classNameControl"
+                                placeholder="Select"
+                                [disableOptionCentering]="true"
+                                panelClass="allign-select-options"
+                            >
+                                <mat-option *ngFor="let className of data.list" [value]="className"
+                                    >{{className.name}}</mat-option
+                                >
+                            </mat-select>
+                            <mat-error
+                                *ngIf="classNameForm.controls.classNameControl.errors?.required"
+                                language="primary.portal.common.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-dialog-content>
+            <mat-dialog-actions class="dialog-footer justify-content-between">
+                <a
+                    href="javascript:void(0)"
+                    mat-button
+                    color="primary"
+                    mat-dialog-close
+                    class="mon-btn-link"
+                    (click)="closeDialog()"
+                    >{{languageStrings["primary.portal.common.cancel"]}}</a
+                >
+                <button
+                    #submit
+                    [disabled]="disableSubmit"
+                    mat-button
+                    color="primary"
+                    type="submit"
+                    class="mon-btn-danger"
+                >
+                    {{languageStrings["primary.portal.common.remove"]}}
+                </button>
+            </mat-dialog-actions>
+        </form>
+    </div>
+</div>

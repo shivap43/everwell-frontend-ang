@@ -1,0 +1,21 @@
+<div
+    class="eb-enrollment-method-settings"
+    data-test="eb-enrollment-method-settings"
+    *ngIf="{value: f2FRestrictionMessage$ | async} as alertMessage"
+>
+    <mon-alert class="method-alert" *ngIf="alertMessage.value">
+        <span [language]="alertMessage.value.language"></span>
+    </mon-alert>
+    <form [formGroup]="form" (submit)="onApply()">
+        <mat-radio-group class="method-radio-group" ngDefaultControl formControlName="selectedEnrollmentMethod">
+            <mat-radio-button
+                class="method-radio-button"
+                *ngFor="let enrollmentMethod of enrollmentsMethods$ | async; trackBy: trackByEnrollmentMethodDescription"
+                [value]="enrollmentMethod.name"
+                [disableControl]="alertMessage.value"
+            >
+                {{ enrollmentMethod.description }}
+            </mat-radio-button>
+        </mat-radio-group>
+    </form>
+</div>

@@ -1,0 +1,111 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<section class="section-container">
+    <div class="section-subheader">
+        <p>{{stepData.directions}}</p>
+    </div>
+    <form [formGroup]="riskClassForm" (ngSubmit)="onNext()" *ngIf="showComponent">
+        <section class="section-container">
+            <div class="question-container">
+                <div class="question-block" id="jobLbl">
+                    <mat-label class="mat-label">{{stepData.currentJobLabel}}</mat-label>
+                </div>
+                <div class="response-block">
+                    <div class="response-type radio">{{occupationDescription}}</div>
+                </div>
+            </div>
+            <div class="question-container">
+                <div class="question-block" id="riskClassLbl">
+                    <mat-label class="mat-label">{{stepData.riskClassLabel}}</mat-label>
+                </div>
+                <div class="response-block">
+                    <div class="response-type select-menu w-200">
+                        <mat-form-field>
+                            <mat-select formControlName="question" (selectionChange)="onRiskClassChange()" disableOptionCentering="true">
+                                <ng-container *ngFor="let option of riskClasses">
+                                    <mat-option [value]="option.id">{{option.name}} </mat-option>
+                                </ng-container>
+                            </mat-select>
+                            <mat-error *ngIf="riskClassForm.controls['question'].hasError('required')">
+                                {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="displayJobTitleDuties && jobTitleDutiesEnabled">
+                <div class="question-container">
+                    <div class="question-block" id="riskClassLbl">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions..changeOccupation.jobTitle']}}</mat-label
+                        >
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type select-menu w-200">
+                            <mat-form-field>
+                                <mat-select formControlName="question" disableOptionCentering="true" placeholder="Select">
+                                    <mat-option
+                                        #jobTitle
+                                        *ngFor="let job of jobs"
+                                        [value]="job.title"
+                                        (click)="onJobTitleChange(jobTitle.value)"
+                                        >{{job.title}}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error *ngIf="riskClassForm.controls['question'].hasError('required')">
+                                    {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-block" id="riskClassLbl">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.policyChangeRequest.transactions..changeOccupation.jobDuties']}}</mat-label
+                        >
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type select-menu w-200">
+                            <mat-form-field class="job-duties">
+                                <input class="job-duties" [placeholder]="jobDuties" matInput [disabled]="true" />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+            <button
+                id="submitAppFlowForm"
+                *ngIf="planObject.lastStep"
+                class="mon-btn-primary submit-app-flow-form"
+                type="submit"
+                mat-flat-button
+            >
+                <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.next']}}{{this.planObject.nextProduct}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextAflacAlways']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextBilling']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextApplications']}}
+                </span>
+            </button>
+            <button *ngIf="!this.planObject.lastStep" mat-flat-button class="mon-btn-primary" type="submit">
+                <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </form>
+</section>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

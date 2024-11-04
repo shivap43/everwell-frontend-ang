@@ -1,0 +1,32 @@
+@import "shared";
+
+:host {
+    display: flex;
+    flex-direction: column;
+
+    .flex-item {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+:host .mat-form-field {
+    margin-bottom: 0px;
+}
+
+:host .mat-checkbox:nth-child(n + 2) {
+    padding-left: convert-unit(10px, "rem");
+}
+
+.mat-checkbox {
+    padding-top: convert-unit(7px, "rem");
+}
+
+.error {
+    color: get("color.info.danger.500");
+
+    ::ng-deep .mat-checkbox-frame {
+        border-color: get("color.info.danger.500");
+        background-color: get("color.info.danger.100");
+    }
+}

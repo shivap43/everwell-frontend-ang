@@ -1,0 +1,30 @@
+@import "shared";
+
+.outer-container {
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    .inner-container {
+        display: flex;
+        flex-direction: column;
+        min-height: map-get($spacers, 0);
+        height: 100%;
+
+        .scrollable-content {
+            flex: 1;
+            overflow: auto;
+            min-height: map-get($spacers, 0);
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: map-get($spacers, 0) map-get($spacers, 50);
+            height: convert-unit(90px, "rem");
+        }
+    }
+}

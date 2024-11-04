@@ -1,0 +1,133 @@
+<ng-template [ngIf]="isLoading" [ngIfElse]="coverageTabTemplate">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template #coverageTabTemplate>
+    <div class="wizard-content">
+        <h2 class="wizard-title" language="primary.portal.enrollmentWizard.currentCoverageTitle"></h2>
+        <p
+            *ngIf="currentFlow === CMEMBERWIZARD.OE_FRESHMAN_OR_NON_FRESHMAN || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_OE || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_OE_NOT_COMPLETED"
+            class="wizard-note"
+            language="primary.portal.enrollmentWizard.ifAnythingChanged"
+        ></p>
+        <!-- ToDO: Continous Scenario are yet to cover -->
+        <p
+            *ngIf="currentFlow === CMEMBERWIZARD.CONT_NO_PLAN_ADDED || currentFlow === CMEMBERWIZARD.CONT_NEW_COMPANY_PLAN_ADDED || currentFlow === CMEMBERWIZARD.CONT_NEW_CONTI_PLAN_ADDED || currentFlow === CMEMBERWIZARD.CONT_NEW_COMPANY_AND_CONTI_PLAN_ADDED"
+            class="wizard-note"
+            language="primary.portal.enrollmentWizard.yourPlanRenewAuto"
+        ></p>
+        <p
+            *ngIf="currentFlow === CMEMBERWIZARD. DUAL_FIRST_VISIT || currentFlow === CMEMBERWIZARD.DUAL_ENROLLMENT_NOT_COMPLETED || currentFlow === CMEMBERWIZARD.ONLY_SEP_FIRST_VISIT || currentFlow === CMEMBERWIZARD.ONLY_SEP_NOT_COMPLETED || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_QLE || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_QLE_NOT_COMPLETED || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_NEW_PY_QLE || currentFlow === CMEMBERWIZARD.DUAL_PLAN_YEAR_NEW_PY_QLE_NOT_COMPLETED"
+            class="wizard-note"
+            language="primary.portal.enrollmentWizard.yourRecentLifeQualifies"
+        ></p>
+        <table mat-table [dataSource]="coverageData">
+            <ng-container matColumnDef="benefit_type">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.enrollmentWizard.benefitType"></th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="benefit-wrapper">
+                        <mon-icon
+                            [fetchedIconPath]="element.product?.product.iconSelectedLocation"
+                            [iconName]="element.product?.product.name"
+                            class="plan-in-cart"
+                            [iconSize]="22"
+                        ></mon-icon>
+                        <div class="product-info">
+                            <span class="product-name">{{element.product?.product.name }}</span>
+                            <ng-container *ngIf="virginiaFeatureEnabled$ | async; else virginiaFeatureNotEnabled">
+                                {{element.carrier?.name | aflacLegalName: element.carrier?.legalName}}
+                            </ng-container>
+                            <ng-template #virginiaFeatureNotEnabled> {{element.carrier?.name}} </ng-template>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="plan">
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.enrollmentWizard.plan"></th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="plan-wrapper">
+                        <span>{{element.plan.name }}</span>
+                        <span>{{ element.coverageLevel.name}}</span>
+                        <ng-template ngFor let-rider [ngForOf]="element.enrollmentRiders">
+                            <span>{{rider.name}}</span>
+                        </ng-template>
+                        <div>
+                            <span> {{ element.coverageDateText }} </span>
+                            <span> {{ element.validity.effectiveStarting | date: dateFormat}} </span>
+                            <span *ngIf="element.validity.expiresAfter"> - {{ element.validity.expiresAfter | date: dateFormat}} </span>
+                        </div>
+                        <div *ngIf="element.planLevelBenefitDollars > ZERO">
+                            <span>{{element.paymentLabel}}:</span>&nbsp;
+                            <span>{{ element.adjustment | payrollFrequencyCalculator: payFrequencyObject | currency}}</span>
+                        </div>
+                        <span>
+                            <a (click)="showPlanDetailsPopup(element.plan)" language="primary.portal.planDetails.title"></a>
+                        </span>
+                    </div>
+                </td>
+
+                <td mat-footer-cell *matFooterCellDef>
+                    {{languageStrings[ "primary.portal.enrollmentWizard.yourFrequencyTotal"].replace("#payFrequency",
+                    payFrequency?.name.toLowerCase())}}
+                </td>
+            </ng-container>
+            <ng-container
+                matColumnDef="status"
+                *ngIf="currentFlow === CMEMBERWIZARD. DUAL_FIRST_VISIT || currentFlow === CMEMBERWIZARD.DUAL_ENROLLMENT_NOT_COMPLETED || currentFlow === CMEMBERWIZARD.ONLY_SEP_FIRST_VISIT || currentFlow === CMEMBERWIZARD.ONLY_SEP_NOT_COMPLETED "
+            >
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.enrollmentWizard.status"></th>
+                <td mat-cell *matCellDef="let element">{{element.status }}</td>
+                <td mat-footer-cell *matFooterCellDef>
+                    {{languageStrings[ "primary.portal.enrollmentWizard.yourFrequencyTotal"].replace("#payFrequency",
+                    payFrequency?.name.toLowerCase()) }}
+                </td>
+            </ng-container>
+            <ng-container
+                matColumnDef="eligible_for_update"
+                *ngIf="currentFlow === CMEMBERWIZARD. DUAL_FIRST_VISIT || currentFlow === CMEMBERWIZARD.DUAL_ENROLLMENT_NOT_COMPLETED || currentFlow === CMEMBERWIZARD.ONLY_SEP_FIRST_VISIT || currentFlow === CMEMBERWIZARD.ONLY_SEP_NOT_COMPLETED "
+            >
+                <th mat-header-cell *matHeaderCellDef language="primary.portal.enrollmentWizard.eligibleForUpdate"></th>
+                <td mat-cell *matCellDef="let element" class="eligible-update">{{element.isUpdate? "Yes": "No"}}</td>
+            </ng-container>
+            <ng-container matColumnDef="current_cost">
+                <th mat-header-cell *matHeaderCellDef class="align-content-right">
+                    {{languageStrings[ "primary.portal.enrollmentWizard.currentFrequencyCost"].replace("#payFrequency",
+                    payFrequency?.name.toLowerCase()) }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="current-cost-wrapper align-content-right">
+                        <span class="current-cost">{{element.memberCost| currency }} </span>
+                        <span>{{getTaxStatus(element.taxStatus) }}</span>
+                    </div>
+                </td>
+
+                <td mat-footer-cell *matFooterCellDef [attr.colspan]="eligibleForUpdates ? 4 : 3" class="footer-wrapper">
+                    <div class="footer-total-wrapper">
+                        <div class="footer-total">
+                            <span>
+                                {{languageStrings[ "primary.portal.enrollmentWizard.yourFrequencyTotal"].replace("#payFrequency",
+                                payFrequency?.name.toLowerCase()) }}</span
+                            >
+                            <span> {{totalCost| currency}}</span>
+                            <span *ngIf="eligibleForUpdates">{{payFrequency?.name.toLowerCase()}}</span>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-footer-row *matFooterRowDef="footerColumns"></tr>
+        </table>
+    </div>
+    <div class="wizard-footer">
+        <button class="mon-btn-secondary mon-mr-20" mat-flat-button (click)="goToTab(prevTab)">
+            <mon-icon class="icon-left" iconSize="12" iconName="left"></mon-icon>
+            {{prevTab?.backButtonLabel}}
+        </button>
+        <ng-container *ngIf="activeEmployee">
+            <button class="mon-btn-primary" mat-flat-button (click)="goToTab(nextTab)" *hasPermission="'core.enrollment.member.shop'">
+                {{nextTab?.nextButtonLabel}}
+                <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+            </button>
+        </ng-container>
+    </div>
+</ng-template>

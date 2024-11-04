@@ -1,0 +1,12 @@
+<mat-tab-group class="vertical-tab" #tab (selectedTabChange)="onTabChanged($event);">
+    <mat-tab *ngFor="let product of quickQuotePlans">
+        <ng-template mat-tab-label>
+            <div class="d-flex justify-content-between products-nav">
+                <span class="product-label">{{product.productName}} </span>
+                <span *ngIf="getProductStatus(product.productId)">
+                    <mon-icon iconName="circle-check" class="icon-success" [iconSize]="16"> </mon-icon>
+                </span>
+            </div>
+        </ng-template>
+    </mat-tab>
+</mat-tab-group>

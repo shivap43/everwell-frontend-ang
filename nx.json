@@ -1,0 +1,49 @@
+{
+	"npmScope": "empowered",
+	"implicitDependencies": {
+		"angular.json": "*",
+		"package.json": "*",
+		"tslint.json": "*",
+		"nx.json": "*",
+		"tsconfig.base.json": "*"
+	},
+	"tasksRunnerOptions": {
+		"default": {
+			"runner": "@nrwl/workspace/tasks-runners/default",
+			"options": {
+				"cacheableOperations": ["build", "lint", "test", "e2e"],
+				"parallel": 1
+			}
+		}
+	},
+	"affected": {
+		"defaultBase": "master"
+	},
+	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+	"newProjectRoot": "",
+	"cli": {
+		"warnings": {
+			"typescriptMismatch": false,
+			"versionMismatch": false
+		},
+		"defaultCollection": "@nrwl/angular",
+		"cache": {
+			"path": "node_modules/.cache/angular"
+		}
+	},
+	"defaultProject": "client",
+	"generators": {
+		"@nrwl/schematics:component": {
+			"style": "scss"
+		},
+		"@nrwl/angular:application": {
+			"linter": "eslint",
+			"unitTestRunner": "jest"
+		},
+		"@nrwl/angular:library": {
+			"linter": "eslint",
+			"unitTestRunner": "jest"
+		},
+		"@nrwl/angular:component": {}
+	}
+}

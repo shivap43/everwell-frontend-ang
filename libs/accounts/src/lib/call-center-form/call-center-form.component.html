@@ -1,0 +1,182 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form>
+        <div mat-dialog-content>
+            <div class="heading">
+                <h2 mat-dialog-title>{{languageStrings['primary.portal.callCenter.title']}}</h2>
+                <p>
+                    {{languageStrings['primary.portal.callCenter.subtitle']}}
+                    <span *ngIf="userCallCenter"> {{userCallCenter.name}} </span>
+                </p>
+            </div>
+            <div class="radiowrapper">
+                <mat-radio-group [(ngModel)]="searchType" (change)="reset()" name="searchType">
+                    <mat-radio-button value="account"
+                        >{{languageStrings['primary.portal.callCenter.searchbyaccount']}}</mat-radio-button
+                    >
+                    <mat-radio-button value="producer"
+                        >{{languageStrings['primary.portal.callCenter.searchbyproducer']}}</mat-radio-button
+                    >
+                </mat-radio-group>
+            </div>
+            <div class="searchcont">
+                <div class="inputbox">
+                    <mat-label class="mat-label">
+                        {{title}}
+                    </mat-label>
+                    <mat-form-field class="mon-mb-0">
+                        <input
+                            matInput
+                            autocomplete="off"
+                            maxlength="45"
+                            [(ngModel)]="searchValue"
+                            name="searchValue"
+                            [attr.aria-label]="languageStrings['primary.portal.callCenter.searchValue']"
+                        />
+                    </mat-form-field>
+                </div>
+                <div class="searchicon">
+                    <button
+                        #submit
+                        mat-flat-button
+                        class="mon-btn-search mon-btn-primary"
+                        color="primary"
+                        type="submit"
+                        (click)="searchSubmit()"
+                        [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                    >
+                        <mon-icon class="mon-icon-search mon-m-0" iconSize="25" iconName="search"></mon-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="error-cont">
+                <mat-error *ngIf="showAccountError && !searchValue.trim()">
+                    {{languageStrings['primary.portal.callCenter.showAccountError']}}
+                </mat-error>
+                <mat-error *ngIf="invalidAccountNumber && searchValue.trim()">
+                    {{languageStrings['primary.portal.callCenter.invalidAccountNumber']}}
+                </mat-error>
+                <mat-error *ngIf="showProducerError && !searchValue.trim()">
+                    {{languageStrings['primary.portal.callCenter.showProducerError']}}
+                </mat-error>
+                <mat-error *ngIf="isAccountSearchEmptyError">
+                    {{languageStrings['primary.portal.callCenter.isAccountSearchEmptyError']}}
+                </mat-error>
+                <mat-error *ngIf="isProducerSearchEmptyError">
+                    {{languageStrings['primary.portal.callCenter.isProducerSearchEmptyError']}}
+                </mat-error>
+            </div>
+            <mat-divider
+                class="callcenterform-divider"
+                *ngIf="producerSearchResults && producerSearchResults.length"
+            ></mat-divider>
+            <div *ngIf="producerSearchResults && producerSearchResults.length" class="tablewrapper">
+                <table mat-table [dataSource]="producerSearchResults">
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>{{languageStrings['primary.portal.callCenter.name']}}</th>
+                        <td mat-cell *matCellDef="let element" class="accountname valigntop">
+                            {{element.producer.name.firstName}} {{element.producer.name.lastName}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.callCenter.email']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="emailid valigntop">
+                            {{element.producer.emailAddress}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="accounts">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.callCenter.accounts']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="accounts valigntop">
+                            <div *ngFor="let account of element.accounts" class="accountswrapper">
+                                {{account.name}}
+                                <div class="addbutton">
+                                    <button
+                                        mat-flat-button
+                                        class="mon-btn-primary"
+                                        color="primary"
+                                        (click)="addAccount(element, account, 'producer')"
+                                        [attr.aria-label]="languageStrings['primary.portal.common.add']"
+                                    >
+                                        {{languageStrings['primary.portal.common.add']}}
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="producerDisplayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: producerDisplayedColumns;"></tr>
+                </table>
+            </div>
+            <mat-divider
+                class="callcenterform-divider"
+                *ngIf="accountSearchResults && accountSearchResults.length"
+            ></mat-divider>
+            <div *ngIf="accountSearchResults && accountSearchResults.length" class="tablewrapper">
+                <table mat-table [dataSource]="accountSearchResults">
+                    <ng-container matColumnDef="Account name">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.callCenter.accountName']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="accountname valigntop">
+                            {{element.name}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="Account number">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.callCenter.accountNumber']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="emailid valigntop">
+                            {{element.groupNumber}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="Primary Producer">
+                        <th mat-header-cell *matHeaderCellDef>
+                            {{languageStrings['primary.portal.callCenter.primaryProducer']}}
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="accounts valigntop">
+                            <div *ngFor="let account of element.producers" class="accountswrapper">
+                                <ng-container *ngIf="account.primary">
+                                    {{account.firstName}} {{account.lastName}}
+                                    <div class="addbutton">
+                                        <button
+                                            mat-flat-button
+                                            class="mon-btn-primary"
+                                            color="primary"
+                                            (click)="addAccount(element, account, 'account')"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.add']"
+                                        >
+                                            {{languageStrings['primary.portal.common.add']}}
+                                        </button>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="accountDisplayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: accountDisplayedColumns;"></tr>
+                </table>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                (click)="onCancel()"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+        </mat-dialog-actions>
+    </form>
+</div>

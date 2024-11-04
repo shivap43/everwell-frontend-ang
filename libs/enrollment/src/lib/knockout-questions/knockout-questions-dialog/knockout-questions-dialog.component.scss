@@ -1,0 +1,53 @@
+@import "shared";
+
+.knockout-modal {
+    h2 {
+        margin-bottom: convert-unit(15px, "rem");
+        color: get("color.gray.600");
+    }
+
+    .mat-dialog-content {
+        padding: 0;
+    }
+
+    .headercontent {
+        margin: convert-unit(50px, "rem") convert-unit(50px, "rem") convert-unit(30px, "rem");
+    }
+
+    .question-container {
+        max-height: calc(100vh - 470px);
+        min-height: convert-unit(160px, "rem");
+        overflow-y: auto;
+        padding: 0 convert-unit(50px, "rem") convert-unit(35px, "rem");
+
+        .question-section {
+            margin-bottom: convert-unit(15px, "rem");
+        }
+
+        .question-block {
+            margin-bottom: convert-unit(20px, "rem");
+        }
+
+        .response-block {
+            padding-left: convert-unit(15px, "rem");
+        }
+    }
+
+    ::ng-deep {
+        mat-label,
+        .mat-label {
+            @include fontFace("primary.regular", sans-serif, true);
+            font-size: convert-unit(16px, "rem") !important;
+        }
+
+        .mat-radio-button {
+            display: block;
+            margin-bottom: convert-unit(10px, "rem") !important;
+        }
+
+        .mat-radio-button:last-child {
+            padding-bottom: convert-unit(15px, "rem") !important;
+            margin-bottom: 0 !important;
+        }
+    }
+}

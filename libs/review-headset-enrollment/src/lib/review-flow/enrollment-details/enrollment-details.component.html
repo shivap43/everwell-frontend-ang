@@ -1,0 +1,327 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading || isDocumentLoading"> </empowered-mon-spinner>
+
+<form *ngIf="!isLoading && !rejectAlert" [formGroup]="enrollmentDetailForm" (ngSubmit)="setEnrollmentStatus(appSettings.APPROVEDSTATUS)">
+    <empowered-modal type="POPUP" size="LG">
+        <empowered-modal-header>
+            <span language="primary.portal.enrollment.review.reviewinfo"></span>
+            <div class="alerts-block">
+                <mon-alert alertType="danger" *ngIf="showAlert">
+                    <span>{{languageStrings['primary.portal.enrollment.applicationNeedsReview']}} </span>
+                </mon-alert>
+                <mon-alert [class.multiple-errors]="viewFormRequired && showAlert" alertType="danger" *ngIf="viewFormRequired">
+                    <span>Preliminary statement needs review</span>
+                </mon-alert>
+            </div>
+        </empowered-modal-header>
+
+        <empowered-modal-footer>
+            <button
+                *ngIf="!enrollment.enrollmentData.plan.vasFunding"
+                mat-flat-button
+                class="mon-btn-danger"
+                type="button"
+                (click)="setEnrollmentStatus(appSettings.REJECTEDSTATUS)"
+                [attr.aria-label]="languageStrings['primary.portal.common.reject']"
+            >
+                {{languageStrings['primary.portal.common.reject']}}
+            </button>
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.common.approve']"
+            >
+                {{languageStrings['primary.portal.common.approve']}}
+            </button>
+        </empowered-modal-footer>
+        <div id="alert">
+            <mon-alert
+                alertType="warning"
+                *ngIf="((isEBSPaymentConfigEnabled$ | async) && !ebsPaymentPresent && (isEBSIndicator$ | async))"
+            >
+                <div class="content">
+                    <h4 language="primary.portal.enrollment.review.ebs.heading"></h4>
+                    <div class="description">
+                        <span language="primary.portal.enrollment.review.ebs.ebsprovide">
+                            <a (click)="gotoAflacEBS()" language="primary.portal.enrollment.review.ebs.ebsInfo">
+                                <mon-icon class="icon-primary icon-vertical-middle" iconName="share-vector" iconSize="15"></mon-icon>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </mon-alert>
+            <mon-alert
+                class="section"
+                alertType="success"
+                *ngIf="successPaylogix && !ebsPaymentFailed && ebsPaymentOnFile && ebsPaymentPresent"
+                closeButton="true"
+            >
+                <span language="primary.portal.applicationFlow.ebs.successfulMsg"></span>
+            </mon-alert>
+            <mon-alert class="section" alertType="danger" *ngIf="showPaymentAlert">
+                <span language="primary.portal.applicationFlow.ebs.mandatoryMsg"></span>
+            </mon-alert>
+            <mon-alert class="section" alertType="danger" *ngIf="ebsPaymentFailed || (successPaylogix && !ebsPaymentPresent)">
+                <span language="primary.portal.applicationFlow.ebs.errorMsg"></span>
+            </mon-alert>
+        </div>
+        <div class="content-column align-left">
+            <div class="justify-sm-column">
+                <mon-alert alertType="warning" *ngIf="ebsPaymentFailed">
+                    <span>{{languageStrings['primary.portal.applicationFlow.ebs.warningMsg']}} </span>
+                </mon-alert>
+            </div>
+            <div class="justify-sm-column">
+                <span class="content-label" language="primary.portal.maintenanceBenefitsOffering.products.planName"></span>
+                <span>{{enrollment.enrollmentData.plan.name}}</span>
+            </div>
+            <div *ngIf="enrollment.enrollmentData.benefitAmount" class="justify-sm-column">
+                <span class="content-label" language="primary.portal.shoppingExperience.benefitAmount"></span>
+                <span>{{enrollment.enrollmentData.benefitAmount | currency}}</span>
+            </div>
+
+            <div *ngIf="enrollment.enrollmentData.coverageLevel.eliminationPeriod" class="justify-sm-column">
+                <span class="content-label">{{languageStrings['primary.portal.shoppingExperience.eliminationPeriod']}} </span>
+                <span>{{enrollment.enrollmentData.coverageLevel.eliminationPeriod}}</span>
+            </div>
+
+            <div class="justify-sm-column">
+                <span class="content-label">{{languageStrings['primary.portal.coverage.taxstatus']}}</span>
+                <span *ngIf="enrollment.enrollmentData.taxStatus==='POSTTAX'">{{languageStrings['primary.portal.coverage.posttax']}}</span>
+                <span *ngIf="enrollment.enrollmentData.taxStatus==='PRETAX'">{{languageStrings['primary.portal.coverage.pretax']}}</span>
+                <span *ngIf="enrollment.enrollmentData.taxStatus==='UNKNOWN'">{{languageStrings['primary.portal.coverage.unknown']}}</span>
+            </div>
+            <div class="justify-sm-column">
+                <span class="content-label">{{languageStrings['primary.portal.coverage.coveredindividuals']}}</span>
+                <div>
+                    <span
+                        >{{memberFullName | titlecase}}
+                        <span class="primary">(primary insured)</span>
+                    </span>
+                    <div class="covered-values" *ngIf="enrollment.enrollmentDependents.length">
+                        <ng-template ngFor let-dependent [ngForOf]="enrollment.enrollmentDependents">
+                            <span>{{dependent.name}} ({{dependent.relationType}})</span>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="justify-sm-column">
+                <span class="content-label" language="primary.portal.benefitsOffering.coverageDates"></span>
+                <div>
+                    <span *ngIf="enrollment.enrollmentData.validity.expiresAfter">
+                        {{enrollment.enrollmentData.validity.effectiveStarting | date: dateFormat}} -
+                        {{enrollment.enrollmentData.validity.expiresAfter | date: dateFormat}}
+                    </span>
+                    <span *ngIf="!enrollment.enrollmentData.validity.expiresAfter">
+                        {{languageStrings['primary.portal.enrollment.begins']}} {{enrollment.enrollmentData.validity.effectiveStarting |
+                        date: dateFormat}}
+                    </span>
+                </div>
+            </div>
+            <div *ngIf="enrollment.flexDollars" class="justify-sm-column">
+                <span class="content-label">{{ enrollment.flexDollars.flexDollarOrIncentiveName }}</span>
+                <div>
+                    <span> {{enrollment.flexDollars.flexDollarOrIncentiveAmount | currency}} </span>
+                </div>
+            </div>
+            <div *ngIf="enrollment.enrollmentBeneficiaries.length" class="justify-sm-column">
+                <span class="content-label" language="primary.portal.coverage.beneficiary"></span>
+                <ng-template ngFor let-beneficiary [ngForOf]="enrollment.enrollmentBeneficiaries">
+                    <span [ngSwitch]="beneficiary.beneficiary.type">
+                        <span *ngSwitchCase="'ESTATE'">
+                            {{languageStrings['primary.portal.coverage.estate']}} - {{beneficiary.percent}}%
+                        </span>
+                        <span *ngSwitchCase="'TRUST'">
+                            {{beneficiary.beneficiary.trustee.firstName | titlecase}} {{beneficiary.beneficiary.trustee.lastName |
+                            titlecase}} - {{beneficiary.percent}}%
+                        </span>
+                        <span *ngSwitchCase="'CHARITY'">
+                            {{languageStrings['primary.portal.coverage.charity']}} - {{beneficiary.percent}}%
+                        </span>
+                        <span *ngSwitchCase="'INDIVIDUAL'">
+                            {{beneficiary.beneficiary.name.firstName | titlecase}} {{beneficiary.beneficiary.name.lastName | titlecase}} -
+                            {{beneficiary.percent}}%
+                        </span>
+                    </span>
+                </ng-template>
+                <a>{{languageStrings['primary.portal.coverage.edit']}}</a>
+            </div>
+            <div *ngIf="enrollment.enrollmentRiders.length" class="justify-sm-column">
+                <span class="content-label" language="primary.portal.coverage.riders"></span>
+                <div class="riders-list">
+                    <ng-template ngFor let-rider [ngForOf]="enrollment.enrollmentRiders">
+                        <span>{{rider.name}}</span>
+                    </ng-template>
+                </div>
+            </div>
+            <div
+                class="payment-details"
+                *ngIf="!hasAflacAlways && showSignerAgreement && paymentDetails.length > 0 && enrollment.enrollmentData.paymentInformation"
+            >
+                <div class="content-column align-left" *ngIf="showCardInfo">
+                    <div class="justify-sm-column">
+                        <span
+                            class="content-label"
+                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardType"
+                        ></span>
+                        <span [innerHtml]="cardContent"></span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.applicationFlow.cardNumber"></span>
+                        <span>{{MASK_FIRST_EIGHT}}{{cardInfo.get(0).cardLastFour}}</span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.applicationFlow.payments.expirationDate"></span>
+                        <span
+                            >{{(cardInfo.get(0).cardExpirationMonth < 10? "0" + cardInfo.get(0).cardExpirationMonth :
+                            cardInfo.get(0).cardExpirationMonth) + "/" + cardInfo.get(0).cardExpirationYear}}</span
+                        >
+                    </div>
+                </div>
+                <div class="content-column align-left" *ngIf="!showCardInfo">
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.accounts.accountList.accountNameColumn"></span>
+                        <span>{{bankDraftInfo.get(0).accountName}}</span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.applicationFlow.payments.bankLabel"></span>
+                        <span>{{bankDraftInfo.get(0).bankName}}</span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.applicationFlow.payments.routingNumber"></span>
+                        <span>{{MASK_FIRST_EIGHT + bankDraftInfo.get(0).routingNumber }}</span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span class="content-label" language="primary.portal.accounts.accountList.accountIdColumn"></span>
+                        <span>{{MASK_FIRST_EIGHT+ bankDraftInfo.get(0).accountNumber}}</span>
+                    </div>
+                    <div class="justify-sm-column">
+                        <span
+                            class="content-label"
+                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountType"
+                        ></span>
+                        <span>{{bankDraftInfo.get(0).accountType | titlecase}}</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                *ngIf="((isEBSPaymentConfigEnabled$ | async) && (ebsPayment$ | async)) && enrollment.enrollmentData.plan.carrierId===aflacCarrierId"
+                class="justify-sm-column"
+            >
+                <span class="content-label">{{languageStrings['primary.portal.applicationFlow.ebs.billing']}}</span>
+                <span>
+                    {{languageStrings['primary.portal.applicationFlow.ebs.aflacEbs']}}:
+                    <a (click)="gotoAflacEBS()">
+                        {{languageStrings["primary.portal.applicationFlow.ebs.viewPmtInfo"]}}
+                        <mon-icon class="icon-primary icon-vertical-middle" iconName="share-vector" iconSize="15"></mon-icon>
+                    </a>
+                </span>
+            </div>
+        </div>
+        <button type="button" *ngIf="hasApplication" (click)="viewApplication()" class="mon-btn-primary mon-mt-10" mat-flat-button>
+            <span>{{languageStrings['primary.portal.applicationFlow.viewApplication']}} </span>
+        </button>
+        <div *ngIf="hasApplication">
+            <mat-hint *ngIf="!showAlert"> {{languageStrings['primary.portal.applicationFlow.viewApplication.required']}} </mat-hint>
+            <mat-error *ngIf="showAlert"> {{languageStrings['primary.portal.applicationFlow.viewApplication.required']}} </mat-error>
+        </div>
+        <div class="links">
+            <div *ngFor="let document of enrollmentDocuments">
+                <span [innerHTML]="document.documentLink" *ngIf="document.isAnchorTag"></span>
+                <span *ngIf="document.isPlainText">{{document.documentLink}}</span>
+                <a href="{{document.documentLink}}" target="_blank" *ngIf="document.isPdf">{{document.documentName}}</a>
+            </div>
+        </div>
+        <div *ngIf="showPrelimCheck" class="headset-ny-prelim-checkbox">
+            <span class="checkbox-form">
+                <mat-checkbox
+                    [disabled]="disablePrelimCheckbox"
+                    [aria-required]="true"
+                    aria-label="By clicking, I confirm that I have viewed the completed"
+                    [aria-readonly]="prelimCheckStatus"
+                    aria-live="polite"
+                    [class.highlight-text]="!prelimCheckStatus && showAcknowledgementError"
+                    (change)="onCheckboxChange($event)"
+                >
+                    By clicking, I confirm that I have viewed the completed
+                </mat-checkbox>
+            </span>
+            <span>
+                <a
+                    target="_blank"
+                    tabindex="0"
+                    (click)="onPrelimNoticeClick()"
+                    role="link"
+                    [aria-label]="languageStrings['primary.portal.applicationFlow.preliminaryStatement1']"
+                    >{{languageStrings['primary.portal.applicationFlow.preliminaryStatement1']}}</a
+                >
+            </span>
+            <div class="prelim-error">
+                <mat-error [aria-label]="languageStrings['primary.portal.applicationFlow.preliminaryViewError']" *ngIf="viewFormRequired"
+                    >{{languageStrings['primary.portal.applicationFlow.preliminaryViewError']}}</mat-error
+                >
+                <mat-error
+                    [aria-label]="languageStrings['primary.portal.applicationFlow.preliminaryAcknowledge']"
+                    *ngIf="showAcknowledgementError"
+                    >{{languageStrings['primary.portal.applicationFlow.preliminaryAcknowledge']}}</mat-error
+                >
+            </div>
+        </div>
+        <div
+            class="signer-agreement"
+            [innerHtml]="consentContent"
+            *ngIf="!hasAflacAlways && showSignerAgreement && enrollment.enrollmentData.plan.carrierId===aflacCarrierId && enrollment.enrollmentData.paymentInformation"
+        >
+            {{languageStrings['primary.portal.member.multiplePayment.signerAgreement.content']}}
+        </div>
+        <div class="d-flex">
+            <div class="flex-item">
+                <empowered-input displayOrder="1" [formName]="formName">
+                    <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollment.review.initial']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            formControlName="initial"
+                            autocomplete="off"
+                            maxlength="3"
+                            [attr.aria-label]="languageStrings['primary.portal.enrollment.review.initial']"
+                        />
+                        <mat-error *ngIf="enrollmentDetailForm.controls['initial'].errors?.required">
+                            {{languageStrings['primary.portal.review.signature.required']}}</mat-error
+                        >
+                        <mat-error
+                            *ngIf="!enrollmentDetailForm.controls['initial'].errors?.required && (enrollmentDetailForm.controls['initial'].errors?.minlength || enrollmentDetailForm.controls['initial'].errors?.pattern)"
+                        >
+                            {{secondaryLanguageStrings['secondary.portal.common.invalidFormat']}}</mat-error
+                        >
+                    </mat-form-field>
+                </empowered-input>
+            </div>
+        </div>
+
+        <input #aflac_eic_prefs type="hidden" id="aflac_eic_prefs" name="aflac_eic_prefs" aria-hidden="true" />
+        <input #userPrefs type="hidden" id="user_prefs2" name="user_prefs2" aria-hidden="true" />
+    </empowered-modal>
+</form>
+
+<!-- application modal pop-up -->
+<ng-template #unsignedTemplate>
+    <empowered-modal type="POPUP" [showCancel]="false" size="XXL">
+        <empowered-modal-header></empowered-modal-header>
+        <empowered-modal-footer>
+            <button
+                type="button"
+                class="mon-btn-primary"
+                mat-flat-button
+                (click)="closeDialog()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                <span>{{languageStrings['primary.portal.common.close']}}</span>
+            </button>
+        </empowered-modal-footer>
+        <div class="pdf-previewer" *ngIf="htmlContentViewer">
+            <div id="documentFrame" [innerHTML]="htmlContentViewer" allowTransparency="true" scrolling="yes" class="form"></div>
+        </div>
+    </empowered-modal>
+</ng-template>

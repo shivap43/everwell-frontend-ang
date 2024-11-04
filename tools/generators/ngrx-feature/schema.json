@@ -1,0 +1,46 @@
+{
+	"$schema": "http://json-schema.org/schema",
+	"$id": "NewNGRXFeature",
+	"title": "Generate New NGRX Feature",
+	"type": "object",
+	"description": "Generates new NGRX feature boilerplate, updates ngrx-store lib, and updates client app for new feature.",
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the feature to be added to ngrx-store lib.",
+			"$default": {
+				"$source": "argv",
+				"index": 0
+			},
+			"x-prompt": "What name would you like to use for the new feature for ngrx-store lib?"
+		},
+		"skipFeatureFiles": {
+			"type": "boolean",
+			"description": "Skip creating feature boilerplate files for ngrx-store lib",
+			"default": false
+		},
+		"skipClient": {
+			"type": "boolean",
+			"description": "Skip updating client app module",
+			"default": false
+		},
+		"skipAppState": {
+			"type": "boolean",
+			"description": "Skip updating app.state.ts in ngrx-store lib",
+			"default": false
+		},
+		"skipStoreModule": {
+			"type": "boolean",
+			"description": "Skip updating store.module.ts in ngrx-store lib",
+			"default": false
+		}
+	},
+	"project": {
+		"type": "string",
+		"description": "The name of the project.",
+		"$default": {
+			"$source": "projectName"
+		}
+	},
+	"required": ["name"]
+}

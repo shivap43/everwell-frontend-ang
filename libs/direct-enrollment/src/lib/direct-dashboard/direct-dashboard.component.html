@@ -1,0 +1,33 @@
+<!-- TODO : language implementation pending. -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="content-header">
+    <button
+        mat-icon-button
+        *ngIf="mobileQuery.matches"
+        class="openSideNavBtn"
+        (click)="genSideNav.dashboardSideNav.open()"
+    >
+        <mat-icon svgIcon="hamburgerMenu" aria-hidden="true"></mat-icon>
+        <span class="cdk-visually-hidden">{{languageStrings['primary.portal.common.openNavigation']}}</span>
+    </button>
+    <div class="account-labels">
+        <span class="account-name mon-mr-20"
+            >{{producerName}}{{languageStrings['primary.portal.direct.directSales']}}</span
+        >
+    </div>
+    <div *ngIf="hasRoleTwentyDirectPermission">
+        <button mat-flat-button class="mon-btn-primary" (click)="openDirect()">
+            {{languageStrings['primary.portal.directDashboard.openOtherProducerDirectAccount']}}
+        </button>
+    </div>
+</div>
+<div class="mat-side-nav">
+    <empowered-generic-sidenav
+        #genSideNav
+        [navigationOptions]="navOptions"
+        [enableBackToPreviousListing]="false"
+        [previousListName]="false"
+        (optionSelectedOutput)="navigateToSelectedOption($event)"
+        ><router-outlet></router-outlet
+    ></empowered-generic-sidenav>
+</div>

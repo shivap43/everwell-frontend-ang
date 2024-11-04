@@ -1,0 +1,136 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="rules-wrapper">
+    <h1 class="rules-header">{{languageStrings['primary.portal.dashboard.rules']}}</h1>
+    <form [formGroup]="stepThreeForm" role="form">
+        <div class="newhire-wrapper">
+            <h2 role="heading" mat-dialog-title>{{languageStrings['primary.portals.accounts.importAccount.newhireEligibility']}}</h2>
+            <p>{{languageStrings['primary.portals.accounts.importAccount.settingsDetermine']}}</p>
+            <div class="content-wrapper">
+                <mat-label class="mat-label enrollment-label"
+                    >{{languageStrings['primary.portals.accounts.importAccount.enrollmentPeriod']}}
+                </mat-label>
+                <ng-container *ngIf="!editPermission">
+                    <a
+                        [richTooltip]="languageStrings['primary.portals.accounts.importAccount.enrollmentTooltip']"
+                        href="javascript:void(0)"
+                        matTooltipPosition="above"
+                        name="enrollmentPeriodTooltip"
+                        matTooltipClass="pos-above"
+                        [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.enrollmentTooltip']"
+                    >
+                        <mon-icon iconName="Filled-info" [iconSize]="20" class="infoicon icon-primary"></mon-icon>
+                    </a>
+                </ng-container>
+                <div class="new-enroll">
+                    {{languageStrings['primary.portals.accounts.importAccount.newEmployees']}}
+                    <mat-form-field class="days-input">
+                        <input
+                            formControlName="enrollmentPeriod"
+                            [maxLength]="3"
+                            matInput
+                            [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.enrollmentPeriod']"
+                            (keypress)="numberValidation($event)"
+                            (paste)="onPasteNumberValidation($event)"
+                        />
+                    </mat-form-field>
+                    {{languageStrings['primary.portals.accounts.importAccount.daystoEnroll']}}
+                </div>
+                <div class="enrollperiod-error">
+                    <mat-error *ngIf="stepThreeForm.get('enrollmentPeriod').hasError('required')">
+                        <span language="primary.portal.common.requiredField"></span>
+                    </mat-error>
+                </div>
+                <div class="coverage-start">
+                    <mat-label class="mat-label">{{languageStrings['primary.portals.accounts.importAccount.coveragestartDate']}}</mat-label>
+                    <mat-radio-group
+                        [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                        formControlName="coverageStartDate"
+                        (change)="onClickCoverageStart($event.value)"
+                        [disabled]="isPrivacyOnForEnroller"
+                    >
+                        <mat-radio-button value="immediately" [checked]="true"
+                            >{{languageStrings['primary.portals.accounts.importAccount.immediatelySigned']}}</mat-radio-button
+                        >
+                        <mat-radio-button value="days"
+                            ><div class="radio-input">
+                                {{languageStrings['primary.portals.accounts.importAccount.immediatelyAfter']}}
+                                <mat-form-field class="days-input">
+                                    <input
+                                        formControlName="daysBeforeCoverageStart"
+                                        [disabled]="isAfterEvent"
+                                        [maxLength]="3"
+                                        matInput
+                                        (keypress)="numberValidation($event)"
+                                        (paste)="onPasteNumberValidation($event)"
+                                        [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.coveragestartDate']"
+                                    /> </mat-form-field
+                                >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                            </div>
+                        </mat-radio-button>
+                        <div class="after-error">
+                            <mat-error *ngIf="stepThreeForm.get('daysBeforeCoverageStart').hasError('required')">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                        </div>
+
+                        <mat-radio-button value="months"
+                            ><div class="radio-input">
+                                {{languageStrings['primary.portals.accounts.importAccount.firstDay']}}
+                                <mat-form-field class="days-input">
+                                    <input
+                                        formControlName="monthsBeforeCoverageStart"
+                                        [disabled]="isFirstOfTheMonethAfter"
+                                        matInput
+                                        [maxLength]="3"
+                                        (keypress)="numberValidation($event)"
+                                        (paste)="onPasteNumberValidation($event)"
+                                        [attr.aria-label]="languageStrings['primary.portals.accounts.importAccount.coveragestartDate']"
+                                    /> </mat-form-field
+                                >{{languageStrings['primary.portals.accounts.importAccount.daysofEmployment']}}
+                            </div>
+                        </mat-radio-button>
+                        <div class="before-error">
+                            <mat-error *ngIf="stepThreeForm.get('monthsBeforeCoverageStart').hasError('required')">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="update-btn" *isRestricted="permissionEnum.ACCOUNT_BO_RESTRICT_MANAGE_PLANS">
+        <button
+            class="mon-btn-primary btn-sm"
+            mat-button
+            *ngIf="(!isSaved || isFormValueChange) && ruleId && !isPrivacyOnForEnroller"
+            [attr.aria-label]="languageStrings['primary.portal.common.update']"
+            (click)="submitHireRules(true)"
+            [disabled]="!ruleId || !(stepThreeForm.dirty || isFormValueChange)|| !stepThreeForm.valid"
+        >
+            {{languageStrings['primary.portal.common.update']}}
+        </button>
+        <button
+            class="mon-btn-primary btn-sm"
+            mat-button
+            *ngIf="(!isSaved || isFormValueChange) && !ruleId"
+            [attr.aria-label]="languageStrings['primary.portal.accounts.rules.create']"
+            (click)="submitHireRules(false)"
+            [disabled]="!(stepThreeForm.dirty || isFormValueChange) || !stepThreeForm.valid"
+        >
+            {{languageStrings['primary.portal.accounts.rules.create']}}
+        </button>
+    </div>
+    <div class="update-btn">
+        <button
+            *ngIf="isSaved && !isFormValueChange"
+            type="button"
+            mat-flat-button
+            class="mon-btn-success"
+            [attr.aria-label]="languageStrings['primary.portal.common.saved']"
+        >
+            <span><mon-icon class="check-icon" iconName="check" [iconSize]="19"></mon-icon></span>
+            <span language="primary.portal.common.saved"></span>
+        </button>
+    </div>
+</div>

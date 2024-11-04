@@ -1,0 +1,53 @@
+<ng-container *ngIf="thread$ | async as thread">
+    <ng-container *ngIf="message$ | async as message">
+        <div class="container">
+            <empowered-metadata-element
+                [label]="labelFrom"
+                [value]="message?.from | dereferenceTargetUnit | async"
+                [showChange]="false"
+            >
+            </empowered-metadata-element>
+
+            <empowered-metadata-element
+                [label]="labelTo"
+                [value]="message?.sentTo | dereferenceTargetUnit | async"
+                [showChange]="false"
+            >
+            </empowered-metadata-element>
+
+            <empowered-metadata-element [label]="labelSent" [value]="message?.sentOn" [showChange]="false">
+            </empowered-metadata-element>
+
+            <empowered-metadata-element [label]="labelSubject" [value]="thread?.subject" [showChange]="false">
+            </empowered-metadata-element>
+
+            <ng-container *ngIf="isAdminPortal">
+                <empowered-metadata-element
+                    [label]="labelStatus"
+                    [value]="thread?.status | dereferenceStatus | async"
+                    [showChange]="showChange"
+                    (changeRequest)="onChangeStatusClick()"
+                >
+                </empowered-metadata-element>
+
+                <empowered-metadata-element
+                    *ngIf="messageCategory$ | async as messageCategory"
+                    [label]="labelCategory"
+                    [value]="messageCategory"
+                    [showChange]="showChange"
+                    (changeRequest)="onChangeCategoryClick()"
+                >
+                </empowered-metadata-element>
+
+                <empowered-metadata-element
+                    [label]="labelAssignedAdmin"
+                    [value]="thread?.assignedAdminId | dereferenceAssignedTo | async"
+                    [showChange]="showChange"
+                    [changeLabel]="thread?.assignedAdminId ? changeLabelChange : changeLabelAssignAnAdmin"
+                    (changeRequest)="onChangeAdminClick()"
+                >
+                </empowered-metadata-element>
+            </ng-container>
+        </div>
+    </ng-container>
+</ng-container>

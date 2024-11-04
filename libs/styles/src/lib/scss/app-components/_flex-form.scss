@@ -1,0 +1,53 @@
+.flex-form-wrapper {
+    .flex-form-item {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+        margin-top: convert-unit(40px, "rem");
+        padding-bottom: convert-unit(20px, "rem");
+
+        &:first-of-type {
+            margin-top: 0;
+        }
+
+        &:last-of-type {
+            border: none;
+        }
+    }
+
+    .flex-item {
+        @extend .mon-mr-20;
+
+        &:last-child {
+            @extend .mon-mr-0;
+        }
+
+        mat-label,
+        .mat-label {
+            .mon-icon {
+                margin: 0 convert-unit(5px, "rem");
+            }
+        }
+    }
+
+    .mon-alert {
+        margin-top: convert-unit(25px, "rem");
+    }
+}
+
+.flex-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    background: get("color.gray.100");
+    border-top: convert-unit(1px, "rem") solid get("color.gray.400");
+    padding: convert-unit(25px, "rem") convert-unit(30px, "rem");
+}
+
+.fixed-position {
+    position: fixed;
+    bottom: map-get($spacers, 0);
+    left: map-get($spacers, 0);
+    right: map-get($spacers, 0);
+}
+
+.is-footer-fixed .fixed-position {
+    position: absolute;
+}

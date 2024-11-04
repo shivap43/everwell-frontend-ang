@@ -1,0 +1,44 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <empowered-modal-header> {{languageStrings["primary.portal.benefitsOffering.reviewSubmit.addAdminTitle"]}} </empowered-modal-header>
+    <p *ngIf="submittingEndCoverage; else defaultHeader" class="admin-description">
+        {{languageStrings["primary.portal.benefitsOffering.reviewSubmit.addAdminDescriptionForEndCoverage"]}}
+    </p>
+    <ng-template #defaultHeader>
+        <p class="admin-description" *ngIf="!isAdminApprovalRequired && !isVasApprovalRequired; else adminApprovalRequired">
+            {{languageStrings["primary.portal.benefitsOffering.reviewSubmit.addAdminDescription.hqVas"]}}
+        </p>
+        <ng-template #adminApprovalRequired>
+            <p class="admin-description">{{languageStrings["primary.portal.benefitsOffering.reviewSubmit.addAdminDescription"]}}</p>
+        </ng-template>
+    </ng-template>
+    <mat-radio-group [formControl]="selectedOption" (change)="chooseOption($event.value)">
+        <div>
+            <mat-radio-button value="manually" class="primary-radio">
+                {{languageStrings['primary.portal.administrators.addManually']}}
+            </mat-radio-button>
+        </div>
+        <div>
+            <mat-radio-button *ngIf="showAddFromEmployee" value="employee" class="primary-radio">
+                {{languageStrings['primary.portal.administrators.addFromEmployeeList']}}
+            </mat-radio-button>
+        </div>
+        <div>
+            <mat-radio-button value="import" class="primary-radio">
+                {{languageStrings['primary.portal.benefitsOffering.reviewSubmit.importFromAccount']}}
+            </mat-radio-button>
+        </div>
+        <mat-error *ngIf="selectedOption.errors?.require"> {{languageStrings["primary.portal.common.selectionRequired"]}} </mat-error>
+    </mat-radio-group>
+    <empowered-modal-footer>
+        <button
+            mat-raised-button
+            (click)="onNext()"
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

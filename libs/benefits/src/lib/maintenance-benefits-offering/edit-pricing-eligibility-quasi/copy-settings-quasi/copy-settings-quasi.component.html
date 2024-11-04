@@ -1,0 +1,56 @@
+<div class="dialog-content mon-px-20">
+    <h1>{{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.title']}}</h1>
+    <mat-radio-group aria-label="Select an option">
+        <div>
+            <mat-radio-button value="future plan" class="mon-mb-10">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.optionYes']}}
+            </mat-radio-button>
+        </div>
+        <div>
+            <mat-radio-button value="current plan" class="mon-mb-10">
+                {{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.optionNo']}}
+            </mat-radio-button>
+            <div class="checkbox-wrapper">
+                <mat-checkbox
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.eligibility']}}</mat-checkbox
+                >
+                <mat-checkbox
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.employerContribution']}}</mat-checkbox
+                >
+                <mat-checkbox
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.pricesOrRates']}}</mat-checkbox
+                >
+                <mat-checkbox
+                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.copySettings.packageCodes']}}</mat-checkbox
+                >
+            </div>
+        </div>
+    </mat-radio-group>
+</div>
+<div class="dialog-footer">
+    <button class="mon-btn-link" mat-flat-button [attr.aria-label]="languageStrings['primary.portal.common.cancel']">
+        {{languageStrings['primary.portal.common.cancel']}}
+    </button>
+    <div>
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+            (click)="onBack()"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+        <button
+            mat-flat-button
+            class="mon-btn-primary mon-ml-20"
+            type="button"
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+            (click)="onNext()"
+        >
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

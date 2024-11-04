@@ -1,0 +1,384 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="member-list-wrapper" *ngIf="!isSpinnerLoading">
+    <div class="zero-state" [hidden]="!zerostate">
+        <h1 role="heading" class="member-list-header" *ngIf="!tabView">
+            <span>{{languageStrings['primary.portal.administrators.header']}}</span>
+        </h1>
+        <p class="info-txt">{{languageStrings['primary.portal.admin.noadminsAdded']}}</p>
+        <div class="search-action-buttons" *isRestricted="userPermissions.ACCOUNT_RESTRICT_CREATE_ADMIN">
+            <button
+                *ngIf="!isPrivacyOnForEnroller"
+                mat-flat-button
+                class="mon-btn-primary btn-sm pull-down-sm mon-mt-10"
+                [matMenuTriggerFor]="addAdmin"
+                [attr.aria-label]="languageStrings['primary.portal.administrators.addAdmin']"
+            >
+                <span>{{languageStrings['primary.portal.administrators.addAdmin']}}</span>
+                <mon-icon [iconSize]="8" iconName="down" class="icon-right"></mon-icon>
+            </button>
+            <mat-menu #addAdmin="matMenu" xPosition="after">
+                <button
+                    mat-menu-item
+                    (click)="addManually()"
+                    [attr.aria-label]="languageStrings['primary.portal.administrators.addManually']"
+                >
+                    {{languageStrings['primary.portal.administrators.addManually']}}
+                </button>
+                <button
+                    *ngIf="showAddFromEmployee"
+                    mat-menu-item
+                    (click)="addEmployeeList()"
+                    [attr.aria-label]="languageStrings['primary.portal.administrators.addFromEmployeeList']"
+                >
+                    {{languageStrings['primary.portal.administrators.addFromEmployeeList']}}
+                </button>
+                <button
+                    mat-menu-item
+                    (click)="addImportAdmin()"
+                    [attr.aria-label]="languageStrings['primary.portal.administrators.importAdmin']"
+                >
+                    {{languageStrings['primary.portal.administrators.importAdmin']}}
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+    <div [hidden]="zerostate">
+        <h1 role="heading" class="member-list-header" *ngIf="!tabView">
+            <span>{{languageStrings['primary.portal.administrators.header']}}</span>
+        </h1>
+        <div class="mon-mb-20">
+            <mon-alert *ngIf="errorFlag" alertType="danger">
+                <span>{{errorMessage}}</span>
+            </mon-alert>
+        </div>
+        <div class="search-filter-wraper flex-column">
+            <div class="search-filter-group">
+                <div class="search-wrapper">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.searchAdmin']}}</mat-label>
+                    <div>
+                        <mat-form-field>
+                            <input
+                                type="text"
+                                class="mon-pt-5"
+                                matInput
+                                autocomplete="off"
+                                #searchValue
+                                (keyup)="searchAdmin(searchValue.value) "
+                                (keyup.enter)="searchOnEnter(searchValue.value)"
+                                (blur)="searchDropdownClose()"
+                                class="mon-input"
+                                [attr.aria-label]="languageStrings['primary.portal.administrators.searchAdmin']"
+                            />
+                        </mat-form-field>
+                        <mat-hint class="mon-hint-msg">{{languageStrings['primary.portal.administrators.adminName']}} </mat-hint>
+                    </div>
+                    <div class="search-box-wrapper" [hidden]="searchState">
+                        <div class="search-box-sub-wrapper">
+                            <mat-action-list>
+                                <div class="search-account-menu">
+                                    <mat-label class="mat-label admin-name"
+                                        >{{languageStrings['primary.portal.administrators.name']}}</mat-label
+                                    >
+                                    <span class="field-value" (click)="searchDropdownClose()">
+                                        <a value="name" mat-flat-button>{{searchValue.value}}</a>
+                                    </span>
+                                </div>
+                            </mat-action-list>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-wrapper">
+                    <mat-label class="mat-label mon-label">{{languageStrings['primary.portal.administrators.filterName']}}</mat-label>
+
+                    <div class="filter-sub-wrapper d-flex">
+                        <!-- Role Filter  -->
+                        <mat-form-field
+                            [ngClass]="{'filter-selected': roleFilter.value && roleFilter.value.length > 0, 'filter-applied': !!isDisplayRole && roleFilter.value && roleFilter.value.length > 0}"
+                            *ngIf="showComponent"
+                        >
+                            <label class="filter-label" mat-label> {{languageStrings['primary.portal.administrators.filterRole']}} </label>
+                            <mat-select
+                                #roleFilterDropdown
+                                multiple
+                                disableOptionCentering="true"
+                                panelClass="list-grid-filter filter-status filter-adminlist filter-role"
+                                [formControl]="roleFilter"
+                                (closed)="clickOutside('roleFilter')"
+                                (openedChange)="matSelectOpenHandler($event)"
+                            >
+                                <mat-select-trigger> </mat-select-trigger>
+                                <div class="filter-options" value="selectedRole">
+                                    <mat-checkbox
+                                        class="mat-option mon-mt-0"
+                                        [disableRipple]="true"
+                                        [indeterminate]="isIndeterminate('roleFilter')"
+                                        [checked]="isChecked('roleFilter')"
+                                        (click)="$event.stopPropagation()"
+                                        (change)="toggleSelection($event)"
+                                        *ngIf="adminRolesMoreThanTenFlag"
+                                        >{{languageStrings['primary.portal.administrators.all']}}
+                                    </mat-checkbox>
+                                    <mat-option *ngFor="let roles of adminRoles" [value]="roles.name">
+                                        <span>{{roles.name}}</span>
+                                    </mat-option>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                *ngIf="roleFilter.value != ''"
+                                                (click)="resetVal('roleFilter')"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                            >
+                                                {{languageStrings['primary.portal.common.clear']}}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                class="mon-apply"
+                                                (click)="filterApply('roleFilter')"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                            >
+                                                {{languageStrings['primary.portal.common.apply']}}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-select>
+                            <label class="filter-label" *ngIf="filterChoiceRole && filterChoiceRole.length"> {{isDisplayRole}} </label>
+                        </mat-form-field>
+                        <!-- Role Filter  -->
+
+                        <!-- Status Filter  -->
+                        <ng-container *ngIf="!forMobileDevices && showComponent">
+                            <mat-form-field
+                                [ngClass]="{'filter-selected': statusFilter.value && statusFilter.value.length > 0, 'filter-applied': !!isDisplayStatus && statusFilter.value && statusFilter.value.length > 0}"
+                            >
+                                <label class="filter-label"> {{languageStrings['primary.portal.administrators.filterStatus']}} </label>
+                                <mat-select
+                                    #statusFilterDropdown
+                                    multiple
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-status filter-adminlist"
+                                    [formControl]="statusFilter"
+                                    (closed)="clickOutside('statusFilter')"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options" value="[selectedStatus]">
+                                        <mat-checkbox
+                                            class="mat-option mon-mt-0"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate('statusFilter')"
+                                            [checked]="isChecked('statusFilter')"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event)"
+                                            *ngIf="adminStatusMoreThanTenFlag"
+                                            >{{languageStrings['primary.portal.administrators.all']}}
+                                        </mat-checkbox>
+                                        <mat-option *ngFor="let status of statusList" [value]="status.status">
+                                            {{status.status}}
+                                        </mat-option>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    *ngIf="statusFilter.value != ''"
+                                                    (click)="resetVal('statusFilter')"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                >
+                                                    {{languageStrings['primary.portal.common.clear']}}
+                                                </a>
+                                            </div>
+                                            <div>
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    (click)="filterApply('statusFilter')"
+                                                    class="mon-apply"
+                                                    [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                >
+                                                    {{languageStrings['primary.portal.common.apply']}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceStatus && filterChoiceStatus.length">
+                                    {{isDisplayStatus}}
+                                </label>
+                            </mat-form-field>
+                        </ng-container>
+
+                        <!-- Status Filter  -->
+                        <empowered-pill-filter-group
+                            *ngIf="showReportsTo"
+                            [filterModels$]="allAdmins$"
+                            (filterChange)="applyPillFilters($event)"
+                            (filterOpen)="pillFilterOpen($event)"
+                        ></empowered-pill-filter-group>
+                    </div>
+                </div>
+
+                <!-- Add admin options, material menu -->
+                <div class="search-action-buttons" *ngIf="!isPrivacyOnForEnroller">
+                    <button
+                        mat-flat-button
+                        class="mon-btn-secondary btn-sm pull-down-sm"
+                        [matMenuTriggerFor]="addAdmin"
+                        *isRestricted="userPermissions.ACCOUNT_RESTRICT_CREATE_ADMIN"
+                    >
+                        <span>{{languageStrings['primary.portal.administrators.addAdmin']}}</span>
+                        <mon-icon [iconSize]="8" iconName="down" class="icon-right"></mon-icon>
+                    </button>
+                    <mat-menu #addAdmin="matMenu" xPosition="before">
+                        <ng-container *ngFor="let addAdminOption of addAdminOptions$ | async">
+                            <button
+                                mat-menu-item
+                                *ngIf="addAdminOption.condition"
+                                (click)="dispatchAddAdminCallback(addAdminOption.callback)"
+                            >
+                                {{ languageStrings[addAdminOption.label] }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </div>
+            </div>
+        </div>
+        <ng-container>
+            <div class="results-grid table-mask-wrapper" [ngClass]="{'grid-overlay' :filterOpen}">
+                <div [hidden]="(!showComponent || dataSource.data.length === 0)">
+                    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
+                        <!-- Name Column -->
+                        <ng-container [matColumnDef]="AdminTableColumns.NAME">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                                {{languageStrings['primary.portal.administrators.name']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'name'}">
+                                {{element.name.firstName + " " + element.name.lastName | titlecase}}
+                                <span *ngIf="element.active === STATUS_INACTIVE"
+                                    >{{languageStrings['primary.portal.accounts.accountList.inactiveAlongWithAccountName']}}</span
+                                >
+                            </td>
+                        </ng-container>
+
+                        <!-- Role Column -->
+                        <ng-container [matColumnDef]="AdminTableColumns.ROLE">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                                {{languageStrings['primary.portal.administrators.filterRole']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'role'}">
+                                {{element.role.name}}
+                            </td>
+                        </ng-container>
+
+                        <!-- Email Column -->
+                        <ng-container [matColumnDef]="AdminTableColumns.EMAIL">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                                {{languageStrings['primary.portal.administrators.email']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'emailAddress'}">
+                                {{element.emailAddress}}
+                            </td>
+                        </ng-container>
+
+                        <!-- Phone Column -->
+                        <ng-container [matColumnDef]="AdminTableColumns.PHONE">
+                            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                                {{languageStrings['primary.portal.administrators.phoneNumber']}}
+                            </th>
+                            <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'phoneNumber'}">
+                                {{element.phoneNumber|phone}}
+                            </td>
+                        </ng-container>
+
+                        <!-- REPORTS TO -->
+                        <div *ngIf="showReportsTo">
+                            <ng-container [matColumnDef]="AdminTableColumns.REPORTS_TO">
+                                <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                                    {{languageStrings['primary.portal.administrators.tableHeader.reportsTo']}}
+                                </th>
+                                <td mat-cell *matCellDef="let element" [ngClass]="{'sorted-column': activeCol === 'reportsTo'}">
+                                    <ng-container *ngIf="element.reportsTo">
+                                        {{ element.reportsTo?.name.firstName | titlecase }} {{ element.reportsTo?.name.lastName | titlecase
+                                        }}
+                                    </ng-container>
+                                </td>
+                            </ng-container>
+                        </div>
+                        <!-- Manage Column -->
+                        <ng-container [matColumnDef]="AdminTableColumns.MANAGE">
+                            <th *matHeaderCellDef mat-header-cell>{{languageStrings['primary.portal.administrators.manage']}}</th>
+                            <td mat-cell *matCellDef="let element">
+                                <button
+                                    mat-icon-button
+                                    *hasAnyPermission="[userPermissions.ACCOUNT_UPDATE_ADMIN_DEACTIVATE, userPermissions.ACCOUNT_UPDATE_ADMIN_REACTIVATE, userPermissions.ACCOUNT_DELETE_ADMIN,userPermissions.ACCOUNT_UPDATE_ADMIN ]"
+                                    [matMenuTriggerFor]="beforeMenu"
+                                    [attr.aria-label]="languageStrings['primary.portal.common.ariaShowMenu']"
+                                >
+                                    <mon-icon
+                                        iconName="ellipsis"
+                                        [iconSize]="20"
+                                        class="more-option icon-primary"
+                                        *ngIf="!isPrivacyOnForEnroller"
+                                    >
+                                    </mon-icon>
+                                </button>
+                                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                                    <ng-template [ngIf]="element.active !== STATUS_INACTIVE">
+                                        <button
+                                            mat-menu-item
+                                            (click)="editAdministrator(element)"
+                                            *hasPermission="userPermissions.ACCOUNT_UPDATE_ADMIN"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.edit']"
+                                        >
+                                            {{languageStrings['primary.portal.common.edit']}}
+                                        </button>
+                                        <button
+                                            mat-menu-item
+                                            (click)="deactivate(element)"
+                                            *hasPermission="userPermissions.ACCOUNT_UPDATE_ADMIN_DEACTIVATE"
+                                            [attr.aria-label]="languageStrings['primary.portal.common.deactivate']"
+                                        >
+                                            {{languageStrings['primary.portal.common.deactivate']}}
+                                        </button>
+                                    </ng-template>
+                                    <ng-container *hasPermission="userPermissions.ACCOUNT_UPDATE_ADMIN_REACTIVATE">
+                                        <button mat-menu-item (click)="reactivate(element)" *ngIf="element.active === STATUS_INACTIVE">
+                                            {{languageStrings['primary.portal.common.reactivate']}}
+                                        </button>
+                                    </ng-container>
+
+                                    <button
+                                        mat-menu-item
+                                        (click)="removeAdmin(element)"
+                                        *hasPermission="userPermissions.ACCOUNT_DELETE_ADMIN"
+                                        class="remove-item"
+                                        [attr.aria-label]="languageStrings['primary.portal.common.remove']"
+                                    >
+                                        {{languageStrings['primary.portal.common.remove']}}
+                                    </button>
+                                </mat-menu>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr
+                            mat-row
+                            *matRowDef="let row; columns: displayedColumns; let element"
+                            [ngClass]="{'inactive': element.active === STATUS_INACTIVE}"
+                        ></tr>
+                    </table>
+                </div>
+                <div *ngIf="this.dataSource.data.length > 0">
+                    <span class="min-range-label">
+                        {{languageStrings['primary.portal.subproducerList.showing']}} {{this.dataSource.data.length}}
+                        {{languageStrings['primary.portal.subproducerList.results']}}
+                    </span>
+                </div>
+            </div>
+            <div *ngIf="noResultFoundFlag" class="no-data">
+                {{languageStrings['primary.portal.subproducerList.noResultFound']}} {{searchValue.value ? searchValue.value: dispError}}
+            </div>
+        </ng-container>
+    </div>
+</div>

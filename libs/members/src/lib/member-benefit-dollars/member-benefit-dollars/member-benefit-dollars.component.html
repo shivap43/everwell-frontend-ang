@@ -1,0 +1,255 @@
+<div class="member-benefit-dollar">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+    <h2 class="title">
+        {{languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.benefitDollars']}}
+    </h2>
+
+    <p class="mon-mb-30" *ngIf="isZeroState">
+        {{languageStrings["primary.portal.memberBenefitDollars.memberBenefitDollars.memberNameZeroState"].replace("#membername",memberName).replace("#companyname",companyName)}}
+    </p>
+    <p class="mon-mb-30" *ngIf="!isZeroState">
+        {{languageStrings["primary.portal.memberBenefitDollars.memberBenefitDollars.memberNameNonZeroState"].replace("#membername",memberName).replace("#companyname",companyName)}}
+    </p>
+    <ng-container>
+        <mat-accordion class="accordion-default">
+            <ng-container *ngFor="let offering of offeringList; index as i">
+                <mat-expansion-panel
+                    class="group-expand"
+                    [expanded]="panelExpanded == offering.id"
+                    (opened)="setPanelExpanded(offering)"
+                    [disabled]="true"
+                >
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <div class="flex-column">
+                                <h4 *ngIf="offering.isPercentage else nonPercentage">
+                                    {{offering.name}} |
+                                    <span *ngIf="!offering.isException">{{offering.amount}}%</span>
+                                    <span *ngIf="offering.isException">{{offering.exceptionAmount}}%</span>
+                                </h4>
+                                <ng-template #nonPercentage>
+                                    <h4>
+                                        {{offering.name}} |
+                                        <span *ngIf="!offering.isException">${{offering.amount.toFixed(2)}}</span>
+                                        <span *ngIf="offering.isException"
+                                            >${{offering.exceptionAmount.toFixed(2)}}</span
+                                        >
+                                        {{payFrequency}}
+                                    </h4>
+                                </ng-template>
+                                <p>
+                                    {{offering.description}}
+                                </p>
+                            </div>
+                            <div>
+                                <button
+                                    class="mon-btn-link edit-link"
+                                    (click)="editOffering(offering, i)"
+                                    *ngIf="allowEdit && panelExpanded != offering.id && !isAdmin"
+                                >
+                                    {{languageStrings['primary.portal.common.edit']}}
+                                    <span class="sr-only">{{offering.name}}</span>
+                                </button>
+                                <button
+                                    class="mon-btn-link"
+                                    (click)="addNewAmount()"
+                                    *ngIf="panelExpanded == offering.id && !isAdmin"
+                                >
+                                    {{languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.addNewAmount']}}
+                                </button>
+                            </div>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <form [formGroup]="offeringForm" (ngSubmit)="saveOfferingForm()" class="bg-gray">
+                        <div
+                            formArrayName="offeringAmounts"
+                            *ngFor="let item of offeringAmountFormArray.controls; let i = index"
+                            class="flex-form-wrapper"
+                        >
+                            <div [formGroupName]="i" class="d-md-flex">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.offeringAmount']}}
+                                    </mat-label>
+                                    <ng-container>
+                                        <mat-form-field class="w-250">
+                                            <span matPrefix *ngIf="!(i == focusedGroup) && !isPercentage">$</span>
+                                            <span matSuffix *ngIf="isPercentage">%</span>
+                                            <input
+                                                *ngIf="isPercentage"
+                                                type="number"
+                                                matInput
+                                                formControlName="amount"
+                                                [attr.aria-label]="languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.offeringAmount']"
+                                                (focus)="onFocus(i)"
+                                                (blur)="onBlur(i)"
+                                            />
+                                            <input
+                                                *ngIf="!isPercentage"
+                                                type="number"
+                                                matInput
+                                                empoweredBenefitAmountFormat
+                                                formControlName="amount"
+                                                [attr.aria-label]="languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.offeringAmount']"
+                                                (focus)="onFocus(i)"
+                                                (blur)="onBlur(i)"
+                                            />
+                                            <mat-error
+                                                *ngIf="offeringAmountFormArray.at(i).get('amount').errors?.required"
+                                                >{{languageStrings['primary.portal.common.requiredField']}}
+                                            </mat-error>
+                                            <mat-error *ngIf="offeringAmountFormArray.at(i).get('amount').errors?.max">
+                                                {{languageStrings['primary.portal.applicationFlow.beneficiary.benefitPercentages']}}
+                                            </mat-error>
+                                            <span
+                                                id="suffix_{{i}}"
+                                                matSuffix
+                                                *ngIf="!(i == focusedGroup) && !isPercentage"
+                                                >{{payFrequency}}</span
+                                            >
+                                        </mat-form-field>
+                                    </ng-container>
+                                </div>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.startDate']}}
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="startDatePicker"
+                                            formControlName="startDate"
+                                            [attr.aria-label]="languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.startDate']"
+                                            name="startDatePicker"
+                                            (keyup)="transform($event)"
+                                            (dateChange)="validateDateRange(i, 'start')"
+                                            [max]="getMaxStartDate(i)"
+                                            [min]="minStartDate"
+                                        />
+                                        <mat-datepicker #startDatePicker></mat-datepicker>
+                                        <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="startDatePicker"
+                                            (click)="startDatePicker.open()"
+                                        >
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('startDate').errors?.required
+                                            && offeringAmountFormArray.at(i).get('startDate').value === ''
+                                            || offeringAmountFormArray.at(i).get('startDate').value === ''"
+                                        >
+                                            {{ languageStrings["primary.portal.common.requiredField"] }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('startDate').errors?.isDateOverlapping"
+                                        >
+                                            {{ languageStrings["primary.portal.memberBenefitDollars.dateRange"] }}
+                                        </mat-error>
+                                        <!-- Invalid Date format error massage -->
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('startDate').errors?.matDatepickerParse
+                                            && offeringAmountFormArray.at(i).get('startDate').value !== ''"
+                                        >
+                                            {{ languageStrings["primary.portal.common.invalidDateFormat"] }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('startDate').errors?.matDatepickerMin"
+                                        >
+                                            {{ languageStrings["primary.portal.thirdParty.date_past"] }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('startDate').errors?.isPastDate"
+                                        >
+                                            {{ languageStrings["primary.portal.thirdParty.date_past"] }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.endDate']}}
+                                        <span class="optional-text" *ngIf="i===0"
+                                            >{{languageStrings['primary.portal.common.optional']}}
+                                        </span>
+                                    </mat-label>
+                                    <mat-form-field class="mon-date-field">
+                                        <input
+                                            matInput
+                                            [matDatepicker]="endDatePicker"
+                                            formControlName="endDate"
+                                            [attr.aria-label]="languageStrings['primary.portal.memberBenefitDollars.memberBenefitDollars.endDate']"
+                                            name="endDatePicker"
+                                            (keyup)="transform($event)"
+                                            (dateChange)="validateDateRange(i, 'end')"
+                                            [min]="getMinEndDate(i)"
+                                        />
+                                        <mat-datepicker #endDatePicker></mat-datepicker>
+                                        <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="endDatePicker"
+                                            (click)="endDatePicker.open()"
+                                        >
+                                            <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                            </mon-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('endDate').errors?.required"
+                                        >
+                                            {{ languageStrings["primary.portal.common.requiredField"] }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('endDate').errors?.isDateOverlapping"
+                                        >
+                                            {{ languageStrings["primary.portal.memberBenefitDollars.dateRange"] }}
+                                        </mat-error>
+                                        <!-- Invalid Date format error massage -->
+                                        <mat-error *ngIf="offeringAmountFormArray.at(i).get('endDate').errors?.inValid">
+                                            {{ languageStrings["primary.portal.common.invalidDateFormat"] }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="offeringAmountFormArray.at(i).get('endDate').errors?.isLessThanMinDate"
+                                        >
+                                            {{ languageStrings["primary.portal.resources.invalidStartDate"] }}
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span>{{languageStrings['primary.portal.memberBenefitDollars.note']}}</span>
+                            <span *ngIf="isPercentage else nonPercent">{{ offering.amount}} %</span>
+                            <ng-template #nonPercent>
+                                <span> {{offering.amount.toFixed(2)}}</span>
+                                <span> {{payFrequency}}</span>
+                            </ng-template>
+                        </div>
+
+                        <mat-action-row>
+                            <button
+                                type="button"
+                                class="mon-btn-secondary mon-mr-20"
+                                (click)="cancel()"
+                                mat-flat-button
+                                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+                            >
+                                {{languageStrings['primary.portal.common.cancel']}}
+                            </button>
+                            <button
+                                type="submit"
+                                class="mon-btn-primary"
+                                mat-flat-button
+                                [attr.aria-label]="languageStrings['primary.portal.common.save']"
+                            >
+                                {{languageStrings['primary.portal.common.save']}}
+                            </button>
+                        </mat-action-row>
+                    </form>
+                </mat-expansion-panel>
+            </ng-container>
+        </mat-accordion>
+    </ng-container>
+</div>

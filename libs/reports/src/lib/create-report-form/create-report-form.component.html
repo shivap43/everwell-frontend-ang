@@ -1,0 +1,490 @@
+<div class="quasi-modal">
+    <div class="modal-header create-report-form-header">
+        <span class="header-text">
+            <span language="primary.portal.createReportForm.create"></span>
+            {{reportType}}
+            <span language="primary.portal.createReportForm.report"></span>
+        </span>
+        <button mat-icon-button (click)="closeFormModal()" aria-label="close window" class="mon-icon-close">
+            <mon-icon [iconSize]="25" iconName="close"></mon-icon>
+            <span class="cdk-visually-hidden">Close</span>
+        </button>
+    </div>
+    <form [formGroup]="createReportForm" (ngSubmit)="onSubmit(createReportForm)" class="create-report-form">
+        <div class="scroll-content create-report-form-fields">
+            <div class="create-report-form-main">
+                <div class="create-report-description">
+                    <mat-label>
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.reportDescription"></span
+                        ><span class="optional-text" language="primary.portal.common.optional"></span>
+                    </mat-label>
+                    <mat-form-field class="create-report-form-input">
+                        <input matNativeControl formControlName="description" />
+                        <mat-error
+                            *ngIf="createReportForm.controls.description.hasError('pattern')"
+                            language="primary.portal.createReportForm.validationMsg.descriptionError"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="chip-list" *ngIf="(reportType === 'enrollment' || reportType === 'deductions')">
+                    <span class="create-report-form-label" language="primary.portal.createReportForm.carriers"></span>
+                    <empowered-chip-select
+                        [chipOptions$]="allCarriers$"
+                        [hasSelectAll]="true"
+                        [valuesChipControl]="carrierValueChipSelect"
+                        [changeStrategy]="changeStrategySubject$.asObservable()"
+                        (chipChange)="checkValidation()"
+                        #carrierChipSelect
+                    >
+                    </empowered-chip-select>
+                    <mat-error *ngIf="carrierMissing" class="create-report-form-error-hint"
+                        ><span language="primary.portal.common.selectionRequired"></span
+                    ></mat-error>
+                </div>
+
+                <div
+                    class="chip-list"
+                    *ngIf="reportType !== 'PDA' && reportType !== 'commissions' && allClasses$ | async as allClassesFromObservable"
+                >
+                    <div *ngIf="allClassesFromObservable.length > 0  && data.source !== direct">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.classes"></span>
+                        <empowered-chip-select
+                            [chipOptions$]="allClasses$"
+                            [hasSelectAll]="true"
+                            [isParentSelectable]="false"
+                            [valuesChipControl]="classValueChipSelect"
+                            [changeStrategy]="changeStrategySubject$.asObservable()"
+                            #classChipSelect
+                            (chipChange)="checkValidation()"
+                        >
+                        </empowered-chip-select>
+                        <mat-error *ngIf="classMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+                </div>
+
+                <div class="chip-list" *ngIf="reportType !== 'PDA' && reportType != 'commissions'">
+                    <span class="create-report-form-label" language="primary.portal.createReportForm.states"></span>
+                    <empowered-chip-select
+                        [chipOptions$]="allStates$"
+                        [hasSelectAll]="true"
+                        [valuesChipControl]="stateValueChipSelect"
+                        [changeStrategy]="changeStrategySubject$.asObservable()"
+                        #stateChipSelect
+                        (chipChange)="checkValidation()"
+                    >
+                    </empowered-chip-select>
+                    <!-- </mat-form-field> -->
+                    <mat-error *ngIf="stateMissing" class="create-report-form-error-hint"
+                        ><span language="primary.portal.common.selectionRequired"></span
+                    ></mat-error>
+                </div>
+
+                <div
+                    [formGroup]="employeeStatuses"
+                    *ngIf="reportType !== 'PDA' && reportType != 'commissions' && data.source !== direct"
+                    class="checkbox-container"
+                >
+                    <span class="create-report-form-label" language="primary.portal.createReportForm.employeeStatus"></span>
+                    <div class="checkbox-group">
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedActive()"
+                            formGroupName="active"
+                            [ngClass]="{'error': employeeStatusesMissing}"
+                            ><span language="primary.portal.createReportForm.employeeStatus.active"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedTerminated()"
+                            formGroupName="terminated"
+                            [ngClass]="{'error': employeeStatusesMissing}"
+                            ><span language="primary.portal.createReportForm.employeeStatus.terminated"></span
+                        ></mat-checkbox>
+                        <mat-error *ngIf="employeeStatusesMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+                </div>
+
+                <div *ngIf="reportType === 'enrollment'" [formGroup]="enrollmentStatuses" class="checkbox-container">
+                    <span class="create-report-form-label" language="primary.portal.createReportForm.enrollment.status"></span>
+                    <!-- FOR PAYROLL  -->
+                    <div class="checkbox-group" *ngIf="data.source !== direct">
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('approved'); enrollmentStatusFlagSet()"
+                            formGroupName="approved"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.approved"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('pending'); enrollmentStatusFlagSet()"
+                            formGroupName="pending"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.pending"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('pendingEAA');enrollmentStatusFlagSet()"
+                            formGroupName="pendingEAA"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.pendingEAA"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('pendingPDA');enrollmentStatusFlagSet()"
+                            formGroupName="pendingPDA"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.pendingPDA"></span
+                        ></mat-checkbox>
+                        <mat-error *ngIf="enrollmentStatusMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+
+                    <!-- FOR DIRECT  -->
+                    <div class="checkbox-group" *ngIf="data.source === direct">
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('approved'); enrollmentStatusFlagSet()"
+                            formGroupName="approved"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.approved"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('pendingSignature'); enrollmentStatusFlagSet()"
+                            formGroupName="pendingSignature"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.pendingSignature"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleEnrollmentStatus('pendingOtherReasons'); enrollmentStatusFlagSet()"
+                            formGroupName="pendingOtherReasons"
+                            [ngClass]="{'error': enrollmentStatusMissing}"
+                            ><span language="primary.portal.createReportForm.enrollment.status.pendingOtherReasons"></span
+                        ></mat-checkbox>
+                        <mat-error *ngIf="enrollmentStatusMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+                    <!--  -->
+                </div>
+
+                <div [formGroup]="formCompletionStatuses" *ngIf="reportType === 'PDA'" class="checkbox-container">
+                    <span class="create-report-form-label" language="primary.portal.createReportForm.formCompletionStatus"></span>
+                    <div class="checkbox-group">
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedComplete()"
+                            formGroupName="complete"
+                            [ngClass]="{'error': formCompletionStatusesMissing}"
+                            ><span language="primary.portal.createReportForm.formCompletionStatus.complete"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedIncomplete()"
+                            formGroupName="incomplete"
+                            [ngClass]="{'error': formCompletionStatusesMissing}"
+                            ><span language="primary.portal.createReportForm.formCompletionStatus.incomplete"></span
+                        ></mat-checkbox>
+                        <mat-error *ngIf="formCompletionStatusesMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+                </div>
+
+                <div class="checkbox-container" [formGroup]="viewedPlans" *ngIf="reportType === 'demographics' || reportType === 'PDA'">
+                    <span class="create-report-form-label"
+                        ><span language="primary.portal.createReportForm.viewedPlans"></span>
+                        <span
+                            richTooltip="{{viewedPlansTooltip}}"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                            attr.aria-label="Get info about username"
+                        >
+                            <mon-icon iconName="Filled-info" class="infoicon viewed-plans-info-icon icon-primary"> </mon-icon>
+                        </span>
+                    </span>
+                    <div class="checkbox-group">
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedSeen(); checkValidation()"
+                            formGroupName="seen"
+                            [ngClass]="{'error': viewedPlansMissing}"
+                        >
+                            <span language="primary.portal.createReportForm.viewedPlans.viewed"></span
+                        ></mat-checkbox>
+                        <mat-checkbox
+                            class="form-checkbox"
+                            (change)="toggleCheckedNotSeen(); checkValidation()"
+                            formGroupName="notSeen"
+                            [ngClass]="{'error': viewedPlansMissing}"
+                        >
+                            <span language="primary.portal.createReportForm.viewedPlans.notViewed"></span
+                        ></mat-checkbox>
+                        <mat-error *ngIf="viewedPlansMissing" class="create-report-form-error-hint"
+                            ><span language="primary.portal.common.selectionRequired"></span
+                        ></mat-error>
+                    </div>
+                </div>
+                <div *ngIf="reportType === 'commissions'">
+                    <div class="date-container-field">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.enrollmentStatus"></span>
+                        <mat-form-field class="create-report-form-select col-md-4">
+                            <mat-select formControlName="enrollmentStatus">
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.ALL"
+                                    language="primary.portal.createReportForm.enrollmentStatus.all"
+                                ></mat-option>
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.SENT"
+                                    language="primary.portal.createReportForm.enrollmentStatus.sent"
+                                ></mat-option>
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.UNSENT"
+                                    language="primary.portal.createReportForm.enrollmentStatus.unsent"
+                                ></mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="radio-button-container">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.signedDates"></span>
+                        <mat-radio-group class="radio-group-stacked" formControlName="signedDates">
+                            <mat-radio-button value="all" [checked]="true" class="form-radio-button-stacked"
+                                ><span language="primary.portal.createReportForm.signedDates.all"></span
+                            ></mat-radio-button>
+                            <mat-radio-button value="selected" class="form-radio-button-stacked"
+                                ><span language="primary.portal.createReportForm.signedDates.selected"></span
+                            ></mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+            <div class="form-dates">
+                <div class="date-container" *ngIf="reportType === 'demographics'">
+                    <div class="date-container-field col-md-3">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.recordsChanged"></span>
+                        <mat-form-field class="create-report-form-select">
+                            <mat-select formControlName="showChangedRecords">
+                                <mat-option value="all" language="primary.portal.createReportForm.recordsChanged.all"></mat-option>
+                                <mat-option
+                                    value="onOrAfter"
+                                    language="primary.portal.createReportForm.recordsChanged.onOrAfter"
+                                ></mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="date-container-field" *ngIf="createReportForm.get('showChangedRecords').value === 'onOrAfter'">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.date"></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input matInput [matDatepicker]="datePicker" formControlName="effectiveStarting" empoweredDateTransform />
+                            <mat-datepicker-toggle matSuffix [for]="datePicker" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePicker class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-error *ngIf="createReportForm.controls.effectiveStarting.errors?.requirement">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="createReportForm.controls.effectiveStarting.errors?.invalid">
+                                <span language="primary.portal.common.invalidDateFormat"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="date-container" *ngIf="reportType === 'enrollment'">
+                    <div class="date-container-field col-md-3">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.includeEnrollments"></span>
+                        <!-- For Payroll -->
+                        <mat-form-field *ngIf="data.source !== direct" class="create-report-form-select mon-date-field">
+                            <mat-select formControlName="includeEnrollments">
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.ALL"
+                                    language="primary.portal.createReportForm.includeEnrollments.all"
+                                ></mat-option>
+                                <mat-option
+                                    value="onOrAfter"
+                                    language="primary.portal.createReportForm.includeEnrollments.onOrAfter"
+                                ></mat-option>
+                                <mat-option
+                                    value="withCoverageBetween"
+                                    language="primary.portal.createReportForm.includeEnrollments.withCoverageBetween"
+                                ></mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <!-- For Direct  -->
+                        <mat-form-field *ngIf="data.source === direct" class="create-report-form-select mon-date-field">
+                            <mat-select formControlName="includeEnrollments">
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.ALL"
+                                    language="primary.portal.createReportForm.includeEnrollments.all"
+                                ></mat-option>
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.SENT"
+                                    language="primary.portal.createReportForm.includeEnrollments.sent"
+                                ></mat-option>
+                                <mat-option
+                                    [value]="includeEnrollmentOptions.UNSENT"
+                                    language="primary.portal.createReportForm.includeEnrollments.unsent"
+                                ></mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div
+                        class="date-container-field"
+                        *ngIf="createReportForm.get('includeEnrollments').value === 'onOrAfter' || createReportForm.get('includeEnrollments').value === 'withCoverageBetween'"
+                    >
+                        <span
+                            class="create-report-form-label"
+                            *ngIf="createReportForm.get('includeEnrollments').value === 'onOrAfter'"
+                            language="primary.portal.createReportForm.includeEnrollments.date"
+                        ></span>
+                        <span
+                            class="create-report-form-label"
+                            *ngIf="createReportForm.get('includeEnrollments').value === 'withCoverageBetween'"
+                            language="primary.portal.createReportForm.includeEnrollments.startDate"
+                        ></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input matInput [matDatepicker]="datePicker" formControlName="effectiveStarting" empoweredDateTransform />
+                            <mat-datepicker-toggle matSuffix [for]="datePicker" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePicker class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-error *ngIf="createReportForm.controls['effectiveStarting'].errors?.requirement">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="createReportForm.controls['effectiveStarting'].errors?.invalid">
+                                <span language="primary.portal.common.invalidDateFormat"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="date-container-field" *ngIf="createReportForm.get('includeEnrollments').value === 'withCoverageBetween'">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.includeEnrollments.endDate"></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input matInput [matDatepicker]="datePicker" formControlName="expiresAfter" empoweredDateTransform />
+                            <mat-datepicker-toggle matSuffix [for]="datePicker" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePicker class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-error *ngIf="createReportForm.controls.expiresAfter.errors?.requirement">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="createReportForm.controls.expiresAfter.errors?.invalid">
+                                <span language="primary.portal.common.invalidDateFormat"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="date-container" *ngIf="reportType === 'deductions'">
+                    <div class="date-container-field">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.payrollReportDate"></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input matInput [matDatepicker]="datePicker" formControlName="payrollReportDate" empoweredDateTransform />
+                            <mat-datepicker-toggle matSuffix [for]="datePicker" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePicker class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-error *ngIf="createReportForm.controls.payrollReportDate.errors?.requirement">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="createReportForm.controls.payrollReportDate.errors?.invalid">
+                                <span language="primary.portal.common.invalidDateFormat"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="date-container" *ngIf="reportType === 'PDA'">
+                    <div class="date-container-field">
+                        <span class="create-report-form-label"
+                            ><span language="primary.portal.createReportForm.reportDate" id="reportDateLabel"></span
+                        ></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input
+                                matInput
+                                [matDatepicker]="datePicker"
+                                formControlName="reportDate"
+                                [max]="today"
+                                empoweredDateTransform
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="datePicker" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePicker class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-error *ngIf="createReportForm.controls.reportDate.errors?.requirement">
+                                <span language="primary.portal.common.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="createReportForm.controls.reportDate.errors?.invalid">
+                                <span language="primary.portal.common.invalidDateFormat"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div
+                    class="date-container"
+                    *ngIf="reportType === 'commissions' && createReportForm.get('signedDates').value === 'selected'"
+                >
+                    <div class="date-container-field">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.signedDates.startDate"></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input
+                                matInput
+                                #datePickerInput
+                                [matDatepicker]="datePickerStartDate"
+                                formControlName="signedStartDate"
+                                empoweredDateTransform
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="datePickerStartDate" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePickerStartDate class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-hint class="create-report-form-hint"
+                                ><span language="primary.portal.createReportForm.dateFormat"></span
+                            ></mat-hint>
+                            <mat-error [language]="validateDate('signedStartDate', datePickerInput.value)"></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="date-container-field">
+                        <span class="create-report-form-label" language="primary.portal.createReportForm.signedDates.endDate"></span>
+                        <mat-form-field class="create-report-form-datepicker-input mon-date-field">
+                            <input
+                                matInput
+                                #datePickerInput
+                                [matDatepicker]="datePickerEndDate"
+                                formControlName="signedEndDate"
+                                empoweredDateTransform
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="datePickerEndDate" class="create-report-form-datepicker-button">
+                                <mon-icon iconName="calendar-date" [iconSize]="23" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #datePickerEndDate class="create-report-form-datepicker"></mat-datepicker>
+                            <mat-hint class="create-report-form-hint"
+                                ><span language="primary.portal.createReportForm.dateFormat"></span
+                            ></mat-hint>
+                            <mat-error [language]="validateDate('signedEndDate', datePickerInput.value)"></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a (click)="closeFormModal()" language="primary.portal.createReportForm.cancel"></a>
+            <button
+                class="footer-button"
+                mat-flat-button
+                color="primary"
+                type="submit"
+                language="primary.portal.createReportForm.runReport"
+            ></button>
+        </div>
+    </form>
+</div>

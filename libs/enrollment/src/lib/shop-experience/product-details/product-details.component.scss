@@ -1,0 +1,247 @@
+@import "shared";
+
+.product-header {
+    display: flex;
+
+    .mon-date-field {
+        width: convert-unit(200px, "rem");
+    }
+}
+
+.product-icon {
+    margin-right: convert-unit(22px, "rem");
+}
+
+.product-error {
+    display: flex;
+    padding-top: map-get($spacers, 30);
+}
+
+.product-info {
+    width: 100%;
+
+    h1 {
+        margin: 0;
+        font-size: convert-unit(36px, "rem");
+    }
+}
+
+.product-carrier {
+    color: get("color.black");
+    font-size: convert-unit(14px, "rem");
+    @include fontFace("primary.bold");
+    font-weight: bold;
+    line-height: convert-unit(22px, "rem");
+    span.carrier-name {
+        font-size: convert-unit(16px, "rem");
+    }
+}
+
+.product-description {
+    color: get("color.gray.700");
+    font-size: convert-unit(16px, "rem");
+    font-weight: normal;
+    line-height: convert-unit(22px, "rem");
+    margin: convert-unit(20px, "rem") convert-unit(180px, "rem") 0 0;
+}
+
+h2.module-title {
+    margin: 20px 0;
+    font-size: 22px;
+    color: get("color.black");
+}
+
+span.carrier-name {
+    font-size: convert-unit(14px, "rem");
+    font-weight: bold;
+}
+
+.common-alert {
+    ::ng-deep .mon-alert {
+        margin-top: convert-unit(20px, "rem");
+    }
+}
+
+.plan-brief {
+    color: get("color.gray.600");
+}
+
+.plan-desc {
+    margin-bottom: convert-unit(20px, "rem");
+}
+
+.product-coverage-decline {
+    background: get("color.white");
+    border: 1px solid get("color.gray.400");
+    border-radius: convert-unit(5px, "rem");
+    padding: convert-unit(34px, "rem") convert-unit(34px, "rem") convert-unit(34px, "rem") convert-unit(102px, "rem");
+    margin: convert-unit(20px, "rem") convert-unit(0px, "rem");
+    position: relative;
+}
+
+.product-coverage-decline .mon-icon {
+    position: absolute;
+    left: convert-unit(46px, "rem");
+    margin: 0;
+}
+
+.product-coverage-decline > div {
+    padding-right: convert-unit(11px, "rem");
+    display: inline;
+}
+
+.product-coverage-decline .splitter {
+    padding-left: convert-unit(11px, "rem");
+}
+
+.product-coverage-decline a {
+    color: rgb(197, 72, 67);
+}
+
+.plan-summary-link {
+    margin-top: convert-unit(22px, "rem");
+    margin-left: convert-unit(15px, "rem");
+}
+
+.lapsed-note {
+    margin: 20px 0;
+
+    h2 {
+        @include fontFace("primary.regular");
+        font-size: 22px;
+        color: get("color.black");
+        line-height: 22px;
+        margin-bottom: 5px;
+    }
+}
+
+.plan-rate {
+    font-family: "Roboto-Bold", sans-serif;
+    color: get("color.black");
+}
+
+.product-dropdown {
+    width: convert-unit(520px, "rem");
+
+    ::ng-deep {
+        .mat-form-field-flex {
+            .mat-form-field-outline-end,
+            .mat-form-field-outline-start {
+                border-color: transparent !important;
+            }
+
+            .mat-form-field-outline-thick {
+                opacity: 0;
+
+                > div {
+                    border-width: convert-unit(0px, "rem");
+                }
+            }
+
+            .mat-select-arrow {
+                opacity: 0;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                .mat-form-field-outline-thick {
+                    opacity: 0;
+
+                    > div {
+                        border-color: transparent !important;
+                    }
+                }
+            }
+
+            .icon-gray {
+                vertical-align: sub;
+            }
+        }
+    }
+}
+
+::ng-deep .mat-select-panel-wrap .shop-plans-details.mat-select-panel {
+    position: absolute;
+    left: convert-unit(-100px, "rem");
+    top: convert-unit(17px, "rem");
+    min-width: 100vw !important;
+    margin-left: convert-unit(4px, "rem");
+
+    .mat-option {
+        height: convert-unit(64px, "rem") !important;
+
+        .mat-option-text {
+            height: convert-unit(64px, "rem") !important;
+        }
+    }
+}
+
+@include media-max("l") {
+    .plan-summary {
+        margin: map-get($spacers, 0) convert-unit(-20px, "rem");
+    }
+}
+
+.card-list {
+    ::ng-deep .coverage-panel-header > .mat-expansion-indicator:after {
+        border: none;
+    }
+
+    .mat-expansion-panel {
+        &:hover {
+            .expansion-arrow {
+                opacity: 1;
+            }
+        }
+
+        &.mat-expanded {
+            .expansion-arrow {
+                opacity: 1;
+                transform: rotate(-45deg);
+            }
+        }
+
+        .expansion-arrow {
+            opacity: 0;
+            position: absolute;
+            left: 50%;
+            bottom: convert-unit(13px, "rem");
+            transform: rotate(135deg);
+            border-style: solid;
+            border-width: convert-unit(2px, "rem") convert-unit(2px, "rem") convert-unit(0px, "rem") convert-unit(0px, "rem");
+            display: inline-block;
+            padding: convert-unit(7px, "rem");
+        }
+        &-header-title {
+            align-items: flex-start;
+        }
+    }
+}
+.additional-child {
+    @include fontFace("primary.regular");
+    .mon-icon {
+        margin: map-get($spacers, 0) map-get($spacers, 5);
+        vertical-align: middle;
+    }
+}
+
+.pay-frequency-name-short {
+    width: 150px;
+    text-align: right;
+    word-wrap: keep-all;
+}
+
+.pay-frequency-name-long {
+    width: 110px;
+    text-align: right;
+    word-wrap: break-all;
+}
+
+.clickToViewPricing {
+    text-align: right;
+    padding-right: convert-unit(27px, "rem");
+    font-family: "Roboto";
+    font-size: convert-unit(16px, "rem");
+    padding-left: convert-unit(42px, "rem");
+}

@@ -1,0 +1,51 @@
+@import "shared";
+
+.rate-sheets {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .products-plans {
+        display: flex;
+        flex: 1;
+
+        .products-container {
+            margin-left: convert-unit(30px, "rem");
+            display: flex;
+            flex-direction: column;
+            .vertical-border {
+                display: flex;
+                flex: 1;
+                border-right: convert-unit(1px, "rem") solid get("color.gray.600");
+            }
+        }
+
+        .plans-container {
+            flex: 1;
+            padding: 0 convert-unit(30px, "rem");
+            margin-bottom: convert-unit(85px, "rem");
+        }
+    }
+}
+
+.top-headericon-text {
+    font-size: convert-unit(36px, "rem");
+    font-weight: 300;
+    @include fontFace("primary.light");
+    height: convert-unit(70px, "rem");
+    color: get("color.gray.600");
+    margin: convert-unit(0px, "rem");
+    padding-left: convert-unit(35px, "rem");
+    align-items: center;
+}
+
+.btn-header {
+    margin-bottom: convert-unit(30px, "rem") !important;
+    margin-top: convert-unit(30px, "rem") !important;
+}
+
+.top-header-container {
+    height: auto;
+    align-items: center;
+    padding-right: convert-unit(30px, "rem");
+}

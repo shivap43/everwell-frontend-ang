@@ -1,0 +1,60 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header> {{languageStrings["primary.portal.benefitsOffering.update.employee.argus.heading"]}} </empowered-modal-header>
+    <div class="mon-mb-30" *ngIf="updateArgusError">
+        <mon-alert alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div class="mon-mb-30">
+        <p language="primary.portal.benefitsOffering.update.employee.argus.description"></p>
+    </div>
+    <div class="mon-mb-20">
+        <p language="primary.portal.benefitsOffering.update.employee.argus.content"></p>
+    </div>
+    <div class="mon-mb-30 refresh-alert" *ngIf="isProposal">
+        <mon-alert alertType="warning" closeButton="true">
+            <span language="primary.portal.proposals.create.proposalDetails.warningMsg"></span>
+        </mon-alert>
+    </div>
+    <div class="form-data">
+        <form [formGroup]="updateEmployeeCountForm">
+            <div class="employee-count">
+                <div class="min-eligible-employee-input-label">
+                    <span language="primary.portal.benefitsOffering.estimated.eligible.employee.for.aflac.DentalVision"></span>
+                </div>
+                <mat-form-field class="eligible-input">
+                    <input
+                        matInput
+                        type="text"
+                        (input)="employeeADVCountChanged($event.target.value)"
+                        formControlName="eligibleADVEmp"
+                        aria-label="Eligible ADV employees"
+                        maxlength="6"
+                        [disabled]="true"
+                    />
+                    <mat-error
+                        *ngIf="updateEmployeeCountForm.controls.eligibleADVEmp.hasError('pattern') || updateEmployeeCountForm.controls.eligibleADVEmp.hasError('requirement')"
+                    >
+                        <span>{{secondaryLanguage["secondary.portal.benefitsOffering.setting.alphaError"]}}</span>
+                    </mat-error>
+                    <mat-error *ngIf="updateEmployeeCountForm.controls.eligibleADVEmp.hasError('required')">
+                        <span>{{secondaryLanguage["secondary.portal.benefitsOffering.setting.employeesRequired"]}}</span>
+                    </mat-error>
+                    <mat-error
+                        *ngIf="updateEmployeeCountForm.controls.eligibleADVEmp.hasError('min') && !updateEmployeeCountForm.controls.eligibleADVEmp.hasError('pattern')"
+                    >
+                        <span>{{secondaryLanguage["secondary.portal.benefitsOffering.setting.minError"]}}</span>
+                    </mat-error>
+                    <mat-hint *ngIf="minArgusEmployeesCheck && !updateEmployeeCountForm.controls.eligibleADVEmp.hasError('required')">
+                        {{ minEligibleADVEmpMsg}}
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+    <empowered-modal-footer>
+        <button mat-button mat-flat-button class="mon-btn-primary" (click)="onUpdateClick()">
+            {{languageStrings['primary.portal.common.update']}}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

@@ -1,0 +1,91 @@
+@import "shared";
+
+.edit-form-wrapper {
+    background-color: get("color.gray.200");
+    padding: convert-unit(20px, "rem") convert-unit(30px, "rem");
+
+    .region-name {
+        width: convert-unit(285px, "rem");
+    }
+
+    .region-desc {
+        width: convert-unit(600px, "rem");
+    }
+
+    .define-region {
+        width: convert-unit(200px, "rem");
+    }
+
+    ::ng-deep .state-input {
+        .mat-form-field-infix,
+        .mat-form-field-flex {
+            padding: 0;
+            display: flex;
+        }
+
+        .mat-chip-list-wrapper {
+            margin: 0;
+            padding: convert-unit(6px, "rem");
+            cursor: text;
+        }
+    }
+
+    .mat-standard-chip .mat-chip-remove,
+    .mat-standard-chip .mat-chip-trailing-icon {
+        margin-top: convert-unit(4px, "rem");
+    }
+
+    .mat-form-field-appearance-outline {
+        background-color: get("color.white");
+    }
+
+    .mat-form-field-appearance-outline .mat-error {
+        background-color: get("color.gray.200");
+        margin-top: 0px;
+    }
+}
+
+.mat-chip-list .mat-chip-list-wrapper .mat-standard-chip {
+    border-radius: convert-unit(50px, "rem");
+    background-color: get("color.black");
+    color: get("color.white");
+}
+
+.mat-icon {
+    color: get("color.white");
+    width: 30px;
+    height: 7px;
+}
+
+.mon-btn-link-cancel {
+    margin: 0 16px 0 0;
+}
+
+.mat-option.selected-state {
+    background: get("color.primary.500") !important;
+    color: get("color.white") !important;
+
+    &:hover {
+        background: get("color.primary.600") !important;
+    }
+}
+
+.mat-option {
+    &.mat-option-disabled {
+        cursor: not-allowed;
+
+        ::ng-deep {
+            .mat-option-text {
+                color: get("color.gray.500");
+            }
+        }
+
+        &.mat-active {
+            background: transparent;
+        }
+
+        &:hover {
+            background: transparent;
+        }
+    }
+}

@@ -1,0 +1,81 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closePopup()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="rehireForm" (ngSubmit)="primaryButtonClick()">
+        <mat-dialog-content>
+            <div mat-dialog-title>{{data.title}}</div>
+            <mon-alert alertType="danger" *ngIf="errorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+            <p class="mon-mb-20">{{data.content.heading}}</p>
+
+            <div class="d-md-flex">
+                <div class="field-wrapper">
+                    <mat-label class="mat-label"
+                        >{{languageStrings["primary.portal.member.rehire.rehiredate"]}}</mat-label
+                    >
+                    <mat-form-field class="mon-date-field">
+                        <input
+                            [matDatepicker]="picker"
+                            matInput
+                            formControlName="date"
+                            #datePickerInput
+                            [attr.aria-label]="languageStrings['primary.portal.member.rehire.rehiredate']"
+                            (dateChange)="dateChange(rehireForm.get('date').valid,rehireForm.get('date').value)"
+                            [min]="terminationDate"
+                            [max]="validFutureDate"
+                            (keyup)="transform($event)"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="picker">
+                            <mon-icon
+                                iconName="calendar-date"
+                                [iconSize]="20"
+                                (click)="picker.open()"
+                                matDatepickerToggleIcon
+                            ></mon-icon>
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-error
+                            *ngIf="rehireForm.get('date').hasError('matDatepickerMin') || rehireForm.get('date').hasError('invalid')"
+                        >
+                            {{displayError}}</mat-error
+                        >
+                        <mat-error
+                            *ngIf="rehireForm.get('date').hasError('required')"
+                            language="secondary.portal.commissionSplit.addUpdate.requiredFieldError"
+                        >
+                        </mat-error>
+                        <mat-hint>{{languageStrings["primary.portal.common.dateHint"]}}</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                aria-label="Cancel"
+                (click)="secondaryButtonClick()"
+                *ngIf="this.data.secondaryButton && this.data.secondaryButton.buttonTitle"
+            >
+                {{data.secondaryButton.buttonTitle}}
+            </a>
+
+            <button
+                mat-button
+                *ngIf="this.data.primaryButton && this.data.primaryButton.buttonTitle"
+                type="submit"
+                class="mon-btn-danger"
+            >
+                {{data.primaryButton.buttonTitle}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

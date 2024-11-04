@@ -1,0 +1,260 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="prospect-wrapper">
+    <div class="zero-state" *ngIf="zeroState; else elseblock">
+        <h1>
+            <span *ngIf="currentProducer">{{currentProducer}}:</span>
+            {{languageStrings['primary.portal.prospects.prospects']}}
+        </h1>
+        <p class="info-txt">{{languageStrings['primary.portal.prospects.noprospectsAdded']}}</p>
+        <button
+            mat-button
+            class="mon-btn-primary"
+            (click)="openCreateProspectPopUp()"
+            *hasPermission="'core.account.create.prospect'"
+        >
+            {{languageStrings['primary.portal.prospects.addProspects']}}
+        </button>
+    </div>
+    <ng-template #elseblock>
+        <div class="prospects-list">
+            <h1>
+                <span *ngIf="currentProducer">{{currentProducer}}:</span>
+                {{languageStrings['primary.portal.prospects.prospects']}}<span class="account-count">
+                    ({{totalProspects}})
+                </span>
+            </h1>
+            <p class="info-txt">{{languageStrings['primary.portal.prospects.finishSetting']}}</p>
+            <div class="search-filter-wraper">
+                <form>
+                    <div class="search-wrapper">
+                        <mat-label class="mat-label"
+                            >{{languageStrings['primary.portal.prospects.searchProspects']}}</mat-label
+                        >
+                        <div>
+                            <mat-form-field>
+                                <input
+                                    type="text"
+                                    class="mon-pt-5"
+                                    matInput
+                                    autocomplete="off"
+                                    (input)="searchAccounts($event.target.value)"
+                                    (keyup.enter)="searchDropdownClose()"
+                                    (blur)="searchDropdownClose()"
+                                    [attr.aria-label]="languageStrings['primary.portal.prospects.searchProspects']"
+                                />
+                                <mat-hint>{{languageStrings['primary.portal.prospects.prospectNameor']}}</mat-hint>
+                            </mat-form-field>
+                        </div>
+                        <div class="search-box-wrapper" [hidden]="searchState">
+                            <div class="search-box-sub-wrapper">
+                                <mat-action-list>
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label prospect-name"
+                                            >{{languageStrings['primary.portal.prospects.prospectName']}}
+                                        </mat-label>
+                                        <span class="field-value" (click)="searchDropdownClose()">
+                                            <a value="name" mat-flat-button>{{searchString}} </a>
+                                        </span>
+                                    </div>
+                                    <div class="search-account-menu">
+                                        <mat-label class="mat-label prospect-name"
+                                            >{{languageStrings['primary.portal.prospects.accountNumber']}}
+                                        </mat-label>
+                                        <span class="field-value" (click)="searchDropdownClose()">
+                                            <a value="name" mat-flat-button> {{searchString}} </a>
+                                        </span>
+                                    </div>
+                                </mat-action-list>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Filter section start here -->
+                <div class="filter-wrapper">
+                    <form>
+                        <mat-label class="mat-label">{{languageStrings['primary.portal.prospects.filters']}}</mat-label>
+                        <div class="filter-sub-wrapper">
+                            <!-- Producer -->
+                            <button
+                                #producerFilterTrigger
+                                *ngIf="subordinateFlag"
+                                class="producer-btn"
+                                cdk-overlay-origin
+                                #trigger="cdkOverlayOrigin"
+                                (click)="loadExpandedView()"
+                                [ngClass]="{'button-active': producerFilterFlag, 'button-color': producerBtn}"
+                                [attr.aria-label]="languageStrings['primary.portal.producerFilter.producer']"
+                            >
+                                {{languageStrings['primary.portal.producerFilter.producer']}}{{producerDisplay}}
+                            </button>
+                            <!-- Producer -->
+                            <!-- state -->
+                            <mat-form-field
+                                [ngClass]="{'filter-selected': stateFilter.value && stateFilter.value > 0, 'filter-applied': !!isDisplayState && stateFilter.value && stateFilter.value > 0}"
+                            >
+                                <label class="filter-label">
+                                    {{languageStrings['primary.portal.accounts.accountList.state']}}
+                                </label>
+                                <mat-select
+                                    #stateFilterDropdown
+                                    multiple
+                                    [formControl]="stateFilter"
+                                    [panelClass]="filterClassNames.state"
+                                    (openedChange)="matSelectOpenHandler($event);"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="chipListDisplay()"
+                                    (closed)="clickOutside('stateFilter');showStateOptions = false"
+                                >
+                                    <div
+                                        class="state-composite"
+                                        (focus)="showStateOptions = true"
+                                        [ngClass]="{'state-options' : showStateOptions === true }"
+                                    >
+                                        <div (focus)="showStateOptions = true">
+                                            <mat-chip-list #chipList>
+                                                <mat-chip
+                                                    *ngFor="let state of stateChipList"
+                                                    [selectable]="true"
+                                                    [removable]="true"
+                                                    [selectable]="true"
+                                                    (removed)="addRemoveState(state)"
+                                                >
+                                                    {{state.toUpperCase()}}
+                                                    <mon-icon
+                                                        [iconSize]="10"
+                                                        class="icon-black"
+                                                        iconName="close"
+                                                        matChipRemove
+                                                    ></mon-icon>
+                                                </mat-chip>
+                                                <input
+                                                    matInput
+                                                    [matChipInputFor]="chipList"
+                                                    [formControl]="stateControl"
+                                                    (keypress)="updateFilteredState()"
+                                                    (focus)="showStateOptions = true"
+                                                    (blur)="removeText()"
+                                                    [attr.aria-label]="languageStrings['primary.portal.accounts.accountList.searchStates']"
+                                                />
+                                            </mat-chip-list>
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                *ngIf="stateFilter.value != ''"
+                                                (click)="resetChips();showStateOptions = false"
+                                                class="icon-clear"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                            >
+                                                <mon-icon
+                                                    [iconSize]="10"
+                                                    class="icon-black"
+                                                    iconName="close"
+                                                ></mon-icon>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="filter-options-wrapper"
+                                        [ngClass]="{'hideStateOptions': !showStateOptions}"
+                                    >
+                                        <mat-select-trigger></mat-select-trigger>
+                                        <div class="filter-options">
+                                            <mat-option
+                                                class="mat-option"
+                                                (click)="$event.stopPropagation();toggleSelectionAll($event)"
+                                            >
+                                                {{languageStrings['primary.portal.common.selectAll']}}
+                                            </mat-option>
+                                            <!-- <mat-divider></mat-divider> -->
+                                            <div
+                                                (click)="$event.stopPropagation()"
+                                                *ngIf="filteredStateData.length > 0"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let state of filteredStateData"
+                                                    [value]="state.abbreviation.toLowerCase()"
+                                                >
+                                                    {{ state.abbreviation }}
+                                                </mat-option>
+                                            </div>
+                                            <div
+                                                (click)="$event.stopPropagation()"
+                                                *ngIf="filteredStateData.length < 1"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let state of stateData"
+                                                    [value]="state.abbreviation.toLowerCase()"
+                                                >
+                                                    {{ state.abbreviation }}
+                                                </mat-option>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="stateFilter.value != ''"
+                                                href="javascript:void(0)"
+                                                (click)="resetVal('stateFilter')"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.clear']"
+                                                >{{languageStrings['primary.portal.common.clear']}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="filterApply('stateFilter')"
+                                                class="mon-apply"
+                                                [attr.aria-label]="languageStrings['primary.portal.common.apply']"
+                                                >{{languageStrings['primary.portal.common.apply']}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label" *ngIf="filterChoiceState && filterChoiceState.length"
+                                    >{{isDisplayState}}</label
+                                >
+                            </mat-form-field>
+                            <!-- state -->
+                        </div>
+                    </form>
+                </div>
+                <!-- Filter section end here -->
+                <!--Add new prospects-->
+                <div class="search-action-buttons">
+                    <button
+                        class="mon-btn-secondary btn-sm mat-button"
+                        (click)="openCreateProspectPopUp()"
+                        *hasPermission="'core.account.create.prospect'"
+                    >
+                        {{languageStrings['primary.portal.prospects.addProspect']}}
+                    </button>
+                    <!--<button mat-flat-button [matMenuTriggerFor]="menu" class="mon-btn-secondary btn-sm pull-down-sm">
+                        <span>{{languageStrings['primary.portal.prospects.addProspect']}}</span>
+                        <mon-icon [iconSize]="8" iconName="down" class="icon-right"></mon-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item type="button" (click)="openCreateProspectPopUp()">
+                            {{languageStrings['primary.portal.prospects.createNew']}}
+                        </button>
+                    </mat-menu>-->
+                </div>
+            </div>
+        </div>
+        <!--Table-->
+        <empowered-prospect-list
+            [prospectData]="prospectData"
+            [currentProducerId]="currentProducerId"
+            [searchedProducer]="searchedProducer"
+        >
+        </empowered-prospect-list>
+        <div class="min-range-label" *ngIf="prospectData && prospectData.length < 16">
+            <span
+                >{{languageStrings['primary.portal.direct.customerList.showingResults'].replace("#no",
+                prospectData.length)}}</span
+            >
+        </div>
+        <div class="no-data" *ngIf="zeroState">{{languageStrings['primary.portal.prospects.noresultFound']}}</div>
+    </ng-template>
+</div>

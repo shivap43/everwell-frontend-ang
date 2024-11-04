@@ -1,0 +1,30 @@
+<div class="row">
+    <div class="col-4">
+        <mat-label [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_ROW_LABEL"></mat-label>
+        <mat-form-field>
+            <mat-select [formControl]="adminControl" [disableOptionCentering]="true" [attr.aria-label]="standardAdminAria">
+                <ng-container *ngFor="let admin of adminsAndAssignment$ | async">
+                    <mat-option *ngIf="id === admin.selectedId || admin.selectedId == null" [value]="admin.id">
+                        {{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}
+                    </mat-option>
+                </ng-container>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    
+    <div class="col-8">
+        <span>
+            <button class="mon-btn-link" 
+                    (click)="onClickPromote()"
+                    [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_ROW_PROMOTE">
+            </button>
+        </span>
+    
+        <span>
+            <button class="mon-btn-link remove-button"
+                    (click)="onClickDelete()"
+                    [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_ROW_REMOVE">
+            </button>
+        </span>
+    </div>
+</div>

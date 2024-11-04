@@ -1,0 +1,15 @@
+<div mat-dialog-content class="ag-individual-contact">
+    <h2 role="heading" mat-dialog-title>
+        {{isAiOnly? languageStrings['primary.portal.aflacgroup.importaccount.individual.agGroupTitle']
+        :languageStrings['primary.portal.aflacgroup.importaccount.individual.title']}}
+    </h2>
+    <div>
+        {{isAiOnly? languageStrings['primary.portal.aflacgroup.importaccount.individual.aflacGroupLinkWarning']
+        :languageStrings['primary.portal.aflacgroup.importaccount.individual.contact']}}&nbsp;
+        <a href="mailto:{{primaryProducer[0].producer.emailAddress}}">{{primaryProducer[0].producer.emailAddress}}</a>
+    </div>
+    <p>
+        {{isAiOnly? languageStrings['primary.portal.aflacgroup.importaccount.individual.aflacGroupNewAccount']
+        :languageStrings['primary.portal.aflacgroup.importaccount.individual.linkWarning']}}
+    </p>
+</div>

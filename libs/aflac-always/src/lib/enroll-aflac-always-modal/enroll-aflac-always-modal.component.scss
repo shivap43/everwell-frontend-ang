@@ -1,0 +1,147 @@
+@import "spacer-mixin";
+@import "variables";
+
+.enroll-aflac-always-modal {
+    @include generate-spacers;
+
+    width: 100vw !important;
+
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+
+        .col {
+            padding: 0;
+        }
+    }
+
+    ::ng-deep .mat-vertical-stepper-header,
+    .mat-horizontal-stepper-header {
+        /* pointer-events: none; */
+    }
+
+    .modal-header {
+        border-bottom: $border-size $border-style $border-color;
+        padding-top: $modal-header-top-padding;
+        padding-bottom: $modal-header-bottom-padding;
+
+        .modal-header-title {
+            .mat-dialog-title {
+                margin: 0;
+            }
+        }
+
+        .modal-header-cancel {
+            .header-close-icon-button {
+                top: unset;
+                right: unset;
+            }
+        }
+    }
+
+    .mat-dialog-content {
+        padding: $step-content-padding;
+        height: $step-content-height;
+        min-height: $step-content-minimum-height;
+        overflow: hidden;
+
+        .enroll-aflac-always-modal-stepper-container {
+            max-width: $enroll-aflac-always-modal-stepper-container-max-width;
+            border-right: $border-size $border-style $border-color;
+
+            mat-vertical-stepper {
+                margin-left: $stepper-number-right-margin;
+                margin-right: $stepper-label-right-margin;
+
+                ::ng-deep .mat-step-icon-content::after {
+                    content: "." !important;
+                }
+
+                ::ng-deep .mat-step-header {
+                    padding-right: 0;
+                }
+
+                ::ng-deep .mat-step-header[aria-labelledby="disable-nav-stepper"] {
+                    opacity: 0.25 !important;
+                    pointer-events: none !important;
+                    cursor: not-allowed !important;
+                }
+            }
+        }
+
+        .enroll-aflac-always-modal-content-container {
+            max-width: $enroll-aflac-always-modal-content-container-max-width;
+
+            .content-area-container {
+                overflow: auto;
+
+                .content-area {
+                    padding: 0 $step-content-right-margin 0 $step-content-left-margin;
+                }
+
+                .dialog-footer {
+                    padding-bottom: $footer-bottom-padding;
+                    padding-top: $footer-top-padding;
+                }
+            }
+        }
+    }
+}
+
+.h-100 {
+    height: 100%;
+}
+
+.content-wrapper {
+    flex-grow: 1;
+    height: calc(100vh - 280px) !important;
+}
+
+::ng-deep .cdk-global-overlay-wrapper {
+    overflow-y: hidden !important;
+}
+
+.sidenav-area {
+    overflow-y: auto;
+    flex: 0 0 convert-unit(240px, "rem");
+    padding-left: convert-unit(4px, "rem");
+}
+
+.stepper-trigger-wrapper {
+    .mon-btn-link {
+        text-align: left;
+        width: 100%;
+
+        &.arrow-up {
+            .mon-icon {
+                transform: rotate(180deg);
+            }
+        }
+    }
+}
+
+.tpi-stepper {
+    margin: map-get($spacers, 0) map-get($spacers, 30);
+
+    .mon-btn-link {
+        padding: map-get($spacers, 10) map-get($spacers, 0);
+        font-size: convert-unit(20px, "rem");
+        border-bottom: none;
+    }
+}
+
+.btm-shadow-border {
+    box-shadow: 0px 2px 4px 0px rgba($color: get("color.black"), $alpha: 0.23);
+    position: relative;
+    z-index: 1;
+}
+
+.tpi-content {
+    height: calc(100vh - 240px) !important;
+}
+
+::ng-deep .mat-step-header[aria-labelledby="disable-nav-stepper"] {
+    opacity: 0.25 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}

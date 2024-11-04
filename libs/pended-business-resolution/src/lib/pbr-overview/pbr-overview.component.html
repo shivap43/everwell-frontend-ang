@@ -1,0 +1,70 @@
+<div class="pbr-overview" *ngIf="companyCode">
+    <mat-tab-group (selectedTabChange)="onSelectedTabChange($event)">
+        <mat-tab *ngFor="let tab of tabs" [label]="tab.name"></mat-tab>
+    </mat-tab-group>
+    <div class="pbr-wrapper" *ngIf="selectedTabIndex === 0 && !isSpinnerLoading; else resolvedApps">
+        <h2>{{languageStrings["primary.portal.pbr.overview.pendedApps"]}}</h2>
+        <div *ngIf="!zeroState">
+            <mat-label class="mat-label"
+                >{{languageStrings["primary.portal.pbr.overview.annualizedPremium"]}}</mat-label
+            >
+            <table mat-table [dataSource]="annualizedPremium">
+                <ng-container
+                    matColumnDef="position"
+                    *ngFor="let column of columnspendedApps"
+                    [matColumnDef]="column.def"
+                >
+                    <th mat-header-cell *matHeaderCellDef>{{column.label}}</th>
+                    <td mat-cell *matCellDef="let row">{{column.cell(row)}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="pendedAppsDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: pendedAppsDisplayedColumns;"></tr>
+            </table>
+
+            <mat-label class="mat-label"
+                >{{languageStrings["primary.portal.pbr.overview.conversionAnnualizedPremium"]}}</mat-label
+            >
+            <table mat-table [dataSource]="conversionAnnualizedPremium">
+                <ng-container
+                    matColumnDef="position"
+                    *ngFor="let column of columnspendedApps"
+                    [matColumnDef]="column.def"
+                >
+                    <th mat-header-cell *matHeaderCellDef>{{column.label}}</th>
+                    <td mat-cell *matCellDef="let row">{{column.cell(row)}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="pendedAppsDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: pendedAppsDisplayedColumns;"></tr>
+            </table>
+        </div>
+
+        <div *ngIf="zeroState">
+            {{languageStrings["primary.portal.pendedBusiness.zeroState"]}}
+        </div>
+    </div>
+    <ng-template #resolvedApps>
+        <div class="pbr-wrapper" *ngIf="!isSpinnerLoading">
+            <h2>{{languageStrings["primary.portal.pbr.overview.resolvedApps"]}}</h2>
+            <table mat-table [dataSource]="resolvedAppsTransformed" *ngIf="!zeroState">
+                <ng-container
+                    matColumnDef="position"
+                    *ngFor="let column of columnsresolvedApps"
+                    [matColumnDef]="column.def"
+                >
+                    <th mat-header-cell *matHeaderCellDef>{{column.label}}</th>
+                    <td mat-cell *matCellDef="let row">{{column.cell(row)}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="resolvedAppsDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: resolvedAppsDisplayedColumns;"></tr>
+            </table>
+
+            <div *ngIf="zeroState">
+                {{languageStrings["primary.portal.pendedBusiness.resolved.zeroState"]}}
+            </div>
+        </div>
+    </ng-template>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>

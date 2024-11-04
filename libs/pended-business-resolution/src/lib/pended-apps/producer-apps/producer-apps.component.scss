@@ -1,0 +1,39 @@
+@import "shared";
+.pended-producer {
+    padding: 0 convert-unit(30px, "rem");
+    h2 {
+        margin: convert-unit(20px, "rem") 0;
+    }
+    .min-range-label {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+    .mat-table {
+        .mat-row {
+            td {
+                &.mat-cell {
+                    &:first-of-type {
+                        @include fontFace("primary.regular");
+                        & a {
+                            color: get("color.primary.500");
+                        }
+                    }
+                }
+            }
+        }
+        .mat-header-row {
+            & .mat-header-cell {
+                &:not(:nth-child(1)):not(:nth-child(2)) {
+                    ::ng-deep {
+                        .mat-sort-header-container {
+                            justify-content: flex-end;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .no-results {
+        text-align: center;
+        padding: convert-unit(30px, "rem");
+    }
+}

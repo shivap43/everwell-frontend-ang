@@ -1,0 +1,54 @@
+@import "shared";
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    button mon-icon ::ng-deep .cls-1 {
+        fill: get("color.gray.600");
+    }
+
+    @include media-max("s") {
+        padding: map-get($spacers, 20);
+    }
+
+    @include media-min("s") {
+        button {
+            padding: map-get($spacers, 25) map-get($spacers, 25) map-get($spacers, 0) map-get($spacers, 0);
+        }
+    }
+}
+
+.hide-cancel {
+    justify-content: flex-end !important;
+}
+
+@include media-min("s") {
+    .mat-dialog-content {
+        max-height: calc(100vh - 400px);
+    }
+}
+
+@include media-max("s") {
+    :host {
+        & > div {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+
+            .mat-dialog-content {
+                max-height: none;
+                flex: 1;
+                padding: map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 20) map-get($spacers, 20);
+                overflow: auto;
+            }
+        }
+
+        .dialog-footer {
+            padding: map-get($spacers, 10) map-get($spacers, 20) map-get($spacers, 10) map-get($spacers, 20);
+            flex-direction: column-reverse;
+        }
+    }
+}

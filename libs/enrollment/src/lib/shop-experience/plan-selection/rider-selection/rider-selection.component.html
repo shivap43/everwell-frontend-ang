@@ -1,0 +1,146 @@
+<ng-template [ngIf]="isLoading" [ngIfElse]="riderView">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+
+<ng-template #riderView>
+    <div class="rider-row">
+        <ng-template ngFor let-trider [ngForOf]="orderById(allRiderDetails)" let-i="index">
+            <ng-template [ngIf]="trider.riderDetails.isCoverageSection && trider.riderDetails.planPricing.length > 0">
+                <div [ngClass]="{'rider-disabled-row': trider.disable}">
+                    <mat-checkbox
+                        #coverageCheckBox
+                        (change)="addRidertoCart($event, trider.riderDetails)"
+                        [checked]="trider.riderDetails.inCart"
+                        class="rider-label"
+                        [disabled]="trider.disable || isRiderDisabledList[i]"
+                        >{{trider.riderDetails.plan.name }}
+                        <span *ngIf="trider.disable">
+                            <mon-icon
+                                iconName="Filled-info"
+                                iconSize="16"
+                                [richTooltip]="tooltipMsg"
+                                matTooltipPosition="above"
+                                class="icon-primary"
+                            ></mon-icon>
+                        </span>
+                    </mat-checkbox>
+                    <div class="rop-rider-info" *ngIf="trider.riderDetails.returnOfPremiumRider">
+                        {{languageStrings['primary.portal.shoppingExperience.ropRiderInfo']}}
+                    </div>
+                    <ng-template [ngIf]="coverageCheckBox.checked && trider.riderDetails.isBenefitAmountSection">
+                        <p *ngIf="getBenefitRiderPlans(trider.riderDetails); else singleBenefitPlan" class="rider-link">
+                            {{languageStrings['primary.portal.shoppingCart.planOfferings.label.riderSelectPriceText']}}
+                        </p>
+                        <ng-template #singleBenefitPlan
+                            ><p class="rider-link">
+                                {{ "primary.portal.shoppingCart.planOfferings.label.riderSinglePriceText" | replaceTag:
+                                { "##rideramt##": riderBenefitAmt | currency} }}
+                            </p></ng-template
+                        >
+                    </ng-template>
+                    <a (click)="showPlanDetailsPopup(trider.riderDetails)" class="rider-link"
+                        >{{languageStrings['primary.portal.shoppingExperience.riderDetails']}}</a
+                    >
+                </div>
+                <ng-template [ngIf]="trider.riderDetails.isSingleBenefit && coverageCheckBox.checked">
+                    <p class="rider-cost">
+                        {{ "primary.portal.shoppingExperience.totalCost" | replaceTag: { "#totalcost":
+                        trider.riderDetails?.selectedPricing?.totalCost | currency } }}
+                    </p>
+                </ng-template>
+                <ng-template [ngIf]="coverageCheckBox.checked" [ngIfElse]="!trider.disable && DefaultLabelTemplate">
+                    <empowered-coverage-level-selection
+                        [isRiderCoverage]="true"
+                        [planOfferingObj]="trider.riderDetails"
+                        [currentCoverageLevel]="trider.riderDetails.selectedPricing"
+                        [productOfferingId]="productOfferingId"
+                        (updateAmount)="updateAmountRider($event, trider.riderDetails)"
+                    >
+                    </empowered-coverage-level-selection>
+                    <ng-template [ngIf]="trider.riderDetails.isBenefitAmountSection">
+                        <empowered-benefit-amount-selection
+                            [planOfferingObj]="trider.riderDetails"
+                            [productOfferingId]="productOfferingId"
+                            [currentCoverageLevel]="trider.riderDetails.selectedPricing"
+                            [isRiderBenefit]="true"
+                            (updateAmount)="updateAmountRider($event, trider.riderDetails)"
+                        >
+                        </empowered-benefit-amount-selection>
+                    </ng-template>
+                </ng-template>
+                <ng-template #DefaultLabelTemplate>
+                    <p *ngIf="!checkforHasBenefits(trider.riderDetails)" class="rider-cost">
+                        {{ "primary.portal.shoppingExperience.selectedPricing" | replaceTag: { "#selectedpricing":
+                        trider.riderDetails.selectedPricing.totalCost | currency } }}
+                    </p>
+                    <p *ngIf="checkforHasBenefits(trider.riderDetails)" class="rider-cost">
+                        {{ "primary.portal.shoppingExperience.riderSelectedPricing" | replaceTag: {
+                        "#riderselectedpricing": trider.riderDetails.selectedPricing.totalCost | currency } }}
+                    </p>
+                </ng-template>
+            </ng-template>
+            <ng-template
+                [ngIf]="trider.riderDetails.isEliminationPeriodSection && trider.riderDetails.planPricing.length > 0"
+            >
+                <div [ngClass]="{'rider-disabled-row': trider.disable}">
+                    <mat-checkbox
+                        #eliminationCheckBox
+                        (change)="addRidertoCart($event,trider.riderDetails )"
+                        [checked]="trider.riderDetails.inCart"
+                        class="rider-label"
+                        [disabled]="trider.disable"
+                        >{{trider.riderDetails.plan.name}}
+                        <span *ngIf="trider.disable">
+                            <mon-icon
+                                iconName="Filled-info"
+                                iconSize="16"
+                                richTooltip="{{languageStrings['primary.portal.shoppingExperience.enrollmentIneligible']}}"
+                                matTooltipPosition="above"
+                                class="icon-primary"
+                            ></mon-icon>
+                        </span>
+                    </mat-checkbox>
+                    <div class="rop-rider-info" *ngIf="trider.riderDetails.returnOfPremiumRider">
+                        {{languageStrings['primary.portal.shoppingExperience.ropRiderInfo']}}
+                    </div>
+                    <a (click)="showPlanDetailsPopup(trider.riderDetails)" class="rider-link"
+                        >{{languageStrings['primary.portal.shoppingExperience.riderDetails']}}</a
+                    >
+                </div>
+                <ng-template
+                    [ngIf]="eliminationCheckBox.checked && trider.riderDetails.planPricing.length > 0"
+                    [ngIfElse]="!trider.disable && DefaultLabelTemplate1"
+                >
+                    <empowered-elimination-period-selection
+                        [isRiderCoverage]="true"
+                        [planOfferingObj]="trider.riderDetails"
+                        [currentCoverageLevel]="trider.riderDetails.selectedPricing"
+                        [productOfferingId]="productOfferingId"
+                        (updateAmount)="updateAmountRider($event, trider.riderDetails)"
+                    >
+                    </empowered-elimination-period-selection>
+                    <ng-template [ngIf]="trider.riderDetails.isBenefitAmountSection">
+                        <empowered-benefit-amount-selection
+                            [planOfferingObj]="trider.riderDetails"
+                            [productOfferingId]="productOfferingId"
+                            [currentCoverageLevel]="trider.riderDetails.selectedPricing"
+                            [isRiderBenefit]="true"
+                            (updateAmount)="updateAmountRider($event, trider.riderDetails)"
+                        >
+                        </empowered-benefit-amount-selection>
+                    </ng-template>
+                </ng-template>
+                <ng-template #DefaultLabelTemplate1>
+                    <p *ngIf="!checkforHasBenefits(trider.riderDetails)" class="rider-cost x">
+                        {{ "primary.portal.shoppingExperience.selectedPricing" | replaceTag: { "#selectedpricing":
+                        trider.riderDetails.selectedPricing.totalCost | currency } }}
+                    </p>
+                    <p *ngIf="checkforHasBenefits(trider.riderDetails)" class="rider-cost y">
+                        {{ "primary.portal.shoppingExperience.riderSelectedPricing" | replaceTag: {
+                        "#riderselectedpricing": trider.riderDetails.selectedPricing.totalCost | currency } }}
+                    </p>
+                </ng-template>
+            </ng-template>
+        </ng-template>
+    </div>
+</ng-template>

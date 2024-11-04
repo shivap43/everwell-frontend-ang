@@ -1,0 +1,31 @@
+@import "shared";
+
+.review-submit-wrapper {
+    padding: map-get($spacers, 0) map-get($spacers, 30);
+    .signature {
+        &-property {
+            min-width: convert-unit(220px, "rem");
+            @include fontFace("primary.bold");
+            font-weight: bold;
+            font-size: convert-unit(16px, "rem");
+        }
+
+        span {
+            @include fontFace("primary.regular");
+            font-size: convert-unit(16px, "rem");
+        }
+    }
+
+    .acknowledgement {
+        margin: map-get($spacers, 30) map-get($spacers, 0);
+        .ack-label {
+            @include fontFace("primary.bold");
+            font-weight: bold;
+            margin-right: map-get($spacers, 5);
+        }
+    }
+}
+
+.pcralert-section {
+    position: relative;
+}

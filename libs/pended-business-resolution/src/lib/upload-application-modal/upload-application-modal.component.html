@@ -1,0 +1,89 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <div>
+            <mat-label class="mat-label" *ngIf="data?.modalFrom === modalFrom.RESOLVED"
+                >{{languageStrings["primary.portal.pendedBusiness.resolveApplicationModal.step"]}} 2
+                {{languageStrings["primary.portal.common.of"]}} 2</mat-label
+            >
+            <h2>{{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.title"]}}</h2>
+        </div>
+        <p class="upload-note" *ngIf="data?.modalFrom === modalFrom.DIRECT">
+            {{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.uploadNote3"]}}
+        </p>
+        <p class="upload-note" *ngIf="data?.modalFrom === modalFrom.RESOLVED">
+            {{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.uploadNote1"]}}
+            #{{data?.applicationDetails?.applicationNumber}}{{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.uploadNote2"]}}
+        </p>
+        <div *ngIf="data?.modalFrom === modalFrom.DIRECT" class="company-code">
+            <mat-label class="mat-label for-radio"
+                >{{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.companyCode"]}}</mat-label
+            >
+            <mat-radio-group [(ngModel)]="selectedCompanyCode">
+                <mat-radio-button [value]="companyCodeConstat.US">
+                    {{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.us"]}}
+                </mat-radio-button>
+                <mat-radio-button [value]="companyCodeConstat.NY">
+                    {{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.ny"]}}
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div>
+            <mat-label class="mat-label"
+                >{{languageStrings["primary.portal.pendedBusiness.uploadApplicationModal.uploadImage"]}}</mat-label
+            >
+            <empowered-mon-upload
+                [accept]="acceptableFormats"
+                (uploadFile)="uploadFile($event)"
+                (cancelUpload)="cancelUpload($event)"
+                [modeProgress]="modeProgress"
+                [files]="files"
+                [hasError]="hasError"
+                [isFileAvailable]="isFileAvailable"
+                [isSucess]="isSuccess"
+                [uploadSucessStatus]="uploadSuccessStatus"
+                [uploadErrorStatus]="uploadErrorStatus"
+                [isProgressBarEnabled]="true"
+                [isFileSelected]="true"
+                [fileUploadPercentage]="fileUploadPercentage"
+                [isUploadingStarted]="isUploadingStarted"
+                [isFileViewable]="isFileViewable"
+                [hintText]="hintText"
+                [hint]="true"
+            ></empowered-mon-upload>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer justify-content-between">
+        <button class="mon-btn-link" (click)="onCancelClick()">
+            {{languageStrings["primary.portal.common.cancel"]}}
+        </button>
+        <div>
+            <button
+                *ngIf="data?.modalFrom === modalFrom.RESOLVED"
+                class="mon-btn-secondary"
+                type="button"
+                mat-flat-button
+                (click)="openResolvedAppDetailModal();"
+            >
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                <span>{{languageStrings["primary.portal.common.back"]}}</span>
+            </button>
+            <button
+                [disabled]="!files.length"
+                mat-flat-button
+                class="mon-btn-primary mon-ml-20"
+                (click)="onfileUploaded()"
+            >
+                <span>{{languageStrings["primary.portal.common.submit"]}}</span>
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

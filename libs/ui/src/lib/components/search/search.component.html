@@ -1,0 +1,45 @@
+<div [formGroup]="form" autocomplete="off" class="search-filter-group">
+    <div class="search-wrapper">
+        <mat-label class="mat-label" id="search-accounts">{{languageSearch}}</mat-label>
+        <div (click)="searchEvent($event)" (empoweredClickOutside)="clickOutsideOfElement($event)">
+            <mat-form-field>
+                <input
+                    (keyup)="[applySearch($event), keyPressHandler($event)]"
+                    (keydown.Tab)="onKeyDown($event)"
+                    class="mon-input"
+                    matInput
+                    type="text"
+                    formControlName="searchInput"
+                    autocomplete="off"
+                    (blur)="clickOutsideOfElement($event)"
+                    aria-labelledby="search-accounts"
+                />
+                <mat-hint>{{languageSearchHint}}</mat-hint>
+            </mat-form-field>
+        </div>
+        <div *ngIf="searchTerm && searchTerm.length >= 3 && dropdownStatus" class="search-box-wrapper">
+            <div class="search-box-sub-wrapper">
+                <mat-action-list>
+                    <div class="search-account-menu" *ngIf="!isAccountList || (isAccountList && nameCount)">
+                        <mat-label class="mat-label">{{languageName}}</mat-label>
+                        <span class="field-value">
+                            <a value="name" mat-flat-button (click)="filterByIdOrName(filterName)">{{searchTerm}} </a>
+                        </span>
+                    </div>
+                    <div class="search-account-menu" *ngIf="!isAccountList || (isAccountList && groupNumberCount)">
+                        <mat-label class="mat-label field-id">{{languageId}}</mat-label>
+                        <span class="field-value">
+                            <a value="groupNumber" mat-flat-button (click)="filterByIdOrName(filterId)"> {{searchTerm}} </a>
+                        </span>
+                    </div>
+                    <div class="search-account-menu" *ngIf="isAccountList && altGroupNumberCount">
+                        <mat-label class="field-id">{{aflacGroupMessage}} </mat-label>
+                        <span class="field-value">
+                            <a value="altGroupNumber" mat-flat-button (click)="filterByIdOrName('altGroupNumber')"> {{searchTerm}} </a>
+                        </span>
+                    </div>
+                </mat-action-list>
+            </div>
+        </div>
+    </div>
+</div>

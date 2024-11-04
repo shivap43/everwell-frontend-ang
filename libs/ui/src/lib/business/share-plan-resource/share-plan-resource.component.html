@@ -1,0 +1,70 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<empowered-modal type="POPUP" size="XL">
+    <empowered-modal-header>{{languageStringArray['primary.portal.sharePlanDoc.sharePlanResources'] }}</empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-raised-button class="mon-btn-primary" (click)="backToPlanDetails()">
+            {{languageStringArray['primary.portal.common.back'] }}
+        </button>
+        <button mat-raised-button class="mon-btn-primary" (click)="sendPlanDocuments()">
+            {{languageStringArray['primary.portal.sharePlanDoc.sendResources'].replace("#resourceCount", (getSelectedPlanDocuments() |
+            async).length ) }}
+        </button>
+    </empowered-modal-footer>
+    <form [formGroup]="sharePlanDocumentsForm">
+        <mon-alert class="mon-mt-0 mon-mb-20" alertType="danger" *ngIf="showErrorMessage">
+            <span>{{ errorMsg }}</span>
+        </mon-alert>
+        <div>
+            <mat-label class="mat-label mon-label">{{languageStringArray['primary.portal.common.emailAddress'] }}</mat-label>
+            <mat-form-field>
+                <input
+                    formControlName="email"
+                    matInput
+                    type="email"
+                    (change)="checkForRestrictedEmail(sharePlanDocumentsForm.get('email'))"
+                    [attr.aria-label]="languageStringArray['primary.portal.common.requiredField']"
+                />
+                <mat-error *ngIf="sharePlanDocumentsForm.get('email').hasError('required')"
+                    >{{languageStringArray['primary.portal.common.requiredField'] }}
+                </mat-error>
+                <mat-error *ngIf="sharePlanDocumentsForm.get('email').hasError('pattern')"
+                    >{{languageStringArray['primary.portal.common.invalidEmailFormat'] }}
+                </mat-error>
+                <mat-error *ngIf="sharePlanDocumentsForm.get('email').hasError('restrictedEmail')"
+                    >{{languageStringArray['primary.portal.common.restrictedEmailFormat'] }}
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="mon-mb-20">
+            <mon-alert *ngIf="selectionError" alertType="danger">
+                <span>{{languageStringArray['primary.portal.sharePlanDoc.resourceMustBeSelected'] }}</span>
+            </mon-alert>
+        </div>
+        <div>
+            <p>{{languageStringArray['primary.portal.sharePlanDoc.selectResourceToSend'] }}</p>
+            <table mat-table [dataSource]="dataSource">
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="checkbox">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let planDocument">
+                        <mat-checkbox (change)="onCheckBoxClick(planDocument)" [checked]="planDocument.selected"></mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let planDocument">{{planDocument.name}}</td>
+                </ng-container>
+
+                <!-- Filetype Column -->
+                <ng-container matColumnDef="fileType">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let planDocument">{{planDocument.type}}</td>
+                </ng-container>
+
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </form>
+</empowered-modal>

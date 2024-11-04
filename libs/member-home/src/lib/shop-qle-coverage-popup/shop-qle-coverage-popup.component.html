@@ -1,0 +1,36 @@
+<empowered-modal type="POPUP" size="XL">
+    <empowered-modal-header>
+        <span *ngIf="!isQleAfterOeEnrollment"
+            >{{ languageStrings["primary.portal.members.shop.dualPlanYear.shopBenefits"] }}
+        </span>
+        <span *ngIf="isQleAfterOeEnrollment">
+            {{ languageStrings["primary.portal.members.shop.dualPlanYear.updateBenefits"] }}
+        </span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div>
+            <button mat-flat-button class="mon-btn-secondary" (click)="shopCoverage(QLE)">
+                {{ languageStrings["primary.portal.members.shop.dualPlanYear.updateFirst"] }}
+            </button>
+            <button
+                mat-flat-button
+                *ngIf="!isQleAfterOeEnrollment"
+                class="mon-btn-primary"
+                (click)="shopCoverage(OPEN_ENROLLMENT)"
+            >
+                {{ languageStrings["primary.portal.members.shop.dualPlanYear.shopFirst"] }}
+            </button>
+            <button
+                mat-flat-button
+                *ngIf="isQleAfterOeEnrollment"
+                class="mon-btn-primary"
+                (click)="shopCoverage(NEW_PY_QLE)"
+            >
+                {{ languageStrings["primary.portal.members.shop.dualPlanYear.updateFirst.future"] }}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <span>{{ languageStrings["primary.portal.members.shop.dualPlanYear.startCoverageUpdates"] }}</span>
+    </div>
+</empowered-modal>

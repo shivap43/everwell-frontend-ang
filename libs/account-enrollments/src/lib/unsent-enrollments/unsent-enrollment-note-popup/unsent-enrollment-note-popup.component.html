@@ -1,0 +1,66 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="onCancelClick()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <form (ngSubmit)="onAddNote(notePopUpForm.value, notePopUpForm.valid)" [formGroup]="notePopUpForm">
+        <div mat-dialog-content formGroupName="noteData" class="flex-form-wrapper">
+            <h1 mat-dialog-title>
+                <span>{{languageStrings['primary.portal.accountEnrollments.addNote.title']}}</span>
+            </h1>
+            <span>{{languageStrings['primary.portal.accountEnrollments.addNote.description']}}</span>
+            <ng-container>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label" for="note">
+                            <span>{{languageStrings['primary.portal.accountEnrollments.addNote.textboxTitle']}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                id="note"
+                                formControlName="enrollmentComment"
+                                type="text"
+                                class="mon-input"
+                                matInput
+                                maxlength="{{data.maxLength}}"
+                                [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.addNote.textboxTitle']"
+                            />
+                            <mat-error
+                                *ngIf="notePopUpForm.get('noteData').get('enrollmentComment').hasError('required')"
+                                langauge="secondary.portal.accountEnrollments.required"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-container>
+            <span
+                ><span>{{languageStrings['primary.portal.accountEnrollments.addNote.maxCharacter']}}</span
+                >{{data.maxLength}}</span
+            >
+        </div>
+
+        <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="onCancelClick()"
+                [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.addNote.cancelNote']"
+                >{{languageStrings['primary.portal.common.cancel']}}</a
+            >
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.addNote.saveNote']"
+            >
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

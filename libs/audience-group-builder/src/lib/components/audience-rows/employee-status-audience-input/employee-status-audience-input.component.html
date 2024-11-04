@@ -1,0 +1,12 @@
+<div class="flex-item" [formGroup]="checkboxGroup">
+    <mat-checkbox (change)="onChangeActive($event)" formControlName="active">
+        <span language="primary.portal.audienceBuilder.employeeStatusInputLabelActive"></span>
+    </mat-checkbox>
+
+    <mat-checkbox (change)="onChangeTerminated($event)" formControlName="terminated">
+        <span language="primary.portal.audienceBuilder.employeeStatusInputLabelTerminated"></span>
+    </mat-checkbox>
+</div>
+<mat-error *ngIf="(validOnSubmit$ | async) === false && selectedStatusValues.length === 0" class="flex-item"
+    ><span language="primary.portal.common.selectionRequired"></span
+></mat-error>

@@ -1,0 +1,105 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="form" class="flex-form-wrapper" (ngSubmit)="saveInfo()">
+    <empowered-modal type="POPUP" size="LG" [showCancel]="true">
+        <empowered-modal-header>
+            <span language="primary.portal.direct.addCustomer.completeRequiredInfo"></span>
+        </empowered-modal-header>
+        <div language="primary.portal.direct.addCustomer.RequiredInfo"></div>
+        <mon-alert *ngIf="errorFlag" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+        <div *ngIf="!isEmailPresent" class="d-md-flex">
+            <div class="field-wrapper flex-item">
+                <mat-label class="mat-label">
+                    <span language="primary.portal.census.manualEntry.emailAddress"> </span>
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        formControlName="emailAddress"
+                        [attr.aria-label]="languageStrings['primary.portal.census.manualEntry.emailAddress']"
+                    />
+                    <mat-error
+                        *ngIf="form.controls.emailAddress.errors?.pattern"
+                        language="secondary.portal.census.manualEntry.validemailAddress"
+                    ></mat-error>
+                    <mat-error *ngIf="form.controls.emailAddress.errors?.required" language="primary.portal.common.requiredField">
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="field-wrapper flex-item">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.direct.addCustomer.type']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="phoneType"
+                        class="mon-input"
+                        [placeholder]="languageStrings['primary.portal.common.select']"
+                    >
+                        <mat-option value="" language="primary.portal.common.select"></mat-option>
+                        <mat-option *ngFor="let type of emailTypes" [value]="type" [title]="type">{{type | titlecase}}</mat-option>
+                    </mat-select>
+                    <mat-error
+                        *ngIf="isFormSubmit && form.controls.phoneType.errors?.required"
+                        language="secondary.portal.members.selectionRequired"
+                    >
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-md-flex" *ngIf="!memberInfo.ssn || (data.ssnConfirmationEnabled && !memberInfo.ssnConfirmed)">
+            <div class="field-wrapper field-wrapper-ssn flex-item">
+                <mat-label class="mat-label" language="primary.portal.member.ssn_itin"></mat-label>
+                <empowered-ssn-input
+                    formControlName="ssn"
+                    [regex]="validationRegex"
+                    [showToggle]="false"
+                    (inputChange)="onSSNInputChange($event)"
+                >
+                    <mat-error
+                        *ngIf="isFormSubmit && !form.controls.ssn.value"
+                        language="secondary.portal.members.requiredField"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="form.controls.ssn.errors?.minlength"
+                        language="secondary.portal.members.dependent.personalInfo.ssnRequirements"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="form.controls.ssn.errors?.pattern && !form.controls.ssn.errors?.minlength"
+                        language="primary.portal.member.invalid.ssn_itin"
+                    >
+                    </mat-error>
+                    <mat-error
+                        *ngIf="form.controls.ssn.errors?.duplicateSSNFound"
+                        language="primary.portal.members.api.ssn.duplicate.nonMmp"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="form.controls.ssn.errors?.duplicateITINFound"
+                        language="primary.portal.member.duplicate.itin"
+                    ></mat-error>
+                </empowered-ssn-input>
+            </div>
+            <div class="field-wrapper flex-item" *ngIf="data.ssnConfirmationEnabled && !memberInfo.ssnConfirmed">
+                <mat-label class="mat-label w-200">
+                    <span language="primary.portal.members.ssn.confirm"></span>
+                </mat-label>
+                <empowered-ssn-input formControlName="confirmSSN" [regex]="validationRegex" [allowPaste]="false">
+                    <mat-error
+                        *ngIf="form.controls.confirmSSN.errors?.required"
+                        language="secondary.portal.members.requiredField"
+                    ></mat-error>
+                    <mat-error *ngIf="form.controls.confirmSSN.errors?.invalid">
+                        <span language="secondary.portal.members.ssn.errors.match"></span>
+                    </mat-error>
+                </empowered-ssn-input>
+            </div>
+        </div>
+
+        <empowered-modal-footer>
+            <div>
+                <button class="mon-btn-primary" mat-flat-button type="submit">
+                    <span language="primary.portal.viewform.save&continue"></span>
+                </button>
+            </div>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>

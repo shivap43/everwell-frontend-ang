@@ -1,0 +1,489 @@
+<div class="quasi-modal content-scroll content">
+    <div class="modal-header row">
+        <h2 class="col-md-10" *ngIf="data.action === 'ADD'">{{languageStrings['primary.portal.resources.addResource']}}</h2>
+        <h2 class="col-md-10" *ngIf="data.action === 'EDIT'">{{languageStrings['primary.portal.resources.editResource']}}</h2>
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div class="stepper-sidebar">
+                <mat-vertical-stepper
+                    #progressIndicator
+                    class="side-nav-stepper"
+                    linear="true"
+                    (selectionChange)="stepChanged($event)"
+                    [selectedIndex]="(changeStepper - 1)"
+                >
+                    <mat-step [completed]="stepPosition>0">
+                        <ng-template matStepLabel>
+                            <p>{{languageStrings['primary.portal.resources.addResource']}}</p>
+                        </ng-template>
+                    </mat-step>
+                    <mat-step [completed]="stepPosition>1">
+                        <ng-template matStepLabel>
+                            <p language="primary.portal.resources.setRules"></p>
+                        </ng-template>
+                    </mat-step>
+
+                    <!-- Icon overrides -->
+
+                    <ng-template matStepperIcon="done">
+                        <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                    </ng-template>
+                </mat-vertical-stepper>
+            </div>
+            <div class="stepper-content">
+                <div class="content-wrapper">
+                    <!-- ****** Add Resource container ***** -->
+
+                    <form [formGroup]="addResourceForm" *ngIf="changeStepper === 1">
+                        <div>
+                            <div>
+                                <h2 *ngIf="data.action === 'ADD'">{{languageStrings['primary.portal.resources.addResource']}}</h2>
+                                <h2 *ngIf="data.action === 'EDIT'">{{languageStrings['primary.portal.resources.editResource']}}</h2>
+                            </div>
+                            <div>
+                                <!-- Category -->
+
+                                <div class="row" *ngIf="data.type === 'COMPANY'">
+                                    <div class="col-md-3">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.category"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select formControlName="category" placeholder="Select">
+                                                <mat-option *ngFor="let category of categoryData" [value]="category">
+                                                    {{ category }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="addResourceForm.controls['category'].errors?.require"
+                                                language="primary.portal.common.selectionRequired"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- Carrier -->
+
+                                    <div class="col-md-3" *ngIf="data.type === 'BENEFIT'">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.carrier"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select
+                                                formControlName="carrier"
+                                                placeholder="Select"
+                                                (selectionChange)="getProductData($event.value)"
+                                            >
+                                                <mat-option *ngFor="let carrier of carrierData" [value]="carrier">
+                                                    {{ carrier.name }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="addResourceForm.controls['carrier'].errors?.require"
+                                                language="primary.portal.common.selectionRequired"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <!-- Product -->
+
+                                    <div class="col-md-3" *ngIf="data.type === 'BENEFIT'">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.product"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select
+                                                formControlName="product"
+                                                placeholder="Select"
+                                                [disabled]="!this.addResourceForm.controls['carrier'].value"
+                                            >
+                                                <mat-option *ngFor="let product of productData" [value]="product">
+                                                    {{ product.name }}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-error
+                                                *ngIf="addResourceForm.controls['product'].errors?.require"
+                                                language="primary.portal.common.selectionRequired"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+
+                                <!-- Resource title -->
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-label
+                                            class="mat-label mon-label"
+                                            language="primary.portal.resources.resourceTitle"
+                                        ></mat-label>
+                                        <mat-form-field class="example-full-width">
+                                            <input
+                                                matInput
+                                                maxlength="40"
+                                                formControlName="name"
+                                                [attr.aria-label]="languageStrings['primary.portal.resources.resourceTitle']"
+                                            />
+                                            <mat-hint language="primary.portal.resources.resourceTitleMaxCharacter"></mat-hint>
+                                            <mat-error *ngIf="addResourceForm.controls['name'].errors?.require">
+                                                <span language="primary.portal.common.requiredField"></span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.description"></mat-label>
+                                        <mat-form-field class="example-full-width">
+                                            <textarea
+                                                matInput
+                                                maxlength="400"
+                                                formControlName="description"
+                                                [attr.aria-label]="languageStrings['primary.portal.resources.description']"
+                                            ></textarea>
+                                            <mat-hint language="primary.portal.resources.descriptionMaxCharacter"></mat-hint>
+                                            <mat-error *ngIf="addResourceForm.controls['description'].errors?.require">
+                                                <span language="primary.portal.common.requiredField"></span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+
+                                <!-- Resource type -->
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.resourceType"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select formControlName="resourceType">
+                                                <mat-option *ngFor="let resourceType of optionResourceType" [value]="resourceType.value"
+                                                    >{{ resourceType.name }}</mat-option
+                                                >
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div>
+                                    <!-- Upload -->
+
+                                    <div class="row" *ngIf="(addResourceForm.controls['resourceType']?.value === 'FILE')">
+                                        <div class="col-md-8">
+                                            <empowered-mon-upload
+                                                (uploadFile)="validateFileAndUpload($event)"
+                                                (viewFile)="viewFile($event)"
+                                                (cancelUpload)="cancelFileUpload($event)"
+                                                [isFileAvailable]="isFileAvailable"
+                                                [isFileSelected]="isFileSelected"
+                                                [isProgressBarEnabled]="isProgressBarEnabled"
+                                                [files]="files"
+                                                [uploadErrorStatus]="uploadErrorStatus"
+                                                [uploadSucessStatus]="uploadSuccessStatus"
+                                                [hasError]="hasError"
+                                                [isSucess]="isSucess"
+                                                [modeProgress]="modeProgress"
+                                                [isUploadingStarted]="isUploadingStarted"
+                                                [fileUploadPercentage]="fileUploadPercentageSubject | async"
+                                                [isFileViewable]="isFileViewable"
+                                                [hintText]="hintText"
+                                                [hint]="true"
+                                                [isSingleFile]="files.length"
+                                            ></empowered-mon-upload>
+                                            <mat-error
+                                                *ngIf="addResourceForm.controls['resourceType'].errors?.require"
+                                                language="primary.portal.common.requiredField"
+                                            ></mat-error>
+                                        </div>
+                                    </div>
+
+                                    <!-- Video Link / URL-->
+
+                                    <div
+                                        class="row"
+                                        *ngIf="(addResourceForm.controls['resourceType']?.value === 'VIDEO') || (addResourceForm.controls['resourceType']?.value === 'URL')"
+                                    >
+                                        <div class="col-md-8">
+                                            <mat-label
+                                                class="mat-label mon-label"
+                                                *ngIf="(addResourceForm.controls['resourceType']?.value === 'VIDEO')"
+                                                language="primary.portal.resources.videoLink"
+                                            ></mat-label>
+                                            <mat-label
+                                                class="mat-label mon-label"
+                                                *ngIf="(addResourceForm.controls['resourceType']?.value === 'URL')"
+                                                language="primary.portal.resources.link"
+                                            ></mat-label>
+                                            <mat-form-field class="example-full-width">
+                                                <input
+                                                    matInput
+                                                    formControlName="link"
+                                                    (change)="isValidLink(addResourceForm.controls['link'].value,addResourceForm.get('link'))"
+                                                    [attr.aria-label]="languageStrings['primary.portal.resources.enterLink']"
+                                                />
+                                                <mat-hint
+                                                    *ngIf="(addResourceForm.controls['resourceType']?.value === 'VIDEO')"
+                                                    language="primary.portal.resources.videoLinkHint"
+                                                ></mat-hint>
+                                                <mat-hint
+                                                    *ngIf="(addResourceForm.controls['resourceType']?.value === 'URL')"
+                                                    language="primary.portal.resources.linkHint"
+                                                ></mat-hint>
+                                                <mat-error
+                                                    *ngIf="addResourceForm.controls['link'].errors?.require"
+                                                    language="primary.portal.common.requiredField"
+                                                >
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="addResourceForm.controls['link'].errors?.inValid"
+                                                    language="primary.portal.common.invalidLinkTryAgain"
+                                                >
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--- ****** ! Add Resource container ****** --->
+
+                    <!-- ****** Set Rules container ***** -->
+
+                    <form [formGroup]="setRulesForm" *ngIf="changeStepper === 2">
+                        <div>
+                            <h2>{{languageStrings['primary.portal.resources.setRules']}}</h2>
+                            <!-- Viewers-->
+                            <div class="resource-rules">
+                                <div>
+                                    <mat-label class="mat-label mon-label" language="primary.portal.resources.viewers"></mat-label>
+                                    <mat-form-field>
+                                        <mat-select formControlName="viewer">
+                                            <mat-option *ngFor="let emp of viewersOptions" [value]="emp"> {{ emp }} </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <!-- Subset of employees -->
+                            <div class="resource-rules">
+                                <div *ngIf="(setRulesForm.controls['viewer']?.value === 'Subset of employees')">
+                                    <!-- Audience Groupings -->
+
+                                    <empowered-audience-builder-container
+                                        [displayAudienceGroupTypes]="['EMPLOYEE_ID', 'EMPLOYMENT_STATUS', 'CLAZZ', 'REGION', 'ENROLLMENT_PLAN']"
+                                        [initialAudienceGrouping]="initialAudienceGroup"
+                                        [submitEvent$]="submitEvent$"
+                                        (audienceGrouping)="onAudienceGroupingChange($event)"
+                                        (isValid)="onAudienceGroupingValidation($event)"
+                                    >
+                                    </empowered-audience-builder-container>
+                                </div>
+                            </div>
+                            <!-- Availability -->
+                            <div class="flex-form-wrapper">
+                                <div class="date-input">
+                                    <div class="flex-item">
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.availability"></mat-label>
+                                        <mat-form-field>
+                                            <mat-select formControlName="availability">
+                                                <mat-option *ngFor="let availability of availabilityOptions" [value]="availability">
+                                                    {{ availability }}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <div
+                                        class="flex-item"
+                                        *ngIf="(setRulesForm.controls['availability']?.value === 'Visible to employees on')"
+                                    >
+                                        <!-- Start Date -->
+
+                                        <mat-label class="mat-label mon-label" language="primary.portal.resources.startDate"></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                formControlName="effectiveStarting"
+                                                matInput
+                                                [min]="minStartDate"
+                                                [matDatepicker]="pickerStartDate"
+                                                (dateChange)="isValidDate($event,setRulesForm.get('effectiveStarting'));"
+                                                empoweredDateTransform
+                                                #startDate
+                                                [attr.aria-label]="languageStrings['primary.portal.resources.startDate']"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="pickerStartDate"
+                                                ><mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #pickerStartDate></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <!-- Require field error massage -->
+                                            <mat-error
+                                                *ngIf="setRulesForm.controls['effectiveStarting'].errors?.require"
+                                                language="primary.portal.common.requiredField"
+                                            >
+                                            </mat-error>
+                                            <!-- Invalid Date format error massage -->
+                                            <mat-error *ngIf="setRulesForm.controls['effectiveStarting'].errors?.inValid"
+                                                ><span language="primary.portal.common.invalidDateFormat"></span>
+                                            </mat-error>
+                                            <mat-error *ngIf="setRulesForm.controls['effectiveStarting'].errors?.isLessThanMinDate"
+                                                ><span language="primary.portal.resources.invalidStartDate"> </span>
+                                            </mat-error>
+                                            <mat-error *ngIf="setRulesForm.controls['effectiveStarting'].errors?.isPastDate"
+                                                ><span language="primary.portal.thirdParty.date_past"> </span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <!-- End Date -->
+
+                                    <div
+                                        class="flex-item"
+                                        *ngIf="(setRulesForm.controls['availability']?.value === 'Visible to employees on')"
+                                    >
+                                        <mat-label class="no-wrap"
+                                            >{{languageStrings['primary.portal.resources.endDate']}}
+                                            <span class="optional-text"
+                                                >{{languageStrings['primary.portal.common.optional']}}</span
+                                            ></mat-label
+                                        >
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                formControlName="expiresAfter"
+                                                matInput
+                                                (dateChange)="isValidDate($event,setRulesForm.get('expiresAfter'))"
+                                                [min]="minDate"
+                                                [matDatepicker]="pickerEndDate"
+                                                [attr.aria-label]="languageStrings['primary.portal.resources.endDate']"
+                                                #endDate
+                                                empoweredDateTransform
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="pickerEndDate"
+                                                ><mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #pickerEndDate></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <!-- Invalid Date format error massage -->
+                                            <mat-error *ngIf="setRulesForm.controls['expiresAfter'].errors?.inValid"
+                                                ><span language="primary.portal.common.invalidDateFormat"></span>
+                                            </mat-error>
+                                            <mat-error *ngIf="setRulesForm.controls['expiresAfter'].errors?.isLessThanStartDate"
+                                                ><span language="primary.portal.resources.invalidEndDate"> </span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Employee Acceptance -->
+
+                            <div class="flex-form-wrapper">
+                                <div class="date-input">
+                                    <div class="flex-item">
+                                        <mat-label
+                                            class="mat-label mon-label"
+                                            language="primary.portal.resources.employeeAcceptance"
+                                        ></mat-label>
+                                        <mat-form-field>
+                                            <mat-select formControlName="employeeAcceptance">
+                                                <mat-option *ngFor="let acceptBy of acceptanceOptions" [value]="acceptBy">
+                                                    {{ acceptBy }}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <!-- Employee Acceptance Date -->
+
+                                    <div
+                                        class="flex-item"
+                                        *ngIf="(setRulesForm.controls['employeeAcceptance']?.value === 'Accept by date')"
+                                    >
+                                        <mat-label
+                                            class="mat-label mon-label"
+                                            language="primary.portal.resources.acceptanceDeadline"
+                                        ></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                formControlName="employeeAcceptanceDate"
+                                                matInput
+                                                [matDatepicker]="employeeAcceptanceDate"
+                                                (dateChange)="isValidDate($event,setRulesForm.get('employeeAcceptanceDate'))"
+                                                #acceptanceDate
+                                                empoweredDateTransform
+                                                [min]="minEmployeeAcceptanceDate"
+                                                [attr.aria-label]="languageStrings['primary.portal.resources.acceptanceDeadline']"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="employeeAcceptanceDate"
+                                                ><mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon
+                                            ></mat-datepicker-toggle>
+                                            <mat-datepicker #employeeAcceptanceDate></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <!-- Require field error massage -->
+                                            <mat-error
+                                                *ngIf="setRulesForm.controls['employeeAcceptanceDate'].errors?.require"
+                                                language="primary.portal.common.requiredField"
+                                            >
+                                            </mat-error>
+                                            <!-- Invalid Date format error massage -->
+                                            <mat-error *ngIf="setRulesForm.controls['employeeAcceptanceDate'].errors?.inValid">
+                                                <span language="primary.portal.common.invalidDateFormat"></span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--- ****** ! Set Rules container ****** --->
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <div class="d-flex justify-content-between flex-fill align-items-center">
+                        <div>
+                            <!-- Cancel Button -->
+                            <a href="javascript:void(0)" class="mon-btn-link" mat-dialog-close (click)="closeForm()" cdkFocusInitial
+                                >{{languageStrings['primary.portal.common.cancel']}}</a
+                            >
+                        </div>
+                        <div>
+                            <!-- Back Button -->
+                            <button *ngIf="changeStepper === 2" class="mon-btn-secondary" mat-flat-button (click)="onClickBack()">
+                                <mon-icon iconName="left" [iconSize]="10"></mon-icon>
+                                <span>{{languageStrings['primary.portal.common.back']}}</span>
+                            </button>
+                            <!-- Next Button -->
+                            <button *ngIf="changeStepper === 1" (click)="OnClickNext()" class="mon-btn-primary" mat-flat-button>
+                                <span>{{languageStrings['primary.portal.common.next']}}</span>
+                            </button>
+                            <!-- Save Button -->
+                            <ng-container *hasPermission="'core.account.update.resource'">
+                                <button
+                                    *ngIf="changeStepper === 2 && data.action === 'EDIT'"
+                                    class="mon-btn-primary"
+                                    mat-flat-button
+                                    (click)="validateConfig()"
+                                >
+                                    {{languageStrings['primary.portal.common.save']}}
+                                </button>
+                            </ng-container>
+                            <!-- Add Button -->
+                            <ng-container *hasPermission="'core.account.create.resource'">
+                                <button
+                                    *ngIf="changeStepper === 2 && data.action === 'ADD'"
+                                    class="mon-btn-primary"
+                                    mat-flat-button
+                                    (click)="validateConfig()"
+                                >
+                                    {{languageStrings['primary.portal.common.add']}}
+                                </button>
+                            </ng-container>
+                        </div>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-dialog-content>
+    </div>
+</div>

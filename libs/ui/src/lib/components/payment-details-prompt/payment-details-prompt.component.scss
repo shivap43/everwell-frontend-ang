@@ -1,0 +1,130 @@
+@import "shared";
+
+.payment-iframe {
+    height: calc(100vh - 280px);
+    width: 100%;
+}
+
+.info-message {
+    font-size: 16px;
+}
+
+.card-expired-message {
+    font-size: convert-unit(14px, "rem");
+}
+
+.error-message-block {
+    margin-top: map-get($spacers, 10);
+}
+
+.card-holder-name {
+    width: convert-unit(404px, "rem");
+    height: convert-unit(38px, "rem");
+}
+
+.card-number {
+    width: convert-unit(212px, "rem");
+    height: convert-unit(70px, "rem");
+}
+
+.expiration-month {
+    width: convert-unit(144px, "rem");
+    height: convert-unit(38px, "rem");
+}
+
+.expiration-year {
+    width: convert-unit(144px, "rem");
+    height: convert-unit(16px, "rem");
+}
+
+.zip-code {
+    width: convert-unit(144px, "rem");
+    padding-top: map-get($spacers, 5);
+    height: convert-unit(50px, "rem");
+}
+
+.date-content {
+    display: inline-flex;
+}
+
+.card-holder-label {
+    padding-top: map-get($spacers, 20);
+}
+
+.expiration {
+    padding-left: map-get($spacers, 20);
+}
+
+:host ::ng-deep .mat-dialog-content {
+    max-height: none !important;
+    padding-top: 0;
+}
+
+:host ::ng-deep .iframe-container {
+    .info-modal.size-medium {
+        width: convert-unit(691px, "rem") !important;
+
+        .mat-dialog-content {
+            overflow-x: hidden;
+            padding: 0;
+        }
+    }
+}
+
+.card-number-label {
+    padding-top: map-get($spacers, 5);
+}
+
+.account-type {
+    width: convert-unit(181px, "rem");
+    height: convert-unit(38px, "rem");
+}
+
+.account-name {
+    width: convert-unit(562px, "rem");
+    height: convert-unit(38px, "rem");
+}
+
+.disclaimer {
+    width: convert-unit(562px, "rem");
+
+    .disclaimer-two {
+        margin-top: map-get($spacers, 10);
+        margin-bottom: map-get($spacers, 30);
+    }
+}
+
+.copy-to-clipboard-btn {
+    mat-icon {
+        color: #0c6cd7;
+        margin-right: 5px;
+    }
+}
+
+.copied-btn {
+    mat-icon {
+        color: #3d862f;
+        margin-right: 5px;
+        margin-left: 30px;
+    }
+}
+
+.mat-icon-button {
+    height: 0;
+    line-height: 0;
+    padding-bottom: convert-unit(12px, "rem");
+}
+
+.warning-message-block {
+    padding-left: convert-unit(50px, "rem");
+    padding-right: convert-unit(70px, "rem");
+    padding-bottom: convert-unit(20px, "rem");
+}
+
+.routing-number-text {
+    margin-right: convert-unit(20px, "rem");
+}
+
+.edit-dialog-content {
+    max-height: calc(100vh - 400px);
+}

@@ -1,0 +1,57 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<section class="section-container">
+    <div class="section-subheader">
+        <p>{{tobaccoDirection}}</p>
+    </div>
+    <form [formGroup]="tobaccoForm" (ngSubmit)="onNext()" *ngIf="showComponent">
+        <section class="section-container">
+            <div class="question-container">
+                <div class="question-block" id="tobaccoquestionlbl">{{tobaccoQuestion}}</div>
+                <div class="response-block">
+                    <div class="response-type radio">
+                        <mat-radio-group formControlName="question" (change)="updateError()" aria-labelledby="tobaccoquestionlbl">
+                            <mat-radio-button [value]="appSettings.YES">{{tobaccoResponse}}</mat-radio-button>
+                            <mat-radio-button [value]="appSettings.NO">{{nonTobaccoResponse}}</mat-radio-button>
+                        </mat-radio-group>
+                        <mat-error *ngIf="showError">
+                            {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                        </mat-error>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+            <button
+                id="submitAppFlowForm"
+                *ngIf="planObject.lastStep"
+                class="mon-btn-primary submit-app-flow-form"
+                type="submit"
+                mat-flat-button
+            >
+                <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.next']}}{{this.planObject.nextProduct}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextAflacAlways']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSPayment)"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextBilling']}}
+                </span>
+                <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                    >{{languageStrings['primary.portal.applicationFlow.planOption.nextApplications']}}
+                </span>
+            </button>
+            <button *ngIf="!this.planObject.lastStep" class="mon-btn-primary" type="submit" mat-flat-button>
+                <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+            </button>
+        </div>
+    </form>
+</section>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

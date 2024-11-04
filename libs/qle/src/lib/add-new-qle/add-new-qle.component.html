@@ -1,0 +1,357 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings.ariaCancel">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+    <mat-horizontal-stepper linear class="enrollment-stepper" [@.disabled]="true">
+        <div class="enrollment-wrapper" *ngIf="stepPosition === false">
+            <mat-step [stepControl]="form">
+                <form [formGroup]="form" (ngSubmit)="changeStep('first')" *ngIf="isformVisible">
+                    <div mat-dialog-content class="mon-p-0">
+                        <div class="mon-px-50 mon-pt-50">
+                            <mat-label class="mat-label" language="primary.portal.qle.addNewQle.step1"></mat-label>
+                            <mon-alert *ngIf="errorResp" alertType="danger" role="alert">
+                                <span>{{errorMessage}}</span>
+                            </mon-alert>
+                            <h2 mat-dialog-title>{{languageStrings.step1Title}}</h2>
+                        </div>
+                        <div class="scroll-content">
+                            <p *ngIf="isProducer" class="mon-mb-30">
+                                <span>{{languageString['primary.portal.census.manualEntry.newHire'] + " "}}</span>
+                                <a
+                                    href="javascript:void(0)"
+                                    class="mon-btn-link"
+                                    language="primary.portal.dashboard.rules"
+                                    (click)="goToRules()"
+                                ></a>
+                                <span>{{" " + languageString['primary.portal.census.manualEntry.accountProfile']}}</span>
+                            </p>
+                            <mat-label class="mat-label" language="primary.portal.qle.addNewQle.eventType"></mat-label>
+                            <mat-form-field class="w-300">
+                                <mat-select
+                                    formControlName="eventType"
+                                    (selectionChange)="changeInEvent($event)"
+                                    disableOptionCentering="true"
+                                    [placeholder]="languageStrings.select"
+                                    panelClass="select-event-type"
+                                    ><mat-option *ngFor="let event of eventTypes" required [value]="event"
+                                        >{{event.description}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error>
+                                    <span
+                                        *ngIf="form.controls['eventType'].hasError('required')"
+                                        language="primary.portal.common.requiredField"
+                                    ></span>
+                                    <span *ngIf="form.controls['eventType'].errors?.incorrect" [language]="getEventTypeError()"></span>
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-label class="mat-label" *ngIf="!isNewHire" language="primary.portal.qle.addNewQle.eventDate"></mat-label>
+                            <mat-label class="mat-label" *ngIf="isNewHire"
+                                >{{languageString['primary.portal.qle.addNewQle.hireDate']}}
+                                <span *ngIf="isNewHire" [richTooltip]="hireDateInfo" matTooltipPosition="above" matTooltipClass="pos-above">
+                                    <mon-icon
+                                        class="file-upload-info icon-primary"
+                                        iconName="Filled-info"
+                                        [iconSize]="17"
+                                    ></mon-icon> </span
+                            ></mat-label>
+                            <mat-form-field class="mon-date-field w-200">
+                                <input
+                                    [matDatepicker]="eventDatePicker"
+                                    matInput
+                                    formControlName="eventDate"
+                                    required
+                                    empoweredDateTransform
+                                    (dateInput)="setEnrollEndDate($event.value)"
+                                    [attr.aria-label]="languageStrings.eventDate"
+                                    [matDatepickerFilter]="applyDateRange"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="eventDatePicker" (click)="eventDatePicker.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #eventDatePicker></mat-datepicker>
+                                <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                <mat-error>
+                                    <span
+                                        *ngIf="form.controls['eventDate'].hasError('required')"
+                                        language="primary.portal.common.requiredField"
+                                    ></span>
+                                    <span *ngIf="form.get('eventDate').touched && form.controls['eventDate'].errors?.requirementDate"
+                                        >{{getDateError()}}</span
+                                    >
+                                    <span
+                                        *ngIf="!form.controls['eventDate'].hasError('required') &&
+                                                form.get('eventDate').touched &&
+                                                form.controls['eventDate'].errors?.requirements"
+                                    >
+                                        {{ "primary.portal.qle.addNewQle.dateValidationMsg.dataPast" | replaceTag: { "#mindate":
+                                        this.minDate, "#maxdate": this.maxDate } }}
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.qle.addNewQle.notes"></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                            </mat-label>
+                            <mat-form-field class="textarea">
+                                <textarea
+                                    rows="6"
+                                    matInput
+                                    formControlName="notes"
+                                    [attr.aria-label]='languageStrings.notes + " " + languageStrings.optionalText'
+                                ></textarea>
+                            </mat-form-field>
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.qle.addNewQle.fileUploadText"></span>
+                                <span class="optional-text" language="primary.portal.common.optional"></span>
+                                <!-- <span
+                                    richTooltip="{{reqDocument}}"
+                                    matTooltipPosition="above"
+                                    matTooltipClass="pos-above"
+                                    [attr.aria-label]="languageStrings.ariaInfo"
+                                >
+                                    <mon-icon class="file-upload-info" iconName="Filled-info" [iconSize]="17"></mon-icon>
+                                </span> -->
+                            </mat-label>
+                            <empowered-mon-upload
+                                [accept]="acceptableFormats"
+                                (uploadFile)="validateFileAndUpload($event)"
+                                (viewFile)="viewFile($event)"
+                                (cancelUpload)="cancelFileUpload($event)"
+                                [isFileAvailable]="isFileAvailable"
+                                [isFileSelected]="isFileSelected"
+                                [isProgressBarEnabled]="isProgressBarEnabled"
+                                [files]="files"
+                                [uploadErrorStatus]="uploadErrorStatus"
+                                [uploadSucessStatus]="uploadSuccessStatus"
+                                [hasError]="hasError"
+                                [isSucess]="isSucess"
+                                [modeProgress]="modeProgress"
+                                [isUploadingStarted]="isUploadingStarted"
+                                [fileUploadPercentage]="fileUploadPercentage"
+                                [isFileViewable]="isFileViewable"
+                                [isQLE]="true"
+                            ></empowered-mon-upload>
+                        </div>
+                    </div>
+                    <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                        <a href="javascript:void(0)" mat-dialog-close (click)="closeForm()" [attr.aria-label]="languageStrings.ariaCancel"
+                            >{{languageStrings.ariaCancel}}</a
+                        >
+                        <button
+                            class="mon-btn-primary mon-px-30"
+                            mat-flat-button
+                            [attr.aria-label]="languageStrings.ariaNext"
+                            type="submit"
+                        >
+                            <span>{{languageStrings.ariaNext}}</span>
+                            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                        </button>
+                    </mat-dialog-actions>
+                </form>
+            </mat-step>
+        </div>
+
+        <mat-step>
+            <div *ngIf="stepPosition === true">
+                <form [formGroup]="createQLEForm" (ngSubmit)="addQLE()">
+                    <div mat-dialog-content class="mon-p-0">
+                        <div class="mon-px-50 mon-pt-50">
+                            <mat-label class="mat-label" language="primary.portal.qle.addNewQle.step2"></mat-label>
+                            <h2 mat-dialog-title>{{languageStrings.step2Title}}</h2>
+                        </div>
+                        <div class="scroll-content">
+                            <mon-alert *ngIf="error" alertType="danger" role="alert">
+                                <span>{{errorMessage}}</span>
+                            </mon-alert>
+                            <div class="enrollment-wrapper second-step">
+                                <div class="qle-title">{{languageString['primary.portal.qle.addNewQle.step2SubTitle']}}</div>
+                                <div class="enroll-date d-md-flex">
+                                    <div>
+                                        <mat-label class="mat-label" language="primary.portal.qle.addNewQle.enrollStart"></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="enrollStart"
+                                                formControlName="enrollStartDate"
+                                                matInput
+                                                empoweredDateTransform
+                                                [attr.aria-label]="languageStrings.enrollStart"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="enrollStart" (click)="enrollStart.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #enrollStart></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="createQLEForm.controls['enrollStartDate'].hasError('required')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span
+                                                    *ngIf="!createQLEForm.controls['enrollStartDate'].hasError('required') && enrollStartDateFlag"
+                                                    >{{enrollStartDateError}}</span
+                                                >
+                                                <span
+                                                    *ngIf="!createQLEForm.controls['enrollStartDate'].hasError('required') && enrollStartDateFlagBeforeCurrent"
+                                                >
+                                                    <span language="primary.portal.qle.addNewQle.enrollStartDateError"></span>
+                                                </span>
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="enroll-date-end">
+                                        <mat-label class="mat-label" language="primary.portal.qle.addNewQle.enrollEnd"></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="enrollEndPicker"
+                                                formControlName="enrollEndDate"
+                                                matInput
+                                                empoweredDateTransform
+                                                [attr.aria-label]="languageStrings.enrollEnd"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="enrollEndPicker" (click)="enrollEndPicker.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #enrollEndPicker></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="createQLEForm.controls['enrollEndDate'].hasError('required')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span
+                                                    *ngIf="!createQLEForm.controls['enrollEndDate'].hasError('required') && enrollEndDateFlag"
+                                                    >{{enrollEndDateError}}</span
+                                                >
+                                                <span
+                                                    *ngIf="!createQLEForm.controls['enrollEndDate'].hasError('required') && !isNewHire && enrollEndDateFlagAfter"
+                                                    >{{ "primary.portal.qle.addNewQle.enrollEndDateError" | replaceTag: { "#enddate":
+                                                    ernollEndErrorDate } }}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <p class="product-detail-text" language="primary.portal.qle.addNewQle.enrollDetailText"></p>
+                                <div *ngIf="isNewHire" class="mon-mb-20">
+                                    <mat-checkbox
+                                        (change)="productSelected($event.source.checked)"
+                                        [checked]="isAllSelected"
+                                        [aria-label]="languageStrings.selectOption"
+                                        formControlName="productsOptionSelected"
+                                        [disabled]="disableAllProducts"
+                                        >{{languageString['primary.portal.qle.addNewQle.useSameCoverage']}}
+                                    </mat-checkbox>
+                                </div>
+                                <div *ngIf="!isNewHire">
+                                    <mat-radio-group
+                                        [attr.aria-label]="languageStrings.selectOption"
+                                        formControlName="productsOptionSelected"
+                                        [disabled]="disableAllProducts"
+                                    >
+                                        <mat-radio-button
+                                            [attr.aria-label]="option.name"
+                                            (change)="productSelected($event.value)"
+                                            *ngFor="let option of productsOption"
+                                            value="{{option.value}}"
+                                            class="mon-mr-20 mon-mb-20"
+                                            >{{ option.name}}</mat-radio-button
+                                        >
+                                    </mat-radio-group>
+                                </div>
+                                <div *ngIf="!productsListDisplay">
+                                    <div *ngFor="let product of productsList">
+                                        <mat-label class="mat-label" language="primary.portal.qle.addNewQle.coverageStart"></mat-label>
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="coverage"
+                                                [matDatepickerFilter]="coverageStart === NEXT_FIRST_OF_MONTH && isNewHire ? enableFirstOfMonth : dateClass"
+                                                matInput
+                                                [max]="qleMaxDate"
+                                                [min]="qleMinDate"
+                                                formControlName="coverage"
+                                                empoweredDateTransform
+                                                [attr.aria-label]="languageStrings.coverageStart"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="coverage" (click)="coverage.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #coverage></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="createQLEForm.controls['coverage'].hasError('required')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span *ngIf="createQLEForm.controls['coverage'].errors?.incorrect"
+                                                    >{{ allProductsCoverageError }}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="specific-product d-md-flex" *ngIf="productsListDisplay">
+                                    <div *ngFor="let product of productsList; let i=index">
+                                        <mat-label class="mat-label"
+                                            >{{product.name.length > 30 ? product.name.substring(0,30) : product.name}}</mat-label
+                                        >
+                                        <mat-form-field class="mon-date-field">
+                                            <input
+                                                [matDatepicker]="coverageDatePicker"
+                                                [matDatepickerFilter]="coverageStart === NEXT_FIRST_OF_MONTH && isNewHire ? enableFirstOfMonth : dateClass"
+                                                matInput
+                                                [max]="product.qleMaxDate"
+                                                [min]="product.qleMinDate"
+                                                empoweredDateTransform
+                                                [formControlName]="product.name"
+                                                [attr.aria-label]="product.name"
+                                            />
+                                            <mat-datepicker-toggle matSuffix [for]="coverageDatePicker" (click)="coverageDatePicker.open()">
+                                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker #coverageDatePicker></mat-datepicker>
+                                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                                            <mat-error>
+                                                <span
+                                                    *ngIf="createQLEForm.controls[product.name]?.hasError('required')"
+                                                    language="primary.portal.common.requiredField"
+                                                ></span>
+                                                <span *ngIf="createQLEForm.controls[product.name].errors?.incorrect"
+                                                    >{{ this.specifiCoverageDateErrors[product.name] }}</span
+                                                >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div *ngIf="isNewHire && nonAflacProducts.length">
+                                    <p>
+                                        {{languageString['primary.portal.qle.addNewQle.coverageNonAflac'].replace("(date)",this.nonAflacProductCoverageStartDate)}}
+                                    </p>
+                                    <ul>
+                                        <li *ngFor="let data of nonAflacProducts">{{data.product.name}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+                        <a href="javascript:void(0)" mat-dialog-close (click)="closeForm()" [attr.aria-label]="languageStrings.ariaCancel"
+                            >{{languageStrings.ariaCancel}}</a
+                        >
+                        <div class="add-life-event-btn">
+                            <button class="mon-btn-secondary mon-mr-20" mat-flat-button type="button" (click)="changeStep('second')">
+                                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                                <span>{{languageStrings.ariaBack}}</span>
+                            </button>
+                            <button class="mon-btn-primary" mat-flat-button type="submit">{{languageStrings.addLifeEvent}}</button>
+                        </div>
+                    </mat-dialog-actions>
+                </form>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

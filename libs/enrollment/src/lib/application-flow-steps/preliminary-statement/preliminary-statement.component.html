@@ -1,0 +1,90 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="preliminary-section-container">
+    <div>
+        <h2>{{preliminaryStatementSections?.[0]?.title}}</h2>
+    </div>
+    <div class="preliminary-content">
+        <div class="preliminary-question">
+            <p>{{preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[0]?.directions}}</p>
+        </div>
+        <div *ngFor="let planName of preliminaryStatementPlans" class="preliminary-question">
+            <div class="d-flex">
+                <mon-icon iconName="file" iconSize="32" class="file-icon icon-black"></mon-icon>
+                <div class="app-details">
+                    <p class="form-name">{{planName}}</p>
+                    <div>
+                        <a
+                            class="view-application"
+                            href="javascript:void(0)"
+                            language="primary.portal.applicationFlow.preliminaryStatement.viewForm"
+                            (click)="viewPreliminaryForm(planName, true)"
+                        >
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="horizontal-border"></div>
+        <div class="radio-question">
+            <p>{{preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[1].question?.text}}</p>
+            <p class="radio-question-notification">{{preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[2].question?.text}}</p>
+            <div class="radio-options">
+                <mat-radio-group [formControl]="preliminaryFormControl" (change)="onPreliminaryOptionChange()">
+                    <mat-radio-button *ngFor="let email of preliminaryEmailOptions" [value]="email" [disabled]="email === noEmailProvided"
+                        ><span>{{email}}</span>
+                        <div class="email-notification" *ngIf="preliminaryFormControl?.value === email">
+                            {{emailNotification}}
+                        </div></mat-radio-button
+                    >
+                    <mat-radio-button [value]="preliminaryOptions.DIFFERENT_EMAIL"
+                        ><span>{{preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[4]?.question?.text}}</span>
+                        <div class="email-notification" *ngIf="preliminaryFormControl.value === preliminaryOptions.DIFFERENT_EMAIL">
+                            <mat-form-field class="w-300">
+                                <input [formControl]="differentEmail" matInput (change)="checkForRestrictedEmail(differentEmail)" />
+                                <mat-error
+                                    *ngIf="differentEmail?.errors?.required"
+                                    language="primary.portal.common.requiredField"
+                                ></mat-error>
+                                <mat-error *ngIf="differentEmail?.errors?.pattern" language="primary.portal.vf2f.invalidEmail"></mat-error>
+                                <mat-error *ngIf="differentEmail?.errors?.maxlength"
+                                    >{{ "primary.portal.applicationFlow.preliminaryStatement.email.maxLength.error" | replaceTag: {
+                                    "{maxlength}": emailValidations.EMAIL_MAX_LENGTH } }}</mat-error
+                                >
+                                <mat-error
+                                    *ngIf="differentEmail.errors?.restrictedEmail"
+                                    language="primary.portal.common.restrictedEmailFormat"
+                                ></mat-error>
+                            </mat-form-field>
+                            <div>{{emailNotification}}</div>
+                        </div>
+                    </mat-radio-button>
+                    <mat-radio-button
+                        *ngIf="preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[5]?.question?.text"
+                        [value]="preliminaryOptions.PAPER_COPY"
+                        >{{preliminaryStatementSections?.[0]?.steps?.[0]?.step?.[5].question?.text}}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button
+            *ngIf="!(preliminaryFormControl?.value === preliminaryOptions.PAPER_COPY)"
+            class="mon-btn-primary"
+            mat-flat-button
+            [disabled]="!preliminaryFormControl?.value"
+            (click)="onNext()"
+        >
+            <span language="primary.portal.applicationFlow.preliminaryStatement.send"></span>
+        </button>
+        <button
+            *ngIf="preliminaryFormControl?.value === preliminaryOptions.PAPER_COPY"
+            class="mon-btn-primary"
+            mat-flat-button
+            (click)="onNext()"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

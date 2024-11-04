@@ -1,0 +1,106 @@
+<!-- TODO - Use language. -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div *ngIf="(forms$|async) && (forms$|async).length > 0; else error" [ngClass]="{'quasi-modal' : maintain}">
+    <div class="mon-my-20" *ngIf="errorResponse">
+        <mon-alert *ngIf="errorResponse" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div [ngClass]="{'dialog-content' : maintain}">
+        <div class="carrier-content">
+            <h2>{{languageStrings['primary.portal.carrierForms.carrierForm']}}</h2>
+            <div class="carrier-forms-list" *ngFor="let form of (forms$|async) as forms">
+                <div class="carrier-logo">
+                    <img
+                        *ngIf="isSitusNyRSLI(form.carrierId)"
+                        src="assets/images/{{form.carrierId}}{{companyCodeNY}}.png"
+                        alt="{{form.carrierId}}"
+                    />
+                    <img
+                        *ngIf="!isSitusState || !isSitusNyRSLI(form.carrierId)"
+                        src="assets/images/{{form.carrierId}}.png"
+                        alt="{{form.carrierId}}"
+                    />
+                </div>
+                <div class="dotted-border-left"></div>
+                <div class="carrier-name"><h3>{{form.formName}}</h3></div>
+                <div class="carrier-status">
+                    <span [ngSwitch]="form.formStatus">
+                        <span *ngSwitchCase="FormStatusEnum.PENDING"
+                            ><mon-icon iconName="Filled-check" class="icon-success" [iconSize]="20"></mon-icon>
+                            {{languageStrings['primary.portal.carrierforms.complete']}}</span
+                        >
+                        <span *ngSwitchCase="FormStatusEnum.APPROVED"
+                            ><mon-icon iconName="Filled-check" class="icon-success" [iconSize]="20"></mon-icon>
+                            {{languageStrings['primary.portal.carrierforms.complete']}}</span
+                        >
+                        <span *ngSwitchCase="FormStatusEnum.INCOMPLETE"
+                            ><mon-icon class="icon-warning" iconName="Filled-warning" [iconSize]="20"></mon-icon>
+                            {{languageStrings['primary.portal.carrierforms.incomplete']}}</span
+                        >
+                    </span>
+                </div>
+                <div class="carrier-actions">
+                    <div *ngIf="form.id">
+                        <div [ngSwitch]="form.formStatus">
+                            <button
+                                *ngSwitchCase="FormStatusEnum.PENDING"
+                                mat-flat-button
+                                (click)="openViewFormModal(form)"
+                                class="mon-btn-link"
+                            >
+                                {{languageStrings['primary.portal.common.view']}}
+                            </button>
+                            <button
+                                *ngSwitchCase="FormStatusEnum.APPROVED"
+                                mat-flat-button
+                                (click)="openViewFormModal(form)"
+                                class="mon-btn-link"
+                            >
+                                {{languageStrings['primary.portal.common.view']}}
+                            </button>
+                            <button
+                                *ngSwitchCase="'NOT_STARTED'"
+                                mat-flat-button
+                                (click)="openViewFormModal(form)"
+                                class="mon-btn-primary"
+                            >
+                                {{languageStrings['primary.portal.carrierforms.start']}}
+                            </button>
+                            <button
+                                *ngSwitchCase="FormStatusEnum.INCOMPLETE"
+                                mat-flat-button
+                                (click)="openViewFormModal(form)"
+                                class="mon-btn-secondary"
+                            >
+                                {{languageStrings['primary.portal.carrierforms.resume']}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <mat-divider class="mon-mt-30"></mat-divider>
+    </div>
+    <div [ngClass]="maintain ? 'dialog-footer justify-content-end' : 'd-flex justify-content-end mon-mt-30 mon-mb-50'">
+        <button class="mon-btn-secondary mon-mr-20" type="button" (click)="onBack()" mat-flat-button>
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span>{{languageStrings['primary.portal.common.back']}}</span>
+        </button>
+        <button
+            [ngClass]="maintain ? 'mon-btn-primary' : 'mon-btn-primary mon-mr-30'"
+            mat-flat-button
+            [disabled]="isAccountDeactivated"
+            (click)="reviewOffering()"
+        >
+            <span>{{languageStrings['primary.portal.carrierforms.reviewoffering']}}</span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>
+<!-- TODO - Show the exact error here instead of the generic one for 500 -->
+<ng-template #error>
+    <mon-alert *ngIf="hasError" alertType="danger" class="mon-alert d-flex justify-content-center mon-mt-30">
+        <span>{{languageStrings["primary.portal.common.servertimeout"]}}</span>
+    </mon-alert>
+</ng-template>

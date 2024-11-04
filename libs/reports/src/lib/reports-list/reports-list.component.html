@@ -1,0 +1,196 @@
+<div class="report-list-page">
+    <h1 class="report-list-page-header">
+        <span>{{languageStrings['primary.portal.reportsList.header']}}</span>
+        <span *ngIf="isZeroState === false">
+            <ng-container *ngIf="isDirectGroup$ && (isDirectGroup$ | async) === false; then payrollCreateButton; else directCreateButton">
+            </ng-container>
+        </span>
+    </h1>
+
+    <div class="non-zero-state" [hidden]="isZeroState !== false">
+        <table
+            mat-table
+            [dataSource]="this.datasource"
+            matSort
+            matSortActive="uploadDate"
+            matSortDirection="desc"
+            (matSortChange)="sortData($event)"
+        >
+            <ng-container matColumnDef="reportType">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span language="primary.portal.reportList.reportType"></span>
+                </th>
+                <td mat-cell *matCellDef="let report" [ngClass]="{'sorted-column': activeCol === 'reportType'}">
+                    <span *ngIf="report.reportType !== 'PDA'"> {{report.reportType | titlecase}} </span>
+                    <span *ngIf="report.reportType === 'PDA'"> {{report.reportType}} </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span language="primary.portal.reportList.description"></span>
+                </th>
+                <td mat-cell *matCellDef="let report" [ngClass]="{'sorted-column': activeCol === 'description'}">
+                    {{ (report.description) ? ((report.description.length > 20) ? (report.description | slice: 0:20)+"..." :
+                    (report.description)) : "" }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="uploadDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span language="primary.portal.reportList.createdOn"></span>
+                </th>
+                <td mat-cell *matCellDef="let report" [ngClass]="{'sorted-column': activeCol === 'uploadDate'}">
+                    {{report.uploadDate | date: 'MM/dd/yyyy'}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span language="primary.portal.reportList.status"></span>
+                </th>
+                <td mat-cell *matCellDef="let report" [ngClass]="{'sorted-column': activeCol === 'status'}">
+                    <span *ngIf="report.status === 'PROCESSING'">
+                        <mat-icon svgIcon="refresh" aria-hidden="true" class="building-icon"></mat-icon>
+                        <span language="primary.portal.reportList.status.building"></span>
+                    </span>
+                    <span *ngIf="report.status === 'COMPLETE'" language="primary.portal.reportList.status.ready"></span>
+                    <span *ngIf="report.status === 'FAILED'">
+                        <mon-icon iconName="Filled-info" class="icon-danger failed-icon"></mon-icon>
+                        <span language="primary.portal.reportList.status.failed"></span>
+                    </span>
+                    <span
+                        *ngIf="report.status === 'INVALID_SEARCH_CRITERIA'"
+                        language="primary.portal.reportList.status.noDataFound"
+                    ></span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="uploadAdmin" *ngIf="isDirectGroup$ && (isDirectGroup$ | async) === false">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span language="primary.portal.reportList.createdFor"></span>
+                </th>
+                <td mat-cell *matCellDef="let report" [ngClass]="{'sorted-column': activeCol === 'uploadAdmin'}">
+                    {{report.uploadAdmin.name.firstName}} {{report.uploadAdmin.name.lastName}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span language="primary.portal.reportList.manage"></span>
+                </th>
+                <td mat-cell *matCellDef="let report">
+                    <button
+                        mat-icon-button
+                        class="app-header-openPrimaryNavBtn"
+                        [matMenuTriggerFor]="manageMenu"
+                        [attr.aria-label]="languageStrings['primary.portal.common.menu']"
+                    >
+                        <mon-icon iconName="ellipsis" class="more-option icon-primary"></mon-icon>
+                        <span class="cdk-visually-hidden">Open Navigation</span>
+                    </button>
+                    <mat-menu #manageMenu="matMenu">
+                        <a mat-menu-item (click)="downloadReport(report)" *ngIf="report.status === 'COMPLETE'"
+                            >{{languageStrings['primary.portal.reportList.download']}}</a
+                        >
+                        <a mat-menu-item (click)="removeReport(report.id)" class="text-danger" *hasPermission="'core.document.delete'"
+                            >{{languageStrings['primary.portal.reportList.remove']}}</a
+                        >
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div
+            class="paginator-wrapper"
+            [hidden]="this.datasource.data.length === 0"
+            [ngClass]="{'range-actions-hide': datasource.paginator.getNumberOfPages() == 1}"
+        >
+            <mat-paginator [pageSizeOptions]="pageSizeOption" showFirstLastButtons></mat-paginator>
+            <mat-form-field class="paginator-input-wrapper">
+                <span language="primary.portal.reportList.paginator.page"></span>
+                <input
+                    class="paginator-input"
+                    (input)="pageInputChanged($event.target.value)"
+                    [formControl]="pageNumberControl"
+                    matInput
+                    type="number"
+                    min="1"
+                    max="{{ datasource.paginator.getNumberOfPages() }}"
+                    [attr.aria-label]="languageStrings['primary.portal.common.enterPageNumber']"
+                />
+                <span language="primary.portal.reportList.paginator.of"></span>
+                <div class="paginator-separator"></div>
+                {{ datasource.paginator.getNumberOfPages() }}
+            </mat-form-field>
+        </div>
+    </div>
+
+    <ng-container *ngIf="isZeroState">
+        <ng-container *ngIf="isDirectGroup$ && (isDirectGroup$ | async) === false; then payrollZeroState; else directZeroState">
+        </ng-container>
+    </ng-container>
+
+    <ng-template #directZeroState>
+        <p class="zero-state" language="primary.portal.reportList.direct.zeroStateMessage"></p>
+        <ng-container *ngIf="true; then directCreateButton"></ng-container>
+    </ng-template>
+    <ng-template #payrollZeroState>
+        <ng-container *ngIf="this.noEmployees && !this.noproducts">
+            <p class="zero-state" language="primary.portal.reportList.noEmployeeMessage"></p>
+        </ng-container>
+        <ng-container *ngIf="!this.noEmployees && this.noproducts">
+            <p class="zero-state" language="primary.portal.reportList.noProductsMessage"></p>
+        </ng-container>
+        <ng-container *ngIf="this.noEmployees && this.noproducts">
+            <p class="zero-state" language="primary.portal.reportList.noEmployeeAndProductsMessage"></p>
+        </ng-container>
+        <ng-container *ngIf="!this.noEmployees && !this.noproducts">
+            <p class="zero-state" language="primary.portal.reportList.zeroStateMessage"></p>
+        </ng-container>
+        <ng-container *ngIf="true; then payrollCreateButton"></ng-container>
+    </ng-template>
+    <ng-template #directCreateButton>
+        <button mat-flat-button [matMenuTriggerFor]="createReportMenu" color="primary" class="create-report-button">
+            <span language="primary.portal.createReport.button"></span>
+            <mat-icon class="mon-btn-pulldown-indicator" svgIcon="arrowDown" aria-hidden="true"></mat-icon>
+        </button>
+        <mat-menu #createReportMenu="matMenu" class="report-menu">
+            <button
+                mat-menu-item
+                class="menu-item"
+                (click)="createReport.openCreateReportForm('enrollment',DIRECT)"
+                language="primary.portal.createReport.enrollment"
+            ></button>
+            <button
+                *ngIf="(isAdminPortal$ | async) === false;"
+                mat-menu-item
+                class="menu-item"
+                (click)="createReport.openCreateReportForm('commissions')"
+                language="primary.portal.createReport.commissions"
+            ></button>
+        </mat-menu>
+    </ng-template>
+    <ng-template #payrollCreateButton>
+        <div *ngIf="!this.noEmployees && !this.noproducts">
+            <empowered-create-report class="zero-state" *hasPermission="'core.document.create.report'"></empowered-create-report>
+        </div>
+        <div>
+            <button
+                routerLink="../employees"
+                mat-flat-button
+                color="primary"
+                class="zero-state mon-btn-primary report-button"
+                *ngIf="this.noEmployees"
+                language="primary.portal.gotoEmployees.button"
+            ></button>
+            <button
+                routerLink="../benefits/offering"
+                mat-flat-button
+                color="primary"
+                class="zero-state mon-btn-primary report-button"
+                *ngIf="noproducts"
+                [disabled]="isSutherlandCallCenter"
+                language="primary.portal.gotoBenefits.button"
+            ></button>
+        </div>
+    </ng-template>
+</div>

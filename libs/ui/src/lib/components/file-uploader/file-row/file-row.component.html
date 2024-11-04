@@ -1,0 +1,38 @@
+<div *ngIf="uploadedFile$ | async as uploadedFile">
+    <div class="detail-bar">
+        <span>
+            <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+            {{ uploadedFile?.name }}
+        </span>
+
+        <span>
+            <!--Uploading or Uploaded-->
+            <ng-container *ngIf="!uploadedFile?.errorMessage else errorTemplate">
+                <!--Upload completed-->
+                <ng-container
+                    *ngIf="uploadedFile?.documentId || (uploadedFile?.percentComplete === undefined && uploadedFile?.file ) else pending"
+                >
+                    <mon-icon class="icon-success" iconName="check" [iconSize]="15"></mon-icon>
+                    <span language="primary.portal.general.fileUpload.uploadSuccessful"></span>
+                </ng-container>
+                <!--Pending, show percentage-->
+                <ng-template #pending> {{ uploadedFile?.percentComplete }}% </ng-template>
+            </ng-container>
+
+            <!--Encountered an error-->
+            <ng-template #errorTemplate>
+                <mon-icon iconName="Filled-error" [iconSize]="16" class="icon-danger"></mon-icon>
+                {{ uploadedFile.errorMessage }}
+            </ng-template>
+            <button mat-icon-button *ngIf="canDelete" type="button" (click)="onDeleteClick()">
+                <mon-icon [iconSize]="10" iconName="close" class="icon-gray"></mon-icon>
+            </button>
+        </span>
+    </div>
+
+    <!--Upload bar-->
+    <div
+        class="upload-bar"
+        [ngStyle]="{ 'width': uploadedFile?.documentId || (uploadedFile?.percentComplete === undefined && uploadedFile?.file ) ? '0%' : uploadedFile?.percentComplete+'%' } "
+    ></div>
+</div>

@@ -1,0 +1,319 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="addManuallyForm" *ngIf="!this.data.editAdministrator" (ngSubmit)="addAdminManually()">
+        <div mat-dialog-content>
+            <h2 mat-dialog-title>{{languageStrings['primary.portal.administrators.addAdministrator']}}</h2>
+            <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+            <mon-alert alertType="warning" *ngIf="nameMatchesWithExistingEmp">
+                <span [innerHtml]="firstAndLastNameMatch"> </span>
+            </mon-alert>
+            <div class="d-flex mon-mt-20">
+                <div>
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.addAdmin.firstName']}} </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            formControlName="firstName"
+                            (blur)="checkExistingEmployeeName()"
+                            [attr.aria-label]="languageStrings['primary.portal.administrators.addAdmin.firstName']"
+                        />
+                        <mat-error>
+                            <span *ngIf="addManuallyForm.controls['firstName'].hasError('required')">
+                                {{languageStrings['primary.portal.common.requiredField']}}</span
+                            >
+                            <span *ngIf="addManuallyForm.controls['firstName'].hasError('pattern')"
+                                >{{languageStrings['primary.portal.administrators.enterValidName']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="mon-ml-20">
+                    <mat-label class="mat-label"> {{languageStrings['primary.portal.administrators.addAdmin.secondName']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            formControlName="lastName"
+                            (blur)="checkExistingEmployeeName()"
+                            [attr.aria-label]="languageStrings['primary.portal.administrators.addAdmin.secondName']"
+                        />
+                        <mat-error>
+                            <span *ngIf="addManuallyForm.controls['lastName'].hasError('required')"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</span
+                            >
+                            <span *ngIf="addManuallyForm.controls['lastName'].hasError('pattern')"
+                                >{{languageStrings['primary.portal.administrators.enterValidName']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.census.manualEntry.emailAddress']}} </mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        type="text"
+                        formControlName="emailAddress"
+                        (blur)="onSearch(emailAddress.value, false)"
+                        #emailAddress
+                        [attr.aria-label]="languageStrings['primary.portal.administrators.email']"
+                    />
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].hasError('required')"
+                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                        >
+                        <span
+                            *ngIf="addManuallyForm.controls['emailAddress'].errors?.incorrect"
+                            [language]="getExistingEmailError()"
+                        ></span>
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.administrators.enterValidEmail']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].errors?.existingEmployee"
+                            >{{languageStrings['primary.portal.administrators.enteredEmail.matchWithExistingEmployee']}}</span
+                        >
+                        <span
+                            *ngIf="addManuallyForm.controls.emailAddress.errors?.invalid"
+                            language="primary.portal.common.invalidEmailAddress"
+                        ></span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.administrators.phoneNumber']}}
+                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        type="text"
+                        [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                        formControlName="phoneNumber"
+                        empoweredNumberValidation
+                        empoweredPhoneNumberFormat
+                        (blur)="checkExistingEmployeePhone()"
+                        [allowDashes]="true"
+                        [attr.aria-label]="languageStrings['primary.portal.administrators.phoneNumber']"
+                    />
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.administrators.enterValidPhone']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].hasError('invalid')">{{errorMessage}}</span>
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].errors?.existingEmployee">
+                            {{languageStrings['primary.portal.administrators.enteredPhoneNumber.matchWithExistingEmployee']}}
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.filterRole']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        class="mon-select-arrow"
+                        formControlName="roleId"
+                        disableOptionCentering="true"
+                        attr.aria-required="true"
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                    >
+                        <mat-option *ngFor="let role of adminRoles" [value]="role.id"> {{role.name}} </mat-option>
+                    </mat-select>
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['roleId'].hasError('required')"
+                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                        >
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!--REPORTS TO-->
+            <div class="w-200" *ngIf="data.allAdmins.length > 0 && showReportsTo">
+                <mat-label class="mat-label" language="primary.portal.administrators.selectLabel.reportsTo"></mat-label>
+                <mat-form-field>
+                    <mat-select
+                        class="mon-select-arrow"
+                        formControlName="reportsTo"
+                        disableOptionCentering="true"
+                        attr.aria-required="false"
+                    >
+                        <mat-option value="" selected language="primary.portal.administrators.selectDefault.reportsTo"> </mat-option>
+                        <mat-option *ngFor="let admin of data.allAdmins" [value]="admin.id">
+                            {{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" class="mon-btn-link" mat-button mat-dialog-close (click)="closeForm()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button class="mon-btn-primary" mat-flat-button type="submit">{{languageStrings['primary.portal.common.add']}}</button>
+        </mat-dialog-actions>
+        <!-- add manually -->
+    </form>
+    <form [formGroup]="addManuallyForm" *ngIf="this.data.editAdministrator" (ngSubmit)="updateAdmin()">
+        <div mat-dialog-content>
+            <mon-alert alertType="danger" *ngIf="showErrorMessage">
+                <span>{{ errorMessage }}</span>
+            </mon-alert>
+            <h2 mat-dialog-title *ngIf="!this.data.selectedAdmin.tpa">
+                {{languageStrings['primary.portal.administrators.editAdministrator']}}
+            </h2>
+            <h2 mat-dialog-title *ngIf="this.data.selectedAdmin.tpa">
+                {{languageStrings['primary.portal.administrators.editTpaAdminintrator']}}
+            </h2>
+            <div class="d-flex">
+                <div>
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.addAdmin.firstName']}} </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            value="{{this.fName}}"
+                            formControlName="firstName"
+                            [attr.aria-label]="languageStrings['primary.portal.administrators.addAdmin.firstName']"
+                        />
+                        <mat-error>
+                            <span *ngIf="addManuallyForm.controls['firstName'].hasError('required')"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</span
+                            >
+                            <span *ngIf="addManuallyForm.controls['firstName'].hasError('pattern')"
+                                >{{languageStrings['primary.portal.administrators.enterValidName']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="mon-ml-15">
+                    <mat-label class="mat-label"> {{languageStrings['primary.portal.administrators.addAdmin.secondName']}}</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            value="{{this.lName}}"
+                            formControlName="lastName"
+                            [attr.aria-label]="languageStrings['primary.portal.administrators.addAdmin.secondName']"
+                        />
+                        <mat-error>
+                            <span *ngIf="addManuallyForm.controls['lastName'].hasError('required')"
+                                >{{languageStrings['primary.portal.common.requiredField']}}</span
+                            >
+                            <span *ngIf="addManuallyForm.controls['lastName'].hasError('pattern')"
+                                >{{languageStrings['primary.portal.administrators.enterValidName']}}</span
+                            >
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.email']}}</mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        type="text"
+                        value="{{this.data.selectedAdmin.emailAddress}}"
+                        formControlName="emailAddress"
+                        (change)="onSearch(emailAddress.value, true)"
+                        #emailAddress
+                        [attr.aria-label]="languageStrings['primary.portal.administrators.email']"
+                    />
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].hasError('required')"
+                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].errors?.incorrect"
+                            >{{languageStrings['primary.portal.assignAdmin.addManually.emailUsedImportMessage']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.administrators.enterValidEmail']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['emailAddress'].errors?.existingEmployee"
+                            >{{languageStrings['primary.portal.administrators.enteredEmail.matchWithExistingEmployee']}}
+                        </span>
+                        <span
+                            *ngIf="addManuallyForm.controls.emailAddress.errors?.invalid"
+                            language="primary.portal.common.invalidEmailAddress"
+                        ></span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">
+                    {{languageStrings['primary.portal.administrators.phoneNumber']}}
+                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                </mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        type="text"
+                        formControlName="phoneNumber"
+                        [maxlength]="PHONE_NUMBER_MAX_LENGTH"
+                        empoweredNumberValidation
+                        empoweredPhoneNumberFormat
+                        (change)="checkExistingEmployeePhone()"
+                        [allowDashes]="true"
+                        value="{{this.data.selectedAdmin.phoneNumber|phone}}"
+                        [attr.aria-label]="languageStrings['primary.portal.administrators.phoneNumberOptional']"
+                    />
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].hasError('pattern')"
+                            >{{languageStrings['primary.portal.administrators.enterValidPhone']}}</span
+                        >
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].errors?.existingEmployee">
+                            {{languageStrings['primary.portal.administrators.enteredPhoneNumber.matchWithExistingEmployee']}}
+                        </span>
+                        <span *ngIf="addManuallyForm.controls['phoneNumber'].hasError('invalid')">{{errorMessage}}</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="w-200">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.administrators.filterRole']}}</mat-label>
+                <mat-form-field>
+                    <mat-select class="mon-select-arrow" formControlName="roleId" disableOptionCentering="true" attr.aria-required="true">
+                        <mat-option *ngFor="let role of adminRoles" [value]="role.id"> {{role.name}} </mat-option>
+                    </mat-select>
+                    <mat-error>
+                        <span *ngIf="addManuallyForm.controls['roleId'].hasError('required')"
+                            >{{languageStrings['primary.portal.common.requiredField']}}</span
+                        >
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!--REPORTS TO-->
+            <div class="w-200" *ngIf="data.allAdmins.length > 0 && showReportsTo">
+                <mat-label class="mat-label" language="primary.portal.administrators.selectLabel.reportsTo"></mat-label>
+                <mat-form-field>
+                    <mat-select
+                        class="mon-select-arrow"
+                        formControlName="reportsTo"
+                        disableOptionCentering="true"
+                        attr.aria-required="false"
+                    >
+                        <mat-option language="primary.portal.administrators.selectDefault.reportsTo" value="" selected> </mat-option>
+                        <mat-option *ngFor="let admin of data.allAdmins" [value]="admin.id">
+                            {{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" class="mon-btn-link" mat-button mat-dialog-close (click)="closeForm()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button class="mon-btn-primary" mat-flat-button>{{languageStrings['primary.portal.administrator.update']}}</button>
+        </mat-dialog-actions>
+        <!-- edit -->
+    </form>
+</div>

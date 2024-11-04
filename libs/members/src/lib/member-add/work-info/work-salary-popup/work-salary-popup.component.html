@@ -1,0 +1,341 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="isLoading"> </empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancelClick()" [attr.aria-label]="langStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+
+    <form (ngSubmit)="onAddSalary(salaryPopUpForm.value)" [formGroup]="salaryPopUpForm">
+        <div mat-dialog-content formGroupName="salaryData" class="flex-form-wrapper">
+            <h1 mat-dialog-title>{{data.title}}</h1>
+            <ng-container *ngIf="hideFieldElementSetting.type">
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label" id="salary-type">
+                            <span language="primary.portal.members.workLabel.type"></span>
+                            <span
+                                *ngIf="!(requiredFields && isRequiredField('type'))"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                aria-labelledby="salary-type"
+                                formControlName="type"
+                                class="mon-input"
+                                [(ngModel)]="selectedType"
+                                (ngModelChange)="updateSalaryTypeSelection($event)"
+                                [disabled]="readOnlyFieldElementSetting.type"
+                                [placeholder]="languageStrings.select"
+                                disableOptionCentering="true"
+                            >
+                                <mat-option value="" language="primary.portal.common.select"></mat-option>
+                                <mat-option *ngFor="let type of data.fieldType" value="{{type}}" title="{{type}}">{{type}}</mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="salaryPopUpForm.get('salaryData').get('type').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-container>
+            <div *ngIf="annualFieldFlag || hourlyFieldFlag">
+                <ng-container *ngIf="hideFieldElementSetting.annualSalary">
+                    <div class="d-md-flex">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="salary-type" *ngIf="annualFieldFlag && !hourlyFieldFlag" for="amount">
+                                <span language="primary.portal.members.workLabel.amount"></span>
+                                <span
+                                    *ngIf="!(requiredFields && isRequiredField('annualSalary'))"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field *ngIf="annualFieldFlag && !hourlyFieldFlag">
+                                <input
+                                    id="amount"
+                                    type="number"
+                                    formControlName="annualSalary"
+                                    class="mon-input"
+                                    matInput
+                                    [attr.aria-label]="langStrings['primary.portal.members.workLabel.amount']"
+                                    [readonly]="readOnlyFieldElementSetting.annualSalary"
+                                />
+                                <mat-error
+                                    *ngIf="salaryPopUpForm.get('salaryData').get('annualSalary').hasError('required')"
+                                    language="secondary.portal.members.workValidationMsg.required"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="salaryPopUpForm.get('salaryData').get('annualSalary').hasError('min') ||
+                                salaryPopUpForm.get('salaryData').get('annualSalary').hasError('max') ||
+                                salaryPopUpForm.get('salaryData').get('annualSalary').hasError('pattern')"
+                                    >{{ "primary.portal.members.annualSalaryMsg.between" | replaceTag: { "##annualminsalary##" :
+                                    annualSalaryMin, "##annualmaxsalary##": annualSalaryMax } }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="salary-calculation">
+                    <ng-container *ngIf="hideFieldElementSetting.hourlyWage">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="hourly-rate" *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span language="primary.portal.quickQuote.hourlyrate"></span>
+                            </mat-label>
+                            <mat-form-field *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span matPrefix>$</span>
+                                <input
+                                    id="hourly-rate"
+                                    type="number"
+                                    formControlName="hourlyRate"
+                                    matInput
+                                    class="mon-input"
+                                    [readonly]="readOnlyFieldElementSetting.hoursPerYear"
+                                    (blur)="calculateHourlyCompensation({type: 'hourlyRate', value: $event})"
+                                    [attr.aria-label]="langStrings['primary.portal.quickQuote.hourlyrate']"
+                                />
+                                <mat-error
+                                    *ngIf="hourlyRateControl.errors?.pattern &&
+                                    !hourlyRateControl.errors?.min &&
+                                    !hourlyRateControl.errors?.max &&
+                                    hourlyRateControl.value"
+                                    language="secondary.portal.common.work.errHoursPerWeekDecimal"
+                                ></mat-error>
+                                <mat-error *ngIf="hourlyRateControl.errors?.max">{{hourlyRateMoreThanMaxErrorMsg}} </mat-error>
+                                <mat-error *ngIf="hourlyRateControl.errors?.min">{{hourlyRateMoreThanMinErrorMsg}} </mat-error>
+                                <mat-error
+                                    *ngIf="hourlyRateControl.errors?.required || !hourlyRateControl.value"
+                                    language="secondary.portal.members.workValidationMsg.required"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <div *ngIf="hourlyFieldFlag" class="icons">
+                        <mon-icon class="close-icon" iconSize="8" iconName="close"></mon-icon>
+                    </div>
+                    <ng-container *ngIf="hideFieldElementSetting.hoursPerYear">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="hours-per-week" *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span language="primary.portal.members.workLabel.hoursPerWeek"></span>
+                            </mat-label>
+                            <mat-form-field *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <input
+                                    [value]="data.salary"
+                                    id="hours-per-week"
+                                    formControlName="hoursPerWeek"
+                                    matInput
+                                    empoweredNumberValidation
+                                    allowDecimals="true"
+                                    (input)="validateNumber($event.target)"
+                                    class="mon-input"
+                                    (focusout)="trimDecimalPoint($event.target)"
+                                    [readonly]="readOnlyFieldElementSetting.hoursPerYear"
+                                    (blur)="calculateHourlyCompensation({type: 'hoursPerWeek', value: $event})"
+                                    [attr.aria-label]="langStrings['primary.portal.members.workLabel.hoursPerWeek']"
+                                />
+                                <mat-error
+                                    *ngIf="hoursPerWeekControl.errors?.pattern &&
+                                    !hoursPerWeekControl.errors?.min &&
+                                    !hoursPerWeekControl.errors?.max &&
+                                    hoursPerWeekControl.value"
+                                    language="secondary.portal.common.work.errHoursPerWeekDecimal"
+                                ></mat-error>
+                                <mat-error *ngIf="hoursPerWeekControl.errors?.max">{{hoursPerWeekMoreThanMaxErrorMsg}} </mat-error>
+                                <mat-error *ngIf="hoursPerWeekControl.errors?.min">{{hoursPerWeekMoreThanMinErrorMsg}} </mat-error>
+                                <mat-error
+                                    *ngIf="hoursPerWeekControl.errors?.required || !hoursPerWeekControl.value"
+                                    language="secondary.portal.members.workValidationMsg.required"
+                                ></mat-error>
+                                <mat-error *ngIf="hoursPerWeekControl.errors?.incorrect">{{youngerEmployeeHoursPerYearErr}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <div *ngIf="hourlyFieldFlag" class="icons">
+                        <mon-icon class="close-icon" iconSize="8" iconName="close"></mon-icon>
+                    </div>
+                    <ng-container *ngIf="hideFieldElementSetting.hoursPerYear">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="weeks-per-year" *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span language="primary.portal.common.weeksperyear"></span>
+                            </mat-label>
+                            <mat-form-field *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <input
+                                    id="weeks-per-year"
+                                    type="number"
+                                    formControlName="weekPerYear"
+                                    matInput
+                                    class="mon-input"
+                                    (blur)="calculateHourlyCompensation({type: 'weekPerYear', value: $event})"
+                                    [attr.aria-label]="langStrings['primary.portal.common.weeksperyear']"
+                                />
+                                <mat-error
+                                    *ngIf="WeeksPerYearControl.errors?.pattern &&
+                                    !WeeksPerYearControl.errors?.min &&
+                                    !WeeksPerYearControl.errors?.max && WeeksPerYearControl.value"
+                                    language="secondary.portal.common.work.errHoursPerWeekDecimal"
+                                ></mat-error>
+                                <mat-error *ngIf="WeeksPerYearControl.errors?.max">{{weeksPerYearMoreThanMaxErrorMsg}} </mat-error>
+                                <mat-error *ngIf="WeeksPerYearControl.errors?.min">{{weeksPerYearMoreThanMinErrorMsg}} </mat-error>
+                                <mat-error
+                                    *ngIf="WeeksPerYearControl.errors?.required || !WeeksPerYearControl.value"
+                                    language="secondary.portal.members.workValidationMsg.required"
+                                ></mat-error>
+                                <mat-error *ngIf="WeeksPerYearControl.errors?.incorrect">{{youngerEmployeeHoursPerYearErr}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <div *ngIf="hourlyFieldFlag" class="icons equal-symbol">
+                        <span>&#61;</span>
+                    </div>
+                    <ng-container *ngIf="hideFieldElementSetting.hourlyWage">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="compensation-hourly" *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span language="primary.portal.quickQuote.missingInfo.SALARY"></span>
+                            </mat-label>
+                            <mat-form-field *ngIf="!annualFieldFlag && hourlyFieldFlag">
+                                <span matPrefix>$</span>
+                                <input
+                                    id="compensation-hourly"
+                                    formControlName="compensationHourly"
+                                    type="number"
+                                    matInput
+                                    class="mon-input"
+                                    [readonly]="readOnlyFieldElementSetting.hourlyWage"
+                                    [attr.aria-label]="langStrings['primary.portal.members.workLabel.compensation']"
+                                />
+                            </mat-form-field>
+                            <mat-error *ngIf="isSalaryOutOfRange">
+                                {{ "primary.portal.members.annualSalaryMsg.between" | replaceTag: { "##annualminsalary##" : annualSalaryMin,
+                                "##annualmaxsalary##": annualSalaryMax } }}
+                            </mat-error>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="d-md-flex">
+                    <ng-container *ngIf="hideFieldElementSetting.effectiveStarting">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="start-date">
+                                <span language="primary.portal.members.workLabel.startDate"></span>
+                                <span
+                                    *ngIf="!(requiredFields && isRequiredField('effectiveStarting'))"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [attr.aria-label]="langStrings['primary.portal.members.workLabel.startDate']"
+                                    formControlName="effectiveStarting"
+                                    id="start-date"
+                                    matInput
+                                    [max]="maxDate"
+                                    [matDatepicker]="pickerStartDate"
+                                    [readonly]="readOnlyFieldElementSetting.effectiveStarting"
+                                    (dateInput)="validateEndDateChange()"
+                                    (dateChange)="validateEndDateChange();"
+                                    #datePickerInput
+                                    empoweredDateTransform
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="pickerStartDate">
+                                    <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerStartDate.open()"></mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #pickerStartDate></mat-datepicker>
+                                <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                                <mat-error>
+                                    <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                                    <span class="error-text" *ngIf="salaryIsOverlappingActualFlag"
+                                        >{{salaryIsOverlappingActualErrorMessage}}</span
+                                    >
+                                    <span class="error-text" *ngIf="salaryIsOverlappingBenefitFlag"
+                                        >{{salaryIsOverlappingBenefitErrorMessage}}</span
+                                    >
+                                    <span class="error-text" *ngIf="isDateInvalid"
+                                        >{{validateDate('effectiveStarting', 'salaryPopUpForm', datePickerInput.value)}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="hideFieldElementSetting.expiresAfter">
+                        <div class="flex-item">
+                            <mat-label class="mat-label" for="end-date">
+                                <span language="primary.portal.members.workLabel.endDate"></span>
+                                <span
+                                    *ngIf="!(requiredFields && isRequiredField('expiresAfter'))"
+                                    class="optional-text"
+                                    language="primary.portal.common.ifApplicable"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    formControlName="expiresAfter"
+                                    matInput
+                                    id="end-date"
+                                    [matDatepicker]="pickerEndDate"
+                                    (dateInput)="validateEndDateChange()"
+                                    (dateChange)="validateEndDateChange()"
+                                    [attr.aria-label]="langStrings['primary.portal.members.workLabel.endDate']"
+                                    #endDate
+                                    [readonly]="readOnlyFieldElementSetting.expiresAfter"
+                                    #datePickerInput
+                                    empoweredDateTransform
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="pickerEndDate">
+                                    <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerEndDate.open()"></mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #pickerEndDate></mat-datepicker>
+                                <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                                <mat-error>
+                                    <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                                    <span
+                                        class="error-text"
+                                        *ngIf="endDateLessThenStartDate && salaryPopUpForm.controls.salaryData.get('expiresAfter').value"
+                                        language="secondary.portal.members.workValidationMsg.termination.cannotBeAfterStartDate"
+                                    >
+                                    </span>
+                                    <span
+                                        class="error-text"
+                                        *ngIf="datesAreSame"
+                                        language="secondary.portal.members.workValidationMsg.classDate.sameEndDate"
+                                    ></span>
+                                    <span
+                                        class="error-text"
+                                        *ngIf="salaryPopUpForm.controls.salaryData.controls[this.EXPIRES_AFTER].invalid"
+                                        >{{validateDate('expiresAfter', 'salaryPopUpForm', datePickerInput.value)}}</span
+                                    >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <mon-alert alertType="info" *ngIf="notificationOngoingOverlap" class="mon-alert">
+                <span>{{updatedMessage}}</span>
+            </mon-alert>
+        </div>
+
+        <mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="onCancelClick()"
+                aria-label="Cancel adding salary"
+                language="primary.portal.common.cancel"
+            ></a>
+            <button
+                mat-flat-button
+                class="mon-btn-primary"
+                type="submit"
+                [disabled]="isLoading"
+                aria-label="Add salary"
+                language="primary.portal.common.add"
+            ></button>
+        </mat-dialog-actions>
+    </form>
+</div>

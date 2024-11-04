@@ -1,0 +1,529 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div *ngIf="canReadMember">
+    <div [hidden]="!showZeroState">
+        <!-- Zero state without permission -->
+        <div *ngIf="!canCreateMember">
+            <div class="member-list-wrapper">
+                <h1 role="heading" class="member-list-header">
+                    <span>{{langStrings["primary.portal.members.membersList.title"]}}</span>
+                </h1>
+                <p>{{langStrings["primary.portal.member.list.noPermissionToAdd"]}}</p>
+            </div>
+        </div>
+        <div *ngIf="canCreateMember">
+            <empowered-census></empowered-census>
+        </div>
+    </div>
+</div>
+<div *ngIf="!canReadMember">
+    <div class="member-list-wrapper">
+        <h1 role="heading" class="member-list-header">
+            <span>{{langStrings["primary.portal.members.membersList.title"]}}</span>
+        </h1>
+        <p>{{langStrings["primary.portal.member.list.noPermissionToRead"]}}</p>
+    </div>
+</div>
+<!-- Outer Wrapper -->
+<div [hidden]="showZeroState !== false">
+    <div>
+        <div class="member-list-wrapper">
+            <ng-container *ngIf="membersList$ | async as membersList">
+                <h1 role="heading" class="member-list-header">
+                    <span language="{{membersListLanguagePath}}.title"></span
+                    ><span class="mon-ml-10 account-count">({{ activeCount }})</span>
+                </h1>
+            </ng-container>
+            <mon-alert *ngIf="alertMessage.show" [alertType]="alertMessage.type" closeButton="true">
+                <span>{{ alertMessage.message }}</span>
+            </mon-alert>
+            <!-- Search Filter -->
+            <div class="search-filter-wraper">
+                <empowered-search
+                    [searchTerm]="searchTerm"
+                    [dropdownStatus]="dropdownStatus"
+                    (searchInputEvent)="searchInputEvent($event)"
+                    (filterByIdName)="filterByIdName($event)"
+                    (keyPressEvent)="keyPressEvent($event)"
+                    (clickOutsideElement)="clickOutsideElement($event)"
+                    (applySearchFilter)="applySearchFilter($event)"
+                    [languageName]="'primary.portal.members.membersList.name'"
+                    [languageId]="'primary.portal.members.membersList.id'"
+                    [languageSearch]="'primary.portal.members.membersList.search.employees'"
+                    [languageSearchHint]="'primary.portal.members.membersList.searchHint'"
+                    [filterId]="'ID'"
+                    [filterName]="'Name'"
+                    (keyDown)="onKey($event)"
+                    [entryPoint]="'member'"
+                    [nameCount]="-1"
+                    [groupNumberCount]="-1"
+                    [altGroupNumberCount]="-1"
+                ></empowered-search>
+                <div [formGroup]="form" class="search-filter-group">
+                    <!-- <div class="search-wrapper">
+                        <mat-label language="{{membersListLanguagePath}}.search"></mat-label>
+                        <div (click)="searchInputEvent($event)" (empoweredClickOutside)="clickOutsideElement($event)">
+                            <mat-form-field>
+                                <input
+                                    [attr.aria-label]="languageStrings.searchEmployees"
+                                    type="text"
+                                    class="mon-pt-5"
+                                    formControlName="searchInput"
+                                    matInput
+                                    autocomplete="off"
+                                    (keyup)="[applySearchFilter($event.target.value), keyPressEvent($event)]"
+                                    (keydown.Tab)="onKey($event)"
+                                />
+                            </mat-form-field>
+                            <div
+                                *ngIf="searchTerm && searchTerm.length >= 3 && dropdownStatus"
+                                class="search-box-wrapper"
+                            >
+                                <div class="search-box-sub-wrapper">
+                                    <mat-action-list>
+                                        <div class="search-account-menu">
+                                            <mat-label
+                                                language="{{membersListLanguagePath}}.name"
+                                                class="w-80"
+                                            ></mat-label>
+                                            <span class="field-value">
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    value="name"
+                                                    mat-flat-button
+                                                    (click)="filterByIdName('Name')"
+                                                    >{{searchTerm}}</a
+                                                >
+                                            </span>
+                                        </div>
+                                        <div class="search-account-menu">
+                                            <mat-label language="{{membersListLanguagePath}}.id" class="field-id w-80">
+                                            </mat-label>
+                                            <span class="field-value">
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    value="id"
+                                                    mat-flat-button
+                                                    (click)="filterByIdName('ID')"
+                                                    >{{searchTerm}}</a
+                                                >
+                                            </span>
+                                        </div>
+                                    </mat-action-list>
+                                </div>
+                            </div>
+                            <mat-hint class="mon-hint-msg" language="{{membersListLanguagePath}}.searchHint"></mat-hint>
+                        </div>
+                    </div> -->
+                    <div class="filter-wrapper">
+                        <mat-label class="mat-label mon-label" language="{{membersListLanguagePath}}.filterLabel"></mat-label>
+                        <div class="filter-sub-wrapper">
+                            <!-- Status -->
+                            <mat-form-field
+                                [attr.aria-label]="languageStrings.status"
+                                *ngIf="statusList.length !== 0"
+                                (click)="resetFilterOptions('status')"
+                            >
+                                <label class="filter-label" id="filterStatus"
+                                    >{{langStrings['primary.portal.members.membersList.status']}}</label
+                                >
+                                <mat-select
+                                    #statusFilterDropdown
+                                    [formControl]="statuses"
+                                    multiple
+                                    disableOptionCentering
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-status"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    aria-labelledby="filterStatus"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-option *ngFor="let status of statusList" [value]="status">
+                                            {{status}}
+                                            <span language="{{membersListLanguagePath}}.lowerCase.employees"></span>
+                                        </mat-option>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="filterDataStatusList.length !== 0"
+                                                href="javascript:void(0)"
+                                                (click)="clearFilterList('status')"
+                                                >{{langStrings["primary.portal.members.membersList.filter.clear"]}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="submitFilterList('status')"
+                                                language="{{membersListLanguagePath}}.filter.apply"
+                                                class="mon-apply"
+                                                >{{langStrings["primary.portal.members.membersList.filter.apply"]}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label">{{displayStatusContent}}</label>
+                            </mat-form-field>
+                            <!-- Status -->
+                            <!-- Coverage -->
+                            <mat-form-field [attr.aria-label]="languageStrings.coverages" (click)="resetFilterOptions('product')">
+                                <label class="filter-label" id="filterCoverage"
+                                    >{{langStrings['primary.portal.members.membersList.coverage']}}</label
+                                >
+                                <mat-select
+                                    #productFilterDropdown
+                                    [formControl]="products"
+                                    multiple
+                                    disableOptionCentering
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-coverage"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    (selectionChange)="coverageOptionSelect($event.value)"
+                                    aria-labelledby="filterCoverage"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-checkbox
+                                            *ngIf="productList.length > 10"
+                                            class="mat-option"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate()"
+                                            [checked]="isChecked('product')"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event, 'product')"
+                                            ><span
+                                                language="{{membersListLanguagePath}}.selectAll"
+                                                [attr.aria-label]="languageStrings.checkbox"
+                                            ></span>
+                                        </mat-checkbox>
+                                        <mat-option
+                                            *ngFor="let product of productList"
+                                            [value]="product"
+                                            [disabled]="disableCoverageProducts"
+                                        >
+                                            {{product}}
+                                        </mat-option>
+                                        <mat-divider></mat-divider>
+                                        <mat-option [value]="NONE" [disabled]="disableOptionNoBenefits">
+                                            {{langStrings['primary.portal.customer.noBenefits']}}
+                                        </mat-option>
+                                        <div class="mon-clear">
+                                            <div>
+                                                <a
+                                                    *ngIf="filterDataProductList.length !== 0"
+                                                    href="javascript:void(0);"
+                                                    (click)="clearFilterList('product')"
+                                                    >{{langStrings["primary.portal.members.membersList.filter.clear"]}}</a
+                                                >
+                                            </div>
+                                            <div>
+                                                <a href="javascript:void(0);" (click)="submitFilterList('product')" class="mon-apply"
+                                                    >{{langStrings["primary.portal.members.membersList.filter.apply"]}}</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label">{{displayProductContent}}</label>
+                            </mat-form-field>
+                            <!-- Coverage -->
+                            <!-- Notifications-->
+                            <mat-form-field
+                                [attr.aria-label]="languageStrings.notification"
+                                *ngIf="notificationList.length !== 0"
+                                (click)="resetFilterOptions('notification')"
+                            >
+                                <label class="filter-label" id="filterNotification"
+                                    >{{langStrings['primary.portal.members.membersList.notification']}}</label
+                                >
+                                <mat-select
+                                    #notificationFilterDropdown
+                                    [formControl]="notifications"
+                                    multiple
+                                    disableOptionCentering
+                                    disableOptionCentering="true"
+                                    panelClass="list-grid-filter filter-notification"
+                                    (openedChange)="matSelectOpenHandler($event)"
+                                    aria-labelledby="filterNotification"
+                                >
+                                    <mat-select-trigger> </mat-select-trigger>
+                                    <div class="filter-options">
+                                        <mat-checkbox
+                                            *ngIf="notificationList.length > 10"
+                                            class="mat-option"
+                                            [disableRipple]="true"
+                                            [indeterminate]="isIndeterminate()"
+                                            [checked]="isChecked('notification')"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="toggleSelection($event, 'notification')"
+                                            ><span
+                                                language="{{membersListLanguagePath}}.selectAll"
+                                                [attr.aria-label]="languageStrings.checkbox"
+                                            ></span>
+                                        </mat-checkbox>
+                                        <mat-option *ngFor="let notification of notificationList" [value]="notification.id"
+                                            >{{notification.displayText}}
+                                        </mat-option>
+                                    </div>
+                                    <div class="mon-clear">
+                                        <div>
+                                            <a
+                                                *ngIf="filterDataNotificationList.length !== 0"
+                                                href="javascript:void(0);"
+                                                (click)="clearFilterList('notification')"
+                                                >{{langStrings["primary.portal.members.membersList.filter.clear"]}}</a
+                                            >
+                                        </div>
+                                        <div>
+                                            <a href="javascript:void(0);" (click)="submitFilterList('notification')" class="mon-apply"
+                                                >{{langStrings["primary.portal.members.membersList.filter.apply"]}}</a
+                                            >
+                                        </div>
+                                    </div>
+                                </mat-select>
+                                <label class="filter-label">{{displayNotificationContent}}</label>
+                            </mat-form-field>
+                            <!-- Notifications-->
+                        </div>
+                    </div>
+                    <div class="search-action-buttons">
+                        <ng-container *ngIf="hasPrivilege$ | async">
+                            <button
+                                mat-flat-button
+                                *ngIf="canCreateMember && showAddEmployee"
+                                class="mon-btn-secondary btn-sm pull-down-sm mon-mr-20"
+                                [matMenuTriggerFor]="addEmployee"
+                                [attr.aria-label]="langStrings['primary.portal.members.membersList.addEmployees']"
+                            >
+                                <span>{{langStrings["primary.portal.members.membersList.addEmployees"]}}</span>
+                                <mon-icon iconSize="8" iconName="down" class="icon-right"></mon-icon>
+                            </button>
+                        </ng-container>
+                        <mat-menu #addEmployee="matMenu" xPosition="before">
+                            <button mat-menu-item *ngFor="let button of options" [value]="button.value" (click)="selectedOption(button)">
+                                {{button.name}}
+                            </button>
+                            <ng-container *configEnabled="'broker.census_upload.create_subscribers_from_existing_policies_service'">
+                                <button
+                                    mat-menu-item
+                                    class="menu-item"
+                                    *ngIf="(importEmployeePermission$ | async) && (!isTpiAccount || showImportAflac)"
+                                    (click)="importFromAflac()"
+                                >
+                                    {{importingFromAflac}}
+                                </button>
+                            </ng-container>
+                        </mat-menu>
+                    </div>
+                </div>
+            </div>
+            <!-- Search Filter -->
+
+            <!-- Table - Members -->
+            <div class="w-100-percent member-list-table-detail results-grid table-mask-wrapper" [ngClass]="{'grid-overlay' : filterOpen}">
+                <table
+                    mat-table
+                    [dataSource]="dataSource"
+                    matSort
+                    matSortDirection="asc"
+                    matSortDisableClear
+                    (matSortChange)="sortData($event)"
+                >
+                    <!-- Header row  firstgroup -->
+                    <ng-container [matColumnDef]="membersListColumnsMap[0].propertyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                            <span language="{{membersListLanguagePath}}.table.column.name"></span>
+                        </th>
+
+                        <td
+                            mat-cell
+                            [ngClass]="{'sorted-column': activeCol === membersListColumnsMap[0].propertyName}"
+                            *matCellDef="let member"
+                        >
+                            <!-- FIXME - This is a temporary fix for threshold condition. -->
+                            <a
+                                (click)="fetchRowDetails(member)"
+                                href="javascript:void(0)"
+                                [attr.aria-label]="ariaLabelForMemberName(member.firstName, member.lastName)"
+                                >{{ member.lastName }}, {{ member.firstName }}
+                                <span
+                                    class="term"
+                                    *ngIf="member.status==='TERMINATED'"
+                                    language="primary.portal.member.terminate.gridtermination"
+                                >
+                                </span
+                                ><span *ngIf="member.test"> {{langStrings["primary.portal.member.testText"]}}</span>
+                            </a>
+                        </td>
+                    </ng-container>
+
+                    <ng-container [matColumnDef]="membersListColumnsMap[1].propertyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold" class="w-100">
+                            <span language="{{membersListLanguagePath}}.table.column.registered"></span>
+                        </th>
+                        <td
+                            mat-cell
+                            [ngClass]="{'sorted-column': activeCol === membersListColumnsMap[1].propertyName}"
+                            *matCellDef="let member"
+                            class="text-center"
+                        >
+                            <mon-icon *ngIf="member.registered && !isTpiAccount" iconName="check" iconSize="15"></mon-icon>
+                        </td>
+                    </ng-container>
+
+                    <ng-container [matColumnDef]="membersListColumnsMap[2].propertyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                            <span language="{{membersListLanguagePath}}.table.column.coverage"></span>
+                        </th>
+                        <td
+                            class="mon-pl-10"
+                            mat-cell
+                            [ngClass]="{'sorted-column': activeCol === membersListColumnsMap[2].propertyName}"
+                            *matCellDef="let member"
+                        >
+                            <div *ngIf="member.products">
+                                <span *ngIf="member.hasPending; else noPending" [attr.aria-label]="languageStrings.warning">
+                                    <mon-icon class="icon-warning" iconName="Filled-warning" [iconSize]="15"></mon-icon
+                                    ><span>{{langStrings["primary.portal.qle.pendingText"]}}</span>
+                                </span>
+                                <ng-template #noPending
+                                    >{{ member.coverageNameList.length}}
+                                    <span *ngIf="member.coverageNameList.length>1; else oneProduct"
+                                        >{{langStrings["primary.portal.direct.policies"]}}</span
+                                    ></ng-template
+                                >
+                                <ng-template #oneProduct>{{langStrings["primary.portal.direct.policy"]}}</ng-template>
+                                <a
+                                    href="javascript:void(0)"
+                                    matTooltipPosition="above"
+                                    attr.aria-label="{{ member.totalCost | currency: 'USD':'symbol':'1.0-0' }} {{ member.coverageNameList }}"
+                                    [richTooltip]="member.matTooltipContent"
+                                >
+                                    <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="15"></mon-icon>
+                                </a>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <ng-container [matColumnDef]="membersListColumnsMap[3].propertyName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span language="{{membersListLanguagePath}}.table.column.dependents"></span>
+                        </th>
+                        <td mat-cell *matCellDef="let member" class="mon-pl-10">{{ member.dependents | relations }}</td>
+                    </ng-container>
+
+                    <ng-container [matColumnDef]="membersListColumnsMap[4].propertyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                            <span language="{{membersListLanguagePath}}.table.column.id"></span>
+                        </th>
+                        <td
+                            mat-cell
+                            [ngClass]="{'sorted-column': activeCol === membersListColumnsMap[4].propertyName}"
+                            *matCellDef="let member"
+                            class="mon-pl-10"
+                        >
+                            {{ member.employeeId }}
+                        </td>
+                    </ng-container>
+                    <ng-container [matColumnDef]="membersListColumnsMap[5].propertyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="threshold">
+                            <span class="sr-only">Notification count</span>
+                            <mon-icon [iconSize]="14" iconName="bell" class="icon-gray"></mon-icon>
+                        </th>
+                        <td *matCellDef="let element" mat-cell [ngClass]="{'sorted-column': activeCol === 'notificationCount'}">
+                            <span
+                                [richTooltip]="getNotificationToolTipContent(element.notifications)"
+                                matTooltipPosition="above"
+                                *ngIf="element.notificationSum > 0"
+                                class="notification-badge"
+                            >
+                                <span class="notification-count" *ngIf="element.notificationSum > 99"
+                                    >{{langStrings["primary.portal.notificationCount"]}}</span
+                                >
+                                <span class="notification-count" *ngIf="element.notificationSum < 100">{{element.notificationSum}}</span>
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container [matColumnDef]="membersListColumnsMap[6].propertyName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <span class="sr-only">{{langStrings["primary.portal.members.membersList.shop"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let member">
+                            <ng-container *ngIf="hasPrivilege$ | async">
+                                <ng-container *hasPermission="'core.shopping.read'">
+                                    <ng-container *hasPermission="permissionEnum.SHOP_READ">
+                                        <button
+                                            *ngIf="isShopEnabled && (member.status!=='TERMINATED') && !unpluggedFeatureFlag
+                                            && member.showShopButton"
+                                            mat-icon-button
+                                            class="mon-btn-link visible-on-row-hover"
+                                            (click)="specificShopNav(member)"
+                                        >
+                                            <span>{{langStrings["primary.portal.members.membersList.shop"]}}</span>
+                                            <mon-icon class="icon-primary" iconName="right" [iconSize]="10"></mon-icon>
+                                        </button>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="header-row-first-group">
+                        <th
+                            mat-header-cell
+                            *matHeaderCellDef
+                            [attr.colspan]="8"
+                            language="{{membersListLanguagePath}}.thresholdWarning"
+                            class="text-center"
+                        ></th>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsArray"></tr>
+                    <tr mat-header-row *matHeaderRowDef="['header-row-first-group']" [hidden]="!threshold"></tr>
+                    <tr
+                        mat-row
+                        *matRowDef="let row; columns: displayedColumnsArray"
+                        [ngClass]="{'inactive': row.status==='TERMINATED'}"
+                    ></tr>
+                </table>
+
+                <div
+                    *ngIf="resultsLoaded && dataSource.data.length === 0"
+                    class="w-100-percent no-results-found text-center mon-pt-50 mon-pb-50"
+                >
+                    <span language="{{membersListLanguagePath}}.noResultsFound"></span>
+                    <span *ngIf="noResultsFoundMessage" language="{{membersListLanguagePath}}.for"></span>
+                    <span
+                        language="{{membersListLanguagePath}}.coverageResult"
+                        *ngIf="filter.query.products.length !== 0 && filter.query.status.length === 0 && latestOperation === 'product'"
+                    ></span>
+                    <span
+                        language="{{membersListLanguagePath}}.statusResult"
+                        *ngIf="filter.query.status.length !== 0 && filter.query.products.length === 0 && latestOperation === 'status'"
+                    ></span>
+                    <span
+                        language="{{membersListLanguagePath}}.{{noResultsFoundMessage}}"
+                        *ngIf="filter.query.status.length !== 0 && filter.query.products.length !== 0"
+                    ></span>
+                    <span *ngIf="noResultsFoundMessage"> {{ noResultsFoundMessage }}</span>
+                </div>
+            </div>
+            <!-- Table Members -->
+            <div class="min-range-label" [hidden]="dataSource?.data.length === 0 || dataSource?.paginator?.getNumberOfPages() > 1">
+                <span *ngIf="dataSource.data.length !== 1"
+                    >{{ langStrings["primary.portal.member.list.showingItems"].replace("#no", dataSource.data.length) }}</span
+                >
+                <span *ngIf="dataSource.data.length === 1"
+                    >{{ langStrings["primary.portal.member.list.showingItem"].replace("#no", dataSource.data.length) }}</span
+                >
+            </div>
+            <!-- Pagination -->
+            <div>
+                <empowered-paginator [data]="dataSource.data"></empowered-paginator>
+            </div>
+            <!-- pagination -->
+        </div>
+        <!-- outer wrapper -->
+    </div>
+</div>

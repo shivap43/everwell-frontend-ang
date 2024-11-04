@@ -1,0 +1,58 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-50 w-600 form-mobile">
+    <!-- Loading Spinner-->
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+    <mat-card role="phone number">
+        <mat-card-content>
+            <mat-card-title language="primary.portal.register.verifyAuthenticationTitle"></mat-card-title>
+            <p *ngIf="verifyMethod == 'email'" class="mon-mt-0 mon-mb-30">
+                {{ languageStrings['primary.portal.register.verifyCodeEmailMessage'] | replaceTag: {"#communicationmethod#": email } }}
+            </p>
+            <p *ngIf="verifyMethod == 'phone'" class="mon-mt-0 mon-mb-30">
+                {{ languageStrings['primary.portal.register.verifyCodePhoneMessage'] | replaceTag: {"#communicationmethod#": phone } }}
+            </p>
+
+            <mat-label class="mat-label" language="primary.portal.register.verifyAuthenticationCodeName"></mat-label>
+            <mat-form-field class="w-130">
+                <input
+                    formControlName="authCode"
+                    matInput
+                    type="Verify"
+                    [attr.aria-label]="languageStrings['primary.portal.register.verifyAuthenticationCodeName']"
+                />
+                <mat-error>
+                    <span
+                        *ngIf="form.controls['authCode'].hasError('required') || requiredError"
+                        language="secondary.portal.register.requiredField"
+                    ></span>
+                </mat-error>
+            </mat-form-field>
+            <div class="w-400">
+                <mon-alert *ngIf="error" alertType="danger">
+                    <span [language]="errorMessage"></span>
+                </mon-alert>
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer *ngIf="!isSelfService" class="d-flex justify-content-between bg-gray-100">
+            <a href="javascript:void(0)" class="mon-btn-link mon-pt-10" routerLink="../../1"
+                >{{languageStrings['primary.portal.common.back']}}</a
+            >
+            <button class="mon-btn-primary" mat-flat-button type="submit">{{languageStrings['primary.portal.common.submit']}}</button>
+        </mat-card-footer>
+        <mat-card-footer *ngIf="isSelfService" class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-px-30 mon-mb-30 mon-btn-primary"
+                mat-flat-button
+                type="submit"
+                language="primary.portal.common.submit"
+            ></button>
+            <p class="mon-m-0">
+                <a href="javascript:void(0)" language="primary.portal.forgotPassword.didNotReceiveCode" (click)="getAuthCode()"></a>
+            </p>
+            <mat-divider class="mon-my-20"></mat-divider>
+            <p class="mon-m-0 mon-my-15">
+                <a href="javascript:void(0)" class="mon-btn-link mon-pt-10" routerLink="../../1" language="primary.portal.common.back"></a>
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

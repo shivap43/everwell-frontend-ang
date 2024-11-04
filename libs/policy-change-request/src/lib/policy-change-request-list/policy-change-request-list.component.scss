@@ -1,0 +1,129 @@
+@import "shared";
+
+.member-list-wrapper {
+    margin: 0 convert-unit(30px, "rem");
+    .filter-applied {
+        ::ng-deep {
+            .mat-form-field-flex {
+                background-color: get("color.gray.800");
+                color: get("color.white");
+                @include fontFace("primary.regular");
+                font-weight: 700;
+            }
+        }
+    }
+}
+.w-100-percent {
+    width: 100%;
+}
+
+th.mat-column-header-row-first-group {
+    border-bottom: none;
+    background-color: get("color.lightYellow");
+    color: get("color.black");
+}
+
+.member-list-wrapper {
+    ::ng-deep .no-mat-pseudo-checkbox {
+        display: none;
+    }
+}
+
+.policyChangeRequestwrapper {
+    margin: 0 0 0 convert-unit(30px, "rem");
+    h1 {
+        margin: convert-unit(30px, "rem") 0 0 0;
+    }
+    p {
+        margin: convert-unit(20px, "rem") 0 convert-unit(20px, "rem") 0 !important;
+    }
+}
+
+.mon-btn-secondary {
+    &.requestchange {
+        margin: 0 convert-unit(20px, "rem") 0 0;
+    }
+
+    &.menubtn {
+        padding-left: 1rem !important;
+        width: convert-unit(60px, "rem");
+        height: convert-unit(32px, "rem");
+    }
+}
+
+.member-list-table-detail {
+    ::ng-deep {
+        .mat-column-manage {
+            text-align: left;
+        }
+    }
+}
+
+td.mat-column-policyHolderName,
+th.mat-column-policyHolderName {
+    width: 25% !important;
+}
+
+td.mat-column-requestNumber,
+th.mat-column-requestNumber {
+    width: 15% !important;
+}
+
+td.mat-column-requestType,
+th.mat-column-requestType {
+    width: 20% !important;
+}
+
+td.mat-column-dateSubmitted,
+th.mat-column-dateSubmitted {
+    width: 15% !important;
+}
+td.mat-mat-column-status,
+th.mat-column-status {
+    width: 15% !important;
+}
+td.mat-column-manage,
+th.mat-column-manage {
+    width: 10% !important;
+}
+
+.search-filter-wraper {
+    button {
+        &.requestchange {
+            height: convert-unit(32px, "rem");
+            line-height: 0;
+            @include media-max("l") {
+                min-width: auto;
+            }
+        }
+    }
+}
+.filter-options {
+    padding: convert-unit(25px, "rem") convert-unit(20px, "rem") convert-unit(20px, "rem");
+}
+
+::ng-deep {
+    .pcrsuccess {
+        margin: 0 0 convert-unit(20px, "rem") 0;
+        .alert-prefix {
+            z-index: -1 !important;
+        }
+    }
+}
+
+::ng-deep .account-list-more-view {
+    display: flex;
+    flex-direction: column;
+    padding: convert-unit(10px, "rem") convert-unit(20px, "rem") 0;
+    border: convert-unit(1px, "rem") solid get("color.gray.500");
+    border-radius: convert-unit(4px, "rem");
+    background-color: get("color.white");
+    margin-top: convert-unit(10px, "rem");
+}
+
+.aflac-always {
+    margin-top: convert-unit(30px, "rem");
+    margin-bottom: convert-unit(30px, "rem");
+    margin-right: convert-unit(30px, "rem");
+    margin-left: convert-unit(30px, "rem");
+}

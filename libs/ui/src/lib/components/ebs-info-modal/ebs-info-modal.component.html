@@ -1,0 +1,18 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="true">
+    <empowered-modal-header>
+        <span>{{languageStrings["primary.portal.applicationFlow.ebs.modal.title"]}}</span>
+    </empowered-modal-header>
+    <div [innerHTML]="modalText"></div>
+    <empowered-modal-footer>
+        <div>
+            <button class="mon-btn-secondary mon-mr-20" type="button" mat-flat-button *ngIf="fromEnrollmentDetails" (click)="goBack()">
+                <mon-icon class="mon-icon icon-left" iconSize="12" iconName="left"></mon-icon>
+                <span>{{languageStrings['primary.portal.common.back']}}</span>
+            </button>
+            <button class="mon-btn-primary" mat-flat-button (click)="gotoAflacEBS()">
+                <span>{{languageStrings["primary.portal.applicationFlow.ebs.modal.continue"]}}</span>
+                <mon-icon class="icon-primary" iconName="share-vector"></mon-icon>
+            </button>
+        </div>
+    </empowered-modal-footer>
+</empowered-modal>

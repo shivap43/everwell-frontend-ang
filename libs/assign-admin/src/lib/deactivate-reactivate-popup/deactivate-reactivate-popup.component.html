@@ -1,0 +1,31 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            mat-icon-button
+            (click)="closeForm()"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            <span>{{this.data.selectedAdmin.name.firstName +" "+ this.data.selectedAdmin.name.lastName}}</span>
+            <span *ngIf="this.data.value">
+                {{languageStrings['primary.portal.deactivateReactivateAdmin.successfullyDeactivated']}}</span
+            >
+            <span *ngIf="!this.data.value">
+                {{languageStrings['primary.portal.deactivateReactivateAdmin.successfullyReactivated']}}</span
+            >
+        </h2>
+
+        <p class="subtitle">
+            {{languageStrings['primary.portal.deactivateReactivateAdmin.deactivateReactivateSubtitle'].replace("##adminFirst##",this.data.selectedAdmin.name.firstName)}}
+        </p>
+    </div>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button class="mon-btn-primary" mat-flat-button (click)="closeForm()">
+            {{languageStrings['primary.portal.common.gotIt']}}
+        </button>
+    </mat-dialog-actions>
+</div>

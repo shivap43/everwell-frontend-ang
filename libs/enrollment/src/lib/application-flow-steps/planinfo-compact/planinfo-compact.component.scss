@@ -1,0 +1,108 @@
+@import "shared";
+
+.planinfo-container {
+    box-shadow: 0px 2px 4px 0px rgba($color: get("color.black"), $alpha: 0.23);
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+    position: relative;
+    z-index: 10;
+
+    .planinfo-section {
+        padding: convert-unit(20px, "rem") convert-unit(30px, "rem") convert-unit(20px, "rem") convert-unit(20px, "rem");
+
+        .planinfo-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            .plan-name,
+            .pay-frequency {
+                color: get("color.gray.600");
+            }
+
+            .price-view {
+                text-align: right;
+            }
+            h2 {
+                margin: 0;
+                color: get("color.black");
+            }
+        }
+    }
+
+    &.tpi-plan-info {
+        .planinfo-section {
+            padding: map-get($spacers, 15) map-get($spacers, 30);
+            .planinfo-compact {
+                align-items: flex-start;
+                .product-name {
+                    color: get("color.gray.700");
+                }
+            }
+            .price-view h2 {
+                font-size: convert-unit(16px, "rem");
+            }
+            .pay-frequency {
+                font-size: convert-unit(12px, "rem");
+            }
+        }
+    }
+}
+
+.content-column {
+    > div {
+        display: flex;
+        font-size: convert-unit(16px, "rem");
+        justify-content: space-between;
+
+        > span {
+            padding-bottom: map-get($spacers, 10);
+        }
+
+        > span.content-label {
+            @include fontFace("primary.bold");
+            width: convert-unit(150px, "rem");
+            margin-right: map-get($spacers, 20);
+            text-align: left !important;
+            color: get("color.black");
+
+            &.base-adjustment-cost {
+                @include fontFace("primary.regular");
+            }
+        }
+    }
+    &.coverage-details {
+        > div {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+    }
+    .final-cost-currency {
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+
+        .currency {
+            @include fontFace("primary.bold");
+            font-size: convert-unit(22px, "rem");
+        }
+        .payFrequency {
+            @include fontFace("primary.bold");
+        }
+    }
+
+    .action-links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-top: map-get($spacers, 10);
+    }
+}
+
+.tax-section-wrapper {
+    .tax-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: map-get($spacers, 20);
+    }
+}

@@ -1,0 +1,81 @@
+@import "shared";
+.commission-wrapper {
+    margin: map-get($spacers, 0) map-get($spacers, 30);
+    .message-block {
+        margin-top: map-get($spacers, 20);
+        display: block;
+    }
+    .commission-splits-expansion {
+        border: none;
+        margin-bottom: map-get($spacers, 15);
+        .mat-expansion-panel-header {
+            padding: map-get($spacers, 0) map-get($spacers, 30);
+            background-color: get("color.gray.200");
+            .mat-expansion-panel-header-title {
+                align-items: center;
+                .split-header {
+                    color: get("color.black");
+                    font-size: convert-unit(18px, "rem");
+                }
+            }
+        }
+        ::ng-deep .mat-expansion-panel-body {
+            padding: map-get($spacers, 0) map-get($spacers, 30) !important;
+            background-color: get("color.gray.200");
+        }
+    }
+    .commission-split {
+        background-color: get("color.gray.200");
+        margin-bottom: map-get($spacers, 15);
+        .commission-splits-expansion {
+            margin-bottom: map-get($spacers, 0);
+        }
+    }
+    .split-applied-panel {
+        display: flex;
+        justify-content: flex-start;
+        padding: map-get($spacers, 0) map-get($spacers, 30) map-get($spacers, 15);
+    }
+    .split-panel,
+    .applied-panel {
+        flex-basis: 50%;
+        .applied-panel-title,
+        .split-panel-title {
+            font-size: convert-unit(14px, "rem");
+            color: get("color.black");
+            @include fontFace("primary.bold");
+        }
+        .applied-panel-description {
+            color: get("color.gray.600");
+        }
+    }
+    .applied-panel {
+        padding-left: map-get($spacers, 30);
+    }
+    .split-details {
+        display: flex;
+        justify-content: flex-start;
+        p {
+            padding-right: map-get($spacers, 15);
+            color: get("color.gray.600");
+        }
+    }
+    .remove-split {
+        color: get("color.info.danger.500");
+    }
+    .panel-white-out {
+        position: relative;
+
+        &:before {
+            content: " ";
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background-color: rgba($color: get("color.white"), $alpha: 0.8);
+            z-index: 1;
+        }
+    }
+    .alert-wrapper {
+        margin-bottom: map-get($spacers, 20);
+    }
+}

@@ -1,0 +1,45 @@
+<ng-container *ngIf="selectedPlanOfferingWithCartAndEnrollment$ | async as planOfferingWithCartAndEnrollment">
+    <ng-container *ngIf="!planOfferingWithCartAndEnrollment.cartItemInfo; else planInCart">
+        <ng-container *ngIf="{ value: isShoppingCartLocked$ | async } as isShoppingCartLocked">
+            <ng-container *ngIf="{ value: disableAddCart$ | async } as disableAddCart">
+                <empowered-add-update-cart-button
+                    *ngIf="isShoppingCartLocked.value === false; else shoppingCartLocked"
+                    [addUpdateCartButtonState]="addUpdateCartButtonStateEnum.ADD_TO_CART"
+                    [disableAddCart]="disableAddCart.value"
+                    (addToCartHandler)="addUpdateCart()"
+                ></empowered-add-update-cart-button>
+            </ng-container>
+            <ng-template #shoppingCartLocked>
+                <empowered-add-update-cart-button
+                    [addUpdateCartButtonState]="addUpdateCartButtonStateEnum.ADD_TO_CART"
+                    [disableAddCart]="true"
+                    [toolTipText]="languageStrings['primary.portal.producerShopPage.toolTipText.anotherUserIsUpdatingCart']"
+                ></empowered-add-update-cart-button>
+            </ng-template>
+        </ng-container>
+    </ng-container>
+    <ng-template #planInCart>
+        <ng-container *ngIf="{changed: isCartDataChanged$ | async} as isCartDataChanged">
+            <ng-container *ngIf="!isCartDataChanged.changed; else update">
+                <empowered-add-update-cart-button
+                    *ngIf="(planOfferingWithCartAndEnrollment?.cartItemInfo || planOfferingWithCartAndEnrollment?.enrollment)"
+                    [addUpdateCartButtonState]="addUpdateCartButtonStateEnum.IN_CART"
+                ></empowered-add-update-cart-button>
+            </ng-container>
+            <ng-template #update>
+                <empowered-add-update-cart-button
+                    *ngIf="(isShoppingCartLocked$ | async) === true; else shoppingCartNotLocked"
+                    [addUpdateCartButtonState]="addUpdateCartButtonStateEnum.UPDATE_CART"
+                    [disableAddCart]="true"
+                ></empowered-add-update-cart-button>
+                <ng-template #shoppingCartNotLocked>
+                    <empowered-add-update-cart-button
+                        *ngIf="(isShoppingCartLocked$ | async)=== false"
+                        [addUpdateCartButtonState]="addUpdateCartButtonStateEnum.UPDATE_CART"
+                        (addToCartHandler)="addUpdateCart()"
+                    ></empowered-add-update-cart-button>
+                </ng-template>
+            </ng-template>
+        </ng-container>
+    </ng-template>
+</ng-container>

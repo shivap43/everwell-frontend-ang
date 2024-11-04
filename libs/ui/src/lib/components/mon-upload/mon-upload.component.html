@@ -1,0 +1,115 @@
+<div
+    (drop)="drop($event)"
+    (dragover)="allowDrop($event)"
+    (dragleave)="drag($event)"
+    (click)="fileInput.click()"
+    [ngClass]="{'file-dragged': isFileDragged, 'file-not-dragged': !isFileDragged,'single-file-upload':isSingleFile}"
+>
+    <button class="mon-btn-upload" type="button" [ngClass]="{'file-selected': !fileBrowsed , 'file-not-selected': fileBrowsed}">
+        <span> {{languageStrings["primary.portal.shared.ui.monUpload.uploadLabel"]}} </span>
+        <a href="javascript:void(0)">
+            <span class="sr-only"> {{languageStrings["primary.portal.shared.ui.monUpload.filesForUpload"]}} </span>
+            <span> {{languageStrings["primary.portal.shared.ui.monUpload.uploadLabel.browse"]}} </span>
+        </a>
+    </button>
+    <input
+        hidden
+        type="file"
+        #fileInput
+        (change)="onUpload($event.target.files[0])"
+        accept="{{this.accept}}"
+        (click)="fileInput.value = null"
+        value=""
+        [attr.aria-label]="languageStrings['primary.portal.shared.ui.monUpload.uploadLabel']"
+    />
+</div>
+<div *ngIf="!hint">
+    <mat-hint *ngIf="isFileViewable && !isQLE"> {{languageStrings["primary.portal.qle.pendingEnrollment.fileAcceptMsg"]}} </mat-hint>
+    <mat-hint *ngIf="!isFileViewable || isQLE">
+        {{ "primary.portal.dashboard.census.fileAcceptMsg" | replaceTag: { "#allowed": this.acceptFormat } }}
+    </mat-hint>
+</div>
+<div *ngIf="hint" [ngClass]="{'single-file-upload':isSingleFile}">
+    <mat-hint>{{ hintText }}</mat-hint>
+</div>
+
+<mat-error *ngIf="(files === [] && !isFileSelected) || fileBrowsed">
+    {{languageStrings["primary.portal.shared.ui.monUpload.errorLabel"]}}
+</mat-error>
+<div class="mat-hint-desc">
+    <mat-hint *ngIf="this.isExistingDoc">
+        {{ "primary.portal.census.lastUpload" | replaceTag: { "#filename": this.lastUploadFileName, "#adminname": this.uploadedAdminName }
+        }} {{lastUploadedFileDate | date:'MM/dd/yy' }}
+    </mat-hint>
+</div>
+<div *ngIf="files!=[]">
+    <div *ngFor="let file of files;let i=index" class="file-list-wrapper">
+        <div class="files-list" *ngIf="file!=null">
+            <div class="file-item">
+                <div
+                    *ngIf="!this.isFileViewable && file.name.length>24"
+                    richTooltip="{{file.name}}"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                    class="file-name-wrapper"
+                >
+                    <p><mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>{{file.modifiedName}}</p>
+                </div>
+                <p class="file-name-wrapper" *ngIf="!this.isFileViewable && file.name.length<=24">
+                    <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>{{file.modifiedName}}
+                </p>
+                <div
+                    *ngIf="isFileViewable  && file.name.length>24"
+                    richTooltip="{{file.name}}"
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                    class="file-name-wrapper"
+                >
+                    <p>
+                        <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+                        <a href="javascript:void(0)" class="file-name" (click)="onClickViewFile(file)"> {{file.modifiedName}} </a>
+                    </p>
+                </div>
+                <p class="file-name-wrapper" *ngIf="this.isFileViewable && file.name.length<=24">
+                    <mon-icon class="icon-black" iconName="file" [iconSize]="15"></mon-icon>
+                    <a href="javascript:void(0)" class="file-name" (click)="onClickViewFile(file)"> {{file.modifiedName}} </a>
+                </p>
+                <div class="file-status">
+                    <span *ngIf="isSucess[i]">
+                        <mon-icon class="icon-success" iconName="check" [iconSize]="15"></mon-icon>
+                        <span *ngIf="!isFileAvailable" language="{{uploadSucessStatus[i]}}"></span>
+                        <span *ngIf="isFileAvailable">{{uploadSucessStatus[i]}}</span>
+                    </span>
+                    <span *ngIf="hasError[i] && !hasWarning">
+                        <mon-icon iconName="Filled-error" [iconSize]="16" class="icon-danger"></mon-icon
+                        ><span *ngIf="!isFileError" language="{{uploadErrorStatus[i]}}"></span>
+                        <span *ngIf="isFileError">{{uploadErrorStatus[i]}}</span>
+                    </span>
+                    <span *ngIf="hasWarning">
+                        <mon-icon iconName="Filled-warning" [iconSize]="16" class="icon-warning"></mon-icon>
+                        <span language="primary.portal.monupload.mapping.warning">
+                            {{languageStrings["primary.portal.monupload.mapping.warning"]}}
+                        </span>
+                    </span>
+                    <span *ngIf="(!hasError[i] && !isSucess[i] && isProgressBarEnabled && isUploadingStarted) " class="mon-mr-10">
+                        {{fileUploadPercentage}} %
+                    </span>
+                    <span *ngIf="((!hasError[i] && !isSucess[i] && isUploadingStarted) || isFileAvailable) && !file.isExisting">
+                        <a
+                            href="javascript:void(0)"
+                            (click)="cancelFileUpload(i)"
+                            [attr.aria-label]="languageStrings['primary.portal.monupload.mapping.warning']"
+                        >
+                            <span richTooltip="Remove" matTooltipPosition="above" matTooltipClass="pos-above">
+                                <mon-icon [iconSize]="10" iconName="close" class="icon-gray"></mon-icon>
+                            </span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div *ngIf="(!hasError[i] && !isSucess[i] && isProgressBarEnabled && isUploadingStarted) ">
+                <mat-progress-bar mode="{{modeProgress}}" value="{{fileUploadPercentage}}"></mat-progress-bar>
+            </div>
+        </div>
+    </div>
+</div>

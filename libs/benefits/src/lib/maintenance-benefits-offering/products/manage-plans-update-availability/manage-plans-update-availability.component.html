@@ -1,0 +1,90 @@
+<form [formGroup]="updateAvailabiltyForm">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+    <div class="info-modal">
+        <div class="modal-header">
+            <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+        <mat-dialog-content>
+            <mon-alert *ngIf="error" alertType="danger">
+                <span> {{ this.errorMsg | replaceTag: { "#fielderror": this.fieldErrorMessage } }} </span>
+            </mon-alert>
+            <div>
+                <h1 mat-dialog-title *ngIf="this.data.opensFrom==='product'">
+                    {{languageStrings["primary.portal.maintenanceBenefitsOffering.managePlans.updateProductAvailability"]
+                    .replace("#product", this.data.productDetails.carrierName + " " +
+                    this.data.productDetails.productName) }}
+                </h1>
+                <h1 mat-dialog-title *ngIf="this.data.opensFrom==='plan'">
+                    {{languageStrings["primary.portal.maintenanceBenefitsOffering.managePlans.updatePlanAvailability"]
+                    .replace("#plan", this.data.productDetails.plan.plan.name) }}
+                </h1>
+                <div class="flex-form-wrapper">
+                    <div class="d-md-flex">
+                        <div class="flex-item w-200">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.enrollmentStartDate']}}</mat-label
+                            >
+                            <mat-form-field class="mon-date-field">
+                                <input
+                                    [matDatepicker]="enrollmentStartDate"
+                                    matInput
+                                    empoweredDateTransform
+                                    [min]="currentDate"
+                                    formControlName="enrollmentStartDate"
+                                    [attr.aria-label]="languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.enrollmentStartDate']"
+                                />
+                                <mat-datepicker #enrollmentStartDate></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix (click)="enrollmentStartDate.open()">
+                                    <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon>
+                                    </mon-icon>
+                                </mat-datepicker-toggle>
+                                <mat-error
+                                    *ngIf="!updateAvailabiltyForm.controls['enrollmentStartDate'].errors?.required"
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.invalidDate']}}</mat-error
+                                >
+                                <mat-error
+                                    *ngIf="updateAvailabiltyForm.controls['enrollmentStartDate'].errors?.required"
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.requiredField']}}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-md-flex">
+                        <div class="flex-item w-300">
+                            <mat-label class="mat-label"
+                                >{{languageStrings['primary.portal.maintenanceBenefitsOffering.managePlans.coverageStartDate']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    [placeholder]="languageStrings['primary.portal.common.select']"
+                                    disableOptionCentering="true"
+                                    formControlName="coverageStartDate"
+                                >
+                                    <mat-option *ngFor="let option of coverageStartDateOptions" [value]="option.value">
+                                        {{option.viewValue}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer">
+            <a href="javascript:void(0)" class="mon-btn-link" (click)="closeModal()">
+                {{languageStrings['primary.portal.common.cancel']}}
+            </a>
+            <button
+                *isRestricted="permissionEnum.ACCOUNT_BO_RESTRICT_UPDATE_AVAILABILITY"
+                type="submit"
+                mat-flat-button
+                class="mon-btn-primary"
+                (click)="saveAvailability()"
+            >
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </mat-dialog-actions>
+    </div>
+</form>

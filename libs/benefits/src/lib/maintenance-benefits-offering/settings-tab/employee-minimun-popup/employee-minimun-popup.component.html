@@ -1,0 +1,52 @@
+<div class="info-modal">
+    <div mat-dialog-content>
+        <h2 mat-dialog-title>
+            {{languageStrings['primary.portal.benefitOffering.employeeMinimumPopup.mimimumRequirement']}}
+        </h2>
+
+        <p *ngIf="plans.ineligiblePlans.length <= 1">
+            {{languageStrings['primary.portal.benefitOffering.employeeMinimumPopup.employeeEstimate']}}
+        </p>
+        <p
+            *ngIf="plans.ineligiblePlans.length >
+             1"
+        >
+            {{languageStrings['primary.portal.benefitOffering.employeeMinimumPopup.employeeEstimateForPlans']}}
+        </p>
+
+        <ul>
+            <li *ngFor="let plan of plans.ineligiblePlans" [innerHTML]="plan.plan.adminName"></li>
+        </ul>
+
+        <p *ngIf="plans.ineligiblePlans.length > 1" else="SinglePlanTemplate">
+            {{languageStrings['primary.portal.benefitOffering.employeeMinimumPopup.planCountMore']}}
+        </p>
+        <p *ngIf="plans.ineligiblePlans.length <= 1" #SinglePlanTemplate>
+            {{languageStrings['primary.portal.benefitOffering.employeeMinimumPopup.planCountMoreForSinglePlan']}}
+        </p>
+    </div>
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            class="mon-btn-link mon-px-0"
+            mat-button
+            (click)="cancelUpdate()"
+            >{{ languageStrings['primary.portal.common.cancelChange']}}
+        </a>
+        <div>
+            <button class="mon-btn-secondary mon-mr-15" (click)="onBack()" mat-flat-button>
+                <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                {{languageStrings['primary.portal.common.back']}}
+            </button>
+            <button
+                class="mon-btn-primary"
+                [attr.aria-label]="languageStrings['primary.portal.common.gotIt']"
+                mat-flat-button
+                (click)="onGotIt()"
+            >
+                {{languageStrings['primary.portal.common.gotIt']}}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</div>

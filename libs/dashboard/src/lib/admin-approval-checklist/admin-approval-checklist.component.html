@@ -1,0 +1,479 @@
+<!-- TODO: Language implementation -->
+<ng-template [ngIf]="isLoading">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<div *ngIf="!isLimited">
+    <div class="quasi-modal content-scroll">
+        <div class="modal-header">
+            <div>
+                <mat-label class="mat-label"
+                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.AccountSetup"]}} {{companyName}}</mat-label
+                >
+                <div>
+                    <h2>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.reviewSignoff"]}}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="dialog-content">
+            <mat-dialog-content>
+                <div class="stepper-sidebar">
+                    <mat-vertical-stepper
+                        #verticalStepper
+                        [linear]="true"
+                        class="side-nav-stepper employee-stepper"
+                        [selectedIndex]="stepperIndex"
+                        (selectionChange)="stepperSelectionChange($event.selectedIndex)"
+                    >
+                        <mat-step [completed]="stepperIndex > WELCOME_STEP">
+                            <ng-template matStepLabel>
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.welcome"]}}
+                            </ng-template>
+                        </mat-step>
+                        <mat-step
+                            *ngIf="unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars"
+                            [completed]="stepperIndex > EMPLOYEE_CENSUS_STEP"
+                        >
+                            <ng-template matStepLabel>
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.employeeCensus"]}}
+                            </ng-template>
+                        </mat-step>
+                        <mat-step
+                            *ngIf="unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedBenefitDollars"
+                            [completed]="(unapprovedRequestContainsBenefitDollars && stepperIndex > BENEFIT_DOLLAR_STEP)
+                            || (hasOnlyUnapprovedBenefitDollars && stepperIndex > BENEFIT_DOLLAR_ALONE_STEP)"
+                        >
+                            <ng-template matStepLabel>
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.benefitDollars"]}}
+                            </ng-template>
+                        </mat-step>
+                        <mat-step
+                            *ngIf="agreementsPresent"
+                            [completed]="(unapprovedRequestContainsBenefitDollars && stepperIndex > AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP)
+                            || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex > AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP)"
+                        >
+                            <ng-template matStepLabel>
+                                {{ this.languageStrings["primary.portal.dashboard.adminApprovalChecklist.agreements"] }}
+                            </ng-template>
+                        </mat-step>
+                        <mat-step
+                            *ngIf="isDentalProduct && situsStateIsCA"
+                            [completed]="(unapprovedRequestContainsBenefitDollars && stepperIndex > californiaRequirementSteps.CALIFORNIA_FORM_WITH_BENEFIT_DOLLAR_STEP) || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex > californiaRequirementSteps.CALIFORNIA_FORM_WITHOUT_BENEFIT_DOLLAR_STEP)"
+                        >
+                            <ng-template matStepLabel>
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.californiaRequirement"] }}</ng-template
+                            >
+                        </mat-step>
+                        <mat-step
+                            *ngIf="unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars"
+                            [completed]="(unapprovedRequestContainsBenefitDollars && stepperIndex > CARRIER_FORM_WITH_BENEFIT_DOLLAR_STEP) || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex > CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP)"
+                        >
+                            <ng-template matStepLabel>
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.carrierForms"]}}
+                            </ng-template>
+                        </mat-step>
+                        <!-- Icon overrides -->
+                        <ng-template matStepperIcon="edit">
+                            <mon-icon iconSize="10" iconName="check"></mon-icon>
+                        </ng-template>
+                    </mat-vertical-stepper>
+                </div>
+                <div class="stepper-content">
+                    <div class="content-wrapper">
+                        <div>
+                            <div *ngIf="stepperIndex === WELCOME_STEP">
+                                <ng-container *ngTemplateOutlet="welcome"></ng-container>
+                            </div>
+                            <div
+                                *ngIf="(unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars) && stepperIndex === EMPLOYEE_CENSUS_STEP"
+                            >
+                                <ng-container *ngTemplateOutlet="employeeCensus"></ng-container>
+                            </div>
+                            <div
+                                *ngIf="(unapprovedRequestContainsBenefitDollars && stepperIndex === BENEFIT_DOLLAR_STEP) || (hasOnlyUnapprovedBenefitDollars && stepperIndex === BENEFIT_DOLLAR_ALONE_STEP)"
+                            >
+                                <ng-container *ngTemplateOutlet="benefitDollars"></ng-container>
+                            </div>
+                            <div
+                                *ngIf="agreementsPresent && ((unapprovedRequestContainsBenefitDollars && stepperIndex === AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP) || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex === AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP))"
+                            >
+                                <ng-container *ngTemplateOutlet="agreements"></ng-container>
+                            </div>
+                            <div
+                                *ngIf="(isDentalProduct && situsStateIsCA) && ((unapprovedRequestContainsBenefitDollars && ((agreementsPresent && stepperIndex === californiaRequirementSteps.CALIFORNIA_FORM_WITH_BENEFIT_DOLLAR_STEP))) || (hasOnlyUnapprovedNonBenefitDollars && (agreementsPresent && stepperIndex === californiaRequirementSteps.CALIFORNIA_FORM_WITHOUT_BENEFIT_DOLLAR_STEP )))"
+                            >
+                                <ng-container *ngTemplateOutlet="californiaRequirement"></ng-container>
+                            </div>
+                            <div
+                                *ngIf="(unapprovedRequestContainsBenefitDollars && (stepperIndex === CARRIER_FORM_WITH_BENEFIT_DOLLAR_STEP || (!agreementsPresent && stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP))) || (hasOnlyUnapprovedNonBenefitDollars && (stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP || (!agreementsPresent && stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP_OR_AGREEMENTS_STEP)))"
+                            >
+                                <ng-container *ngTemplateOutlet="carrierForms"></ng-container>
+                            </div>
+                        </div>
+                        <div
+                            class="mon-mt-20"
+                            *ngIf="((unapprovedRequestContainsBenefitDollars && ((stepperIndex === CARRIER_FORM_WITH_BENEFIT_DOLLAR_STEP && showErrorMessage) || (!agreementsPresent && stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP))) ||(hasOnlyUnapprovedNonBenefitDollars && stepperIndex===CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP && showErrorMessage))"
+                        >
+                            <mon-alert alertType="danger">
+                                <span>{{ processAlert }}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="mon-mt-20">
+                            <mon-alert alertType="danger" *ngIf="hasSubmitApiError" class="message-block">
+                                <span
+                                    >{{ errorMessage }}
+                                    <a (click)="closeModal(SAVE)"
+                                        >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.exit"]}}</a
+                                    ></span
+                                >
+                            </mon-alert>
+                        </div>
+                    </div>
+
+                    <mat-dialog-actions class="dialog-footer">
+                        <div>
+                            <a href="javascript:void(0)" (click)="closeModal('logout')"
+                                >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.logout"]}}</a
+                            >
+                        </div>
+                        <div>
+                            <button
+                                mat-flat-button
+                                type="button"
+                                class="mon-btn-secondary mon-mr-20"
+                                *ngIf="stepperIndex>WELCOME_STEP"
+                                (click)="onBack()"
+                            >
+                                <mon-icon class="icon-left" iconName="left" iconSize="10"></mon-icon>
+                                <span>{{languageStrings["primary.portal.common.back"]}}</span>
+                            </button>
+                            <button
+                                mat-flat-button
+                                type="button"
+                                class="mon-btn-secondary mon-mr-20"
+                                [disabled]="hasSubmitApiError || allFormsSigned"
+                                *ngIf="(unapprovedRequestContainsBenefitDollars && (stepperIndex === CARRIER_FORM_WITH_BENEFIT_DOLLAR_STEP || stepperIndex === AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP)) || (hasOnlyUnapprovedNonBenefitDollars && (stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP || stepperIndex === AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP))"
+                                (click)="showRequestChangeModal(unapprovedRequestContainsBenefitDollars && stepperIndex === AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP || hasOnlyUnapprovedNonBenefitDollars && stepperIndex === AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP)"
+                            >
+                                <span>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.requestChanges"]}}</span>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="(unapprovedRequestContainsBenefitDollars && (stepperIndex === CARRIER_FORM_WITH_BENEFIT_DOLLAR_STEP || (!agreementsPresent && stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP))) || (hasOnlyUnapprovedNonBenefitDollars && (stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP || (!agreementsPresent && stepperIndex === CARRIER_FORM_WITHOUT_BENEFIT_DOLLAR_STEP_OR_AGREEMENTS_STEP)))"
+                                (click)="finishReviewAndSignOff()"
+                            >
+                                <span
+                                    >{{documentSignRequired ? isQ60FormPresent ?
+                                    languageStrings["primary.portal.dashboard.adminApprovalChecklist.approvalSubmit"] :
+                                    languageStrings["primary.portal.dashboard.adminApprovalChecklist.submitSignedDoc"] :
+                                    languageStrings["primary.portal.dashboard.adminApprovalChecklist.finishReview"]}}</span
+                                >
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="stepperIndex === WELCOME_STEP"
+                                (click)="onNext()"
+                            >
+                                <span>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.getStarted"]}}</span>
+                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                *ngIf="(isDentalProduct && situsStateIsCA) && ((unapprovedRequestContainsBenefitDollars && (stepperIndex === californiaRequirementSteps.CALIFORNIA_FORM_WITH_BENEFIT_DOLLAR_STEP )) || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex === californiaRequirementSteps.CALIFORNIA_FORM_WITHOUT_BENEFIT_DOLLAR_STEP))"
+                                (click)="onNext()"
+                            >
+                                <span> {{languageStrings["primary.portal.common.next"]}} </span>
+                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="(stepperIndex === EMPLOYEE_CENSUS_STEP
+                                && (unapprovedRequestContainsBenefitDollars|| hasOnlyUnapprovedNonBenefitDollars))
+                                || (stepperIndex === BENEFIT_DOLLAR_STEP && unapprovedRequestContainsBenefitDollars)"
+                                (click)="onNext()"
+                            >
+                                <span>{{languageStrings["primary.portal.common.next"]}}</span>
+                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="(stepperIndex === BENEFIT_DOLLAR_ALONE_STEP && hasOnlyUnapprovedBenefitDollars)"
+                                (click)="approveBenefitDollars()"
+                            >
+                                <span>{{languageStrings["primary.portal.common.approve"]}}</span>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="((unapprovedRequestContainsBenefitDollars && stepperIndex === AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP)
+                                || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex === AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP))
+                                && (unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars) && agreementsPresent"
+                                (click)="agreeToStatements(false)"
+                            >
+                                <span>{{ agreeButtonText }}</span>
+                                <mon-icon
+                                    *ngIf="unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars"
+                                    class="icon-right"
+                                    iconName="right"
+                                    iconSize="10"
+                                ></mon-icon>
+                            </button>
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                type="button"
+                                [disabled]="hasSubmitApiError"
+                                *ngIf="((unapprovedRequestContainsBenefitDollars && stepperIndex === AGREEMENTS_WITH_BENEFIT_DOLLAR_STEP)
+                                || (hasOnlyUnapprovedNonBenefitDollars && stepperIndex === AGREEMENTS_WITHOUT_BENEFIT_DOLLAR_STEP))
+                                && !(unapprovedRequestContainsBenefitDollars || hasOnlyUnapprovedNonBenefitDollars) && agreementsPresent"
+                                (click)="agreeToStatements(true)"
+                            >
+                                <span>{{languageStrings["primary.portal.common.agreeAndFinishSignoff"]}}</span>
+                                <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                            </button>
+                        </div>
+                    </mat-dialog-actions>
+                </div>
+            </mat-dialog-content>
+        </div>
+    </div>
+</div>
+
+<ng-template #welcome>
+    <div *ngIf="isFirst">
+        <h2 class="mon-mt-0">{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.yourAccountReady"]}}</h2>
+        <div>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.yourAccountReadyDesc"]}}</div>
+    </div>
+    <div *ngIf="!isFirst">
+        <h2>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.yourAccountUpdated"]}}</h2>
+        <div>{{producerName}} {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.yourAccountUpdatedDesc"]}}</div>
+    </div>
+</ng-template>
+
+<ng-template #employeeCensus>
+    <div>
+        <h2 class="mon-mt-0">{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.reviewYourEmployeeSensus"]}}</h2>
+        <span>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.reviewYourEmployeeSensusDesc"]}}</span>
+        <div class="total-employee">
+            <span>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.estimatedEmployees"]}}</span>
+            <span class="mon-ml-30">{{employeeCount}}</span>
+        </div>
+        <div class="employee-census" *ngIf="employeeCount">
+            <mon-icon class="icon-black" iconSize="34" iconName="file"></mon-icon>
+            <div class="download-wrapper">
+                <p>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.employeeCensusTitle"]}}</p>
+                <a href="javascript:void(0)" (click)="downloadDocument()"
+                    >{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.downloadMostRecent"]}}</a
+                >
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #benefitDollars>
+    <div class="benefit-dollar-container">
+        <div class="employer-contributions-wrapper">
+            <h2 class="mon-mt-0">{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.benefitDollars"]}}</h2>
+            <span>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.benefitDollars.headerMessage"]}}</span>
+            <div class="message-block" *ngIf="stateNYorOH">
+                <mon-alert alertType="warning" *ngIf="invalidStates.length && validStates.length">
+                    <span *ngIf="invalidStates.length === LENGTH_ONE"
+                        >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.notAvailableForEnrollments'] |
+                        replaceTag: { "##state##" : invalidStates[0] } }}
+                    </span>
+                    <span *ngIf="invalidStates.length === LENGTH_TWO"
+                        >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.statesNotAvailableForEnrollments'] |
+                        replaceTag: { "##state##" : invalidStates[0], "##state1##" : invalidStates[1] } }}
+                    </span>
+                </mon-alert>
+                <mon-alert alertType="danger" *ngIf="invalidStates.length && !validStates.length">
+                    <span *ngIf="invalidStates.length === LENGTH_ONE"
+                        >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.notAllowedInState'] | replaceTag: {
+                        "##state##" : invalidStates[0] } }}
+                    </span>
+                    <span *ngIf="invalidStates.length === LENGTH_TWO"
+                        >{{ languageStrings['primary.portal.maintenanceBenefitsOffering.benefitDollar.statesNotAllowed'] | replaceTag: {
+                        "##state##" : invalidStates[0], "##state1##" : invalidStates[1] } }}
+                    </span>
+                </mon-alert>
+            </div>
+            <div class="benefit-dollars">
+                <!-- form to be added -->
+                <ng-container *ngFor="let benefitDollar of benefitDollarList; index as i">
+                    <div class="benefit-dollar-item">
+                        <div class="left-column">
+                            <span
+                                *ngIf="benefitDollarDataList[i].benefitDollarStatus === BenefitDollarStatus.REMOVED"
+                                language="primary.portal.dashboard.adminApprovalChecklist.benefitDollars.removed"
+                            ></span>
+                            <span [ngClass]="{'gray-out' : benefitDollarDataList[i].benefitDollarStatus === BenefitDollarStatus.REMOVED}">
+                                {{languageStrings["primary.portal.dashboard.adminApprovalChecklist.benefitDollars.employerContribution"]}}
+                                {{ benefitDollar.applicableProduct.name }} |
+                                <ng-container *ngIf="benefitDollar.contributionType === contributionType.FLAT_AMOUNT"
+                                    >$ {{ benefitDollar.amount }} {{ benefitDollar.payFrequency.name }}</ng-container
+                                >
+                                <ng-container *ngIf="benefitDollar.contributionType === contributionType.PERCENTAGE"
+                                    >{{ benefitDollar.amount }}%</ng-container
+                                >
+                            </span>
+                        </div>
+                        <div class="right-column" *ngIf="benefitDollarDataList[i].benefitDollarStatus !== BenefitDollarStatus.REMOVED">
+                            <a
+                                href="javascript:void(0)"
+                                (click)="openRemoveBenefitDollarModal(benefitDollar, i)"
+                                language="primary.portal.common.remove"
+                                class="action-link"
+                            ></a>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="openEditBenefitDollarModal(benefitDollar, i)"
+                                language="primary.portal.common.edit"
+                                class="action-link"
+                            ></a>
+                        </div>
+                        <div class="right-column" *ngIf="benefitDollarDataList[i].benefitDollarStatus === BenefitDollarStatus.REMOVED">
+                            <a
+                                href="javascript:void(0)"
+                                (click)="openUndoRemoveBenefitDollarModal(i)"
+                                language="primary.portal.dashboard.adminApprovalChecklist.benefitDollars.dontRemove"
+                            ></a>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div class="footer-message" [innerHTML]="erisaMessageHtml"></div>
+    </div>
+</ng-template>
+
+<ng-template #agreements>
+    <div>
+        <h2 class="mon-mt-0" class="agreements-title">
+            {{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.agreements"] }}
+        </h2>
+        <p class="agreements-subtitle">{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.agreementsSubtitle"] }}</p>
+        <ng-container *ngFor="let agreement of agreementLanguageStrings; let i = index">
+            <div [innerHTML]="agreement | unsafeHtml"></div>
+            <mat-divider *ngIf="i !== agreementLanguageStrings.length - 1" class="agreements-divider"></mat-divider>
+        </ng-container>
+    </div>
+</ng-template>
+<ng-template #californiaRequirement>
+    <h2 class="mon-mt-0" language="primary.portal.dashboard.adminApprovalChecklist.californiaRequirement"></h2>
+    <span language="primary.portal.dashboard.adminApprovalChecklist.californiaRequirement.description"></span>
+    <div class="california-requirement" *ngFor="let document of planDocuments">
+        <mon-icon class="icon-black" iconSize="34" iconName="file"></mon-icon>
+        <div class="download-wrapper">
+            <p>{{document.name}}</p>
+            <a
+                [href]="downloadPdf(document.location)"
+                download="File.pdf"
+                target="_blank"
+                [attr.aria-label]="document.name"
+                language="primary.portal.dashboard.adminApprovalChecklist.californiaRequirement.download"
+            >
+            </a>
+        </div>
+    </div>
+</ng-template>
+<ng-template #carrierForms>
+    <div>
+        <h2 class="mon-mt-0">{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.finalizeForms"] }}</h2>
+        <div>{{languageStrings["primary.portal.dashboard.adminApprovalChecklist.finalizeFormsDesc"]}}</div>
+        <div class="mon-mt-20" *ngIf="carrierData && carrierData.length">
+            <div class="documentation-wrapper" *ngFor="let carrier of carrierData">
+                <div class="inner-wraper">
+                    <div class="image-wrapper">
+                        <div class="left-wrapper">
+                            <img
+                                *ngIf="isSitusNyRSLI(carrier.carrier?.id)"
+                                alt="carrier-id"
+                                src="assets/images/{{carrier.carrier?.id}}{{companyCodeNY}}.png"
+                            />
+                            <img
+                                *ngIf="!isSitusState || !isSitusNyRSLI(carrier.carrier?.id)"
+                                alt="carrier-id"
+                                src="assets/images/{{carrier.carrier?.id}}.png"
+                            />
+                        </div>
+                        <div class="dotted-border-left"></div>
+                        <div>
+                            <p *ngFor="let carrierForm of carrier.carrierFormNames">{{carrierForm}}</p>
+                        </div>
+                    </div>
+                    <div class="action-wrapper">
+                        <span *ngIf="carrier.viewOnly">
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                *ngIf="!carrier.documentViewed"
+                                type="button"
+                                (click)="openDocument(carrier)"
+                            >
+                                {{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.Review"] }}
+                            </button>
+                            <a href="javascript:void(0)" *ngIf="carrier.documentViewed" (click)="openDocument(carrier)"
+                                >{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewDetails"] }}</a
+                            >
+                        </span>
+                        <span *ngIf="!carrier.viewOnly">
+                            <button
+                                mat-flat-button
+                                class="mon-btn-primary"
+                                *ngIf="carrier.signatureRequired"
+                                type="button"
+                                (click)="openDocument(carrier)"
+                            >
+                                {{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.sign"] }}
+                            </button>
+                            <ng-container *ngIf="!carrier.signatureRequired && !isProcessMasterApproved && carrier.isQ60">
+                                <button mat-flat-button class="mon-btn-primary" type="button" (click)="procesMasterApp()">
+                                    {{ buttonText }}
+                                </button>
+                                <mat-error
+                                    >{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.processMasterAppError"]
+                                    }}</mat-error
+                                >
+                            </ng-container>
+                            <a
+                                href="javascript:void(0)"
+                                *ngIf="!carrier.signatureRequired && (!carrier.isQ60 || carrier.isQ60 && isProcessMasterApproved)"
+                                (click)="openDocument(carrier)"
+                                >{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.viewSignedDocument"] }}</a
+                            >
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Your account has limited access Modal -->
+<div *ngIf="isLimited">
+    <mat-dialog-content>
+        <h4 mat-dialog-title>{{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.limitedAccess"] }}</h4>
+        <p>{{ producerName }} {{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.limitedAccessDesc"] }}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer d-flex justify-content-end">
+        <button class="mon-btn-primary" mat-flat-button (click)="closeModal('close')">
+            {{ languageStrings["primary.portal.dashboard.adminApprovalChecklist.gotIt"] }}
+        </button>
+    </mat-dialog-actions>
+</div>
+<!-- modal ends here -->

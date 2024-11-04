@@ -1,0 +1,62 @@
+@import "shared";
+
+.primaryNav {
+    display: flex;
+
+    :host-context(.member-portal) & {
+        flex-direction: column;
+        padding: map-get($spacers, 10) map-get($spacers, 20);
+    }
+
+    :host-context(.admin-portal) &,
+    :host-context(.producer-portal) & {
+        height: 100%;
+        align-items: stretch;
+
+        .primaryNav-link {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: map-get($spacers, 0) map-get($spacers, 20);
+            color: get("color.gray.400");
+            white-space: nowrap;
+            @include media-max("l") {
+                padding: map-get($spacers, 0) convert-unit(14px, "rem");
+            }
+
+            &:hover {
+                text-decoration: none;
+                background-color: get("color.gray.1000");
+                color: get("color.white");
+            }
+
+            &--active {
+                background-color: get("color.gray.1000");
+                color: get("color.white");
+                @include fontFace("primary.bold");
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    left: 50%;
+                    bottom: 0;
+                    border-left: convert-unit(7px, "rem") solid transparent;
+                    border-right: convert-unit(7px, "rem") solid transparent;
+                    border-bottom: convert-unit(7px, "rem") solid get("color.white");
+                    transform: translateX(-50%);
+                }
+            }
+        }
+    }
+
+    @include media-max("m") {
+        margin-top: map-get($spacers, 50);
+    }
+}
+.mon-btn-pulldown-indicator {
+    height: 0.4em;
+    width: 1em;
+    margin: convert-unit(4px, "rem") map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 5);
+}

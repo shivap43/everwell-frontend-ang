@@ -1,0 +1,757 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="alert-msg" *ngIf="showError">
+    <mon-alert alertType="danger" closeButton="true">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+</div>
+<div class="alert-msg" *ngIf="downloadError">
+    <mon-alert alertType="danger" closeButton="true">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+</div>
+<section class="section-container" #oneSignatureSection>
+    <div class="appflow-section">
+        <div class="section-step active-section tpi-flow-border">
+            <div class="section-header">
+                <div>
+                    <h2 language="primary.portal.applicationFlow.finishApplications"></h2>
+                </div>
+            </div>
+            <div *ngIf="showSignatureForm" class="section-header">
+                <div>
+                    <h2 language="primary.portal.applicationFlow.signApplications"></h2>
+                </div>
+
+                <div>
+                    <h3 class="price-text text-align-right">{{totalCost | currency}}</h3>
+                    <p
+                        [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                    >
+                        {{payFrequency.name}}
+                    </p>
+                </div>
+            </div>
+            <div *ngIf="showReviewForm">
+                <div class="alert-msg" *ngIf="emailPreliminaryForm$ | async">
+                    <mon-alert alertType="success" closeButton="true">
+                        <span language="primary.portal.applicationFlow.preliminaryStatement.email.sent"></span>
+                    </mon-alert>
+                </div>
+                <div class="application-review-block" id="applicationFloweSigning">
+                    <h3 language="primary.portal.applicationFlow.applicationReviewOptions"></h3>
+                    <p language="primary.portal.applicationFlow.eSigning"></p>
+                </div>
+                <div class="response-block">
+                    <div class="response-type radio">
+                        <form
+                            [formGroup]="reviewApplicationForm"
+                            [empoweredFocusOnFirstInvalidField]="queryString"
+                            (ngSubmit)="reviewOnNext()"
+                        >
+                            <div class="whole-block">
+                                <mat-radio-group formControlName="reviewApplication" aria-labelledby="applicationFloweSigning">
+                                    <mat-radio-button
+                                        value="No"
+                                        [disabled]="hideIDoNotOption || stateVA"
+                                        empoweredFocusInitial
+                                        tabindex="-1"
+                                    >
+                                        <span
+                                            class="text-bold text-right-margin-space"
+                                            language="primary.portal.applicationFlow.iDoNot"
+                                        ></span>
+                                        <span language="primary.portal.applicationFlow.Iunderstand"></span>
+                                    </mat-radio-button>
+                                    <mat-radio-button
+                                        value="Yes"
+                                        [checked]="hideIDoNotOption || stateVA"
+                                        [disabled]="stateVA"
+                                        *ngIf="!hideApplicationOption"
+                                    >
+                                        <span
+                                            class="text-bold text-right-margin-space"
+                                            language="primary.portal.applicationFlow.iDo"
+                                        ></span>
+                                        <span language="primary.portal.applicationFlow.wantToView"></span>
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <mat-error *ngIf="hasError" language="primary.portal.common.selectionRequired"> </mat-error>
+                                <div class="signature-section">
+                                    <button
+                                        id="submitAppFlowForm"
+                                        class="mon-btn-primary submit-app-flow-form"
+                                        type="submit"
+                                        mat-flat-button
+                                    >
+                                        <span *ngIf="isVF2F" language="primary.portal.common.next"></span>
+                                        <span *ngIf="!isVF2F" language="primary.portal.applicationFlow.nextSignature"></span>
+                                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <empowered-send-otp
+                *ngIf="isVF2F && isOtpRequired && sendOtpForm && !isReinstate"
+                [sendOtpForm]="sendOtpForm"
+                [vF2FStepDetails]="vF2FStepDetails"
+                (stepChange)="gotoNextSubStep($event)"
+            >
+            </empowered-send-otp>
+            <empowered-verify-otp
+                *ngIf="isVF2F && hasOtp && !isReinstate"
+                (stepChange)="gotoNextSubStep($event)"
+                [sendOtpForm]="sendOtpForm"
+                [vF2FStepDetails]="vF2FStepDetails"
+            ></empowered-verify-otp>
+            <div *ngIf="showSignatureForm">
+                <div class="section-subheader">
+                    <p *ngIf="isHeadset">
+                        <span language="primary.portal.applicationFlow.signatureReview"></span>
+                        <span *ngIf="allData.length > 1" language="primary.portal.applicationFlow.confirmation.signReqApplications"></span>
+                        <span *ngIf="allData.length <= 1" language="primary.portal.applicationFlow.confirmation.signReqApplication"></span>
+                        <span language="primary.portal.applicationFlow.customerSignature"></span>
+                    </p>
+                    <p *ngIf="!isHeadset && reviewNotRequiredStatus">
+                        <span language="primary.portal.applicationFlow.provide"></span>
+                        <span language="primary.portal.applicationFlow.signatureAndDot"></span>
+                        <span language="primary.portal.applicationFlow.signatureProvide"></span>
+                    </p>
+                    <p *ngIf="!isHeadset && !reviewNotRequiredStatus">
+                        <span language="primary.portal.applicationFlow.provide"></span>
+                        <span language="primary.portal.applicationFlow.signature"></span>
+                        <span language="primary.portal.applicationFlow.initialContent"></span>
+                        <span language="primary.portal.applicationFlow.signatureProvide"></span>
+                        <span *ngIf="viewSomeReview" language="primary.portal.applicationFlow.wantToViewSome"></span>
+                    </p>
+                </div>
+                <div>
+                    <form [formGroup]="signatureForm" (ngSubmit)="onNext()" #signatureFormRef>
+                        <div class="whole-block">
+                            <div class="plan-block" *ngFor="let steps of allData; let a = index">
+                                <div class="plan-header">
+                                    <div>
+                                        <h3 [innerHTML]="steps.planName"></h3>
+                                        <p class="legal-name">{{steps?.legalName}}</p>
+                                        <p class="mon-mt-5">
+                                            <a
+                                                href="javascript:void(0)"
+                                                (click)="viewUnsignedApplication(steps.cartId, a,'')"
+                                                [ngClass]="{'mat-button mon-btn-primary': isButtonClicked[a]}"
+                                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.viewApplication']"
+                                                *ngIf="!viewMandatoryIds.includes(steps.planId+''); else mandatoryToView"
+                                                language="primary.portal.applicationFlow.viewApplication"
+                                            >
+                                            </a>
+                                            <mat-error
+                                                *ngIf="isButtonClicked[a] && this.requiredFormError"
+                                                language="primary.portal.applicationFlow.viewApplication.required"
+                                            >
+                                            </mat-error>
+                                            <ng-template #mandatoryToView>
+                                                <button
+                                                    type="button"
+                                                    (click)="viewUnsignedApplication(steps.cartId, a,steps.planId+'')"
+                                                    class="mon-btn-primary"
+                                                    mat-flat-button
+                                                    language="primary.portal.applicationFlow.viewApplication"
+                                                ></button>
+                                                <div>
+                                                    <mat-hint
+                                                        *ngIf="!isButtonClicked[a]"
+                                                        language="primary.portal.applicationFlow.viewApplication.required"
+                                                    >
+                                                    </mat-hint>
+                                                </div>
+                                            </ng-template>
+                                        </p>
+                                        <mat-hint
+                                            *ngIf="isButtonClicked[a] && !this.requiredFormError"
+                                            [ngStyle]="{'background-color': isButtonClicked[a]}"
+                                            language="primary.portal.applicationFlow.viewApplication.required"
+                                        >
+                                        </mat-hint>
+
+                                        <ng-template #unsignedTemplate>
+                                            <div class="info-modal" [ngClass]="{'unsigned-pdf' :isTpi}">
+                                                <div class="modal-header">
+                                                    <button
+                                                        mat-icon-button
+                                                        (click)="closeDialog()"
+                                                        [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                                                    >
+                                                        <mon-icon class="mon-icon-close" iconSize="25" iconName="close"> </mon-icon>
+                                                    </button>
+                                                </div>
+                                                <div>
+                                                    <h2>
+                                                        <span language="primary.portal.applicationFlow.applicationInsurance"></span>
+                                                        <span>{{planNames}}</span>
+                                                    </h2>
+                                                    <div class="iframe-wrapper">
+                                                        <iframe
+                                                            id="myIframe"
+                                                            [src]="safeUrl"
+                                                            name="targetframe"
+                                                            allowTransparency="true"
+                                                            width="100%"
+                                                            scrolling="yes"
+                                                            frameborder="0"
+                                                            class="signed-pdf"
+                                                            title="targetframe"
+                                                        >
+                                                        </iframe>
+                                                    </div>
+                                                </div>
+                                                <mat-dialog-actions class="dialog-footer justify-content-between">
+                                                    <button type="button" class="mon-btn-secondary" mat-flat-button (click)="print()">
+                                                        <span language="primary.portal.applicationFlow.print"></span>
+                                                    </button>
+                                                    <button type="button" class="mon-btn-primary" mat-flat-button (click)="closeDialog()">
+                                                        <span language="primary.portal.applicationFlow.finish"></span>
+                                                        <mon-icon class="icon-right" iconName="right" [iconSize]="10"> </mon-icon>
+                                                    </button>
+                                                </mat-dialog-actions>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                    <div class="plan-pricing">
+                                        <h3 class="price-text">{{steps.cost | currency}}</h3>
+                                        <p
+                                            [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                        >
+                                            {{payFrequency.name}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="plan-details">
+                                    <div class="statements-agreements" *ngIf="!steps.applicant && isVF2F">
+                                        <h4 language="primary.portal.applicationFlow.applicationReviewStatus"></h4>
+                                        <p language="primary.portal.applicationFlow.applicationReviewDescription"></p>
+                                        <mat-form-field class="w-200 mon-mt-10" [ngClass]="{'highlight-required': isVF2F}">
+                                            <input
+                                                *ngIf="isVF2F"
+                                                matInput
+                                                type="text"
+                                                [placeholder]="languageStrings['primary.portal.enrollment.review.initial']"
+                                                [maxlength]="MAX_INITIALS_LEN"
+                                                autocomplete="off"
+                                                [formControlName]="initials+a"
+                                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.initials']"
+                                                [disableControl]="steps.disableData"
+                                            />
+                                            <mat-error
+                                                *ngIf="signatureForm.controls[initials + a]?.errors?.required"
+                                                language="primary.portal.common.requiredField"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="!showPin && !signatureForm.controls[initials + a]?.errors?.required && (signatureForm.controls[initials + a]?.errors?.pattern || signatureForm.controls[initials + a]?.errors?.minlength)"
+                                                language="primary.portal.applicationFlow.invalidFormat"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="statements-agreements" *ngIf="steps.applicant">
+                                        <h4 language="primary.portal.applicationFlow.applicationStatus"></h4>
+                                        <div *ngFor="let stepsData of steps.applicant.steps">
+                                            <div
+                                                class="text-content"
+                                                [innerHTML]="stepsData.question.text.replace(regEx(replaceGlossary), '')
+                                                .replace(regEx(replaceSalary), salary ? '<u><strong>' + (salary | currency) + '</u></strong>': replaceSalary)"
+                                            ></div>
+
+                                            <mat-form-field class="w-200 mon-mt-10" [ngClass]="{'highlight-required': isVF2F}">
+                                                <input
+                                                    *ngIf="!isHeadset && !showPin"
+                                                    matInput
+                                                    type="text"
+                                                    placeholder="Initials"
+                                                    maxlength="3"
+                                                    autocomplete="off"
+                                                    [formControlName]="initials+a"
+                                                    [attr.aria-label]="languageStrings['primary.portal.applicationFlow.initials']"
+                                                    [disableControl]="steps.disableData"
+                                                />
+                                                <input
+                                                    *ngIf="isHeadset"
+                                                    matInput
+                                                    type="text"
+                                                    autocomplete="off"
+                                                    [formControlName]="initials+a"
+                                                    [attr.aria-label]="languageStrings['primary.portal.applicationFlow.initials']"
+                                                    [disableControl]="steps.disableData || isHeadset"
+                                                />
+                                                <input
+                                                    *ngIf="showPin"
+                                                    matInput
+                                                    type="text"
+                                                    autocomplete="off"
+                                                    placeholder="Enter PIN"
+                                                    [formControlName]="initials+a"
+                                                    [attr.aria-label]="languageStrings['primary.portal.applicationFlow.initials']"
+                                                    [disableControl]="steps.disableData || pinDisableFlag"
+                                                    (input)="setPinSignature($event.target.value,a)"
+                                                />
+                                                <mat-error
+                                                    *ngIf="signatureForm.controls[initials + a]?.errors?.required"
+                                                    language="primary.portal.common.requiredField"
+                                                >
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="!showPin && !signatureForm.controls[initials + a]?.errors?.required && (signatureForm.controls[initials + a]?.errors?.pattern || signatureForm.controls[initials + a]?.errors?.minlength)"
+                                                    language="primary.portal.applicationFlow.invalidFormat"
+                                                >
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="showPin && signatureForm.controls[initials + a].hasError('maxlength')"
+                                                    language="primary.portal.applicationFlow.cannotExceed"
+                                                >
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="showPin && signatureForm.controls[initials + a].hasError('minlength')"
+                                                    language="primary.portal.applicationFlow.minthreeCharacters"
+                                                >
+                                                    <!-- TODO: Need to change later based on moqup -->
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="showPin && signatureForm.controls[initials + a].hasError('pattern')"
+                                                    language="primary.portal.applicationFlow.useOnlyLetters"
+                                                >
+                                                </mat-error>
+                                            </mat-form-field>
+                                            <p *ngIf="isHeadset" language="primary.portal.applicationFlow.initialLetter"></p>
+                                        </div>
+                                    </div>
+                                    <div class="required-forms" *ngIf="steps.requiredForm">
+                                        <div *ngFor="let stepData of steps.requiredForm.steps">
+                                            <h4 language="primary.portal.applicationFlow.requiredForms"></h4>
+                                            <div
+                                                id="requiredformlbl"
+                                                class="text-content"
+                                                [innerHTML]="stepData.question.text.replace(regEx(replaceGlossary), '')
+                                                    .replace(regEx(replaceSalary), salary ? '<u><strong>' + (salary | currency) + '</u></strong>': replaceSalary)"
+                                            ></div>
+                                            <div class="forms-list">
+                                                <div *ngFor="let forms of requiredFormsConstraints[a]; let i = index">
+                                                    <ng-container *ngIf="forms.value && forms.showOption" aria-labelledby="requiredformlbl">
+                                                        <mat-checkbox
+                                                            (change)="pathCustomValueToForm(forms.value, i.toString(), a.toString())"
+                                                            [formControlName]="a+ checkedForm +i"
+                                                            [disabled]="steps.disableData || isHeadset"
+                                                            [ngClass]="{'highlight-required': isVF2F}"
+                                                        >
+                                                            <span
+                                                                *ngIf="forms.value !== preliminaryNotice; else preliminaryForm"
+                                                                [innerHTML]="forms.label"
+                                                            ></span>
+                                                            <ng-template #preliminaryForm>
+                                                                The completed
+                                                                <a
+                                                                    (click)="downloadPreliminaryForm(a)"
+                                                                    language="primary.portal.applicationFlow.preliminaryStatement1"
+                                                                ></a>
+                                                            </ng-template>
+                                                        </mat-checkbox>
+                                                        <div *ngIf="requiredFormError">
+                                                            <mat-error
+                                                                *ngIf="signatureForm.controls[a+checkedForm+i]?.errors?.required"
+                                                                language="primary.portal.common.requiredField"
+                                                            >
+                                                            </mat-error>
+                                                        </div>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mon-mt-20" *ngIf="steps.unsignedForms">
+                                        <h4 language="primary.portal.applicationFlow.listOfUnsignedForms"></h4>
+                                        <ul class="signature-unsigned">
+                                            <li *ngFor="let forms of steps.unsignedForms">{{forms}}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="showSignature && showPin">
+                                <div class="signature-block">
+                                    <div class="sign-in">
+                                        <p class="sign-txt" id="iHerebylbl" language="primary.portal.applicationFlow.iHereby"></p>
+                                        <mat-checkbox
+                                            formControlName="privacyNote"
+                                            (change)="updateError($event)"
+                                            class="mon-my-20"
+                                            [disabled]="disableTillViewPDF"
+                                            aria-labelledby="iHerebylbl"
+                                        >
+                                            <span language="primary.portal.applicationFlow.iacknowledge"></span>
+                                            <span
+                                                ><a
+                                                    href="javascript:void(0)"
+                                                    (click)="openPrivacyNote()"
+                                                    [attr.aria-label]="languageStrings['primary.portal.applicationFlow.privacyNote']"
+                                                ></a
+                                                ><span language="primary.portal.applicationFlow.privacyNote"></span
+                                            ></span>
+                                        </mat-checkbox>
+
+                                        <mat-error *ngIf="privacyNoteError" language="primary.portal.common.selectionRequired"> </mat-error>
+                                        <h3 language="primary.portal.applicationFlow.applicationInsurance"></h3>
+                                        <mat-label class="mat-label" language="primary.portal.applicationFlow.enterPin"> </mat-label>
+                                        <mat-form-field class="w-200">
+                                            <input
+                                                matInput
+                                                formControlName="pinControl"
+                                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.enterPin']"
+                                                (input)="setPinSignature($event.target.value)"
+                                            />
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['pinControl'].hasError('required')"
+                                                language="primary.portal.common.requiredField"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['pinControl'].hasError('maxlength')"
+                                                language="primary.portal.applicationFlow.cannotExceed"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['pinControl'].hasError('minlength')"
+                                                language="primary.portal.applicationFlow.minthreeCharacters"
+                                            >
+                                                <!-- TODO: Need to change later based on moqup -->
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['pinControl'].hasError('pattern')"
+                                                language="primary.portal.applicationFlow.useOnlyLetters"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <mat-label
+                                            class="mat-label"
+                                            *ngIf="isOwnerSignature"
+                                            language="primary.portal.applicationFlow.enterOwnerPin"
+                                        >
+                                        </mat-label>
+                                        <mat-form-field class="w-200" *ngIf="isOwnerSignature">
+                                            <input
+                                                matInput
+                                                formControlName="ownerPinControl"
+                                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.enterPin']"
+                                            />
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['ownerPinControl'].hasError('required')"
+                                                language="primary.portal.common.requiredField"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['ownerPinControl'].hasError('maxlength')"
+                                                language="primary.portal.applicationFlow.cannotExceed"
+                                            >
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['ownerPinControl'].hasError('minlength')"
+                                                language="primary.portal.applicationFlow.minthreeCharacters"
+                                            >
+                                                <!-- TODO: Need to change later based on moqup -->
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="signatureForm.controls['ownerPinControl'].hasError('pattern')"
+                                                language="primary.portal.applicationFlow.useOnlyLetters"
+                                            >
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <p>
+                                            <span language="primary.portal.applicationFlow.electronicSign"></span>
+                                            <span>{{currentDate | date:dateFormat  }}</span>
+                                        </p>
+                                        <p>
+                                            <span language="primary.portal.applicationFlow.agentSignature"></span>
+                                            <span>{{firstName}} {{lastName}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="signature-block tpi-flow-border" *ngIf="showSignature && !showPin">
+                                <div class="sign-in">
+                                    <p class="sign-txt" id="signiHerebylbl" language="primary.portal.applicationFlow.iHereby"></p>
+                                    <p class="sign-txt" *ngIf="isBDAvailable" language="primary.portal.benefitDollars.payment.message"></p>
+                                    <mat-checkbox
+                                        [disabled]="disableTillViewPDF || isHeadset"
+                                        formControlName="privacyNote"
+                                        (change)="updateError($event)"
+                                        aria-labelledby="signiHerebylbl"
+                                        [ngClass]="{'highlight-required': isVF2F}"
+                                    >
+                                        <span language="primary.portal.applicationFlow.iacknowledge"></span>
+                                        <span class="mon-ml-5">
+                                            <a
+                                                (click)="openPrivacyNote()"
+                                                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.privacyNote']"
+                                                language="primary.portal.applicationFlow.privacyNote"
+                                            >
+                                            </a>
+                                        </span>
+                                        <span class="mon-ml-5" *ngIf="isVF2F" language="primary.portal.common.and">
+                                            <a (click)="openModal()" language="primary.portal.vf2f.consent.statement"></a>
+                                        </span>
+                                    </mat-checkbox>
+
+                                    <mat-error *ngIf="privacyNoteError">Selection Required</mat-error>
+                                    <h3 language="primary.portal.applicationFlow.applicationInsuranceOne"></h3>
+                                    <p language="primary.portal.applicationFlow.applicationeSignature"></p>
+                                    <mat-form-field class="w-200" [ngClass]="{'highlight-required': isVF2F}">
+                                        <input
+                                            [disableControl]="disableTillViewPDF || isHeadset"
+                                            matInput
+                                            type="text"
+                                            formControlName="signature"
+                                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.applicationeSignature']"
+                                        />
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['signature']?.errors?.required"
+                                            language="primary.portal.applicationFlow.signatureRequired"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['signature']?.errors?.minlength && !signatureForm.controls['signature']?.errors?.pattern"
+                                            language="secondary.portal.accounts.minCharRequired"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['signature']?.errors?.maxlength && !signatureForm.controls['signature']?.errors?.pattern"
+                                        >
+                                            {{ maxLengthError }}
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['signature']?.errors?.pattern"
+                                            language="secondary.portal.common.pattern.signature"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <p *ngIf="isOwnerSignature" language="primary.portal.applicationFlow.ownerSignature"></p>
+                                    <mat-form-field class="w-200" *ngIf="isOwnerSignature">
+                                        <input
+                                            [disableControl]="disableTillViewPDF || isHeadset"
+                                            matInput
+                                            type="text"
+                                            formControlName="ownerSignature"
+                                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.applicationeSignature']"
+                                        />
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['ownerSignature']?.errors?.required"
+                                            language="primary.portal.applicationFlow.signatureRequired"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['ownerSignature']?.errors?.minlength && !signatureForm.controls['signature']?.errors?.pattern"
+                                            language="primary.portal.applicationFlow.oneCharacter"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="signatureForm.controls['ownerSignature']?.errors?.pattern"
+                                            language="primary.portal.applicationFlow.invalidFormat"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <ng-container *ngIf="isHeadset || isVF2F">
+                                        <p *ngIf="isHeadset" language="primary.portal.applicationFlow.signatureLater"></p>
+                                        <div class="agent-section">
+                                            <p>
+                                                <span *ngIf="isHeadset" language="primary.portal.applicationFlow.electronicSign"></span>
+                                                <span *ngIf="isVF2F" language="primary.portal.vf2f.electronicSign"></span>
+                                                <span>{{ currentDate | date : dateFormat}}</span>
+                                            </p>
+                                            <p>
+                                                <span language="primary.portal.applicationFlow.agentSignature"></span>
+                                                <span>{{firstName}} {{lastName}}</span>
+                                            </p>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-applications" *ngIf="showReview">
+                            <div class="section-header">
+                                <div>
+                                    <h2 language="primary.portal.applicationFlow.review"></h2>
+                                </div>
+                            </div>
+                            <div class="section-subheader">
+                                <p *ngIf="reviewData.length === 1" language="primary.portal.applicationFlow.enrollmentCompletedOneApp"></p>
+                                <p *ngIf="reviewData.length > 1" language="primary.portal.applicationFlow.enrollmentCompleted"></p>
+                            </div>
+
+                            <div class="whole-block">
+                                <div class="plan-block" *ngFor="let review of reviewData; index as a">
+                                    <div class="plan-header">
+                                        <div>
+                                            <h3 [innerHTML]="review.planName"></h3>
+                                            <p *ngIf="review.carrierId === agCarrierId" class="mon-mt-5">
+                                                <a
+                                                    href="javascript:void(0)"
+                                                    (click)="viewPlanDetailsDialog(review.cartId)"
+                                                    language="primary.portal.shoppingExperience.viewDetails"
+                                                >
+                                                </a>
+                                            </p>
+                                        </div>
+                                        <div class="plan-pricing">
+                                            <h3 class="price-text">{{review.cost | currency}}</h3>
+                                            <p
+                                                [ngClass]="payFrequency.name.length < PAY_FREQUENCY_SHORT_LENGTH?'pay-frequency-name-short':'pay-frequency-name-long'"
+                                            >
+                                                {{payFrequency.name}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="plan-details" *ngIf="isVF2F">
+                                        <div class="statements-agreements">
+                                            <h4 language="primary.portal.applicationFlow.applicationReviewStatus"></h4>
+                                            <p language="primary.portal.applicationFlow.applicationReviewDescription"></p>
+                                            <mat-form-field class="w-200 mon-mt-10" [ngClass]="{'highlight-required': isVF2F}">
+                                                <input
+                                                    matInput
+                                                    type="text"
+                                                    [placeholder]="languageStrings['primary.portal.enrollment.review.initial']"
+                                                    [maxlength]="MAX_INITIALS_LEN"
+                                                    autocomplete="off"
+                                                    [formControlName]="'reviewInitials' +a"
+                                                    [attr.aria-label]="languageStrings['primary.portal.applicationFlow.initials']"
+                                                />
+                                                <mat-error
+                                                    *ngIf="signatureForm.controls['reviewInitials' + a]?.errors?.required"
+                                                    language="primary.portal.common.requiredField"
+                                                >
+                                                </mat-error>
+                                                <mat-error
+                                                    *ngIf="!showPin && !signatureForm.controls['reviewInitials' + a]?.errors?.required && (signatureForm.controls['reviewInitials' + a]?.errors?.pattern || signatureForm.controls['reviewInitials' + a]?.errors?.minlength)"
+                                                    language="primary.portal.applicationFlow.invalidFormat"
+                                                >
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="whole-block hipaa-section" *ngIf="isHipaaEligible && isHipaaAllowed">
+                            <h3 language="primary.portal.applicationFlow.hipaa.heading"></h3>
+                            <mat-checkbox formControlName="hipaaConsent" (change)="changeHipaaValue($event)">
+                                <span language="primary.portal.applicationFlow.hipaa.info"></span>
+                                <span *ngIf="!isHipaaChecked" language="primary.portal.applicationFlow.hipaa.optIn"> </span>
+                                <span *ngIf="isHipaaChecked" language="primary.portal.applicationFlow.hipaa.optOut"> </span>
+                                <span class="mon-ml-5"
+                                    ><a
+                                        (click)="openConsentForm($event)"
+                                        [attr.aria-label]="languageStrings['primary.portal.applicationFlow.hipaa.viewPdf']"
+                                        language="primary.portal.applicationFlow.hipaa.viewPdf"
+                                    >
+                                    </a>
+                                </span>
+                                <span *ngIf="!isHipaaChecked" language="primary.portal.applicationFlow.hipaa.check"> </span>
+                                <span *ngIf="isHipaaChecked" language="primary.portal.applicationFlow.hipaa.unCheck"> </span>
+                            </mat-checkbox>
+                        </div>
+                        <div class="signature-section">
+                            <div>
+                                <button
+                                    id="previousForm"
+                                    type="button"
+                                    mat-button
+                                    *ngIf="!hideBackReviewButton"
+                                    class="mon-btn-secondary mon-mr-15 submit-app-flow-form"
+                                    (click)="backToReview()"
+                                    mat-flat-button
+                                >
+                                    <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+                                    <span language="primary.portal.applicationFlow.backReview"></span>
+                                </button>
+                                <button
+                                    id="submitAppFlowForm"
+                                    mat-button
+                                    class="mon-btn-primary submit-app-flow-form"
+                                    type="submit"
+                                    mat-flat-button
+                                >
+                                    <span *ngIf="isHeadset" class="submit-txt" language="primary.portal.common.submit.applicant"> </span>
+                                    <span *ngIf="!isHeadset" class="submit-txt" language="primary.portal.applicationFlow.submit"> </span>
+                                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div>
+                        <ng-template #contactTemplate>
+                            <div class="info-modal">
+                                <form [formGroup]="contactForm" *ngIf="isHeadset" class="contact-form">
+                                    <div mat-dialog-content>
+                                        <h2 mat-dialog-title language="primary.portal.applicationFlow.customerSignatureRequired"></h2>
+                                        <p class="mon-pt-0">
+                                            <ng-container *ngIf="!hasMemberContact">
+                                                <span>{{memberFirstName}}</span>
+                                                <span language="primary.portal.applicationFlow.emailNotHave"></span>
+                                            </ng-container>
+                                            <ng-container *ngIf="hasMemberContact">
+                                                <span language="primary.portal.applicationFlow.youCanNotify"></span>
+                                                <span>{{memberFirstName}} </span>
+                                                <span language="primary.portal.applicationFlow.contactInfo"></span>
+                                                <br />
+                                                <span
+                                                    class="acknowledge-text"
+                                                    language="primary.portal.applicationFlow.acknowledgement"
+                                                ></span>
+                                            </ng-container>
+                                        </p>
+
+                                        <mat-radio-group
+                                            ariaLabel="stepData.step.question.text"
+                                            formControlName="contacts"
+                                            class="contacts"
+                                        >
+                                            <ng-container *ngFor="let option of contactList">
+                                                <mat-radio-button [value]="option" [disabled]="option.disableField">
+                                                    <div *ngIf="option.type === email" language="primary.portal.headset.email">
+                                                        {{option.contact}}
+                                                    </div>
+                                                    <div *ngIf="option.type === phoneNumber" language="primary.portal.headset.text">
+                                                        {{option.formatted}}
+                                                    </div>
+                                                    <div *ngIf="!option.type">{{option.contact}}</div>
+                                                </mat-radio-button>
+                                            </ng-container>
+                                        </mat-radio-group>
+                                    </div>
+                                    <div mat-dialog-actions class="dialog-footer mon-py-25">
+                                        <button
+                                            class="mon-btn-secondary"
+                                            mat-flat-button
+                                            (click)="skipAndSend()"
+                                            language="primary.portal.applicationFlow.skipSendLater"
+                                        ></button>
+                                        <button
+                                            class="mon-btn-primary"
+                                            mat-flat-button
+                                            (click)="sendToCustomer()"
+                                            *ngIf="hasMemberContact"
+                                            language="primary.portal.headset.sendto.applicant"
+                                        ></button>
+                                        <button
+                                            class="mon-btn-primary"
+                                            mat-flat-button
+                                            (click)="addContactInfo()"
+                                            *ngIf="!hasMemberContact"
+                                            language="primary.portal.applicationFlow.addContactInfo"
+                                        ></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

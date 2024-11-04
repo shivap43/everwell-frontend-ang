@@ -1,0 +1,38 @@
+<ng-container *ngIf="branding$ | async">
+    <!--Custom Branding-->
+    <ng-container *ngIf="isCustomBranding$ | async; else standardBranding">
+        <ng-container *ngIf="size$ | async as size">
+            <div
+                *ngIf="logoData$ | async as logoData"
+                class="logo-outer custom-branding"
+                [ngStyle]="{ 'height': logoOuterHeight$ | async, 'width': logoOuterWidth$ | async }"
+            >
+                <div class="logo-inner" [ngStyle]="{ 'height': logoInnerHeight$ | async, 'width': logoInnerWidth$ | async }">
+                    <ng-container *ngIf="customLogoOrientation$ | async as orientation">
+                        <img
+                            #customLogo
+                            alt="branding logo"
+                            [src]="logoData"
+                            [ngClass]="{ 'wide': orientation === 'wide', 'tall': orientation === 'tall' }"
+                            (load)="onLoadLogo()"
+                        />
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+
+    <!--Standard Branding-->
+    <ng-template #standardBranding>
+        <ng-container *ngIf="logoData$ | async as logoData">
+            <ng-container *ngIf="size$ | async as size">
+                <div
+                    class="logo-outer"
+                    [ngStyle]="{ 'height': logoOuterHeight$ | async, 'width': logoOuterWidth$ | async, 'background-color': backgroundColor$ | async }"
+                >
+                    <img [src]="logoData" alt="branding logo" [ngClass]="size === 'LARGE' ? 'large-outer' : 'small-outer'" />
+                </div>
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</ng-container>

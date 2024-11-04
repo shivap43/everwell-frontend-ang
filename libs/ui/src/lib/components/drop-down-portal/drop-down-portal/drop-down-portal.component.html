@@ -1,0 +1,10 @@
+<div
+    role="dialog"
+    aria-modal="true"
+    #portalWrapper
+    [ngStyle]="{'visibility': isHidden ? 'hidden' : 'visible'}"
+    [ngClass]="['empowered-portal-wrapper', portalClass]"
+>
+    <span class="cdk-visually-hidden" #hiddenLabel tabindex="-1" [language]="ariaTitle"></span>
+    <ng-content></ng-content>
+</div>

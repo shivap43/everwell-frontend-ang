@@ -1,0 +1,79 @@
+@import "shared";
+
+.file-icon {
+    margin: 0;
+}
+
+:host ::ng-deep {
+    .plan-details-empty .mat-tab-header {
+        border-bottom: 0;
+    }
+
+    .plan-details {
+        mat-label,
+        .mat-label {
+            margin-bottom: convert-unit(2px, "rem");
+        }
+
+        .video-frame {
+            width: 100%;
+            height: convert-unit(250px, "rem");
+        }
+
+        a,
+        .now-playing {
+            font-size: convert-unit(14px, "rem");
+            line-height: 1;
+        }
+    }
+}
+
+.plan-detail-header {
+    padding: map-get($spacers, 50) map-get($spacers, 50) map-get($spacers, 0);
+
+    .plan-header {
+        @include fontFace("secondary.regular");
+    }
+}
+
+.plan-details-wrapper {
+    max-height: calc(100vh - 335px);
+    overflow-y: auto;
+    padding: map-get($spacers, 0) map-get($spacers, 50) map-get($spacers, 50);
+
+    .share-plan-documents {
+        display: flex;
+        margin: map-get($spacers, 10) map-get($spacers, 0);
+    }
+
+    .plan-description {
+        margin: map-get($spacers, 20) map-get($spacers, 0);
+    }
+
+    .details-tab {
+        padding-left: convert-unit(18px, "rem");
+        line-height: convert-unit(30px, "rem");
+
+        li:last-child {
+            @include fontFace("primary.bold");
+        }
+    }
+
+    .email-icon {
+        margin: map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 0);
+    }
+
+    .coverage-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: map-get($spacers, 20);
+
+        &:last-child {
+            margin-bottom: map-get($spacers, 0);
+        }
+
+        .coverage-value {
+            text-align: right;
+        }
+    }
+}

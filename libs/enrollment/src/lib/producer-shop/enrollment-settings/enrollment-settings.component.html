@@ -1,0 +1,63 @@
+<div class="wrapper settings">
+    <div class="settings-title" language="primary.portal.shoppingCart.quoteLevelSettings.subHeader.settings"></div>
+    <div class="settings-dropdown-block">
+        <empowered-settings-dropdown [meta]="enrollmentMethodPortalMeta" [settingsDropdownContent]="method" #methodDropdown>
+            <empowered-enrollment-method-settings
+                class="content"
+                #method
+                [portalRef]="methodDropdown.portal"
+            ></empowered-enrollment-method-settings
+        ></empowered-settings-dropdown>
+
+        <empowered-settings-dropdown [meta]="locationPortalMeta" [settingsDropdownContent]="location" #locationDropdown
+            ><empowered-enrollment-location class="content" #location [portalRef]="locationDropdown.portal"></empowered-enrollment-location
+        ></empowered-settings-dropdown>
+
+        <empowered-settings-dropdown [meta]="coverageStartDatesPortalMeta" [settingsDropdownContent]="coverageDates" #coverageDatesDropdown
+            ><empowered-coverage-dates class="content" #coverageDates [portalRef]="coverageDatesDropdown.portal"></empowered-coverage-dates
+        ></empowered-settings-dropdown>
+
+        <empowered-settings-dropdown [meta]="occupationClassPortalMeta" [settingsDropdownContent]="occupationClass" #occupationClassDropdown
+            ><empowered-occupation-class
+                class="content"
+                #occupationClass
+                [portalRef]="occupationClassDropdown.portal"
+            ></empowered-occupation-class
+        ></empowered-settings-dropdown>
+
+        <!-- Adding Spouse and Applicant details dropdown -->
+
+        <empowered-settings-dropdown
+            *ngIf="ageRepositionConfigEnabled$ | async"
+            [meta]="applicantPortalMeta"
+            [settingsDropdownContent]="applicantInfo"
+            #applicantDetailsDropdown
+            ><empowered-applicant-details
+                class="content"
+                #applicantInfo
+                [portalRef]="applicantDetailsDropdown.portal"
+            ></empowered-applicant-details
+        ></empowered-settings-dropdown>
+
+        <empowered-settings-dropdown
+            *ngIf="ageRepositionConfigEnabled$ | async"
+            [meta]="spousePortalMeta"
+            [settingsDropdownContent]="spouseInfo"
+            #spouseDetailsDropdown
+            ><empowered-spouse-details class="content" #spouseInfo [portalRef]="spouseDetailsDropdown.portal"></empowered-spouse-details
+        ></empowered-settings-dropdown>
+
+        <empowered-settings-dropdown [meta]="morePortalMeta" [settingsDropdownContent]="moreSettings" #moreSettingsDropdown
+            ><empowered-producer-shop-more-settings
+                class="content"
+                #moreSettings
+                [portalRef]="moreSettingsDropdown.portal"
+            ></empowered-producer-shop-more-settings
+        ></empowered-settings-dropdown>
+    </div>
+</div>
+
+<div class="wrapper benefit-bank" *ngIf="showEmployerContributions$ | async">
+    <div class="benefit-bank">{{ languageStrings['primary.portal.shoppingCart.quoteLevelSettings.footer.benefitBank'] | uppercase }}</div>
+    <a href="javascript:void(0)" language="primary.portal.coverage.view" (click)="openEmployerContributionsDialog()"></a>
+</div>

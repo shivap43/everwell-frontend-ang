@@ -1,0 +1,36 @@
+@import "shared";
+.forms-filters {
+    margin: map-get($spacers, 30);
+    .search-type {
+        margin: map-get($spacers, 20) map-get($spacers, 0);
+        .filter-type {
+            ::ng-deep {
+                .mat-radio-label {
+                    margin-right: map-get($spacers, 20);
+                }
+            }
+        }
+    }
+    .filter {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+        margin-bottom: map-get($spacers, 20);
+        > div {
+            margin-right: map-get($spacers, 20);
+        }
+        .form-search {
+            padding-top: map-get($spacers, 20);
+        }
+    }
+    .form {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.500");
+        margin-bottom: map-get($spacers, 20);
+        > div {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+        }
+    }
+}

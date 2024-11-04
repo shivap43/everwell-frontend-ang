@@ -1,0 +1,73 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<div class="alert-msg" *ngIf="showError">
+    <mon-alert alertType="danger" closeButton="true">
+        <span>{{errorMessage}}</span>
+    </mon-alert>
+</div>
+<div class="info-modal">
+    <form [formGroup]="contactForm" class="contact-form">
+        <div mat-dialog-content>
+            <div class="d-flex flex-row justify-content-between">
+                <h2 mat-dialog-title language="primary.portal.applicationFlow.customerSignatureRequired"></h2>
+                <button
+                    type="button"
+                    (click)="skipAndSend()"
+                    class="header-close-icon-button"
+                    [attr.aria-label]="languageStrings['primary.portal.common.close']"
+                >
+                    <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+                </button>
+            </div>
+
+            <p class="mon-pt-0">
+                <ng-container *ngIf="!hasMemberContact && memberFirstName">
+                    <span>{{memberFirstName}}</span>
+                    <span language="primary.portal.applicationFlow.emailNotHave"></span>
+                </ng-container>
+                <ng-container *ngIf="hasMemberContact && memberFirstName">
+                    <span language="primary.portal.applicationFlow.youCanNotify"></span>
+                    <span>{{memberFirstName}} </span>
+                    <span language="primary.portal.applicationFlow.contactInfo"></span>
+                </ng-container>
+            </p>
+
+            <mat-radio-group
+                aria-label="stepData.step.question.text"
+                formControlName="contacts"
+                ngDefaultControl
+                class="contacts"
+                [(ngModel)]="selectedValue"
+            >
+                <ng-container *ngFor="let option of contactList">
+                    <mat-radio-button [value]="option" [disabled]="option.disableField">
+                        <div *ngIf="option.type === email" language="primary.portal.headset.email">{{option.contact}}</div>
+                        <div *ngIf="option.type === phoneNumber" language="primary.portal.headset.text">{{option.formatted}}</div>
+                        <div *ngIf="!option.type">{{option.contact}}</div>
+                    </mat-radio-button>
+                </ng-container>
+            </mat-radio-group>
+        </div>
+        <div mat-dialog-actions class="dialog-footer mon-py-25">
+            <button
+                class="mon-btn-secondary"
+                mat-flat-button
+                (click)="skipAndSend()"
+                language="primary.portal.applicationFlow.skipSendLater"
+            ></button>
+            <button
+                class="mon-btn-primary"
+                mat-flat-button
+                (click)="sendToCustomer()"
+                *ngIf="hasMemberContact"
+                language="primary.portal.headset.sendto.applicant"
+            ></button>
+            <button
+                class="mon-btn-primary"
+                mat-flat-button
+                (click)="addContactInfo()"
+                *ngIf="!hasMemberContact"
+                language="primary.portal.applicationFlow.addContactInfo"
+            ></button>
+        </div>
+    </form>
+</div>

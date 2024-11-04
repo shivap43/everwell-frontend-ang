@@ -1,0 +1,365 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div class="alert-msg">
+    <mon-alert class="message-block" alertType="danger" *ngIf="showErrorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <mon-alert class="message-block" alertType="success" *ngIf="enrollmentSentCount > 0 && enrollmentSentCount <=1">
+        <span>{{ enrollmentSentCount }} {{ languageStrings["primary.portal.accountEnrollments.enrollmentSent"] }}</span>
+        <mat-icon svgIcon="close" aria-hidden="true" (click)="hideAlertBox()"></mat-icon>
+    </mon-alert>
+    <mon-alert class="message-block" alertType="success" *ngIf="enrollmentSentCount > 1">
+        <span>{{ enrollmentSentCount }} {{ languageStrings["primary.portal.accountEnrollments.enrollmentsSent"] }}</span>
+        <mat-icon svgIcon="close" aria-hidden="true" (click)="hideAlertBox()"></mat-icon>
+    </mon-alert>
+    <mon-alert class="message-block" alertType="info" *ngIf="enrollmentSuccessCount > 0 && enrollmentSuccessCount <=1">
+        <span>{{ enrollmentSuccessCount }} {{ languageStrings["primary.portal.accountEnrollments.enrollmentUpdated"] }}</span>
+    </mon-alert>
+    <mon-alert class="message-block" alertType="info" *ngIf="enrollmentSuccessCount > 1">
+        <span>{{ enrollmentSuccessCount }} {{ languageStrings["primary.portal.accountEnrollments.enrollmentsUpdated"] }}</span>
+    </mon-alert>
+</div>
+<div>
+    <div class="unsent-filters">
+        <h2 class="enrollments-header">{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.title"] }}</h2>
+        <div class="header-def" *ngIf="data?.length != 0 || filterString !== ''">
+            <p *ngIf="!selfEnrollmentFlag">{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.description"] }}</p>
+            <p *ngIf="selfEnrollmentFlag">
+                {{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.selfEnrollmentDescription"] }}
+            </p>
+            <p class="shared-account" *ngIf="!isDirectAccount && currentAccount?.importType===accountImportType.SHARED_CASE">
+                {{ languageStrings["primary.portal.accountEnrollments.agBusinessNotInList"] }}
+            </p>
+        </div>
+        <mon-alert class="message-block" alertType="warning" *ngIf="commissionSplitWarning">
+            <span> {{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.commissionSplitWarning"] }} </span>
+        </mon-alert>
+        <mon-alert class="message-block" alertType="danger" *ngIf="isRepairRequiredCommissionSplit || !hasCommissionSplits">
+            <span
+                >{{languageStrings["primary.portal.commissionSplit.repairRequires.errorMsg"]}}
+                <a href="javascript:void(0)" (click)="navigateToCommissionSplit()">
+                    {{languageStrings["primary.portal.commissionSplit.repairRequires.goToCommissionSendSchedule"]}}</a
+                ></span
+            >
+        </mon-alert>
+        <ng-container *configEnabled="DUPLICATE_CHECK_ENABLE_CONFIG">
+            <div *ngIf="(isPayrollAccount || isDirectAccount) && isProducer">
+                <mon-alert class="message-block" alertType="warning" *ngIf="expiredSitCodes.length>0">
+                    <span *ngIf="expiredSitCodes.length === 1"
+                        >{{ secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.singleRecord'] | replaceTag: {
+                        "##writingnumber##" : expiredSitCodes[0].writingNumber, "##sitcode##" : expiredSitCodes[0].sitCode } }}</span
+                    >
+                    <div *ngIf="expiredSitCodes.length > 1">
+                        <span>{{secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.multipleRecordsHeader']}}</span>
+                        <ul>
+                            <li *ngFor="let expiredSitCode of expiredSitCodesFiltered">
+                                {{ secondaryLanguageString['secondary.portal.commissionSplit.expiredSitCodes.multipleRecords'] | replaceTag
+                                : { "##writingnumber##" : expiredSitCode.writingNumber, "##sitcode##" : expiredSitCode.sitCode } }}
+                            </li>
+                        </ul>
+                    </div>
+                </mon-alert>
+            </div>
+        </ng-container>
+        <div class="header-def">
+            <mon-alert class="message-block" alertType="info" *ngIf="isCrossBorderRulesEnabled && hasPendingEAAEnrollments">
+                <span>
+                    {{languageStrings["primary.portal.accountEnrollments.incompleteMissingEAAMessage"]}}
+                    <a (click)="downloadFile()" href="javascript:void(0)"
+                        >{{languageStrings["primary.portal.accountEnrollments.incompleteMissingEAAMessage.anchor"]}}</a
+                    ></span
+                >
+            </mon-alert>
+        </div>
+        <div class="search-filter-wraper" *ngIf="data?.length != 0 || filterString !== ''">
+            <div class="search-wrapper">
+                <div>
+                    <span class="search-label"
+                        >{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.unsentEnrollments"]}}</span
+                    >
+                    <span>{{ unsentEnrollments }}</span>
+                </div>
+
+                <div>
+                    <span class="search-label">{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.unsentAP"]}}</span>
+                    <span>{{ unsentAP | currency }}</span>
+                </div>
+            </div>
+            <div class="filter-wrapper dotted-border-left" *ngIf="!selfEnrollmentFlag">
+                <empowered-enrollments-filters
+                    type="UNSENT"
+                    (afterFilterApply)="afterFilterApply($event)"
+                    (onFilterApply)="onFilterApply($event)"
+                ></empowered-enrollments-filters>
+            </div>
+        </div>
+        <div class="result-not-found" *ngIf="data?.length === 0 && filterString === ''">
+            <span *ngIf="!selfEnrollmentFlag">{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.noResultFound"]}}</span>
+            <span *ngIf="selfEnrollmentFlag"
+                >{{ languageStrings["primary.portal.accountEnrollments.unsentBusiness.selfEnrollmentDescription"] }}</span
+            >
+        </div>
+    </div>
+    <div class="alert-msg" *ngIf="disableWarningMessage">
+        <mon-alert alertType="warning" class="message-block" closeButton="true">
+            <span language="primary.portal.unsentBusiness.zeroPercentCommissionWarningMessage"> </span>
+        </mon-alert>
+    </div>
+    <div class="table-mask-wrapper" *ngIf="data?.length != 0 || filterString !== ''">
+        <form
+            *ngIf="formSet"
+            [formGroup]="unsentEnrollmentForm"
+            (ngSubmit)="sendEnrollments()"
+            (keydown.enter)="$event.preventDefault()"
+            novalidate
+        >
+            <div class="unsent-container">
+                <table formArrayName="enrollments" [dataSource]="dataSource" mat-table matSort matSortDisableClear>
+                    <!-- Checkbox Column -->
+                    <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox
+                                (change)="$event ? masterToggle() : null"
+                                [checked]="selection.hasValue() && isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()"
+                                [disabled]="isAllPendingPda || (isCrossBorderRulesEnabled && hasPendingEAAEnrollments)"
+                            >
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let row; let rowIndex = index">
+                            <mat-checkbox
+                                *ngIf="row.checkboxRequired"
+                                (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionRow(row) : null"
+                                [checked]="selection.isSelected(row.enrollmentId)"
+                                [aria-label]="checkboxLabel(row)"
+                                [disabled]="row.status === INCOMPLETE_PDA || (isCrossBorderRulesEnabled && row.status === INCOMPLETE_MISSING_EAA) || unsentEnrollmentForm.get('enrollments').controls[rowIndex]?.get('commissionSplitId').hasError('invalid')"
+                            >
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="producerName">
+                        <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                            <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.columnProducer"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            {{ element.producerName }}
+                            <span *ngIf="selfEnrollmentFlag"
+                                >{{languageStrings['primary.portal.accountEnrollments.sentUnsentBusiness.selfEnroll']}}</span
+                            >
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="enrollment">
+                        <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                            <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.columnEnrollment"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <div *ngIf="element.checkboxRequired">
+                                <span>{{ element.enrollmentDate }}</span>
+                                <span>{{ element.memberName }}</span>
+                                <span
+                                    >{{ element.productName }} &ndash; ${{ element.annualPremium }}
+                                    <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.annually"]}}</span>
+                                    <button
+                                        mat-icon-button
+                                        [richTooltip]="element.effectiveTooltip"
+                                        matTooltipPosition="above"
+                                        matTooltipClass="pos-above"
+                                        type="button"
+                                        *ngIf="element.effectiveTooltip"
+                                        [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.sentUnsentBusiness.annually']"
+                                    >
+                                        <mon-icon iconName="Filled-info" class="infoicon icon-primary" iconSize="15"> </mon-icon>
+                                    </button>
+                                </span>
+                                <span *ngIf="element.status === INCOMPLETE_MISSING_EAA">
+                                    <mon-icon class="icon-warning" iconName="Filled-warning" iconSize="15"></mon-icon>
+                                    {{ languageStrings['primary.portal.enrollments.eaaRequiredStatus'] }}
+                                </span>
+                                <span *ngIf="element.status === INCOMPLETE_PDA">
+                                    <mon-icon class="icon-warning" iconName="Filled-warning" iconSize="15"></mon-icon>
+                                    {{ languageStrings['primary.portal.accountEnrollments.pendingPDACompletion'] }}
+                                </span>
+                            </div>
+                            <div *ngIf="!element.checkboxRequired">{{ element.enrollmentAP | currency }}</div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="note">
+                        <th [ngClass]="{'enrolled-note': isEnrolled}" *matHeaderCellDef mat-header-cell>
+                            <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.columnNote"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element" [ngClass]="{'enrolled-note': isEnrolled}">
+                            <a
+                                href="javascript:void(0)"
+                                [richTooltip]="element.enrollmentComment"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                                *ngIf="element.checkboxRequired && !element.isArgus"
+                                (click)="editNote(element)"
+                                [attr.aria-label]="languageStrings['primary.portal.accountEnrollments.sentUnsentBusiness.columnNote']"
+                            >
+                                <mon-icon
+                                    iconName="note"
+                                    class="note-icon"
+                                    [ngClass]="{' infoicon': !element.enrollmentComment}"
+                                    iconSize="24"
+                                ></mon-icon>
+                            </a>
+                            <span *ngIf="!element.checkboxRequired">{{ element.enrollmentComment }}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="commissionSplit">
+                        <th *matHeaderCellDef mat-header-cell>
+                            <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.columnCommissionSplit"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element; let rowIndex = index" [formGroupName]="rowIndex">
+                            <div>
+                                <mat-form-field>
+                                    <mat-select
+                                        class="commission_split_dropdown"
+                                        formControlName="commissionSplitId"
+                                        (selectionChange)="commissionSplitChanged($event.value, element.enrollmentId, rowIndex)"
+                                        panelClass="wrap-select commission_split_dropdown"
+                                        placeholder="Select"
+                                        disableOptionCentering="true"
+                                        [disabled]="(isCrossBorderRulesEnabled && element.status === INCOMPLETE_MISSING_EAA) || selfEnrollmentFlag || element.status == INCOMPLETE_PDA"
+                                    >
+                                        <mat-select-trigger>
+                                            {{fetchTrimmedData(rowIndex, getCommissionSplitsByProducerId(element.producerId,
+                                            element.commissionSplit, rowIndex, element.state), true, element.commissionSplitId[0])}}
+                                        </mat-select-trigger>
+                                        <mat-option
+                                            *ngFor="let split of getCommissionSplitsByProducerId(element.producerId, element.commissionSplit, rowIndex, element.state, element.enrollmentId)"
+                                            [value]="split.id"
+                                        >
+                                            <div>
+                                                <span>{{split.name}}</span>
+
+                                                <span *ngFor="let assignment of split.assignments"
+                                                    >{{assignment.percent}}% {{assignment.producer.name}}
+                                                    {{mapSitCode(assignment.producer.producerId, assignment.sitCodeId)}}</span
+                                                >
+                                            </div>
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="unsentEnrollmentForm.get('enrollments').controls[rowIndex]?.get('commissionSplitId').hasError('required')"
+                                    >
+                                        {{ languageSecondStringsArray["secondary.portal.accountEnrollments.selectionRequired"]}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="unsentEnrollmentForm.get('enrollments').controls[rowIndex]?.get('commissionSplitId').hasError('invalid')"
+                                    >
+                                        {{languageStrings['primary.portal.commissionSplit.repairRequires.invalidError']}}
+                                    </mat-error>
+                                </mat-form-field>
+
+                                <div *ngIf="enrollmentWarnings[rowIndex]" class="d-flex flex-row">
+                                    <mon-icon class="icon-warning" iconName="Filled-warning" iconSize="15"></mon-icon>
+                                    <div class="flex-grow-1 commission-split-warning">
+                                        <span>
+                                            {{languageStrings['primary.portal.accountEnrollments.unsentBusiness.enrollmentWarning'] |
+                                            replaceTag: { "##state##" : enrollmentWarningsState[rowIndex] } }}
+                                        </span>
+                                        <ng-container *ngFor="let producer of enrollmentWarningsProducers[rowIndex]; let i = index">
+                                            <span *ngIf="i+1 < enrollmentWarningsProducers[rowIndex].length && i < 4">
+                                                {{ producer }},
+                                            </span>
+                                            <span *ngIf="i+1 === enrollmentWarningsProducers[rowIndex].length && i < 4">
+                                                {{ producer }}
+                                            </span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="sendDate">
+                        <th *matHeaderCellDef mat-header-cell>
+                            <span>{{ languageStrings["primary.portal.accountEnrollments.sentUnsentBusiness.columnSendDate"]}}</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element; let rowIndex = index" [formGroupName]="rowIndex">
+                            <div>
+                                <mat-form-field>
+                                    <mat-select
+                                        class="send_date_dropdown"
+                                        formControlName="sentDate"
+                                        (selectionChange)="sentDateChanged($event, element.enrollmentId)"
+                                        panelClass="wrap-select send_date_dropdown"
+                                        placeholder="Select"
+                                        disableOptionCentering="true"
+                                        [compareWith]="sentSelectCompareWith"
+                                        [disabled]=" commissionSplitError || (isCrossBorderRulesEnabled && element.status === INCOMPLETE_MISSING_EAA) ||
+                                            element.status == INCOMPLETE_PDA || element.isArgus ||
+                                            (selection.selected.length !== 0 && rowIndex === 0 && onlyArgusSelected)"
+                                    >
+                                        <mat-select-trigger>
+                                            {{fetchTrimmedData(rowIndex, sendDateArr[rowIndex], false, element.enrollmentId)}}
+                                        </mat-select-trigger>
+                                        <mat-option *ngFor="let date of sendDateArr[rowIndex]" [value]="date">
+                                            <div *ngIf="!date.hideOption">
+                                                <span *ngIf="date.dateVal">{{date.dateVal}}</span>
+                                                <span>{{date.type}}</span>
+                                            </div>
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="unsentEnrollmentForm.get('enrollments').controls[rowIndex]?.get('sentDate').hasError('required')"
+                                    >
+                                        {{ languageSecondStringsArray["secondary.portal.accountEnrollments.selectionRequired"] }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="noResults">
+                        <th mat-header-cell *matHeaderCellDef [attr.colspan]="10" class="text-center result-not-found">
+                            {{NoDataOnFilterErrorMessage}}
+                        </th>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true;"></tr>
+                    <tr
+                        *matRowDef="let row; columns: displayedColumns"
+                        mat-row
+                        [ngClass]="{'enrolled_row' : row.enrollmentComment == languageStrings['primary.portal.accountEnrollments.applyToSelected']}"
+                    >
+                        <ng-container *ngIf="row && row.rowRequired"></ng-container>
+                    </tr>
+                    <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource?.data.length != 0 || filterString === ''"></tr>
+                </table>
+            </div>
+            <footer *ngIf="data?.length" class="flex-form-footer fixed-position">
+                <button
+                    mat-flat-button
+                    class="mon-btn-secondary mon-mr-20"
+                    type="button"
+                    (click)="revertForm()"
+                    *ngIf="hasBeenChanged"
+                    [attr.aria-label]="languageStrings['primary.portal.common.undoChanges']"
+                >
+                    {{ languageStrings["primary.portal.common.undoChanges"]}}
+                </button>
+                <button
+                    *ngIf="(!unsentEnrollmentForm.dirty) && !hasBeenChanged && isSaved"
+                    type="button"
+                    mat-flat-button
+                    class="mon-btn-success"
+                    [attr.aria-label]="languageStrings['primary.portal.common.saved']"
+                >
+                    <mon-icon class="tick-icon" iconName="check" iconSize="12"></mon-icon>
+                    <span>{{ languageStrings["primary.portal.common.saved"]}}</span>
+                </button>
+                <button
+                    mat-flat-button
+                    *ngIf="((!isSaved && !unsentEnrollmentForm.dirty) || unsentEnrollmentForm.dirty)"
+                    class="w-120 mon-btn-primary"
+                    [disabled]="!hasBeenChanged"
+                    [attr.aria-label]="languageStrings['primary.portal.common.save']"
+                    type="submit"
+                >
+                    {{ languageStrings["primary.portal.common.save"]}}
+                </button>
+            </footer>
+        </form>
+    </div>
+</div>

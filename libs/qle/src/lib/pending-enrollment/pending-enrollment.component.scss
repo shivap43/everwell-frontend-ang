@@ -1,0 +1,35 @@
+@import "shared";
+
+:host {
+    .layout-header-2column {
+        height: calc(100vh - 100px);
+
+        .header-content {
+            display: flex;
+            flex: 1;
+            justify-content: space-between;
+            .mat-dialog-title {
+                margin-bottom: 0;
+            }
+        }
+
+        .columns {
+            overflow: hidden;
+
+            .sidenav-area {
+                overflow-y: auto;
+                border-right-width: 0;
+                @include media-min("m") {
+                    min-width: convert-unit(240px, "rem");
+                    max-width: convert-unit(240px, "rem");
+                    border-right-width: convert-unit(1px, "rem");
+                }
+            }
+
+            .content-area {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    }
+}

@@ -1,0 +1,4 @@
+export enum EnrollmentStateRelation {
+    SAME_AS_RESIDENT = "SAME_AS_RESIDENT",
+    DIFFERENT_FROM_RESIDENT = "DIFFERENT_FROM_RESIDENT",
+}

@@ -1,0 +1,351 @@
+<div class="info-modal size-large">
+    <ng-template [ngIf]="isLoading">
+        <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+    </ng-template>
+    <div class="modal-header">
+        <button mat-icon-button (click)="closeDialog()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h2 mat-dialog-title>
+            <ng-template [ngIf]="data.mode === STR_ADD" [ngIfElse]="editTitleTemplate">
+                {{languageStrings['primary.portal.enrollmentWizard.addDependents']}}</ng-template
+            >
+            <ng-template #editTitleTemplate>
+                <span *ngIf="data.dependentData.dependentRelationId !== -1">
+                    {{languageStrings['primary.portal.enrollmentWizard.editDependent']}}
+                </span>
+                <span *ngIf="data.dependentData.dependentRelationId === -1">
+                    {{languageStrings['primary.portal.enrollmentWizard.editInfo']}}
+                </span></ng-template
+            >
+        </h2>
+        <div class="scrollable-content">
+            <form
+                *ngFor="let dependentForm of dependentForm.get('forms')['controls']; let i = index"
+                [formGroup]="dependentForm"
+                class="form-wrapper"
+                [ngClass]="{'dotted-border-top': (data.mode === STR_ADD)}"
+            >
+                <mon-alert alertType="danger" *ngIf="hasError">
+                    <span>{{ errorMsg }}</span>
+                </mon-alert>
+                <div class="d-md-flex">
+                    <div class="flex-item form-name mon-mr-20">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.firstName']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="firstName"
+                                matInput
+                                name="firstName"
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentWizard.firstName']"
+                            />
+
+                            <mat-error *ngIf="dependentForm.get('firstName').touched && dependentForm.get('firstName').hasError">
+                                <span
+                                    *ngIf="dependentForm.get('firstName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </span>
+                                <span
+                                    *ngIf="dependentForm.get('firstName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(dependentForm.get('firstName').value)"
+                                    language="secondary.portal.members.personalValidationMsg.firstNameMsg1"
+                                >
+                                </span>
+                                <span
+                                    *ngIf="dependentForm.get('firstName').hasError('pattern') && nameWithHypenApostrophesValidation.test(dependentForm.get('firstName').value)"
+                                    language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                                >
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item form-name">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.lastName']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="lastName"
+                                matInput
+                                name="lastName"
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentWizard.lastName']"
+                            />
+
+                            <mat-error
+                                *ngIf="dependentForm.get('lastName').touched && dependentForm.get('lastName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="dependentForm.get('lastName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(dependentForm.get('lastName').value)"
+                                language="secondary.portal.members.personalValidationMsg.lastNameMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="dependentForm.get('lastName').hasError('pattern') && nameWithHypenApostrophesValidation.test(dependentForm.get('lastName').value)"
+                                language="secondary.portal.register.personalInfo.invalidStringWithHypenApostrophe"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item form-datepicker mon-mr-20">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.birthday']}} </mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="birthDate"
+                                [matDatepicker]="picker"
+                                matInput
+                                name="birthDate"
+                                (dateInput)="checkDate($event);chekMatError(dependentForm)"
+                                (dateChange)="checkDate($event);chekMatError(dependentForm)"
+                                [max]="maxDate[i]"
+                                [min]="minDate[i]"
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentWizard.birthday']"
+                                empoweredDateTransform
+                                #datePickerInput
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                            <mat-error *ngIf="isDateInvalid">{{validateDate(dependentForm)}}</mat-error>
+                            <mat-error
+                                *ngIf="dependentForm.get('birthDate').hasError('matDatepickerMax') && dependentForm.get('relationshipToEmployee').value=='1'"
+                                language="primary.portal.members.dependentValidationMsg.birthDateMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="dependentForm.get('birthDate').hasError('matDatepickerMin') && dependentForm.get('relationshipToEmployee').value=='2'"
+                                language="primary.portal.members.dependentValidationMsg.birthDateMsg2"
+                            >
+                            </mat-error>
+                            <mat-error *ngIf="dependentForm.get('birthDate').hasError('matDatepickerParse') &&!isRequired "
+                                >{{secondaryLanguageStrings['secondary.portal.common.invalidDateFormat']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item form-gender">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.gender']}} </mat-label>
+                        <mat-form-field>
+                            <mat-select formControlName="gender" name="gender" disableOptionCentering="true">
+                                <mat-option *ngFor="let gender of genders" [value]="gender">{{gender}} </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-error
+                            *ngIf="dependentForm.get('gender').touched && dependentForm.get('gender').hasError('required')"
+                            language="secondary.portal.members.selectionRequired"
+                        >
+                        </mat-error>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="d-md-flex mon-mb-20">
+                        <ng-container *ngIf="data.dependentData?.dependentRelationId !== -1">
+                            <mat-checkbox
+                                [attr.aria-label]="languageStrings['primary.portal.members.dependent.personalInfo.optionYes']"
+                                formControlName="homeAddressSameAsEmployee"
+                                (click)="$event.stopPropagation()"
+                                (change)="sameAsEmployeeChange($event.checked, i)"
+                            >
+                                <span>
+                                    {{languageStrings['primary.portal.members.dependent.personalInfo.sameAsPrimaryAddress']
+                                    .replace("#firstname", dependantFirstName ) }}
+                                </span>
+                            </mat-checkbox>
+                            <mat-error
+                                *ngIf="dependentForm.get('homeAddressSameAsEmployee').touched && dependentForm.get('homeAddressSameAsEmployee').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            >
+                            </mat-error>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item form-name">
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.members.personalLabel.streetAddress1']}}
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="address1"
+                                matInput
+                                class="mon-input"
+                                type="text"
+                                name="address1"
+                                attr.aria-label="{{languageStrings['primary.portal.members.personalLabel.streetAddress1']}}"
+                            />
+
+                            <mat-error *ngIf="dependentForm.get('address1').touched && dependentForm.get('address1').hasError">
+                                <span
+                                    *ngIf="dependentForm.get('address1').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </span>
+                                <mat-error
+                                    *ngIf="dependentForm.get('address1').hasError('maxlength')"
+                                    language="primary.portal.members.personalValidationMsg.maxlength100"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="dependentForm.get('address1').hasError('pattern')"
+                                    language="primary.portal.members.personalValidationMsg.streetAddress1"
+                                >
+                                </mat-error>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item form-name">
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.members.personalLabel.streetAddress2']}}
+                            <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="address2"
+                                matInput
+                                name="address2"
+                                [attr.aria-label]="languageStrings['primary.portal.members.personalLabel.streetAddress2']"
+                            />
+                            <mat-hint>{{languageStrings['primary.portal.members.personalLabel.AptOrUnit']}}</mat-hint>
+
+                            <mat-error *ngIf="dependentForm.get('address2').touched && dependentForm.get('address2').hasError">
+                                <span
+                                    *ngIf="dependentForm.get('address2').hasError('maxlength')"
+                                    language="primary.portal.members.personalValidationMsg.maxlength100"
+                                >
+                                </span>
+                                <span
+                                    *ngIf="dependentForm.get('address2').hasError('pattern')"
+                                    language="primary.portal.members.personalValidationMsg.streetAddress2"
+                                >
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item form-zip mon-mr-20">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.members.personalLabel.city']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="city"
+                                type="text"
+                                class="mon-input"
+                                matInput
+                                name="city"
+                                attr.aria-label="{{languageStrings['primary.portal.members.personalLabel.city']}}"
+                            />
+                            <mat-error *ngIf="dependentForm.get('city').touched && dependentForm.get('city').hasError">
+                                <span *ngIf="dependentForm.get('city').hasError('required')"
+                                    >{{secondaryLanguageStrings['secondary.portal.members.requiredField']}}
+                                </span>
+                            </mat-error>
+                            <mat-error *ngIf="dependentForm.get('city').hasError('maxlength')"
+                                >{{languageStrings['primary.portal.members.personalValidationMsg.maxlength100']}}
+                            </mat-error>
+                            <mat-error>
+                                <span *ngIf="dependentForm.get('city').hasError('pattern')"
+                                    >{{languageStrings['primary.portal.common.city.patternError']}}</span
+                                >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item form-state mon-mr-20">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.state']}} </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="state"
+                                (selectionChange)=" checkZipCode(zip.value,dependentForm)"
+                                name="state"
+                                disableOptionCentering="true"
+                            >
+                                <mat-option *ngFor="let s of states" value="{{s.abbreviation}}">{{s.abbreviation}} </mat-option>
+                            </mat-select>
+
+                            <mat-error
+                                *ngIf="dependentForm.get('state').touched && dependentForm.get('state').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item form-zip mon-mr-20">
+                        <mat-label class="mat-label"> {{languageStrings['primary.portal.enrollmentWizard.zip']}} </mat-label>
+                        <mat-form-field>
+                            <input
+                                formControlName="zip"
+                                matInput
+                                name="zip"
+                                maxlength="10"
+                                (keyup)="checkZipCode($event.target.value,dependentForm)"
+                                #zip
+                                empoweredZipCodeFormat
+                                [attr.aria-label]="languageStrings['primary.portal.enrollmentWizard.zip']"
+                            />
+
+                            <mat-error
+                                *ngIf="dependentForm.get('zip').touched && dependentForm.get('zip').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="dependentForm.get('zip').hasError('pattern') || dependentForm.get('zip').hasError('zipMismatch')"
+                                language="primary.portal.members.dependentValidationMsg.zipMsg"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex" *ngIf="data.dependentData?.dependentRelationId !== -1">
+                    <div class="flex-item form-relation">
+                        <mat-label class="mat-label">
+                            {{languageStrings['primary.portal.enrollmentWizard.relationshipTo']}} {{data.userData.name.firstName +' ' +
+                            data.userData.name.lastName }}
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="relationshipToEmployee"
+                                name="relationshipToEmployee"
+                                disableOptionCentering="true"
+                                (ngModelChange)="checkBirthDateOnRelationshipChange(dependentForm,i)"
+                            >
+                                <mat-option *ngFor="let relation of relations" [value]="relation.id">{{ relation.name}} </mat-option>
+                            </mat-select>
+
+                            <mat-error
+                                *ngIf="dependentForm.get('relationshipToEmployee').touched && dependentForm.get('relationshipToEmployee').hasError('required')"
+                                language="secondary.portal.members.selectionRequired"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="action-remove-wrapper" *ngIf="i > 0 && data.mode ===STR_ADD ">
+                    <a (click)="removeDependentForm()">{{languageStrings['primary.portal.enrollmentWizard.remove']}}</a>
+                </div>
+            </form>
+            <div class="content-footer dotted-border-top" *ngIf="data.mode === STR_ADD">
+                <a (click)="addAnotherDependentForm()">{{languageStrings['primary.portal.enrollmentWizard.addAnotherDependent']}}</a>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-footer">
+        <a (click)="closeDialog()">{{languageStrings['primary.portal.enrollmentWizard.cancel']}}</a>
+        <ng-template [ngIf]="data.mode === STR_ADD" [ngIfElse]="editSubmitButtonTemplate">
+            <button class="mon-btn-primary mat-flat-button" (click)="saveDependent()" [disabled]="this.dependentForm.invalid">
+                {{languageStrings['primary.portal.enrollmentWizard.saveDependent']}}
+            </button>
+        </ng-template>
+        <ng-template #editSubmitButtonTemplate>
+            <button class="mon-btn-primary mat-flat-button" (click)="updateDependent()" [disabled]="this.dependentForm.invalid">
+                {{languageStrings['primary.portal.enrollmentWizard.save']}}
+            </button>
+        </ng-template>
+    </mat-dialog-actions>
+</div>

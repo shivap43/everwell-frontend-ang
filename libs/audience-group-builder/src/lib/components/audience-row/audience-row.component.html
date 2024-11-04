@@ -1,0 +1,52 @@
+<div>
+    <div>
+        <p *ngIf="!isFirst" language="primary.portal.audienceBuilder.additionalCondition"></p>
+
+        <form [formGroup]="form">
+            <mat-form-field>
+                <label></label>
+                <mat-select
+                    [placeholder]="conditionPlaceholder"
+                    panelClass="audience-group-panel"
+                    formControlName="audienceType"
+                    [disableOptionCentering]="true"
+                    aria-label="Select an audience subset condition"
+                >
+                    <ng-container *ngFor="let audienceCondition of availableAudienceConditions$ | async">
+                        <ng-container *ngIf="audienceCondition.subValues != null; else mainCategory">
+                            <mat-option disabled class="option-category_header">
+                                {{ audienceCondition.name }}
+                            </mat-option>
+                            <ng-container *ngFor="let subValue of audienceCondition.subValues">
+                                <mat-option
+                                    *ngIf="id === subValue.selectedBy || subValue.selectedBy == null"
+                                    [value]="subValue.id"
+                                    class="option-sub_option"
+                                >
+                                    {{ subValue.name }}
+                                </mat-option>
+                            </ng-container>
+                        </ng-container>
+                        <ng-template #mainCategory>
+                            <mat-option
+                                *ngIf="id === audienceCondition.selectedBy || audienceCondition.selectedBy == null"
+                                [value]="audienceCondition.id"
+                                class="sub-option"
+                            >
+                                {{ audienceCondition.name }}
+                            </mat-option>
+                        </ng-template>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </form>
+
+        <p *ngIf="currentOptionType != null" language="primary.portal.audienceBuilder.conditionJoiner"></p>
+    </div>
+
+    <div #inputContainer class="inputContainer"></div>
+
+    <a *ngIf="!isFirst" (click)="propagateDeleteRequest()"
+        >{{languageStrings['primary.portal.audienceBuilder.removeCondition']}}</a
+    >
+</div>

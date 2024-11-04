@@ -1,0 +1,215 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form *ngIf="!isLoading" [formGroup]="secondFormGroup" (submit)="saveEnrollmentSignatures()">
+    <ng-template matStepLabel language="primary.portal.enrollment.review.reviewandsign"></ng-template>
+    <div [ngClass]="reviewAflacAlwaysOnly ? 'header' : 'header mrg-btm'">
+        <h1>
+            {{reviewAflacAlwaysOnly ? languageStrings['primary.portal.enrollment.review.reviewAflacAlwaysSelections'] :
+            languageStrings['primary.portal.enrollment.review.reviewplan']}}
+        </h1>
+        <mon-alert alertType="warning" *ngIf="!paymentPresent && ebsConfigEnabled && (isEBSIndicator$ | async) && isAflacPlanPresent">
+            <div class="content">
+                <h4 language="primary.portal.enrollment.review.ebs.heading"></h4>
+                <div class="description">
+                    <span language="primary.portal.enrollment.review.ebs.ebsprovide">
+                        <a (click)="gotoAflacEBS()" language="primary.portal.enrollment.review.ebs.ebsInfo">
+                            <mon-icon class="icon-primary icon-vertical-middle" iconName="share-vector" iconSize="15"></mon-icon>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </mon-alert>
+        <p>{{reviewSubheader}}</p>
+    </div>
+    <div *ngIf="errorResponse">
+        <mon-alert alertType="danger" close="true">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+    <div class="verify-summary">
+        <div *ngFor="let enrollment of enrollmentsListData" class="flex-sm-column">
+            <div class="d-flex">
+                <div>
+                    <mon-icon
+                        [iconName]="enrollment.productDetails.name"
+                        [fetchedIconPath]="enrollment.productDetails.iconSelectedLocation"
+                        class="plan-icon mobile-hide"
+                        iconSize="45"
+                    ></mon-icon>
+                </div>
+                <div class="plan-coverage">
+                    <span> {{enrollment.productDetails.name}} </span>
+                    <div class="plan-name">
+                        {{enrollment.enrollmentData.plan.name}}
+                        <div class="plan-rates mobile-show">
+                            <div class="plan-amount">$ {{enrollment.enrollmentData.memberCostPerPayPeriod.toFixed(DECIMAL_PLACES)}}</div>
+                            <div class="frequency">{{enrollment.payFrequency.name}}</div>
+                        </div>
+                    </div>
+                    <span class="legal-name">{{enrollment?.legalName}}</span>
+                    <span> {{enrollment.enrollmentData.coverageLevel.name}} </span>
+                </div>
+                <div class="plan-rates mobile-show">
+                    <div class="plan-amount">$ {{enrollment.enrollmentData.memberCostPerPayPeriod.toFixed(DECIMAL_PLACES)}}</div>
+                    <div class="frequency">{{enrollment.payFrequency.name}}</div>
+                </div>
+            </div>
+            <div class="d-flex mobile-width-100">
+                <div
+                    *ngIf="!paymentPresent && ebsConfigEnabled && (isEBSIndicator$ | async) && enrollment.enrollmentData.plan.carrierId===aflacCarrierId"
+                    class="ebs-plan-status"
+                >
+                    <mon-icon class="icon-warning icon-vertical-middle" iconName="Filled-warning" iconSize="20"></mon-icon>
+                    <span language="primary.portal.enrollment.review.ebs.ebsPaymentInfoNeeded"></span>
+                </div>
+                <div class="status">
+                    <div class="align-sm-success">
+                        <span class="status-icon">
+                            <mon-icon
+                                *ngIf="enrollment.status && enrollment.status===appSettings.APPROVESTATUS"
+                                iconName="Filled-check"
+                                iconSize="20"
+                                class="icon-success"
+                            >
+                            </mon-icon
+                            ><span
+                                *ngIf="enrollment.status && enrollment.status===appSettings.APPROVESTATUS"
+                                language="primary.portal.review.Completed"
+                            ></span>
+                            <mon-icon
+                                *ngIf="enrollment.status && enrollment.status===appSettings.REJECTSTATUS"
+                                iconName="cancel-circle"
+                                iconSize="15"
+                                class="icon-danger"
+                            ></mon-icon
+                            ><span
+                                *ngIf="enrollment.status && enrollment.status===appSettings.REJECTSTATUS"
+                                language="primary.portal.review.Rejected"
+                            ></span>
+                        </span>
+                        <a
+                            class="edit"
+                            *ngIf="enrollment.status===appSettings.APPROVESTATUS || enrollment.status===appSettings.REJECTSTATUS"
+                            (click)="openEnrollmentDetails(enrollment)"
+                            language="primary.portal.enrollment.review.edit"
+                        ></a>
+                    </div>
+                    <div
+                        class="review"
+                        [hidden]="enrollment.status===appSettings.APPROVESTATUS || enrollment.status===appSettings.REJECTSTATUS"
+                    >
+                        <button
+                            class="mon-btn-secondary mon-btn-block"
+                            (click)="openEnrollmentDetails(enrollment)"
+                            type="button"
+                            mat-flat-button
+                        >
+                            <span language="primary.portal.enrollment.review.review"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="plan-rates dotted-border-left mobile-hide">
+                    <div class="plan-amount">$ {{enrollment.enrollmentData.memberCostPerPayPeriod.toFixed(DECIMAL_PLACES)}}</div>
+                    <div class="frequency">{{enrollment.payFrequency.name}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="total-cost" *ngIf="!reviewAflacAlwaysOnly">
+        <div class="content-label" language="primary.portal.enrollment.review.yourtotalcost"></div>
+        <div>
+            <span class="amount">${{totalCost.toFixed(DECIMAL_PLACES)}}</span>
+            <span class="frequency"> {{payFrequency}}</span>
+        </div>
+    </div>
+    <div *ngIf="isEnrolled" class="aflac-always">
+        <empowered-aflac-always-card
+            [mpGroupId]="groupId"
+            [memberId]="memberId"
+            [rejectedEnrollmentIds] ="rejectedEnrollmentIds"
+            headerLanguageString="primary.portal.applicationFlow.reinstate.aflacAlways"
+            bodyLanguageString="primary.portal.coverage.AflacAlwaysCard.content"
+        ></empowered-aflac-always-card>
+    </div>
+    <p class="acknowledge" language="primary.portal.enrollment.review.acknowledge"></p>
+    <p class="acknowledge" *ngIf="isBDAvailable" language="primary.portal.benefitDollars.payment.message"></p>
+    <div class="acknowledgement-checker">
+        <mat-checkbox formControlName="privacyNote" class="mon-my-20" aria-labelledby="iHerebylbl">
+            <span class="normal-white-space text-right-margin-space" language="primary.portal.applicationFlow.iacknowledge"></span>
+            <a
+                href="javascript:void(0)"
+                (click)="openPrivacyNote()"
+                [attr.aria-label]="languageStrings['primary.portal.applicationFlow.privacyNote']"
+                language="primary.portal.applicationFlow.privacyNote"
+            ></a>
+        </mat-checkbox>
+        <mat-error
+            *ngIf="secondFormGroup.get('privacyNote').errors?.required && secondFormGroup.controls['privacyNote'].touched"
+            language="primary.portal.common.selectionRequired"
+        >
+        </mat-error>
+    </div>
+    <div class="d-flex">
+        <div class="flex-item">
+            <empowered-input [formName]="formName" displayOrder="1">
+                <mat-label class="mat-label" language="primary.portal.enrollment.review.esignature"> </mat-label>
+                <mat-form-field>
+                    <input
+                        matInput
+                        type="text"
+                        autocomplete="off"
+                        formControlName="signature"
+                        [attr.aria-label]="languageStrings['primary.portal.enrollment.review.esignature']"
+                    />
+                    <mat-error
+                        *ngIf="secondFormGroup.controls['signature'].errors?.required && secondFormGroup.controls['signature'].touched"
+                        language="primary.portal.common.requiredField"
+                    ></mat-error>
+                    <mat-error
+                        *ngIf="secondFormGroup.controls['signature'].errors?.minlength && !secondFormGroup.controls['signature'].errors?.pattern"
+                        language="secondary.portal.accounts.minCharRequired"
+                    ></mat-error>
+                    <mat-error *ngIf="secondFormGroup.controls['signature'].errors?.pattern ">
+                        {{secondaryLanguageStrings['secondary.portal.common.pattern.signature']}}
+                    </mat-error>
+                    <mat-error
+                        *ngIf="secondFormGroup.controls['signature']?.errors?.maxlength && !secondFormGroup.controls['signature']?.errors?.pattern"
+                    >
+                        {{languageStrings["primary.portal.applicationFlow.signature.maxLength"].replace("##length##",
+                        ESIGNATURE_MAX_LENGTH.toString())}}
+                    </mat-error>
+                </mat-form-field>
+            </empowered-input>
+        </div>
+    </div>
+    <div class="d-flex">
+        <div class="flex-item">
+            <ng-container *ngIf="isHipaaEligible && isHipaaAllowed">
+                <h3 language="primary.portal.applicationFlow.hipaa.heading"></h3>
+                <mat-checkbox
+                    [disableRipple]="true"
+                    (change)="changeHipaaValue($event)"
+                    formControlName="hipaaConsent"
+                    class="hippa-checkbox"
+                >
+                    <span language="primary.portal.applicationFlow.hipaa.info"></span>
+                    <span *ngIf="!isHipaaChecked" language="primary.portal.applicationFlow.hipaa.optIn"></span>
+                    <span *ngIf="isHipaaChecked" language="primary.portal.applicationFlow.hipaa.optOut"></span>
+                    <span class="mon-ml-5"
+                        ><a
+                            (click)="openConsentForm($event)"
+                            [attr.aria-label]="languageStrings['primary.portal.applicationFlow.hipaa.viewPdf']"
+                            language="primary.portal.applicationFlow.hipaa.viewPdf"
+                        ></a>
+                    </span>
+                    <span *ngIf="!isHipaaChecked" language="primary.portal.applicationFlow.hipaa.check"></span>
+                    <span *ngIf="isHipaaChecked" language="primary.portal.applicationFlow.hipaa.unCheck"></span>
+                </mat-checkbox>
+            </ng-container>
+        </div>
+    </div>
+    <div class="action-btn">
+        <button class="mon-btn-primary" type="submit" mat-flat-button [disabled]="!continue">
+            <span language="primary.portal.enrollment.review.reviewcomplete"></span>
+        </button>
+    </div>
+</form>

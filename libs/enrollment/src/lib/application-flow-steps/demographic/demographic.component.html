@@ -1,0 +1,264 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<form [formGroup]="demographicsForm" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onNext()">
+    <section class="section-container">
+        <div class="section-header">
+            <h3 *ngIf="showTitle">{{demographicsDirection}}</h3>
+        </div>
+        <div class="question-container">
+            <div *ngFor="let item of arrayOfDistinctValues">
+                <div class="response-block inline mon-mt-0">
+                    <div class="response-type select-menu" *ngIf="item === demographicsFields.HEIGHTFEET">
+                        <empowered-input displayOrder="1" [formName]="formName">
+                            <mat-label class="mat-label" id="memberHeightFeet">
+                                <span
+                                    >{{languagePrimaryStrings['primary.portal.members.personalLabel.heightFeet']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="HeightFeet"
+                                    disableOptionCentering="true"
+                                    [placeholder]="languagePrimaryStrings['primary.portal.common.selectFt']"
+                                    (selectionChange)="checkHeight()"
+                                >
+                                    <mat-option [value]="ftSelect"
+                                        >{{languagePrimaryStrings['primary.portal.common.selectFt']}}</mat-option
+                                    >
+                                    <ng-container *ngFor="let optionFeet of heightFeet">
+                                        <mat-option [value]="optionFeet">{{optionFeet}} Feet</mat-option>
+                                    </ng-container>
+                                </mat-select>
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.required">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.selectionRequired']}}
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.invalid">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidHeight']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </empowered-input>
+                    </div>
+
+                    <div class="response-type select-menu" *ngIf="item === demographicsFields.HEIGHTINCHES">
+                        <empowered-input displayOrder="2" [formName]="formName">
+                            <mat-label class="mat-label" id="memberHeightInches">
+                                <span
+                                    >{{languagePrimaryStrings['primary.portal.members.personalLabel.heightInches']}}</span
+                                >
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="HeightInches"
+                                    disableOptionCentering="true"
+                                    [placeholder]="languagePrimaryStrings['primary.portal.common.selectIn']"
+                                    (selectionChange)="checkHeight()"
+                                >
+                                    <mat-option>
+                                        {{languagePrimaryStrings['primary.portal.common.selectIn']}}</mat-option
+                                    >
+                                    <ng-container *ngFor="let optionInch of heightInches">
+                                        <mat-option [value]="optionInch">{{optionInch}} Inches</mat-option>
+                                    </ng-container>
+                                </mat-select>
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.required">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.selectionRequired']}}
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.invalid">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidHeight']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </empowered-input>
+                    </div>
+
+                    <div class="response-type select-menu" *ngIf="item === demographicsFields.DRIVERSLICENSESTATE">
+                        <mat-label class="mat-label" id="userDriverLicenseState">{{userDriverLicenseState}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="{{item}}"
+                                disableOptionCentering="true"
+                                aria-labelledby="userDriverLicenseState"
+                                [placeholder]="languagePrimaryStrings['primary.portal.applicationFlow.state.select']"
+                            >
+                                <ng-container *ngFor="let option of stateDropDown">
+                                    <mat-option [value]="option">{{option}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="demographicsForm.controls[item].errors?.required"
+                                language="secondary.portal.applicationFlow.demographics.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="response-type select-menu" *ngIf="item === demographicsFields.PREFFEREDCONTACTTIME">
+                        <mat-label class="mat-label" id="preferredContactTime">{{preferredContactTime}}</mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="{{item}}"
+                                disableOptionCentering="true"
+                                aria-labelledby="preferredContactTime"
+                            >
+                                <ng-container *ngFor="let option of contactTime">
+                                    <mat-option [value]="option">{{option}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                            <mat-error *ngIf="showError">
+                                {{languageStrings['secondary.portal.applicationFlow.demographics.selectionRequired']}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="response-type select-menu" *ngFor="let fields of arrayFields">
+                        <div *ngIf="item === demographicsFields.WEIGHT">
+                            <mat-label class="mat-label"
+                                >{{fields}} {{languagePrimaryStrings['primary.portal.applicationFlow.lbs']}}</mat-label
+                            >
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="{{item}}"
+                                    (keypress)="validateNumber($event)"
+                                    (change)="checkWeight()"
+                                    maxlength="3"
+                                    [attr.aria-label]="fields"
+                                />
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.required">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.requiredField']}}
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls[item].errors?.invalid">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidWeight']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="item === demographicsFields.EMAIL">
+                            <mat-label class="mat-label">{{fields}}</mat-label>
+                            <mat-form-field>
+                                <input matInput type="text" formControlName="{{item}}" />
+                                <mat-error
+                                    *ngIf="demographicsForm.controls['email'].errors?.pattern &&
+                             !demographicsForm.controls['email'].errors?.required"
+                                >
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidFormat']}}
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls['email'].errors?.required">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.requiredField']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="item === demographicsFields.DRIVERSLICENSENO">
+                            <mat-label class="mat-label">{{fields}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="{{item}}"
+                                    maxlength="15"
+                                    [attr.aria-label]="fields"
+                                />
+                                <mat-error
+                                    *ngIf="demographicsForm.controls[item].errors?.required"
+                                    language="secondary.portal.applicationFlow.demographics.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls[item].value">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidFormat']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="item === demographicsFields.EMPLOYEEID">
+                            <mat-label class="mat-label">{{fields}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="{{item}}"
+                                    maxlength="10"
+                                    (keypress)="validateNumber($event)"
+                                />
+                                <mat-error>
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.requiredField']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="item === demographicsFields.HOURSPERWEEK">
+                            <mat-label class="mat-label">{{fields}}</mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="{{item}}"
+                                    maxlength="10"
+                                    (keypress)="validateNumber($event)"
+                                />
+                                <mat-error>
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidFormat']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngIf="item === demographicsFields.SSN">
+                            <mat-label class="mat-label">{{fields}}</mat-label>
+                            <mat-form-field>
+                                <div class="d-flex">
+                                    <input
+                                        matInput
+                                        type="text"
+                                        formControlName="{{item}}"
+                                        (keypress)="validateNumber($event)"
+                                        hiddenInput="true"
+                                        [mask]="ssnFormat"
+                                        [patterns]="customPattern"
+                                        (input)="isFormValueChange = true"
+                                        (click)="ssnMaskingToggler(true)"
+                                        (blur)="ssnMaskingToggler(false)"
+                                        (keydown)="onSSNValueChange()"
+                                    />
+                                    <span
+                                        *ngIf="isShowHideButtonVisible && demographicsForm.controls.ssn.valid && isSSNValue"
+                                    >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="isMaskedTrue"
+                                            (click)="ssnMaskingToggler(true)"
+                                            class="nodec-link"
+                                            >{{languagePrimaryStrings['primary.portal.common.show']}}</a
+                                        >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="!isMaskedTrue"
+                                            (click)="ssnMaskingToggler(false)"
+                                            class="nodec-link"
+                                            >{{languagePrimaryStrings['primary.portal.common.hide']}}</a
+                                        >
+                                    </span>
+                                </div>
+                                <mat-error *ngIf="demographicsForm.controls['ssn'].errors?.required">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.requiredField']}}
+                                </mat-error>
+                                <mat-error *ngIf="demographicsForm.controls['ssn'].errors?.minlength">
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidSSNMessage']}}
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="demographicsForm.controls['ssn'].errors?.pattern &&
+                                                             !demographicsForm.controls['ssn'].errors?.required && !demographicsForm.controls['ssn'].errors?.minlength"
+                                >
+                                    {{languageStrings['secondary.portal.applicationFlow.demographics.invalidFormat']}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex mon-py-25">
+            <button type="submit" class="mon-btn-primary" mat-flat-button>
+                {{languagePrimaryStrings['primary.portal.common.next']}}
+            </button>
+        </div>
+    </section>
+</form>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languagePrimaryStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languagePrimaryStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

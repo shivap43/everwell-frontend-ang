@@ -1,0 +1,87 @@
+.search-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    .mat-form-field {
+        margin-bottom: 0;
+    }
+
+    .mat-form-field-ripple {
+        background-color: transparent;
+    }
+
+    .mat-form-field-wrapper {
+        padding-bottom: convert-unit(5px, "rem");
+
+        .mat-form-field-infix {
+            padding: convert-unit(8px, "rem") 0;
+        }
+    }
+}
+
+.search-box-wrapper {
+    position: absolute;
+    top: convert-unit(53px, "rem");
+    background: get("color.white");
+    z-index: 2;
+
+    .search-box-sub-wrapper {
+        border-radius: 0 0 convert-unit(4px, "rem") convert-unit(4px, "rem");
+        box-shadow: 0 convert-unit(1px, "rem") convert-unit(6px, "rem") 0 rgba(0, 0, 0, 0.24);
+
+        .mat-action-list {
+            padding-bottom: convert-unit(8px, "rem");
+
+            .search-account-menu {
+                display: flex;
+
+                mat-label,
+                .mat-label {
+                    width: convert-unit(110px, "rem");
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    padding-right: convert-unit(10px, "rem");
+                    margin-bottom: 0;
+                }
+
+                .field-value {
+                    background-image: linear-gradient(to bottom, get("color.gray.600") 20%, rgba(255, 255, 255, 0) 0%);
+                    background-position: left;
+                    background-size: convert-unit(1px, "rem") convert-unit(4px, "rem");
+                    background-repeat: repeat-y;
+                    display: block;
+                    padding: 0 convert-unit(10px, "rem");
+                    min-width: convert-unit(120px, "rem");
+
+                    &:hover {
+                        background: get("color.primary.500");
+
+                        a {
+                            background: get("color.primary.500");
+                            color: get("color.white");
+                        }
+                    }
+
+                    a {
+                        padding: 0;
+                        display: block;
+                        border-radius: 0;
+
+                        &:hover {
+                            color: get("color.white");
+                            background: get("color.primary.500");
+                        }
+
+                        .mat-button-wrapper {
+                            display: flex;
+                            font-size: convert-unit(14px, "rem");
+                            font-weight: normal;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

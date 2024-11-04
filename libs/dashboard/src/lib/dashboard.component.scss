@@ -1,0 +1,190 @@
+@import "shared";
+
+:host {
+    flex: 1 0 auto;
+
+    .mat-side-nav {
+        width: auto;
+        height: 100%;
+
+        &-closeBtn.mat-icon-button {
+            position: absolute;
+            right: convert-unit(5px, "rem");
+        }
+    }
+}
+
+.content-header {
+    margin: 0;
+    padding: convert-unit(17px, "rem") convert-unit(30px, "rem");
+    font-weight: normal;
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    background-color: get("color.gray.100");
+    color: get("color.gray.1000");
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    .group-label {
+        display: inline-flex;
+        .openSideNavBtn {
+            .hamburgerMenu {
+                height: convert-unit(24px, "rem") !important;
+                width: convert-unit(24px, "rem") !important;
+            }
+        }
+
+        .account-labels {
+            .account-name {
+                font-size: convert-unit(28px, "rem");
+                .account-number {
+                    font-size: convert-unit(22px, "rem");
+                }
+            }
+
+            .account-holder-location {
+                color: get("color.gray.600");
+                padding-bottom: convert-unit(2px, "rem");
+            }
+        }
+    }
+}
+
+.mat-side-nav {
+    width: auto;
+    height: 100%;
+
+    &-closeBtn.mat-icon-button {
+        position: absolute;
+        right: convert-unit(5px, "rem");
+    }
+
+    ::ng-deep .mat-drawer-backdrop {
+        position: fixed;
+    }
+}
+
+.accountName {
+    font-size: convert-unit(48px, "rem");
+}
+
+.mat-sidenav {
+    background-color: get("color.gray.100");
+}
+
+.dashboardSideNavbranding {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 convert-unit(20px, "rem");
+
+    &-logo {
+        height: convert-unit(30px, "rem");
+    }
+}
+
+.info-alert {
+    display: block;
+    padding: convert-unit(20px, "rem");
+}
+
+.alert-wrapper {
+    margin: map-get($spacers, 0) map-get($spacers, 20);
+
+    .alert-msg {
+        margin: map-get($spacers, 20) map-get($spacers, 0) map-get($spacers, 0) map-get($spacers, 0);
+    }
+}
+
+.dashboard-wrapper {
+    padding: map-get($spacers, 0) map-get($spacers, 20) map-get($spacers, 20);
+    flex: 1;
+
+    .account-dashboard {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 convert-unit(20px, "rem");
+
+        .widget-wrapper {
+            width: 50%;
+            padding: 0 0 0 convert-unit(20px, "rem");
+            margin: convert-unit(20px, "rem") 0;
+
+            &:nth-child(2n + 1) {
+                border-right: 1px dashed get("color.gray.600");
+                padding: 0 convert-unit(20px, "rem") 0 0;
+            }
+
+            .widget {
+                border-top: 1px dashed get("color.gray.600");
+                margin-top: convert-unit(-20px, "rem");
+                padding-top: convert-unit(20px, "rem");
+                height: convert-unit(250px, "rem");
+                text-align: center;
+
+                .widget-icon {
+                    margin-top: convert-unit(35px, "rem");
+
+                    ::ng-deep * {
+                        fill: get("color.primary.500");
+                    }
+                }
+
+                .accountdashboard-link {
+                    display: block;
+                }
+
+                span {
+                    margin: convert-unit(10px, "rem") 0;
+                    font-size: convert-unit(28px, "rem");
+                    color: get("color.primary.500");
+                    display: block;
+                }
+
+                p {
+                    color: get("color.gray.600");
+                }
+
+                &.resource-list {
+                    text-align: left;
+
+                    h3 {
+                        margin: convert-unit(40px, "rem");
+                        margin-bottom: 0;
+                        font-size: convert-unit(22px, "rem");
+                        color: get("color.gray.600");
+                    }
+
+                    ul {
+                        list-style: none;
+                        margin: 0;
+                        padding: convert-unit(40px, "rem");
+                        padding-top: 0;
+
+                        li {
+                            line-height: convert-unit(36px, "rem");
+
+                            .resource-icon {
+                                margin: 0 convert-unit(10px, "rem") 0 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            &:nth-child(1) .widget,
+            &:nth-child(2) .widget {
+                border-top: 0;
+            }
+        }
+    }
+}
+
+::ng-deep .manage-account-menu {
+    width: convert-unit(180px, "rem");
+
+    .mat-menu-item {
+        white-space: pre-line;
+    }
+}

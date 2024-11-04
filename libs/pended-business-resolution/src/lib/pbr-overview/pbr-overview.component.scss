@@ -1,0 +1,37 @@
+@import "shared";
+.pbr-overview {
+    .pbr-wrapper {
+        padding: 0 convert-unit(30px, "rem");
+    }
+    h2 {
+        margin: convert-unit(20px, "rem") 0;
+    }
+    .mat-table {
+        margin-bottom: convert-unit(20px, "rem");
+        .mat-header-row {
+            th {
+                &.mat-header-cell {
+                    &:not(:first-of-type) {
+                        text-align: right;
+                        width: 12%;
+                    }
+                }
+            }
+        }
+        .mat-row {
+            td {
+                &.mat-cell {
+                    font-family: Roboto, sans-serif;
+                    &:not(:first-of-type) {
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+    .mat-tab-group {
+        ::ng-deep .mat-tab-header {
+            margin: 0 convert-unit(30px, "rem");
+        }
+    }
+}

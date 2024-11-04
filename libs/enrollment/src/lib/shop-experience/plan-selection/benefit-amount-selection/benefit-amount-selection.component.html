@@ -1,0 +1,95 @@
+<ng-template [ngIf]="isLoading" [ngIfElse]="benefitAmountView">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>
+<ng-template #benefitAmountView>
+    <div *ngIf="benefitData?.length ">
+        <div class="row">
+            <ng-template [ngIf]="benefitData.length < 9 && !isRiderBenefit" [ngIfElse]="dropdownTemplate">
+                <mat-radio-group
+                    [attr.aria-label]="languageStrings.selectOption"
+                    [formControl]="benefitSelectRadio"
+                    (change)="getSelectedBenefitAmount($event.value.benefitAmount)"
+                    class="plan-selection-radio"
+                >
+                    <mat-radio-button
+                        *ngFor="let benefit of benefitData"
+                        [value]="benefit"
+                        [checked]="benefit.coverageLevelId === currentCoverageLevel.coverageLevelId && benefit.benefitAmount === currentCoverageLevel.benefitAmount "
+                    >
+                        <div class="plan-card">
+                            <div
+                                class="coverage-head benefit-amount"
+                                [ngClass]="{'active':benefit.coverageLevelId === currentCoverageLevel.coverageLevelId && benefit.benefitAmount === currentCoverageLevel.benefitAmount }"
+                            >
+                                <p>{{benefit.benefitAmount | currency}}</p>
+                            </div>
+                            <div *ngIf="benefitData.length > 1 ">
+                                <p *ngIf="!isSingleCoverage">
+                                    {{ "primary.portal.shoppingExperience.getBenefitCost" | replaceTag: {
+                                    "#getbenefitcost": getBenefitCost(benefit) | currency } }}
+                                </p>
+                                <p *ngIf="isSingleCoverage">
+                                    {{ "primary.portal.shoppingExperience.getBenefitCost" | replaceTag: {
+                                    "#getbenefitcost": getCoverageLevelCost(benefit) | currency } }}
+                                </p>
+                            </div>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </ng-template>
+        </div>
+        <ng-template #dropdownTemplate>
+            <div class="plan-select filter-sub-wrapper" [ngClass]="{'rider-elimination-coverage': isRiderBenefit}">
+                <mat-label
+                    class="mat-label"
+                    *ngIf="benefitData.length > 1"
+                    language="primary.portal.shoppingExperience.benefitAmount"
+                ></mat-label>
+                <p
+                    *ngIf="isRiderBenefit && benefitData.length > 1"
+                    language="primary.portal.shoppingExperience.benefitAmountRiderDescription"
+                    class="plan-description-texts"
+                ></p>
+                <form [formGroup]="benefitForm">
+                    <mat-form-field *ngIf="benefitData.length > 1">
+                        <mat-select
+                            formControlName="benefitAmtSelect"
+                            (selectionChange)="getSelectedBenefitAmount($event.value)"
+                            disableOptionCentering="true"
+                            panelClass="comm-spilts-select"
+                            [disabled]="planOfferingObj.supplementary"
+                        >
+                            <mat-select-trigger>{{currentCoverageLevel.benefitAmount | currency}}</mat-select-trigger>
+                            <mat-option
+                                *ngFor="let benefit of benefitData"
+                                [value]="benefit.benefitAmount"
+                                [attr.arial-label]="benefit.benefitAmount"
+                            >
+                                <ng-template [ngIf]="isSingleCoverage ">
+                                    {{ "primary.portal.shoppingExperience.benefitAmountCost" | replaceTag: {
+                                    "#benefitamount": benefit.benefitAmount | currency, "#totalcost": benefit.totalCost
+                                    | currency} }}
+                                </ng-template>
+                                <ng-template [ngIf]="!isSingleCoverage">
+                                    {{ "primary.portal.shoppingExperience.benefitAmountCost" | replaceTag: {
+                                    "#benefitamount": benefit.benefitAmount | currency, "#totalcost":
+                                    getBenefitCost(benefit) | currency} }}
+                                </ng-template>
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </form>
+                <p *ngIf="benefitData.length > 1">
+                    <ng-template [ngIf]="!isSingleCoverage">
+                        {{ "primary.portal.shoppingExperience.getBenefit" | replaceTag: { "#benefitcost":
+                        getBenefitCost(null) | currency } }}
+                    </ng-template>
+                    <ng-template [ngIf]="isSingleCoverage">
+                        {{ "primary.portal.shoppingExperience.getBenefit" | replaceTag: { "#benefitcost":
+                        getCoverageLevelCost(null) | currency } }}
+                    </ng-template>
+                </p>
+            </div>
+        </ng-template>
+    </div>
+</ng-template>

@@ -1,0 +1,11 @@
+<form data-test="eb-dependent-age__form" [formGroup]="form">
+    <mat-radio-group class="eb-dependent-age__form--radio-group" formControlName="dependentAge">
+        <mat-radio-button
+            class="dependent-age-button"
+            data-test="eb-dependent-age__form--radio-button"
+            *ngFor="let dependentAge of dependentAgeRange$ | async; trackBy: trackByDependentAge"
+            [value]="dependentAge"
+            >{{ dependentAge }}</mat-radio-button
+        >
+    </mat-radio-group>
+</form>

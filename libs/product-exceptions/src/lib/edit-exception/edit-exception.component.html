@@ -1,0 +1,171 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="info-modal">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form *ngIf="exceptionForm && products" [formGroup]="exceptionForm" (ngSubmit)="submit.focus(); updateException()">
+        <div mat-dialog-content>
+            <div>
+                <h1 mat-dialog-title>{{languageStrings["primary.portal.productExceptions.newException.editTitle"]}}</h1>
+            </div>
+            <!--code for form-->
+            <div class="exception-wrapper">
+                <mat-label class="mat-label">{{languageStrings["primary.portal.productExceptions.newException.exceptionType"]}}</mat-label>
+                <mat-form-field>
+                    <mat-select formControlName="exceptionType" [disableOptionCentering]="true">
+                        <mat-option *ngFor="let plan of withDrawnPlan" [value]="plan">{{plan}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="d-md-flex">
+                    <div class="field-wrapper">
+                        <mat-label class="mat-label"
+                            >{{languageStrings["primary.portal.productExceptions.newException.startDate"]}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="startDate"
+                                matInput
+                                [matDatepicker]="pickerStartDate"
+                                [min]="today"
+                                [max]="startDateMax"
+                                autocomplete="off"
+                                [attr.aria-label]="languageStrings['primary.portal.productExceptions.newException.startDate']"
+                                empoweredDateTransform
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-error
+                                *ngIf="exceptionForm.controls.startDate.hasError('required') && !exceptionForm.controls.startDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.startDate.hasError('matDatepickerMin')"
+                                >{{languageStrings["primary.portal.productExceptions.newException.cantBeInPast"]}}
+                            </mat-error>
+                            <mat-error *ngIf="exceptionForm.controls.startDate.hasError('matDatepickerMax')"
+                                >{{startDateMaxError}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.startDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.census.errorMessage.general.error.date_format"]}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="pickerStartDate">
+                                <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerStartDate.open()"></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerStartDate></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="field-wrapper">
+                        <mat-label class="mat-label"
+                            >{{languageStrings["primary.portal.productExceptions.newException.endDate"]}}</mat-label
+                        >
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                formControlName="endDate"
+                                matInput
+                                [matDatepicker]="pickerEndDate"
+                                [min]="endDateMin"
+                                [max]="endDateMax"
+                                autocomplete="off"
+                                [attr.aria-label]="languageStrings['primary.portal.productExceptions.newException.endDate']"
+                                empoweredDateTransform
+                            />
+                            <mat-hint language="primary.portal.members.workLabel.dateFormat"></mat-hint>
+                            <mat-error
+                                *ngIf="exceptionForm.controls.endDate.hasError('required') && !exceptionForm.controls.endDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.common.requiredField"]}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.endDate.hasError('matDatepickerMin')">{{endDateMinError}} </mat-error>
+                            <mat-error *ngIf="exceptionForm.controls.endDate.hasError('matDatepickerMax')"
+                                >{{languageStrings["primary.portal.productExceptions.newException.mustBeBefore"]}} {{endDateMax | date:
+                                dateFormat}}</mat-error
+                            >
+                            <mat-error *ngIf="exceptionForm.controls.endDate.errors?.matDatepickerParse?.text"
+                                >{{languageStrings["primary.portal.census.errorMessage.general.error.date_format"]}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="pickerEndDate">
+                                <mon-icon matDatepickerToggleIcon iconName="calendar-date" (click)="pickerEndDate.open()"></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #pickerEndDate></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="add-plan-wrapper">
+                <div class="plan-form">
+                    <div class="d-md-flex">
+                        <div class="field-wrapper">
+                            <mat-label class="mat-label"
+                                >{{languageStrings["primary.portal.productExceptions.newException.product"]}}</mat-label
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    (selectionChange)="getSelectedProduct(exceptionForm.get('product').value)"
+                                    (click)="$event.preventDefault()"
+                                    formControlName="product"
+                                    [disableOptionCentering]="true"
+                                >
+                                    <mat-option *ngFor="let product of products" [value]="product.product.name"
+                                        >{{product.product.name}}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error>{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="field-wrapper">
+                            <mat-label class="mat-label"
+                                >{{languageStrings["primary.portal.productExceptions.newException.policySeries"]}}</mat-label
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="policySeries"
+                                    [disableOptionCentering]="true"
+                                    (selectionChange)="onPolicySeriesSelectionChange()"
+                                    (click)="$event.preventDefault()"
+                                >
+                                    <mat-option *ngFor="let policy of getPolicySeries(exceptionForm.get('product').value)" [value]="policy"
+                                        >{{policy}}</mat-option
+                                    >
+                                </mat-select>
+                                <mat-error>{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <mat-label class="mat-label">{{languageStrings["primary.portal.productExceptions.newException.planName"]}}</mat-label>
+                    <mat-form-field class="plan-name">
+                        <mat-select formControlName="planName" [disableOptionCentering]="true">
+                            <mat-option
+                                *ngFor="let plan of getPlanName(exceptionForm.get('policySeries').value)"
+                                [value]="plan.id"
+                                (click)="onPlanNameChange(plan.states)"
+                                >{{plan.name}}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error>{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error>
+                    </mat-form-field>
+                    <mat-label class="mat-label">{{languageStrings["primary.portal.productExceptions.newException.states"]}}</mat-label>
+                    <empowered-chip-select
+                        [chipOptions$]="allStates$"
+                        [hasSelectAll]="true"
+                        [valuesChipControl]="stateValueChipSelect"
+                        [changeStrategy]="changeStrategy$"
+                        [initSelectedChips]="initialStateValues"
+                        [disableChip]="startDateIsSameOrBeforeToday"
+                        (chipChange)="changeStateControl($event)"
+                        #stateChipSelect
+                    >
+                    </empowered-chip-select>
+                    <mat-error *ngIf="exceptionForm.get('states').hasError('required')"
+                        >{{languageStrings["primary.portal.common.selectionRequired"]}}</mat-error
+                    >
+                </div>
+            </div>
+            <mat-error>{{errorMessage}}</mat-error>
+        </div>
+        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <button type="button" class="mon-btn-link" mat-flat-button mat-dialog-close>
+                {{languageStrings["primary.portal.common.cancel"]}}
+            </button>
+            <button class="mon-btn-primary" mat-flat-button type="submit" #submit>{{languageStrings["primary.portal.common.save"]}}</button>
+        </div>
+    </form>
+</div>

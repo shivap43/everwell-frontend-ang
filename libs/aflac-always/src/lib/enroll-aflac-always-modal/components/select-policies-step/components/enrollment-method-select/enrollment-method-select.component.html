@@ -1,0 +1,23 @@
+<mat-label class="mat-label" [attr.aria-label]="languageStrings[languageKeys.enrollmentMethod]">
+    {{ languageStrings[languageKeys.enrollmentMethod] }}
+</mat-label>
+<mat-form-field class="aflac-form-field">
+    <mat-select
+        matNativeControl
+        required
+        [placeholder]="languageStrings[languageKeys.enrollmentMethod]"
+        disableOptionCentering="true"
+        (selectionChange)="onChange($event.value)"
+        panelClass="select-enrollment-method"
+        [(value)]="value"
+    >
+        <mat-option *ngFor="let method of enrollmentMethodDetails" [value]="method?.name" [attr.aria-label]="method?.description"
+            >{{method?.description}}</mat-option
+        >
+    </mat-select>
+    <mat-error>
+        <span *ngIf="isEnrollmentMethodRequiredError" [attr.aria-label]="languageStrings[languageKeys.selectionRequired]">
+            {{ languageStrings[languageKeys.selectionRequired ] }}
+        </span>
+    </mat-error>
+</mat-form-field>

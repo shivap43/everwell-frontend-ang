@@ -1,0 +1,50 @@
+@import "shared";
+
+.quasi-modal {
+    .mat-dialog-content {
+        ::ng-deep {
+            .mat-form-field-prefix {
+                top: map-get($spacers, 0);
+            }
+        }
+
+        .offering-access {
+            display: flex;
+            .offering-access-item {
+                width: convert-unit(300px, "rem");
+                margin-right: map-get($spacers, 20);
+            }
+        }
+
+        .offering-amount {
+            .mat-radio-group {
+                display: flex;
+                flex-flow: column wrap;
+                margin-bottom: map-get($spacers, 20);
+
+                .mat-radio-button {
+                    &:first-child {
+                        margin-top: map-get($spacers, 5);
+                    }
+                    margin-top: map-get($spacers, 10);
+                }
+                .offering-price,
+                .offering-percent {
+                    margin: map-get($spacers, 10) map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 30);
+                }
+            }
+        }
+    }
+}
+
+:host ::ng-deep .state-input {
+    .mat-form-field-infix,
+    .mat-form-field-flex {
+        padding: map-get($spacers, 0);
+    }
+
+    .mat-chip-list-wrapper {
+        margin: map-get($spacers, 0);
+        padding: convert-unit(6px, "rem");
+    }
+}

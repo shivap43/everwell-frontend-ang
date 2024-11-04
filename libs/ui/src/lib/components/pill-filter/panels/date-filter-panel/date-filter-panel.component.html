@@ -1,0 +1,108 @@
+<!-- TODO - Replace mat-datepicker with empowered-datepicker when it is ready to use -->
+<ng-container *ngIf="selectionModel$ | async as selectionModelAsync">
+    <div class="filter-options">
+        <mat-radio-group [formControl]="dateFilterType">
+            <mat-radio-button value="specific">
+                <span language="primary.portal.accountEnrollments.filterEnrollment.specificDate"></span>
+            </mat-radio-button>
+            <div *ngIf="dateFilterType.value === 'specific'">
+                <mat-form-field *ngIf="dateFilterType.value === 'specific'" class="mon-date-field start-date-block">
+                    <input
+                        [formControl]="specificDate"
+                        [matDatepicker]="specificDatePicker"
+                        matInput
+                        empoweredDateTransform
+                        autocomplete="off"
+                    />
+                    <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                    <mat-datepicker #specificDatePicker></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="specificDatePicker">
+                        <mon-icon
+                            iconName="calendar-date"
+                            [iconSize]="20"
+                            matDatepickerToggleIcon
+                            (click)="specificDatePicker.open()"
+                        ></mon-icon>
+                    </mat-datepicker-toggle>
+
+                    <mat-error
+                        *ngIf="specificDate.errors?.matDatepickerParse?.text"
+                        language="primary.portal.coverage.invalidDate"
+                    ></mat-error>
+                    <mat-error *ngIf="specificDate.errors?.required" language="primary.portal.common.requiredField"></mat-error>
+                </mat-form-field>
+            </div>
+            <mat-radio-button value="range">
+                <span language="primary.portal.accountEnrollments.filterEnrollment.dateRange"></span>
+            </mat-radio-button>
+            <div *ngIf="dateFilterType.value === 'range'">
+                <div class="d-flex">
+                    <div class="start-date-block">
+                        <mat-label
+                            class="mat-label date-filter-label"
+                            language="primary.portal.accountEnrollments.filterEnrollment.startDate"
+                        ></mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [formControl]="startDate"
+                                [matDatepicker]="startDatePicker"
+                                [max]="endDate.value"
+                                matInput
+                                empoweredDateTransform
+                                autocomplete="off"
+                            />
+                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                            <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+                                <mon-icon
+                                    iconName="calendar-date"
+                                    [iconSize]="20"
+                                    matDatepickerToggleIcon
+                                    (click)="startDatePicker.open()"
+                                ></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #startDatePicker></mat-datepicker>
+                            <mat-error *ngIf="startDate.errors?.matDatepickerParse?.text" language="primary.portal.coverage.invalidDate">
+                            </mat-error>
+                            <mat-error *ngIf="startDate.errors?.required" language="primary.portal.common.requiredField"></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="end-date-block">
+                        <mat-label
+                            class="mat-label date-filter-label"
+                            language="primary.portal.accountEnrollments.filterEnrollment.endDate"
+                        ></mat-label>
+                        <mat-form-field class="mon-date-field">
+                            <input
+                                [formControl]="endDate"
+                                [matDatepicker]="endDatePicker"
+                                [min]="startDate.value"
+                                matInput
+                                empoweredDateTransform
+                                autocomplete="off"
+                            />
+                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                            <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+                                <mon-icon
+                                    iconName="calendar-date"
+                                    [iconSize]="20"
+                                    matDatepickerToggleIcon
+                                    (click)="endDatePicker.open()"
+                                ></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #endDatePicker></mat-datepicker>
+
+                            <mat-error *ngIf="endDate.errors?.matDatepickerParse?.text" language="primary.portal.coverage.invalidDate">
+                            </mat-error>
+                            <mat-error *ngIf="endDate.errors?.required" language="primary.portal.common.requiredField"></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-radio-group>
+        <mat-error
+            *ngIf="dateFilterType.errors?.required && dateFilterType.touched"
+            language="primary.portal.common.selectionRequired"
+            class="radio-group-error-text"
+        ></mat-error>
+    </div>
+</ng-container>

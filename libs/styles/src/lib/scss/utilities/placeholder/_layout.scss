@@ -1,0 +1,126 @@
+@each $width in $widthAmounts {
+    .w-#{strip-unit($width)} {
+        width: convert-unit($width, "rem") !important;
+    }
+}
+
+.seperator {
+    border-bottom: 1px dotted get("color.gray.500");
+}
+
+.divider {
+    border-bottom: 1px solid get("color.gray.500");
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.hidden,
+.hide {
+    display: none;
+}
+.flex-container {
+    display: flex;
+    padding: 0 convert-unit(30px, "rem");
+    .flex-grow-one {
+        flex-grow: 1;
+        width: convert-unit(220px, "rem");
+    }
+    .flex-grow-two {
+        flex-grow: 2;
+        flex-basis: 100%;
+    }
+}
+.line-height {
+    line-height: convert-unit(10px, "rem");
+}
+.wrapper-margin {
+    margin: 0 convert-unit(30px, "rem");
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+.upload-input {
+    .file-not-dragged {
+        margin: convert-unit(10px, "rem") 0 0 0;
+    }
+}
+.dotted-line-bottom {
+    background-image: linear-gradient(to right, get("color.gray.700") 50%, rgba(255, 255, 255, 1) 0%);
+    background-position: bottom;
+    background-size: convert-unit(1px, "rem") convert-unit(1px, "rem");
+    background-repeat: repeat-x;
+    padding: convert-unit(5px, "rem");
+    margin-bottom: convert-unit(5px, "rem");
+}
+// Variables to control the truncation behaviour
+$startFixedChars: 3; // Number of chars before ellipsis - have priority over end chars
+$endFixedChars: 8; // Number of chars after ellipsis  - lower priority than start chars
+// $fontFaceScaleFactor: 0.46; // Magic number dependent on font face - set by trial and error
+
+// Dervied from the 3 variables above
+// $startWidth: 1em * $fontFaceScaleFactor ($startFixedChars + 3);
+// $endWidth: 1em * $fontFaceScaleFactor * $endFixedChars;
+$startWidth: $startFixedChars + 3;
+$endWidth: $endFixedChars;
+
+.truncate-middle {
+    .firstPart,
+    .lastPart {
+        display: inline-block;
+        vertical-align: bottom;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .firstPart {
+        max-width: calc(100% - #{$endWidth});
+        min-width: $startWidth;
+        text-overflow: ellipsis;
+    }
+    .lastPart {
+        max-width: calc(100% - #{$startWidth});
+        direction: rtl;
+    }
+    .container {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+
+.panel-white-out {
+    position: relative;
+
+    &:before {
+        content: " ";
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-color: rgba($color: get("color.white"), $alpha: 0.8);
+        z-index: 1;
+    }
+}
+
+.mat-paginator-page-size {
+    @include media-max("l") {
+        display: none;
+    }
+}
+
+.hidden-md {
+    @include media-max("l") {
+        display: none;
+    }
+}
+
+.hidden-max-xl {
+    @include media-max("xl") {
+        display: none;
+    }
+}

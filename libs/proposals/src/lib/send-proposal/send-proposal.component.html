@@ -1,0 +1,135 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <span language="primary.portal.proposals.send.header"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-flat-button color="primary" class="confirm-button" (click)="onSubmit(sendProposalForm)">
+            {{languageStrings['primary.portal.proposals.send.confirm']}}
+        </button>
+    </empowered-modal-footer>
+
+    <ng-container *ngIf="(missingFlyerFeatureEnable$ | async) && missingFlyerInfo?.length > 0 && !isRatesSelected">
+        <mon-alert class="warning" alertType="warning" closeButton="true">
+            <div class="missingEmployerFlyer">
+                <div>{{languageStrings['primary.portal.previewProposal.employerFlyerUnavailable']}}</div>
+                <ul class="plan-list">
+                    <li *ngFor="let element of missingFlyerInfo">{{element.planName}}</li>
+                </ul>
+                <div>{{ languageStrings['primary.portal.previewProposal.ratesIncluded']}}</div>
+            </div>
+        </mon-alert>
+    </ng-container>
+
+    <div class="field-container col-md-6">
+        <mat-label language="primary.portal.proposals.send.proposalName" class="mat-label preview-proposal-form-label"></mat-label>
+        <span>{{data.name}}</span>
+    </div>
+
+    <form [formGroup]="sendProposalForm">
+        <div class="state-zip">
+            <div class="form-field-container col-md-4">
+                <span language="primary.portal.proposals.send.state" class="send-proposal-form-label"></span>
+                <mat-form-field class="send-proposal-form-select">
+                    <mat-select formControlName="state" (selectionChange)="checkFlyerForStates($event.value)">
+                        <mat-option *ngFor="let state of allStates" value="{{state.abbreviation}}"> {{state.name}} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="form-zip-container col-md-3">
+                <mat-label class="mat-label">
+                    <span class="send-proposal-form-label" language="primary.portal.proposals.send.zip"></span
+                    ><span class="text-regular" language="primary.portal.common.optional"></span>
+                </mat-label>
+                <mat-form-field class="send-proposal-form-input">
+                    <input
+                        matNativeControl
+                        formControlName="zip"
+                        [attr.aria-label]="languageStrings['primary.portal.proposals.send.zip']"
+                    />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="form-field-container col-md-3">
+            <span language="primary.portal.proposals.send.proposalType" class="send-proposal-form-label"></span>
+            <mat-radio-group formControlName="proposalType" class="radio-group-stacked" (change)="chooseOption($event.value)">
+                <mat-radio-button value="FULL" class="form-radio-button-stacked">
+                    <span language="primary.portal.proposals.send.proposalType.fullProposal"></span>
+                </mat-radio-button>
+                <mat-radio-button value="RATES_ONLY" class="form-radio-button-stacked">
+                    <span language="primary.portal.proposals.send.proposalType.ratesOnly"></span>
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+
+        <mat-divider class="divider"></mat-divider>
+
+        <mat-label language="primary.portal.proposals.send.selectRecipients" class="mat-label send-proposal-table-label"></mat-label>
+
+        <table mat-table [dataSource]="datasource">
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox
+                        (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()"
+                        [ngClass]="{'error': !isFormValid}"
+                    ></mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox
+                        (click)="$event.stopPropagation(); isFormValid = true;"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)"
+                        [ngClass]="{'error': !isFormValid}"
+                    ></mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span language="primary.portal.proposals.send.selectRecipients.name"></span>
+                </th>
+                <td mat-cell *matCellDef="let recipient">{{recipient.name.firstName}} {{recipient.name.lastName}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="emailAddress">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span language="primary.portal.proposals.send.selectRecipients.email"></span>
+                </th>
+                <td mat-cell *matCellDef="let recipient">{{recipient.emailAddress}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span language="primary.portal.proposals.send.selectRecipients.role"></span>
+                </th>
+                <td mat-cell *matCellDef="let recipient">{{recipient.role}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="!isFormValid" class="message">
+            <span class="error" language="primary.portal.proposals.send.selectionRequired"></span>
+        </div>
+
+        <div class="form-field-container form-message-container col-md-12">
+            <mat-label class="mat-label">
+                <span class="preview-proposal-form-label" language="primary.portal.proposals.send.message"></span
+                ><span class="text-regular" language="primary.portal.common.optional"></span>
+            </mat-label>
+            <mat-form-field>
+                <textarea
+                    matNativeControl
+                    formControlName="message"
+                    [attr.aria-label]="languageStrings['primary.portal.proposals.send.message']"
+                ></textarea>
+            </mat-form-field>
+        </div>
+    </form>
+</empowered-modal>

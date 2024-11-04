@@ -1,0 +1,52 @@
+<div *ngIf="loadSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</div>
+<div
+    class="tpi-approval-info"
+    *ngIf="!loadSpinner && (approvalPending || duplicateMember || internalServerErrorSpecificMessage || preferredContactErrorMessage.length)"
+>
+    <empowered-tpi-primary-header [headerContent]="true"></empowered-tpi-primary-header>
+    <mat-divider></mat-divider>
+    <div class="message-block" *ngIf="approvalPending">
+        <span>{{approvalPending}}</span>
+    </div>
+    <div *ngIf="duplicateMember">
+        <mon-alert alertType="danger" closeButton="true" [ngClass]=" tpiModalMode ? 'message-block' : 'error-block'">
+            <span>{{duplicateMember}}</span>
+        </mon-alert>
+    </div>
+    <div *ngIf="internalServerErrorSpecificMessage">
+        <mon-alert alertType="danger" class="error-block" iconAltText="Error">
+            <span [innerHTML]="internalServerErrorSpecificMessage"></span>
+        </mon-alert>
+    </div>
+    <div *ngIf="preferredContactErrorMessage" tabindex="0" [ngClass]=" tpiModalMode ? 'scroll-content-lnl' : ''">
+        <mon-alert alertType="danger" class="error-block" alertNote="An error ocurred" *ngFor="let error of preferredContactErrorMessage">
+            <span [innerHTML]="error"></span>
+        </mon-alert>
+    </div>
+    <empowered-lnl-footer *ngIf="tpiModalMode" class="lnl-footer"></empowered-lnl-footer>
+    <empowered-tpi-footer *ngIf="!tpiModalMode" class="tpi-footer">
+        <button mat-button class="mon-btn-primary" (click)="onExit()" language="primary.portal.tpiEnrollment.exit"></button>
+    </empowered-tpi-footer>
+</div>
+<div
+    class="tpi-processing-info"
+    *ngIf="!loadSpinner && !approvalPending && !duplicateMember && !internalServerErrorSpecificMessage && !preferredContactErrorMessage.length"
+>
+    <div class="tpi-info" *ngIf="!errorMessage">
+        <span *ngIf="tpiModalMode">{{languageStrings['primary.portal.interimProcess.everwell']}}</span>
+        <span *ngIf="!tpiModalMode">{{languageStrings['primary.portal.interimProcess.aflac']}}</span>
+    </div>
+    <div class="mon-p-30" *ngIf="errorMessage">
+        <mon-alert alertType="danger" class="message-block">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+</div>
+<div
+    class="footer"
+    *ngIf="tpiModalMode && !approvalPending && !duplicateMember && !internalServerErrorSpecificMessage && !preferredContactErrorMessage.length"
+>
+    <p>{{version}}</p>
+</div>

@@ -1,0 +1,960 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<form [formGroup]="beneficiaryEditForm" (ngSubmit)="saveBeneficiary()">
+    <div class="flex-form-wrapper">
+        <a href="javascript:void(0)" class="mon-btn-link" mat-dialog-close (click)="cancelBeneficiary()"
+            >{{languageStrings['primary.portal.common.back']}}</a
+        >
+        <div class="mon-mt-30">
+            <mon-alert *ngIf="showErrorMessage" alertType="danger">
+                <span>{{errorMessage}}</span>
+            </mon-alert>
+            <h1 class="mon-mt-0">
+                <span language="primary.portal.members.beneficiaryEdit.title"></span>:
+                <span [ngSwitch]="beneficiaryEnum[beneficiaryObjType]">
+                    <span *ngSwitchCase="beneficiaryEnum.INDIVIDUAL">
+                        {{ beneficiaryObj?.name?.firstName + ' ' + beneficiaryObj?.name?.lastName }}</span
+                    >
+                    <span *ngSwitchCase="beneficiaryEnum.CHARITY"> {{ beneficiaryObj?.name}}</span>
+                    <span *ngSwitchCase="beneficiaryEnum.TRUST"> {{ beneficiaryObj?.name}}</span>
+                </span>
+            </h1>
+            <div>
+                <mat-label class="mat-label">
+                    <span language="primary.portal.members.beneficiaryEdit.type"></span>
+                </mat-label>
+                <mat-form-field class="w-200">
+                    <mat-select
+                        [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                        formControlName="type"
+                        [disabled]="'true'"
+                        name="type"
+                        disableOptionCentering="true"
+                    >
+                        <mat-option *ngFor="let option of beneficiaryType" [value]="option.name">{{option.value}} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <ng-container>
+            <mat-divider></mat-divider>
+            <ng-template [ngIf]="currentBeneficiaryType == beneficiaryEnum.INDIVIDUAL">
+                <h2>{{languageStrings['primary.portal.members.beneficiaryEdit.individualTitle']}}</h2>
+                <div class="d-md-flex flex-wrap" formGroupName="name">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.firstName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualFirstName"></span>
+                            <span *ngIf="isOptionalField('firstName')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="firstName"
+                                name="firstName"
+                                empoweredTrimSpace
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.individualFirstName']"
+                                [readonly]="readOnlyFieldElementSetting.firstName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('firstName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('firstName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('firstName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('firstName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('firstName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg2"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.middleName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualMiddleName"></span>
+                            <span *ngIf="isOptionalField('middleName')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="middleName"
+                                name="middleName"
+                                empoweredTrimSpace
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.individualMiddleName"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.middleName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('middleName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error *ngIf="beneficiaryEditForm.controls.name.get('middleName').errors?.pattern as error">
+                                <span
+                                    *ngIf="!nameWithHypenApostrophesValidation.test(error.actualValue); else hasHyphensApostrophes"
+                                    language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg1"
+                                >
+                                </span>
+                                <ng-template #hasHyphensApostrophes>
+                                    <span language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg2"></span>
+                                </ng-template>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.lastName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualLastName"></span>
+                            <span *ngIf="isOptionalField('lastName')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="lastName"
+                                name="lastName"
+                                empoweredTrimSpace
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.individualLastName']"
+                                [readonly]="readOnlyFieldElementSetting.lastName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('lastName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('lastName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('lastName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.lastNameMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('lastName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('lastName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.lastNameMsg2"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.suffix">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualSuffix"></span>
+                            <span *ngIf="isOptionalField('suffix')" class="optional-text" language="primary.portal.common.optional"> </span>
+                        </mat-label>
+                        <mat-form-field class="w-120">
+                            <mat-select
+                                formControlName="suffix"
+                                name="suffix"
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                disableOptionCentering="true"
+                                [disabled]="readOnlyFieldElementSetting.suffix"
+                            >
+                                <mat-option *ngFor="let suffix of suffixes" [value]="suffix"> {{suffix}} </mat-option>
+                            </mat-select>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('suffix').hasError('required')"
+                                language="primary.portal.common.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex flex-wrap">
+                    <div class="flex-item" formGroupName="name" *ngIf="hideFieldElementSetting.maidenName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualMaidenName"></span>
+                            <span *ngIf="isOptionalField('maidenName')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="maidenName"
+                                name="maidenName"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.individualMaidenName"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.maidenName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('maidenName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('maidenName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('maidenName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.maidenNameMsg1"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('name').get('maidenName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('name').get('maidenName').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.maidenNameMsg2"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.gender">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualgender"></span>
+                            <span *ngIf="isOptionalField('gender')" class="optional-text" language="primary.portal.common.optional"> </span>
+                        </mat-label>
+                        <mat-form-field class="w-120">
+                            <mat-select
+                                formControlName="gender"
+                                name="gender"
+                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                disableOptionCentering="true"
+                                [disabled]="readOnlyFieldElementSetting.gender"
+                            >
+                                <mat-option *ngFor="let gender of (genders$ | async)" [value]="gender.value"> {{gender.for}} </mat-option>
+                            </mat-select>
+
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('gender').hasError('required')"
+                                language="primary.portal.common.selectionRequired"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.birthDate">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualBirthDate"></span>
+                            <span *ngIf="isOptionalField('birthDate')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field class="w-150 mon-date-field">
+                            <input
+                                matInput
+                                [matDatepicker]="picker"
+                                [max]="maxDate"
+                                formControlName="birthDate"
+                                name="birthDate"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.individualBirthDate"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.birthDate"
+                                #datePickerInput
+                                (keyup)="transform($event)"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error *ngIf="isDateInvalid"
+                                >{{validateDate('birthDate', 'beneficiaryEditForm', datePickerInput.value)}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                            </mat-datepicker-toggle>
+
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.ssn">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.member.ssn_itin"></span>
+                            <span *ngIf="isOptionalField('ssn')" class="optional-text" language="primary.portal.common.optional"> </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <div class="d-flex">
+                                <input
+                                    matInput
+                                    formControlName="ssn"
+                                    name="ssn"
+                                    [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.individualSSN"]  + " " +  languageStrings["primary.portal.common.optional"]'
+                                    [readonly]="readOnlyFieldElementSetting.ssn"
+                                    [hiddenInput]="true"
+                                    empoweredSsnFormat
+                                    [patterns]="customPattern"
+                                    (input)="isFormValueChange = true"
+                                    (click)="ssnMaskingToggler(true)"
+                                    (focusout)="ssnMaskingToggler(false)"
+                                    (keyup)="onSSNValueChange()"
+                                    (change)="maskValue()"
+                                    [maxlength]="ssnMaxLength"
+                                />
+                                <span *ngIf="isShowHideButtonVisible && beneficiaryEditForm.controls.ssn.valid && isSSNValue">
+                                    <a href="javascript:void(0)" *ngIf="isMaskedTrue" (click)="ssnMaskingToggler(true)" class="nodec-link"
+                                        >{{languageStrings['primary.portal.common.show']}}</a
+                                    >
+                                    <a href="javascript:void(0)" *ngIf="!isMaskedTrue" (click)="ssnMaskingToggler(false)" class="nodec-link"
+                                        >{{languageStrings['primary.portal.common.hide']}}</a
+                                    >
+                                </span>
+                            </div>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('ssn').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('ssn').hasError('pattern') && beneficiaryEditForm.get('ssn').value.length === ssnMaxLength"
+                                language="primary.portal.members.beneficiaryValidationMsg.SSNMsg2"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('ssn').value && beneficiaryEditForm.get('ssn').value.length !== ssnMaxLength"
+                                language="primary.portal.members.beneficiaryValidationMsg.SSNMsg1"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('ssn').errors?.duplicate"
+                                language="secondary.portal.members.beneficiary.ssn.duplicate"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="d-md-flex">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.relationshipToMember">
+                        <mat-label class="mat-label">
+                            <span>{{relationshipMemberLabel}}</span>
+                            <span
+                                *ngIf="isOptionalField('relationshipToMember')"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            >
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="relationshipToMember"
+                                name="relationshipToMember"
+                                empoweredTrimSpace
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.individualRelationToEmp']"
+                                [readonly]="readOnlyFieldElementSetting.relationshipToMember"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('relationshipToMember').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('relationshipToMember').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('relationshipToMember').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg1"
+                            >
+                            </mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('relationshipToMember').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('relationshipToMember').value)"
+                                language="primary.portal.members.beneficiaryValidationMsg.firstNameMsg2"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.details">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.individualDetail"></span>
+                            <span *ngIf="isOptionalField('details')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field class="textarea w-400">
+                            <textarea
+                                matInput
+                                formControlName="details"
+                                name="details"
+                                rows="5"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.individualDetail"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.details"
+                                (input)="isFormValueChange = true"
+                            ></textarea>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('details').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.controls.details.errors?.pattern"
+                                language="primary.portal.members.beneficiaryValidationMsg.streetAddress2"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template [ngIf]="currentBeneficiaryType == beneficiaryEnum.CHARITY">
+                <h2>{{languageStrings['primary.portal.members.beneficiaryEdit.organizationTitle']}}</h2>
+                <div class="d-md-flex flex-wrap">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.organizationName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.organizationName"> </span>
+                            <span
+                                *ngIf="isOptionalField('organizationName')"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            >
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="organizationName"
+                                name="name"
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.organizationName']"
+                                [readonly]="readOnlyFieldElementSetting.organizationName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('organizationName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('organizationName').hasError('pattern') "
+                                language="primary.portal.members.beneficiaryValidationMsg.orgName"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.taxId">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.organizationTaxID"></span>
+                            <span *ngIf="isOptionalField('taxId')" class="optional-text" language="primary.portal.common.optional"> </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="taxId"
+                                name="name"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.organizationTaxID"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.taxId"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('taxId').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('taxId').hasError('pattern')"
+                                language="primary.portal.members.beneficiaryValidationMsg.taxID"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.details">
+                        <mat-label class="mat-label"
+                            ><span language="primary.portal.members.beneficiaryEdit.organizationDetail"></span>
+                            <span *ngIf="isOptionalField('details')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field class="textarea w-400">
+                            <textarea
+                                matInput
+                                formControlName="details"
+                                name="details"
+                                rows="5"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.organizationDetail"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.details"
+                                (input)="isFormValueChange = true"
+                            ></textarea>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('details').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template [ngIf]="currentBeneficiaryType == beneficiaryEnum.TRUST">
+                <h2>{{languageStrings['primary.portal.members.beneficiaryEdit.trustTitle']}}</h2>
+                <div class="d-md-flex flex-wrap">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.trustName">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.trustName"> </span>
+                            <span *ngIf="isOptionalField('trustName')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="trustName"
+                                name="trustName"
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.trustName']"
+                                [readonly]="readOnlyFieldElementSetting.trustName"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('trustName').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('trustName').hasError('pattern')"
+                                language="primary.portal.members.beneficiaryValidationMsg.trustName"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.trustAgreementDate">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.members.beneficiaryEdit.trustAgreementDate"></span>
+                            <span
+                                *ngIf="isOptionalField('trustAgreementDate')"
+                                class="optional-text"
+                                language="primary.portal.common.optional"
+                            >
+                            </span>
+                        </mat-label>
+                        <mat-form-field class="mon-date-field mon-mb-10">
+                            <input
+                                matInput
+                                [matDatepicker]="picker"
+                                [max]="maxDate"
+                                formControlName="trustAgreementDate"
+                                name="trustAgreementDate"
+                                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.trustAgreementDate']"
+                                [readonly]="readOnlyFieldElementSetting.trustAgreementDate"
+                                #datePickerInput
+                                (keyup)="transform($event)"
+                                (input)="isFormValueChange = true"
+                            />
+                            <mat-error *ngIf="isDateInvalid"
+                                >{{validateDate('trustAgreementDate', 'beneficiaryEditForm', datePickerInput.value)}}</mat-error
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint language="primary.portal.common.dateHint"></mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <ng-container formGroupName="trustee">
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.trusteeFirstName">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.trustFirstName"></span>
+                                <span
+                                    *ngIf="isOptionalField('trusteeFirstName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                >
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="firstName"
+                                    name="firstName"
+                                    [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.trustFirstName']"
+                                    [readonly]="readOnlyFieldElementSetting.trusteeFirstName"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('firstName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('firstName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('trustee').get('firstName').value)"
+                                    language="primary.portal.members.beneficiaryValidationMsg.trusteeFirstNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('firstName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('trustee').get('firstName').value)"
+                                    language="primary.portal.members.beneficiaryValidationMsg.trusteeFirstNameMsg2"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.trusteeLastName">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.trustLastName"></span>
+                                <span
+                                    *ngIf="isOptionalField('trusteeLastName')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                >
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="lastName"
+                                    name="lastName"
+                                    [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.trustLastName']"
+                                    [readonly]="readOnlyFieldElementSetting.trusteeLastName"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('lastName').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('lastName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('trustee').get('lastName').value)"
+                                    language="primary.portal.members.beneficiaryValidationMsg.trusteeLastNameMsg1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('lastName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(beneficiaryEditForm.get('trustee').get('lastName').value)"
+                                    language="primary.portal.members.beneficiaryValidationMsg.trusteeLastNameMsg2"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.trusteeSuffix">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.trustSuffix"></span>
+                                <span
+                                    *ngIf="isOptionalField('trusteeSuffix')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                >
+                                </span>
+                            </mat-label>
+                            <mat-form-field class="w-120">
+                                <mat-select
+                                    formControlName="suffix"
+                                    name="suffix"
+                                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    disableOptionCentering="true"
+                                    [disabled]="readOnlyFieldElementSetting.trusteeSuffix"
+                                >
+                                    <mat-option *ngFor="let suffix of suffixes" [value]="suffix"> {{suffix}} </mat-option>
+                                </mat-select>
+
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('trustee').get('suffix').hasError('required')"
+                                    language="primary.portal.common.selectionRequired"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="d-md-flex">
+                    <div class="flex-item" *ngIf="hideFieldElementSetting.details">
+                        <mat-label class="mat-label">
+                            <span *ngIf="!isMemberPortal" language="primary.portal.members.beneficiaryEdit.trustDetails"></span>
+                            <span *ngIf="isMemberPortal" language="primary.portal.members.beneficiaryEdit.trustDetailsMMP"></span>
+                            <span *ngIf="isOptionalField('details')" class="optional-text" language="primary.portal.common.optional">
+                            </span>
+                        </mat-label>
+                        <mat-form-field class="textarea w-400">
+                            <textarea
+                                matInput
+                                formControlName="details"
+                                name="details"
+                                rows="5"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.trustDetails"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.details"
+                                (input)="isFormValueChange = true"
+                            ></textarea>
+
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('details').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-template>
+        </ng-container>
+        <ng-container>
+            <mat-divider></mat-divider>
+            <h2>
+                {{contactInfoTitle}}
+
+                <mon-icon
+                    *ngIf="currentBeneficiaryType === beneficiaryEnum.CHARITY"
+                    iconName="Filled-info"
+                    [iconSize]="15"
+                    richTooltip="Address and contact for this organization's primary location/headquarters "
+                    matTooltipPosition="above"
+                    matTooltipClass="pos-above"
+                    class="icon-primary"
+                >
+                </mon-icon>
+            </h2>
+            <ng-template [ngIf]="currentBeneficiaryType === beneficiaryEnum.INDIVIDUAL">
+                <div class="mon-mb-30">
+                    <mat-checkbox formControlName="homeAddressSameAsEmployee" (change)="onEmpAddressChange($event.checked)">
+                        <span>{{samePrimaryAddressLabel}}</span>
+                    </mat-checkbox>
+                    <div>
+                        <mat-hint *ngIf="incompleteAddress">
+                            {{languageStrings["primary.portal.members.beneficiaryAdd.completeAddress"] | replaceTag : { "##empname##" :
+                            empFirstName} }}</mat-hint
+                        >
+                    </div>
+                    <mat-error *ngIf="memberContactError"> {{memberContactError}} </mat-error>
+                </div>
+            </ng-template>
+            <ng-container formGroupName="contact">
+                <ng-container formGroupName="address">
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.address1">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.streetAddress1"></span>
+                                <span *ngIf="isOptionalField('address1')" class="optional-text" language="primary.portal.common.optional">
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="address1"
+                                    name="address1"
+                                    [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.streetAddress1']"
+                                    [readonly]="readOnlyFieldElementSetting.address1"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address1').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address1').hasError('pattern')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.streetAddress1"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address1').hasError('maxlength')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.streetAddress1.maxlength"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.address2">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.streetAddress2"></span>
+                                <span *ngIf="isOptionalField('address2')" class="optional-text" language="primary.portal.common.optional">
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="address2"
+                                    name="address2"
+                                    [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.streetAddress2"] + " " + languageStrings["primary.portal.common.optional"]'
+                                    [readonly]="readOnlyFieldElementSetting.address2"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address2').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address2').hasError('pattern')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.streetAddress2"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('address2').hasError('maxlength')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.streetAddress2.maxlength"
+                                >
+                                </mat-error>
+                                <mat-hint
+                                    *ngIf="currentBeneficiaryType == beneficiaryEnum.INDIVIDUAL"
+                                    language="primary.portal.members.streetAddressHint1"
+                                >
+                                </mat-hint>
+                                <mat-hint
+                                    *ngIf="currentBeneficiaryType == beneficiaryEnum.CHARITY || currentBeneficiaryType == beneficiaryEnum.TRUST"
+                                    language="primary.portal.members.streetAddressHint2"
+                                >
+                                </mat-hint>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.city">
+                            <mat-label class="mat-label"
+                                ><span language="primary.portal.members.beneficiaryEdit.city"></span>
+                                <span *ngIf="isOptionalField('city')" class="optional-text" language="primary.portal.common.optional">
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="city"
+                                    name="city"
+                                    [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.city"] + " " + languageStrings["primary.portal.common.optional"]'
+                                    [readonly]="readOnlyFieldElementSetting.city"
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('city').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('city').hasError('pattern')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.city"
+                                >
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('city').hasError('maxlength')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.city.maxlength"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.state">
+                            <mat-label class="mat-label">
+                                <span language="primary.portal.members.beneficiaryEdit.state"></span>
+                                <span *ngIf="isOptionalField('state')" class="optional-text" language="primary.portal.common.optional">
+                                </span>
+                            </mat-label>
+                            <mat-form-field class="w-120">
+                                <mat-select
+                                    formControlName="state"
+                                    name="state"
+                                    [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                    disableOptionCentering="true"
+                                    [disabled]="readOnlyFieldElementSetting.state"
+                                >
+                                    <mat-option *ngFor="let state of states" [value]="state.abbreviation">
+                                        {{ state.abbreviation }}
+                                    </mat-option>
+                                </mat-select>
+
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('address').get('state').hasError('required')"
+                                    language="primary.portal.common.selectionRequired"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="hideFieldElementSetting.zip">
+                            <empowered-zip-code-input
+                                formControlName="zip"
+                                [formControl]="beneficiaryEditForm?.controls?.contact?.controls?.address?.controls?.zip"
+                                [stateControlValue]="beneficiaryEditForm?.controls?.contact?.controls?.address?.controls?.state?.value"
+                                (input)="isFormValueChange = true"
+                            >
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm?.controls?.contact?.controls?.address?.controls?.zip?.errors?.required"
+                                    language="secondary.portal.members.requiredField"
+                                >
+                                </mat-error>
+                            </empowered-zip-code-input>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <div class="d-md-flex flex-wrap">
+                    <div formGroupName="emailAddresses" class="flex-item" *ngIf="hideFieldElementSetting.email">
+                        <mat-label class="mat-label"
+                            ><span
+                                *ngIf="currentBeneficiaryType == beneficiaryEnum.CHARITY || currentBeneficiaryType == beneficiaryEnum.TRUST"
+                                language="primary.portal.members.beneficiaryEdit.contactEmail"
+                            ></span>
+                            <span
+                                *ngIf="currentBeneficiaryType == beneficiaryEnum.INDIVIDUAL"
+                                language="primary.portal.members.beneficiaryEdit.email"
+                            ></span>
+                            <span *ngIf="isOptionalField('email')" class="optional-text" language="primary.portal.common.optional"> </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="email"
+                                name="email"
+                                [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.contactEmail"] + " " + languageStrings["primary.portal.common.optional"]'
+                                [readonly]="readOnlyFieldElementSetting.email"
+                                (input)="isFormValueChange = true"
+                            />
+
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('contact').get('emailAddresses').get('email').hasError('required')"
+                                language="secondary.portal.members.requiredField"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('contact').get('emailAddresses').get('email').hasError('pattern')"
+                                language="primary.portal.members.beneficiaryValidationMsg.email"
+                            ></mat-error>
+                            <mat-error
+                                *ngIf="beneficiaryEditForm.get('contact').get('emailAddresses').get('email').hasError('maxlength')"
+                                language="primary.portal.members.beneficiaryValidationMsg.email.maxlength"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <ng-container formGroupName="phoneNumbers" *ngIf="hideFieldElementSetting.phoneNumber">
+                        <div class="flex-item">
+                            <mat-label class="mat-label"
+                                ><span
+                                    *ngIf="currentBeneficiaryType == beneficiaryEnum.CHARITY || currentBeneficiaryType == beneficiaryEnum.TRUST"
+                                    language="primary.portal.members.beneficiaryEdit.contactPhone"
+                                ></span>
+                                <span
+                                    *ngIf="currentBeneficiaryType == beneficiaryEnum.INDIVIDUAL"
+                                    language="primary.portal.members.beneficiaryEdit.phone"
+                                ></span>
+                                <span
+                                    *ngIf="isOptionalField('phoneNumber')"
+                                    class="optional-text"
+                                    language="primary.portal.common.optional"
+                                >
+                                </span>
+                            </mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="phoneNumber"
+                                    name="phoneNumber"
+                                    [maxlength]="phoneMaxLength"
+                                    [attr.aria-label]='languageStrings["primary.portal.members.beneficiaryEdit.contactPhone"] + " " + languageStrings["primary.portal.common.optional"]'
+                                    [readonly]="readOnlyFieldElementSetting.phoneNumber"
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                    (input)="isFormValueChange = true"
+                                />
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('phoneNumbers').get('phoneNumber').hasError('required')"
+                                    language="secondary.portal.members.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="beneficiaryEditForm.get('contact').get('phoneNumbers').get('phoneNumber').hasError('pattern')"
+                                    language="primary.portal.members.beneficiaryValidationMsg.phoneNumber"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item" *ngIf="currentBeneficiaryType !== beneficiaryEnum.TRUST">
+                            <mat-label
+                                class="mat-label"
+                                language="primary.portal.census.manualEntry.phoneType"
+                                id="memberPhoneType"
+                            ></mat-label>
+                            <mat-form-field>
+                                <mat-select formControlName="type" aria-labelledby="memberPhoneType">
+                                    <mat-option *ngFor="let phoneTypeItem of phoneNumberTypes" [value]="phoneTypeItem"
+                                        >{{phoneTypeItem}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item mon-mt-30" *ngIf="currentBeneficiaryType !== beneficiaryEnum.TRUST">
+                            <mat-checkbox formControlName="isMobile">
+                                <span language="primary.portal.census.manualEntry.isMobilenumber"></span>
+                            </mat-checkbox>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+
+    <footer class="flex-form-footer">
+        <div>
+            <button
+                type="button"
+                *ngIf="beneficiaryEditForm.touched || isFormValueChange"
+                mat-flat-button
+                (click)="revertForm()"
+                class="mon-btn-secondary mon-mr-20"
+                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.ariaUndoChanges']"
+            >
+                {{languageStrings['primary.portal.common.undoChanges']}}
+            </button>
+            <button
+                *ngIf="!isSaved || isFormValueChange"
+                [disabled]="!(beneficiaryEditForm.touched || isFormValueChange)"
+                mat-flat-button
+                class="mon-btn-primary mon-px-30"
+                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.ariaSave']"
+            >
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+            <button
+                *ngIf="isSaved && !isFormValueChange"
+                mat-flat-button
+                class="mon-btn-success mon-px-15"
+                [attr.aria-label]="languageStrings['primary.portal.members.beneficiaryEdit.ariaSaved']"
+            >
+                <span>
+                    <mon-icon class="check-icon" iconName="check" [iconSize]="19"></mon-icon>
+                </span>
+                <span>{{languageStrings['primary.portal.common.saved']}}</span>
+            </button>
+        </div>
+    </footer>
+</form>

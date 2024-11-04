@@ -1,0 +1,57 @@
+<div class="info-modal">
+    <div class="modal-header">
+        <button
+            (click)="close()"
+            mat-icon-button
+            mat-dialog-close
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <h1 mat-dialog-title>{{languageStrings['primary.portal.producerAuthorizationCode.title']}}</h1>
+        <div *ngIf="error" class="mon-mb-20">
+            <mon-alert alertType="danger">
+                <span> {{ this.errorMsg}} </span>
+            </mon-alert>
+        </div>
+        <div class="flex-form-wrapper">
+            <div class="d-md-flex">
+                <div class="flex-item">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.producerAuthorizationCode.unpluggedAgent']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            [value]="producersToDisplay[0].id"
+                            (selectionChange)="onSelectionChange($event)"
+                            disableOptionCentering="true"
+                        >
+                            <mat-option *ngFor="let producer of producersToDisplay" [value]="producer.id">
+                                {{producer.lastName + ", " +producer.firstName }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="auth-code">
+            <span>{{languageStrings['primary.portal.producerAuthorizationCode.authorizationCode']}}</span>
+            <span>&nbsp;</span>
+            <span>{{AuthorizationCodeToDisplay ? AuthorizationCodeToDisplay.toString() : "" }}</span>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-footer justify-content-end">
+        <button
+            type="submit"
+            mat-flat-button
+            (click)="close()"
+            class="mon-btn-primary"
+            [attr.aria-label]="languageStrings['primary.portal.common.close']"
+        >
+            {{languageStrings['primary.portal.common.close']}}
+        </button>
+    </mat-dialog-actions>
+</div>

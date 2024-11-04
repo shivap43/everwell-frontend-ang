@@ -1,0 +1,33 @@
+@import "shared";
+
+.info-modal {
+    .mat-dialog-content {
+        padding: 0;
+        .header {
+            padding: convert-unit(50px, "rem") convert-unit(50px, "rem") convert-unit(30px, "rem");
+        }
+    }
+    .scroll-content {
+        padding: 0 convert-unit(50px, "rem") convert-unit(30px, "rem");
+        overflow-y: auto;
+        max-height: 53vh;
+    }
+}
+:host ::ng-deep .state-input {
+    .mat-form-field-infix,
+    .mat-form-field-flex {
+        padding: 0;
+    }
+    .mat-chip-list-wrapper {
+        margin: 0;
+        padding: convert-unit(6px, "rem");
+        cursor: text;
+    }
+}
+.mat-option.selected-state {
+    background: get("color.primary.500");
+    color: get("color.white");
+    &:hover {
+        background: get("color.primary.600");
+    }
+}

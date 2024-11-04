@@ -1,0 +1,162 @@
+.mat-tab-group {
+    .mat-tab-header {
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+    }
+
+    .mon-tab-sub-wrapper {
+        padding: 0 convert-unit(30px, "rem");
+
+        h1 {
+            margin-top: convert-unit(40px, "rem");
+            margin-bottom: convert-unit(30px, "rem");
+        }
+    }
+
+    .mat-tab-label-container {
+        background-color: get("color.gray.100");
+
+        .mat-ink-bar {
+            background-color: get("color.gray.700");
+            height: 0;
+        }
+
+        .mat-tab-label {
+            color: get("color.gray.1000");
+            font-size: convert-unit(16px, "rem");
+            font-weight: normal;
+            opacity: 1;
+            padding: convert-unit(15px, "rem") convert-unit(30px, "rem");
+            @include fontFace("primary.regular");
+            border-right: 0;
+            border-left: 0;
+            border-bottom: convert-unit(2px, "rem") solid transparent;
+            min-width: auto;
+
+            &.mat-ripple {
+                height: auto !important;
+                width: auto !important;
+            }
+
+            &-active,
+            &:active,
+            &:focus {
+                @include fontFace("primary.medium");
+                color: get("color.gray.1000");
+                opacity: 1;
+                border-bottom: convert-unit(2px, "rem") solid get("color.gray.700");
+            }
+
+            &:hover {
+                border-bottom: convert-unit(2px, "rem") solid get("color.gray.700");
+            }
+        }
+    }
+
+    &.vertical-tab.mat-tab-group {
+        flex-direction: column;
+
+        .mat-tab-label-container {
+            .mat-tab-label {
+                padding: convert-unit(10px, "rem") convert-unit(15px, "rem");
+                height: convert-unit(44px, "rem") !important;
+                border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+                width: convert-unit(220px, "rem") !important;
+                border-right: convert-unit(1px, "rem") solid get("color.gray.600");
+                color: get("color.black");
+                display: flex;
+                justify-content: space-between;
+
+                .mat-tab-label-content {
+                    display: flex;
+                    justify-content: space-between;
+                    color: get("color.black");
+                    flex: 1;
+
+                    span {
+                        width: auto;
+                        white-space: normal;
+                        text-align: left;
+                    }
+                }
+            }
+
+            .mat-tab-label-active,
+            .mat-tab-label:hover {
+                color: get("color.white") !important;
+                font-weight: normal !important;
+                background-color: $mon--primary-base;
+                opacity: 1;
+                border-right: 0;
+
+                .mat-tab-label-content {
+                    color: get("color.white") !important;
+                    flex: 1;
+
+                    .icon-primary .mat-icon,
+                    .icon-success .mat-icon,
+                    .icon-danger .mat-icon {
+                        fill: get("color.white");
+                        .cls-1 {
+                            fill: get("color.white");
+                        }
+                    }
+                }
+            }
+            @include media-min("l") {
+                .mat-tab-label-active:after {
+                    border-right: convert-unit(10px, "rem") solid get("color.white");
+                    border-bottom: convert-unit(10px, "rem") solid transparent;
+                    border-top: convert-unit(10px, "rem") solid transparent;
+                    content: " ";
+                    position: absolute;
+                    right: 0;
+                    display: flex;
+                }
+            }
+        }
+
+        .mat-tab-header {
+            border-bottom: none;
+            margin: 0;
+        }
+
+        .mat-tab-header-pagination {
+            display: none !important;
+        }
+
+        .mat-tab-labels {
+            flex-direction: column;
+
+            .mat-ink-bar {
+                visibility: hidden !important;
+            }
+        }
+
+        .mat-tab-body-wrapper {
+            flex: 1 1 auto !important;
+        }
+
+        .mat-tab-label-container {
+            border-bottom: convert-unit(0px, "rem") !important;
+
+            .mat-tab-list {
+                background-color: get("color.white");
+            }
+        }
+    }
+
+    &.accounts-list-tab {
+        .mat-tab-label-container {
+            .mat-tab-label {
+                &:nth-child(3) {
+                    flex-grow: 3;
+                    justify-content: flex-end;
+                }
+                &:hover {
+                    border-bottom: convert-unit(2px, "rem") solid transparent;
+                    padding: map-get($spacers, 15) map-get($spacers, 30);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,33 @@
+<div class="unplugged-wrapper">
+    <div class="flex-grid">
+        <div class="right-content" *ngIf="showMacDownload">
+            <div class="softdoc">{{languageStrings['primary.portal.downloadUnplugged.softwareDocumentation']}}</div>
+            <mat-tab-group animationDuration="0ms" #operatingSystemTab [(selectedIndex)]="selectedIndex">
+                <mat-tab class="windows-device">
+                    <ng-template mat-tab-label>{{languageStrings['primary.portal.operatingSystem.windows']}}</ng-template>
+                    <div class="everwell">{{languageStrings['primary.portal.downloadUnplugged.everwellUnplugged']}}</div>
+                    <p><span [innerHTML]="languageStrings['primary.portal.downloadUnplugged.downloadEverwell']"></span></p>
+                    <a (click)="downloadUnplugged(installedOS.WINDOWS)" mat-flat-button class="mon-btn-primary">
+                        {{languageStrings['primary.portal.downloadUnplugged.downloadUnpluggedForWindows']}}
+                    </a>
+                </mat-tab>
+                <mat-tab class="mac-device">
+                    <ng-template mat-tab-label>{{languageStrings['primary.portal.operatingSystem.macOS']}}</ng-template>
+                    <div class="everwell">{{languageStrings['primary.portal.downloadUnplugged.everwellUnpluggedMac']}}</div>
+                    <p><span [innerHTML]="languageStrings['primary.portal.downloadUnpluggedMac.downloadEverwell']"></span></p>
+                    <a (click)="downloadUnplugged(installedOS.MACOS)" mat-flat-button class="mon-btn-primary">
+                        {{languageStrings['primary.portal.downloadUnplugged.downloadUnpluggedForMac']}}
+                    </a>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+        <div class="right-content-config" *ngIf="!showMacDownload">
+            <div class="softdoc">{{languageStrings['primary.portal.downloadUnplugged.softwareDocumentation']}}</div>
+            <div class="everwell">{{languageStrings['primary.portal.downloadUnplugged.everwellUnplugged']}}</div>
+            <p><span [innerHTML]="languageStrings['primary.portal.downloadUnplugged.downloadEverwell']"></span></p>
+            <a (click)="downloadUnplugged(installedOS.WINDOWS)" mat-flat-button class="mon-btn-primary">
+                {{languageStrings['primary.portal.downloadUnplugged.downloadUnpluggedForWindows']}}
+            </a>
+        </div>
+    </div>
+</div>

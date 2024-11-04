@@ -1,0 +1,74 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form" class="mon-card-wrapper mon-my-25" role="form">
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title language="primary.portal.forgotUsername.verifyIdentityTitle"></mat-card-title>
+            <mat-card-subtitle language="primary.portal.forgotUsername.verifyIdentitySubTitle"></mat-card-subtitle>
+            <mat-label for="verifyMethod" id="verifyMethod-label" class="mat-label mon-pt-10">
+                <span language="primary.portal.forgotUsername.chooseMethod"></span>
+            </mat-label>
+
+            <mat-radio-group
+                formControlName="verifyMethod"
+                attr.aria-label="{{languageStrings['primary.portal.forgotUsername.chooseMethod']}}"
+            >
+                <div class="mon-my-10">
+                    <mat-radio-button
+                        (change)="updateSelection()"
+                        [ngClass]="{'field-invalid': error}"
+                        (click)="setcommunicationMode()"
+                        id="verifyMethod-2"
+                        value="email"
+                        [attr.aria-label]="languageStrings['primary.portal.forgotUsername.email']"
+                    >
+                        <span language="primary.portal.forgotUsername.email"></span>
+                    </mat-radio-button>
+                </div>
+
+                <div>
+                    <mat-radio-button
+                        (change)="updateSelection()"
+                        [ngClass]="{'field-invalid': error}"
+                        (click)="setcommunicationMode()"
+                        id="verifyMethod-1"
+                        value="Text"
+                        [attr.aria-label]="languageStrings['primary.portal.forgotPassword.text']"
+                    >
+                        <span language="primary.portal.forgotPassword.text"></span>
+                    </mat-radio-button>
+                </div>
+            </mat-radio-group>
+            <div class="mon-mt-10">
+                <mat-error *ngIf="error" [language]="errorMsg"></mat-error>
+            </div>
+        </mat-card-content>
+        <mat-card-footer class="text-center bg-gray-100">
+            <button
+                class="mon-button-full-width mon-btn-primary mon-mb-30"
+                mat-flat-button
+                type="submit"
+                [attr.aria-label]="languageStrings['primary.portal.common.next']"
+            >
+                {{languageStrings['primary.portal.common.next']}}
+            </button>
+            <p class="mon-m-0">
+                <a
+                    href="javascript:void(0)"
+                    routerLink="../../forgot-password"
+                    [attr.aria-label]="languageStrings['primary.portal.forgotUsername.forgotPassword']"
+                >
+                    {{languageStrings['primary.portal.forgotUsername.forgotPassword']}}</a
+                >
+            </p>
+            <mat-divider class="mon-my-20"></mat-divider>
+            <p class="text-center">
+                <a
+                    href="javascript:void(0)"
+                    routerLink="../../login"
+                    [attr.aria-label]="languageStrings['primary.portal.common.back']"
+                >
+                    {{languageStrings['primary.portal.common.back']}}</a
+                >
+            </p>
+        </mat-card-footer>
+    </mat-card>
+</form>

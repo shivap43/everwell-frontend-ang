@@ -1,0 +1,22 @@
+////
+/// Admin Portal Styles
+///
+/// Since `AdminPortalComponent` has ViewEncapsulation.None, this stylesheet can be used to style any child component in Admin portal.
+///
+
+.admin-portal {
+    /// Ensure all child components fill the available space by default.
+    empowered-admin-portal {
+        flex: 1 0 auto;
+
+        display: flex;
+        flex-direction: column;
+
+        & > *:not(.router-outlet) {
+            flex: 1 0 auto;
+
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

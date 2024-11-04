@@ -1,0 +1,901 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="dialog-content">
+    <form [formGroup]="transferToDirectForm">
+        <div class="flex-form-wrapper mon-px-30">
+            <h3>{{languageStrings['primary.portal.policyChangeRequest.transactions.transferToDirect.header']}}</h3>
+            <div>
+                <div class="d-md-flex">
+                    <div class="flex-item policy-checkbox">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.transferPayroll.affectedPolicies"></span>
+                        </mat-label>
+                        <mat-checkbox
+                            *ngIf="policyList.length > 7"
+                            type="checkbox"
+                            [checked]="isAllPolicySelected"
+                            class="transfer-direct-checkbox"
+                            (change)="selectAll($event.checked)"
+                            [indeterminate]="isIndeterminate"
+                            [disabled]="isMultipleAccounts"
+                        >
+                            <span language="primary.portal.policyChangeRequest.transactions.selectAll"></span>
+                        </mat-checkbox>
+                        <div class="item mon-mb-5">
+                            <ng-container
+                                formArrayName="policyNumbers"
+                                *ngFor="let policy of formControl['policyNumbers'].controls; let i = index"
+                            >
+                                <mat-checkbox
+                                    [ngClass]="{'pcrcheckbox': counter === 0 && isSubmitted}"
+                                    (change)="selectSingle($event.checked, policyList[i])"
+                                    [formControlName]="i"
+                                    class="transfer-direct-checkbox"
+                                    [disabled]="selectedAccountNumber && policyList[i]?.accountNumber !== selectedAccountNumber"
+                                >
+                                    <span>{{policyList[i].policyName}}</span>
+                                </mat-checkbox>
+                            </ng-container>
+                        </div>
+                        <mat-error *ngIf="counter === 0 && isSubmitted">
+                            <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                        </mat-error>
+                    </div>
+                </div>
+                <mat-divider class="mon-mt-20"></mat-divider>
+                <div class="d-md-flex mon-mt-20">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span language="primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountName"></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                class="mon-input"
+                                matInput
+                                formControlName="currentAccountName"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.transferPayroll.currentAccountName']"
+                            />
+                            <mat-error *ngIf="transferToDirectForm.dirty && (formControl['currentAccountName'].errors?.required)">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl['currentAccountName'].errors?.pattern">
+                                <span language="primary.portal.policyChangeRequest.transactions.accountNumberValidation"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item mon-mb-20" *ngIf="tempusConfig || bankDraftTempusConfig; else paymetricFlow">
+                        <mon-alert
+                            class="mon-mb-20 alert-message"
+                            alertType="danger"
+                            (emitCloseEvent)="closeNoPaymentInfoAlert()"
+                            closeButton="true"
+                            *ngIf="showNoCardError || showNoAccountError"
+                            ><span language="primary.portal.applicationFlow.payments.noPaymentInfoError"></span
+                        ></mon-alert>
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.billingType"
+                            ></span>
+                        </mat-label>
+                        <mat-radio-group (change)="selectBillingType($event.value)" formControlName="billingType" class="radio-wrapper">
+                            <mat-radio-button
+                                class="mon-mr-30"
+                                *ngFor="let paymentMethod of paymentMethods; let i=index"
+                                [value]="paymentMethod.id"
+                                [checked]="i===selectedBillingTypeIndex"
+                                >{{paymentMethod.name}}</mat-radio-button
+                            >
+                        </mat-radio-group>
+                    </div>
+                    <ng-template #paymetricFlow>
+                        <div class="flex-item">
+                            <mat-label class="mat-label">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.billingType"
+                                ></span>
+                            </mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    placeholder="Select"
+                                    matNativeControl
+                                    class="mon-input"
+                                    formControlName="billingType"
+                                    (selectionChange)="selectBillingType($event.value)"
+                                >
+                                    <mat-option *ngFor="let type of billingTypeList" [value]="type.id" [title]="type.name">
+                                        {{type.name}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="formControl['billingType'].errors?.required">
+                                    <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </ng-template>
+                </div>
+                <div>
+                    <div>
+                        <div class="d-md-flex" *ngIf="enableBankDraftTempusBilling && !addedBankAccounts.length">
+                            <div class="flex-item">
+                                <button
+                                    type="button"
+                                    class="mon-btn-secondary mon-mb-20"
+                                    (click)="openBankDraftPrompt()"
+                                    mat-flat-button
+                                    [disabled]="disableAddAccount"
+                                >
+                                    <span language="primary.portal.applicationFlow.payments.bankDraft.addAccount"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="enableBankDraftTempusBilling && addedBankAccounts.length">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.applicationFlow.payments.selectAccount"></span>
+                                </mat-label>
+                                <mat-form-field class="w-250">
+                                    <mat-select [value]="selectedBankAccount" class="mon-input">
+                                        <mat-option
+                                            *ngFor="let account of addedBankAccounts; let i = index"
+                                            [value]="account.tempusTokenIdentityGuid"
+                                            (click)="prePopulateBankAccount(i)"
+                                        >
+                                            {{
+                                            languageStrings["primary.portal.applicationFlow.payments.bankDraft.accountLabeling"].replace("#accountType",account.accountType
+                                            | titlecase).replace("#accountNumberLastFourDigits",account.accountNumberLastFour)
+                                            }}</mat-option
+                                        >
+                                        <mat-option
+                                            (click)="openBankDraftPrompt()"
+                                            [value]="languageStrings['primary.portal.applicationFlow.payments.addNewAccount']"
+                                        >
+                                            <a href="javascript:void(0)"
+                                                ><span language="primary.portal.applicationFlow.payments.addNewAccount"></span>
+                                            </a>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div *ngIf="enableBankDraftTempusBilling && !isAchEditTempusPaymentService && addedBankAccounts.length">
+                            <mon-alert alertType="warning" class="ach-information-alert">
+                                <span language="primary.portal.applicationFlow.payments.paymentMethod.achEditRetireWarning"></span>
+                            </mon-alert>
+                        </div>
+
+                        <div class="d-md-flex view-details" *ngIf="enableBankDraftTempusBilling && addedBankAccounts.length">
+                            <div class="flex-item">
+                                <div class="bank-draft" *ngIf="addedBankAccounts[selectedBankAccountIndex]?.accountName">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.accountType"></span>
+                                    </div>
+                                    <div class="view-data">{{addedBankAccounts[selectedBankAccountIndex]?.accountType | titlecase}}</div>
+                                </div>
+                                <div class="bank-draft">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.bankDraft.accountHolder"></span>
+                                    </div>
+                                    <div class="view-data">{{addedBankAccounts[selectedBankAccountIndex]?.accountName}}</div>
+                                </div>
+
+                                <div class="bank-draft">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.accountNumber"></span>
+                                    </div>
+                                    <div class="view-data">{{showMaskedAccountNumber}}</div>
+                                </div>
+                                <div class="bank-draft">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.routingNumber"></span>
+                                    </div>
+                                    <div class="view-data">{{MASK_FIRST_FIVE + routingNumberLastFourDigits}}</div>
+                                </div>
+                                <div class="bank-draft">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.viewAccount.bankName"></span>
+                                    </div>
+                                    <div class="view-data">{{addedBankAccounts[selectedBankAccountIndex]?.bankName}}</div>
+                                </div>
+
+                                <div class="d-md-flex">
+                                    <div class="edit-account" *ngIf="isAchEditTempusPaymentService">
+                                        <a href="javascript:void()" (click)="openBankDraftPrompt(true)"
+                                            ><span language="primary.portal.applicationFlow.payments.editAccount"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-md-flex">
+                                    <a href="javascript:void()" class="delete-account" (click)="deleteBankAccount()"
+                                        ><span language="primary.portal.common.delete"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-md-flex" *ngIf="formControl['accountHoldersName']" formGroupName="accountHoldersName">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountHolderFirstname"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="firstName"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountHolderFirstname']"
+                                    />
+                                    <mat-error *ngIf="formControl['accountHoldersName'].controls.firstName.errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.firstName.errors?.pattern && ! nameWithHypenApostrophesValidation.test(formControl['accountHoldersName'].controls.firstName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.firstName.errors?.pattern &&  nameWithHypenApostrophesValidation.test(formControl['accountHoldersName'].controls.firstName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.firstName.errors?.length"
+                                        language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountHolderLastname"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="lastName"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountHolderLastname']"
+                                    />
+                                    <mat-error *ngIf="formControl['accountHoldersName'].controls.lastName.errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.lastName.errors?.pattern && ! nameWithHypenApostrophesValidation.test(formControl['accountHoldersName'].controls.lastName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.lastName.errors?.pattern &&  nameWithHypenApostrophesValidation.test(formControl['accountHoldersName'].controls.lastName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['accountHoldersName'].controls.lastName.errors?.length"
+                                        language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="flex-item" *ngIf="formControl['accountNumber']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountNumber"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="accountNumber"
+                                        (focusout)="maskAccountNumber()"
+                                        [maxlength]="accountNumberNumberMaxlength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountNumber']"
+                                    />
+                                    <mat-error *ngIf="formControl['accountNumber'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="formControl['accountNumber'].errors?.pattern">
+                                        <span
+                                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.validationError.accountNumber"
+                                        ></span
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item" *ngIf="formControl['accountType']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountType"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select placeholder="Select" class="mon-input" formControlName="accountType">
+                                        <mat-option *ngFor="let type of accountTypeList" value="{{type.id}}" title="{{type.name}}">
+                                            {{type.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="formControl['accountType'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="formControl['transitNumber']">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.transitNumber"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="transitNumber"
+                                        [maxlength]="transitNumberMaxLength"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.transitNumber']"
+                                    />
+                                    <mat-error *ngIf="formControl['transitNumber'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="formControl['transitNumber'].errors?.pattern">
+                                        <span
+                                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.validationError.transitNumber"
+                                        ></span
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <div class="d-md-flex" *ngIf="enableTempusCardBilling">
+                            <div class="flex-item mon-mb-20">
+                                <span language="primary.portal.applicationFlow.payments.debitCardNoteMessage"></span>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="enableTempusCardBilling && !addedCards.length">
+                            <div class="flex-item">
+                                <button
+                                    type="button"
+                                    class="mon-btn-secondary mon-mb-20"
+                                    (click)="openPaymentPrompt(false)"
+                                    mat-flat-button
+                                    [disabled]="disableAddCard"
+                                >
+                                    <span language="primary.portal.applicationFlow.payments.addCard"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="enableTempusCardBilling && addedCards.length">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.applicationFlow.payments.selectCreditCard"></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select [value]="selectedAccount" class="mon-input">
+                                        <mat-option
+                                            *ngFor="let account of addedCards; let i = index"
+                                            [value]="account.lastFour"
+                                            (click)="prePopulateAccount(i)"
+                                        >
+                                            <span language="primary.portal.paymentDetails.cardEndingIn"></span>
+                                            {{' ' + account.lastFour}}</mat-option
+                                        >
+                                        <mat-option
+                                            (click)="openPaymentPrompt(false)"
+                                            [value]="languageStrings['primary.portal.applicationFlow.payments.addNewCard']"
+                                        >
+                                            <a href="javascript:void(0)"
+                                                ><span language="primary.portal.applicationFlow.payments.addNewCard"></span>
+                                            </a>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="card-expired-block" *ngIf="enableTempusCardBilling && addedCards.length && !isCardNotExpired">
+                            <mon-alert alertType="danger">
+                                <span
+                                    class="card-expired-message"
+                                    language="secondary.portal.applicationFlow.payments.cardExpiredMessage"
+                                ></span>
+                            </mon-alert>
+                        </div>
+                        <div class="d-md-flex view-details" *ngIf="enableTempusCardBilling && addedCards.length">
+                            <div class="flex-item">
+                                <div class="credit-card" *ngIf="addedCards[selectedIndex]?.accountName">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.cardHolderName"></span>
+                                    </div>
+                                    <div>{{addedCards[selectedIndex]?.accountName}}</div>
+                                </div>
+                                <div class="credit-card">
+                                    <div class="label">
+                                        <span
+                                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardType"
+                                        ></span>
+                                    </div>
+                                    <div>{{addedCards[selectedIndex]?.type}}</div>
+                                </div>
+                                <div class="credit-card">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.cardNumber"></span>
+                                    </div>
+                                    <div>{{MASK_FIRST_EIGHT + addedCards[selectedIndex]?.lastFour}}</div>
+                                </div>
+                                <div class="credit-card">
+                                    <div class="label">
+                                        <span language="primary.portal.applicationFlow.payments.expirationDate"></span>
+                                    </div>
+                                    <div *ngIf="isCardNotExpired; else dateInPast">
+                                        {{(addedCards[selectedIndex]?.expirationMonth < 10 ? "0" +
+                                        addedCards[selectedIndex]?.expirationMonth : addedCards[selectedIndex]?.expirationMonth) +'/' +
+                                        addedCards[selectedIndex]?.expirationYear}}
+                                    </div>
+                                    <ng-template #dateInPast>
+                                        <span class="card-expiration-error">
+                                            <mon-icon [iconSize]="16" iconName="Filled-error" class="icon-danger"></mon-icon>
+                                            {{(addedCards[selectedIndex]?.expirationMonth < 10 ? "0" +
+                                            addedCards[selectedIndex]?.expirationMonth : addedCards[selectedIndex]?.expirationMonth) +'/' +
+                                            addedCards[selectedIndex]?.expirationYear}}
+                                        </span>
+                                    </ng-template>
+                                </div>
+                                <div class="d-md-flex" *ngIf="addedCards.length">
+                                    <div class="edit-account">
+                                        <a href="javascript:void()" (click)="openPaymentPrompt(true)"
+                                            ><span language="primary.portal.applicationFlow.payments.editCard"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-md-flex" *ngIf="addedCards.length">
+                                    <a href="javascript:void()" class="delete-account" (click)="deleteAccount()"
+                                        ><span language="primary.portal.common.delete"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="formControl['cardHoldersName']" formGroupName="cardHoldersName">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardHolderFirstName"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="firstName"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardHolderFirstName']"
+                                    />
+                                    <mat-error *ngIf="formControl['cardHoldersName'].controls['firstName'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.firstName.errors?.pattern && ! nameWithHypenApostrophesValidation.test(formControl['cardHoldersName'].controls.firstName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.firstName.errors?.pattern &&  nameWithHypenApostrophesValidation.test(formControl['cardHoldersName'].controls.firstName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.firstName.errors?.length"
+                                        language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardHolderLastName"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="lastName"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardHolderLastName']"
+                                    />
+                                    <mat-error *ngIf="formControl['cardHoldersName'].controls['lastName'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.lastName.errors?.pattern && ! nameWithHypenApostrophesValidation.test(formControl['cardHoldersName'].controls.lastName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg1"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.lastName.errors?.pattern &&  nameWithHypenApostrophesValidation.test(formControl['cardHoldersName'].controls.lastName.value)"
+                                        language="primary.portal.policyChangeRequest.transactions.namevalidationMsg2"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['cardHoldersName'].controls.lastName.errors?.length"
+                                        language="primary.portal.policyChangeRequest.transactions.maxLength60"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="flex-item" *ngIf="formControl['creditCardType']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardType"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        placeholder="Select"
+                                        class="mon-input"
+                                        formControlName="creditCardType"
+                                        (selectionChange)="cardTypeUpdated($event)"
+                                    >
+                                        <mat-option *ngFor="let cardType of cardTypeList" value="{{ cardType.id }}">
+                                            {{ cardType.name }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="formControl['creditCardType'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="flex-item" *ngIf="formControl['creditCardAccessToken']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardNumber"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="creditCardAccessToken"
+                                        [maxlength]="isAmexSelected ? amexMaxLength : cardNumberMaxlength"
+                                        (focusout)="maskCardNumber()"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardNumber']"
+                                    />
+                                    <mat-error *ngIf="formControl.creditCardAccessToken.errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl.creditCardAccessToken.errors?.pattern || formControl.creditCardAccessToken.errors?.minlength || formControl.creditCardAccessToken.errors?.maxlength"
+                                    >
+                                        <span
+                                            [language]="isAmexSelected ? 'primary.portal.policyChangeRequest.transactions.amexCardValidation' : 'primary.portal.policyChangeRequest.transactions.creditCardValidation'"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item" *ngIf="formControl['expDate']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.expDate"
+                                    ></span>
+                                </mat-label>
+                                <empowered-date-picker-month-year
+                                    [displayDate]="displayDate"
+                                    [minDate]="minDate"
+                                    (getDate)="getDate($event)"
+                                >
+                                </empowered-date-picker-month-year>
+                            </div>
+                        </div>
+                        <div class="d-md-flex" *ngIf="formControl['address1']">
+                            <div class="flex-item street-address">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.streetAddress"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="address1"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.streetAddress']"
+                                    />
+                                    <mat-error *ngIf="formControl['address1'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['address1'].errors?.maxlength "
+                                        language="primary.portal.policyChangeRequest.transactions.maxLength100"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="formControl['address1'].errors?.pattern"
+                                        language="primary.portal.policyChangeRequest.transactions.streetAddress1ValidationMessage"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-md-flex">
+                            <div class="flex-item city" *ngIf="formControl['city']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.city"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="city"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.city']"
+                                    />
+                                    <mat-error *ngIf="formControl['city'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item state" *ngIf="formControl['state']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.state"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        placeholder="Select"
+                                        disableOptionCentering="true"
+                                        class="mon-input"
+                                        formControlName="state"
+                                        (selectionChange)="validateZipIfStateChange()"
+                                    >
+                                        <mat-option *ngFor="let state of states$ | async" value="{{ state.abbreviation }}"
+                                            >{{ state.abbreviation }}</mat-option
+                                        >
+                                    </mat-select>
+                                    <mat-error *ngIf="formControl['state'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item zip" *ngIf="formControl['zip']">
+                                <mat-label class="mat-label">
+                                    <span
+                                        language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.zip"
+                                    ></span>
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        formControlName="zip"
+                                        (focusout)="validateZipCode()"
+                                        [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.zip']"
+                                    />
+                                    <mat-error *ngIf="formControl['zip'].errors?.required">
+                                        <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                                    </mat-error>
+                                    <mat-error *ngIf="formControl['zip'].errors?.zipValid">
+                                        <span
+                                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.validationError.zip"
+                                        ></span>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <mat-divider class="mon-mb-20"></mat-divider>
+                    </div>
+                </div>
+
+                <div class="d-md-flex">
+                    <div class="flex-item billing-mode">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.billingMode"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" matNativeControl class="mon-input" formControlName="billingMode">
+                                <mat-option
+                                    *ngFor="let billingMode of billingModeList"
+                                    value="{{billingMode.id}}"
+                                    title="{{billingMode.name}}"
+                                >
+                                    {{billingMode.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="formControl['billingMode'].errors?.required">
+                                <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-item deduction-date-per-period">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.deductionDatePerPeriod"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <mat-select placeholder="Select" matNativeControl formControlName="deductionDatePerPeriod" class="mon-input">
+                                <mat-option *ngFor="let item of deductionDateList" value="{{item.id}}" title="{{item.name}}">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="formControl['deductionDatePerPeriod'].errors?.required">
+                                <span language="primary.portal.policyChangeRequest.transactions.selectionRequired"></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <span language="primary.portal.policyChangeRequest.transactions.changeName.supportiveDocs"></span>
+                        <span class="optional-text" language="primary.portal.common.optional"></span>
+                        <div class="pcr-fileupload">
+                            <empowered-pcr-file-upload
+                                [uploadApi]="uploadApi"
+                                [isFileUploadFromTransaction]="true"
+                                [documentIds]="documentIdArray"
+                                [mpGroup]="mpGroup"
+                                [memberId]="memberId"
+                                [cifNumber]="cifNumber"
+                                (getDocumentId)="getDocumentId($event)"
+                            ></empowered-pcr-file-upload>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.effectiveDate"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field class="mon-date-field w-200">
+                            <input
+                                [matDatepicker]="picker"
+                                formControlName="effectiveDate"
+                                matInput
+                                [min]="minDate"
+                                (keyup)="transform($event)"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.effectiveDate']"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="picker" (click)="picker.open()">
+                                <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon></mon-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint
+                                ><span
+                                    language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.effectiveDateFormat"
+                                ></span
+                            ></mat-hint>
+                            <mat-error *ngIf="formControl['effectiveDate'].errors?.required">
+                                <span language="primary.portal.policyChangeRequest.transactions.requiredField"></span>
+                            </mat-error>
+                            <mat-error *ngIf="formControl['effectiveDate'].hasError('matDatepickerMin')">
+                                <span
+                                    language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.validationError.effectiveDate"
+                                ></span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-divider class="mon-mb-20" aria-hidden="true"></mat-divider>
+                <div>
+                    <p>
+                        <span
+                            language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.termAndCondition"
+                        ></span>
+                    </p>
+                </div>
+                <div class="d-md-flex">
+                    <div
+                        class="flex-item authorized-agreement"
+                        *ngIf="showSignerAgreement && (tempusConfig && enableTempusCardBilling || bankDraftTempusConfig && selectedBillingType === paymentType.BANK_ACCOUNT)"
+                    >
+                        <div [innerHtml]="consentContent"></div>
+                    </div>
+                </div>
+                <div class="d-md-flex">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.applicantSignature"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="policyHolderSignature"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.applicantSignature']"
+                            />
+                            <mat-error
+                                *ngIf="formControl['policyHolderSignature'].errors?.required"
+                                language="primary.portal.policyChangeRequest.transactions.requiredField"
+                            >
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex" *ngIf="formControl['accountSignature']">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountSignature"
+                            ></span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="accountSignature"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.accountSignature']"
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="d-md-flex" *ngIf="formControl['cardHoldersSignature']">
+                    <div class="flex-item">
+                        <mat-label class="mat-label">
+                            <span
+                                language="primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardSignature"
+                            >
+                            </span>
+                        </mat-label>
+                        <mat-form-field>
+                            <input
+                                matInput
+                                formControlName="cardHoldersSignature"
+                                [attr.aria-label]="languageStrings['primary.portal.policyChangeRequest.transactions.changeBeneficiary.transferToDirect.cardSignature']"
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="dialog-footer">
+    <div class="flex-item">
+        <button
+            class="mon-btn-link"
+            aria-label="Cancel"
+            mat-flat-button
+            (click)="cancel()"
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+        >
+            <span language="primary.portal.common.cancel"></span>
+        </button>
+    </div>
+    <div class="flex-item">
+        <button
+            type="button"
+            class="mon-btn-secondary"
+            mat-flat-button
+            (click)="back()"
+            [attr.aria-label]="languageStrings['primary.portal.common.back']"
+        >
+            <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+            <span language="primary.portal.common.back"></span>
+        </button>
+        <button
+            type="submit"
+            class="mon-btn-primary mon-ml-20"
+            (click)="transferToDirect()"
+            mat-flat-button
+            [attr.aria-label]="languageStrings['primary.portal.common.next']"
+        >
+            <span language="primary.portal.common.next"></span>
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</div>

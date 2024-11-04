@@ -1,0 +1,406 @@
+@import "shared";
+
+.plan-level-options {
+    display: flex;
+    align-items: center;
+    border-right: convert-unit(1px, "rem") solid get("color.gray.500");
+    padding: convert-unit(10px, "rem") convert-unit(20px, "rem");
+
+    span {
+        margin-bottom: convert-unit(2px, "rem");
+    }
+
+    .coverage-setting {
+        display: flex;
+        align-items: center;
+
+        .mat-text-coverage {
+            margin: 0 convert-unit(5px, "rem");
+            color: get("color.primary.500");
+            font-size: convert-unit(16px, "rem");
+            @include fontFace("primary.regular");
+        }
+
+        .mat-form-field {
+            line-height: 0;
+
+            .mat-form-field-flex {
+                padding: 0;
+
+                .mat-select {
+                    margin-bottom: convert-unit(2px, "rem");
+                }
+            }
+        }
+    }
+}
+
+.add-to-rate-sheet {
+    margin-left: auto;
+    margin-right: convert-unit(15px, "rem");
+    align-self: center;
+    font-size: convert-unit(16px, "rem");
+}
+
+.quick-quote-plans {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .plan-offerings {
+        flex-grow: 1;
+    }
+}
+
+.mat-cell:first-of-type,
+.mat-footer-cell:first-of-type,
+.mat-header-cell:first-of-type {
+    min-width: 45% !important;
+    padding-top: convert-unit(15px, "rem");
+    align-items: flex-start;
+
+    @include media-min("l") {
+        min-width: 65% !important;
+    }
+}
+
+.mat-table .mat-row .mat-cell {
+    font-weight: normal !important;
+}
+
+.products-accordion-table-footer-total-value {
+    @include fontFace("primary.bold");
+    color: get("color.black");
+}
+
+.expansion-panel-table-bottom-cntr {
+    padding: convert-unit(10px, "rem");
+}
+
+.shop-expansion-panel .mat-expansion-content-filterSection {
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.300");
+    border-top: convert-unit(1px, "rem") solid get("color.gray.300");
+    @include fontFace("primary.bold");
+}
+
+.mat-cell,
+.mat-footer-cell {
+    flex-direction: column;
+    padding: convert-unit(8px, "rem");
+}
+
+.total_month {
+    display: flex;
+    flex-direction: column;
+}
+
+.total_footer {
+    color: get("color.black");
+    font-size: convert-unit(16px, "rem");
+    @include fontFace("primary.bold");
+    height: convert-unit(44px, "rem");
+}
+
+.mat-cell,
+.mat-footer-cell {
+    align-items: flex-end;
+}
+
+.mat-table .mat-header-row {
+    border-bottom: convert-unit(2px, "rem") solid get("color.gray.500");
+}
+
+.mat-table .mat-row:nth-child(even) {
+    background-color: get("color.white");
+}
+
+.mat-table {
+    .mat-header-row {
+        height: auto;
+
+        .mat-header-cell {
+            &:nth-child(3) {
+                line-height: convert-unit(14px, "rem");
+
+                @include media-min("l") {
+                    line-height: convert-unit(21px, "rem");
+                }
+            }
+
+            text-align: end;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+    }
+}
+
+::ng-deep .universal-select-rider {
+    border-radius: convert-unit(4px, "rem") !important;
+    border: convert-unit(1px, "rem") solid get("color.gray.600") !important;
+    top: convert-unit(15px, "rem");
+    padding: convert-unit(15px, "rem");
+    width: 100% !important;
+    max-width: convert-unit(420px, "rem") !important;
+}
+
+::ng-deep {
+    .select-benefit-amount,
+    .select-elimination-period {
+        margin-top: convert-unit(12px, "rem") !important;
+        .mat-selection-list {
+            .mat-list-option {
+                &.mat-list-item {
+                    height: convert-unit(32px, "rem") !important;
+                }
+            }
+        }
+    }
+}
+
+.mat-expansion-panel-header-title {
+    margin-right: convert-unit(0px, "rem") !important;
+    margin-left: convert-unit(10px, "rem") !important;
+}
+
+.mat-expansion-panel-header-description {
+    min-width: convert-unit(0px, "rem") !important;
+}
+
+.quote_text {
+    width: convert-unit(154px, "rem");
+
+    @include media-min("l") {
+        width: auto;
+    }
+}
+
+.plan-name {
+    max-width: convert-unit(490px, "rem");
+
+    @include media-min("l") {
+        max-width: none;
+    }
+}
+
+.mat-expanded {
+    border-top: convert-unit(1px, "rem") solid get("color.black") !important;
+    border-bottom: convert-unit(1px, "rem") solid get("color.black") !important;
+}
+
+.include_logo {
+    position: relative;
+    bottom: convert-unit(3px, "rem");
+}
+
+.plan-offering-content {
+    margin-bottom: convert-unit(70px, "rem");
+
+    @include media-min("l") {
+        margin-bottom: convert-unit(20px, "rem");
+    }
+}
+
+::ng-deep .custom-checkBox-wrapper {
+    max-height: convert-unit(300px, "rem");
+    overflow-y: auto;
+}
+
+.benefit-select-block {
+    padding: 0 convert-unit(20px, "rem");
+    max-height: convert-unit(170px, "rem");
+    min-width: fit-content;
+    overflow: auto;
+
+    .mat-label {
+        margin-bottom: convert-unit(10px, "rem");
+    }
+}
+
+//CSS to target only IE-11 browser
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    ::ng-deep .universal-select-rider {
+        min-width: convert-unit(420px, "rem") !important;
+    }
+}
+
+.benefit-reset-apply-link {
+    display: flex;
+    justify-content: space-between;
+    padding: map-get($spacers, 15) map-get($spacers, 20) map-get($spacers, 0);
+    .drop-down-anchor-link {
+        font-size: convert-unit(14px, "rem");
+        color: get("color.primary.500");
+        cursor: pointer;
+    }
+    .reset-txt-btn {
+        color: get("color.black");
+    }
+}
+
+.settings-controls-label {
+    margin-bottom: map-get($spacers, 10);
+    .dropdown-arrow {
+        margin: map-get($spacers, 0) map-get($spacers, 10) map-get($spacers, 5);
+    }
+}
+
+.multiple-benefit-amount-options,
+.multiple-select-options {
+    padding-top: convert-unit(10px, "rem");
+    ::ng-deep .mat-list-option {
+        pointer-events: all;
+        .mat-list-item-content {
+            .mat-pseudo-checkbox-checked {
+                background-color: get("color.gray.800");
+            }
+            .mat-pseudo-checkbox-disabled {
+                background-color: get("color.gray.300");
+            }
+            padding: map-get($spacers, 0);
+            max-height: convert-unit(5px, "rem");
+        }
+        &:hover {
+            background: none;
+        }
+        &:focus {
+            background: none;
+        }
+        &.mat-list-item-disabled {
+            background: none;
+        }
+        &.error {
+            .mat-list-item-content {
+                .mat-pseudo-checkbox {
+                    border-color: get("color.info.danger.500") !important;
+                    background-color: get("color.info.danger.100") !important;
+                }
+            }
+        }
+    }
+}
+.products-accordion-table-cntr {
+    .mat-table .mat-header-row .mat-header-cell.plan-elimination-period-name {
+        text-align: start;
+        justify-content: flex-start;
+    }
+}
+
+.apply-btn-right {
+    margin-left: auto;
+}
+
+::ng-deep .mat-select-panel-wrap {
+    .mat-select-panel {
+        &.filter-select {
+            min-width: convert-unit(160px, "rem") !important;
+        }
+    }
+}
+
+::ng-deep .multiple-benefit-amount-options,
+.multiple-select-options {
+    .mat-selection-list {
+        .mat-list-option {
+            &.mat-list-item {
+                height: convert-unit(32px, "rem") !important;
+            }
+        }
+    }
+}
+::ng-deep .shop-expansion-panel {
+    &.mat-expanded {
+        .mat-expansion-panel-header {
+            border-bottom: convert-unit(1px, "rem") solid get("color.gray.300") !important;
+        }
+    }
+}
+
+.CustomCheckBox-ElementWrapper {
+    .CustomCheckBox-Element {
+        ::ng-deep.mat-checkbox-label {
+            margin-bottom: map-get($spacers, 10);
+        }
+    }
+}
+
+.CustomRadioOption {
+    line-height: convert-unit(35px, "rem");
+
+    ::ng-deep .mat-radio-label {
+        align-items: center;
+    }
+}
+
+.riderBenefitAmount-cntr {
+    margin-left: convert-unit(28px, "rem");
+
+    .multiple-riders {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .multiple-rider-benefit-amount-cntr {
+        margin-left: convert-unit(28px, "rem");
+        margin-top: convert-unit(5px, "rem");
+
+        .mat-form-field {
+            max-width: convert-unit(178px, "rem") !important;
+        }
+
+        ::ng-deep .mat-form-field-flex {
+            max-height: convert-unit(32px, "rem") !important;
+        }
+
+        ::ng-deep .mat-select-trigger {
+            font-size: convert-unit(14px, "rem");
+        }
+    }
+}
+.eligibility-text {
+    font-size: 12px !important;
+    margin-bottom: convert-unit(5px, "rem");
+}
+
+::ng-deep .cdk-overlay-pane {
+    max-height: fit-content;
+}
+
+.footnote-cntr {
+    padding: convert-unit(10px, "rem");
+
+    .footnote-txt {
+        color: get("color.gray.600");
+        font-size: convert-unit(12px, "rem");
+    }
+}
+
+.no-border {
+    border: none;
+}
+
+.rider-table-data {
+    width: 100%;
+
+    .rider-data {
+        font-size: convert-unit(14px, "rem");
+        padding-left: convert-unit(30px, "rem") !important;
+        font-family: "Roboto";
+        font-style: normal;
+        font-weight: 400 !important;
+        line-height: convert-unit(18px, "rem") !important;
+    }
+
+    .row-align {
+        padding-left: convert-unit(166px, "rem") !important;
+    }
+
+    .mat-row {
+        border: none;
+    }
+
+    .mat-row:nth-child(odd) {
+        background-color: get("color.gray.200");
+    }
+}

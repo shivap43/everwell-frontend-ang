@@ -1,0 +1,309 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<form (ngSubmit)="onSubmit()" [formGroup]="contactForm" class="mon-card-wrapper mon-my-50 w-600" *ngIf="isDateLoaded">
+    <mat-card>
+        <mat-card-content>
+            <mat-card-title
+                [language]="(multipleAccountMode$ | async) ? 'primary.portal.register.contactInfo.confirmInfo' : 'primary.portal.register.contactInfo.title'"
+            ></mat-card-title>
+            <div class="mon-mb-20">
+                <mon-alert *ngIf="error" alertType="danger">
+                    <span [language]="errorMessage"></span>
+                </mon-alert>
+                <mon-alert *ngIf="isAflacReadOnly && formInitInvalid" alertType="danger">
+                    <span language="secondary.portal.register.requiredRegistrationInfoMissing"></span>
+                </mon-alert>
+            </div>
+            <div class="mon-mb-20">
+                <mon-alert *ngIf="isDuplicateEmail" alertType="danger">
+                    <span>{{duplicateEmailErrors}}</span>
+                </mon-alert>
+            </div>
+            <div [formGroup]="contactForm.controls.address">
+                <div>
+                    <mat-label
+                        class="mat-label"
+                        language="primary.portal.register.contactInfo.streetAddress1"
+                    ></mat-label>
+                    <mat-form-field class="w-400">
+                        <input
+                            formControlName="address1"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.streetAddress1']"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="isFormSubmit && address.controls.address1.hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        ></mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div>
+                    <mat-label class="mat-label">
+                        <span language="primary.portal.register.contactInfo.streetAddress2"></span>
+                        <span class="optional-text" language="primary.portal.common.optional"></span>
+                    </mat-label>
+                    <mat-form-field class="w-400">
+                        <input
+                            formControlName="address2"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.streetAddress2'] + '(' + languageStrings['primary.portal.common.optional'] + ')'"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-hint language="primary.portal.register.contactInfo.streetAddress2Hint"></mat-hint>
+                    </mat-form-field>
+                </div>
+
+                <div class="w-400">
+                    <mat-label class="mat-label" language="primary.portal.register.contactInfo.city"></mat-label>
+                    <mat-form-field>
+                        <input
+                            formControlName="city"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.city']"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            language="secondary.portal.common.form.requiredField"
+                            *ngIf="isFormSubmit && address.controls.city.hasError('required')"
+                            language="secondary.portal.register.requiredField"
+                        >
+                        </mat-error>
+                        <mat-error *ngIf="address.controls.city.hasError('pattern')"
+                            >{{languageStrings['primary.portal.common.city.patternError']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-form-wrapper">
+                    <div class="d-md-flex">
+                        <div class="flex-item contact-info">
+                            <mat-label
+                                class="mat-label"
+                                language="primary.portal.register.contactInfo.state"
+                            ></mat-label>
+                            <mat-form-field>
+                                <mat-select
+                                    formControlName="state"
+                                    matNativeControl
+                                    required
+                                    placeholder="Select"
+                                    disableOptionCentering="true"
+                                    (selectionChange)="employeeZipFlag = true; checkZipCode(zip.value)"
+                                    [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.state']"
+                                    [disabled]="isAflacReadOnly"
+                                >
+                                    <mat-option *ngFor="let state of states" value="{{ state.abbreviation }}">
+                                        {{ state.abbreviation }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="isFormSubmit && address.controls.state.hasError('required')"
+                                    language="secondary.portal.register.requiredField"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-item contact-info">
+                            <mat-label class="mat-label" language="primary.portal.register.contactInfo.zip"></mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    maxlength="{{zipMaximumLength}}"
+                                    minlength="{{zipMinLength}}"
+                                    formControlName="zip"
+                                    #zip
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredZipCodeFormat
+                                    [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.zip']"
+                                    (keyup)="checkZipCode($event.target.value)"
+                                    [readonly]="isAflacReadOnly"
+                                />
+                                <mat-error
+                                    *ngIf="isFormSubmit && address.controls['zip'].hasError('required')"
+                                    language="secondary.portal.register.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="address.controls['zip'].hasError('pattern')"
+                                    language="secondary.portal.census.manualEntry.validZip"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="address.controls['zip'].hasError('zipMismatch') && !address.controls['zip'].hasError('pattern')"
+                                    language="primary.portal.census.manualEntry.zipErrorMsg"
+                                >
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-400" [formGroup]="contactForm.controls.profile">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.members.personalLabel.preferredLanguage']}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            class="mon-input"
+                            formControlName="languagePreference"
+                            disableOptionCentering="true"
+                            [placeholder]="languageStrings['primary.portal.members.personalLabel.select']"
+                            [disabled]="isAflacReadOnly"
+                        >
+                            <mat-option *ngFor="let item of preferredLangOptions" value="{{item}}">
+                                {{item}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div [formGroup]="contactForm.controls.phoneNumbers" class="flex-form-wrapper">
+                <div class="d-md-flex">
+                    <div class="flex-item contact-info">
+                        <div [formGroup]="contactForm.controls.phoneNumbers">
+                            <mat-label
+                                class="mat-label"
+                                language="primary.portal.register.contactInfo.phoneNumber"
+                            ></mat-label>
+                            <mat-form-field>
+                                <input
+                                    matInput
+                                    formControlName="phoneNumber"
+                                    matInput
+                                    [maxlength]="phoneNumberLength"
+                                    type="text"
+                                    empoweredNumberValidation
+                                    [allowDashes]="true"
+                                    empoweredPhoneNumberFormat
+                                    [value]="phoneNumbers.controls['phoneNumber'].value|phone"
+                                    [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.phoneNumber']"
+                                    [readonly]="isAflacReadOnly"
+                                />
+                                <mat-error
+                                    *ngIf="isFormSubmit && phoneNumbers.controls['phoneNumber'].hasError('required')"
+                                    language="secondary.portal.register.requiredField"
+                                ></mat-error>
+                                <mat-error
+                                    *ngIf="phoneNumbers.controls['phoneNumber'].hasError('pattern')"
+                                    language="secondary.portal.census.manualEntry.validphoneNumber"
+                                ></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="flex-item contact-info">
+                        <mat-label
+                            class="mat-label"
+                            language="primary.portal.register.contactInfo.workOrHome"
+                        ></mat-label>
+                        <mat-form-field>
+                            <mat-select
+                                formControlName="type"
+                                matNativeControl
+                                required
+                                placeholder="Select"
+                                disableOptionCentering="true"
+                                [disabled]="true"
+                                [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.workOrHome']"
+                                [disabled]="isAflacReadOnly"
+                            >
+                                <mat-option *ngFor="let types of workType" value="{{ types.value }}"
+                                    >{{ types.viewValue }}</mat-option
+                                >
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="w-400 mon-mb-20">
+                    <mat-checkbox [checked]="isMobile" (change)="cellType($event)" [disabled]="isAflacReadOnly">
+                        <span language="primary.portal.register.contactInfo.mobileNumberMessage"></span>
+                    </mat-checkbox>
+                </div>
+            </div>
+
+            <div [formGroup]="contactForm.controls.profile">
+                <div class="mon-pb-20">
+                    <mat-label
+                        class="mat-label"
+                        language="primary.portal.register.contactInfo.infoReceiveType"
+                    ></mat-label>
+                    <mat-radio-group
+                        aria-label="languageStrings['primary.portal.register.contactInfo.infoReceiveType']"
+                        formControlName="correspondenceType"
+                    >
+                        <div>
+                            <mat-radio-button (change)="selectEmail($event)" class="mon-mr-30" value="ELECTRONIC">
+                                <span language="primary.portal.register.contactInfo.receiveTypeEmail"></span>
+                            </mat-radio-button>
+                        </div>
+                        <div>
+                            <mat-radio-button (change)="selectPaper($event)" value="PAPER">
+                                <span language="primary.portal.register.contactInfo.receiveTypePaper"></span>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    <div *ngIf="emailSelected">
+                        <p *ngIf="firstName" class="policy-delivery-hint">
+                            {{languageStrings['primary.portal.members.mmpPolicyDeliveryMsgElectronic'].replace('##memberFirstName##',
+                            firstName)}}
+                        </p>
+                    </div>
+                    <div *ngIf="!emailSelected">
+                        <p *ngIf="firstName" class="policy-delivery-hint">
+                            {{languageStrings['primary.portal.members.mmpPolicyDeliveryMsgPaper'].replace('##memberFirstName##',
+                            firstName)}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div [formGroup]="contactForm.controls.emailAddresses">
+                <div *ngIf="emailSelected">
+                    <mat-label
+                        class="mat-label"
+                        language="primary.portal.register.contactInfo.receiveTypeEmailField"
+                    ></mat-label>
+                    <mat-form-field class="w-400">
+                        <input
+                            formControlName="email"
+                            matInput
+                            type="text"
+                            [attr.aria-label]="languageStrings['primary.portal.register.contactInfo.receiveTypeEmailField']"
+                            [readonly]="isAflacReadOnly"
+                        />
+                        <mat-error
+                            *ngIf="!emailAddresses.controls.email.valid && emailAddresses.controls.email.touched && !emailAddresses.controls.email.errors?.required"
+                            language="secondary.portal.register.contactInfo.emailRequired"
+                        >
+                        </mat-error>
+                        <mat-error *ngIf="isFormSubmit && emailAddresses.controls.email.errors?.required">
+                            {{languageStrings['primary.portal.common.requiredField']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+
+        <mat-card-footer class="d-flex justify-content-between bg-gray-100">
+            <a href="javascript:void(0)" (click)="onBack()" class="mon-btn-link  mon-pt-10">
+                {{languageStrings['primary.portal.common.back']}}
+            </a>
+            <button type="submit" [disabled]="formInitInvalid" class="mon-btn-primary" mat-button mat-flat-button>
+                <span *ngIf="formInitInvalid;else notAflacAccount"
+                    >{{languageStrings[isAflacReadOnly ? 'primary.portal.common.finishRegistration' :
+                    (multipleAccountMode$ | async) ? 'primary.portal.common.confirm' :
+                    'primary.portal.common.next']}}</span
+                >
+                <ng-template #notAflacAccount>
+                    <span *ngIf="!hideDependentTab"> {{languageStrings['primary.portal.common.next']}}</span>
+                    <span *ngIf="hideDependentTab"
+                        >{{languageStrings['primary.portal.common.finishRegistration']}}</span
+                    >
+                </ng-template>
+            </button>
+        </mat-card-footer>
+    </mat-card>
+</form>

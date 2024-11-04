@@ -1,0 +1,136 @@
+<div
+    *ngIf="!showSpinner"
+    class="layout-header-2column"
+    [ngClass]="{'member-portal-layout-header' : isMemberPortal, 'tpi-app-flow' : isTpi && !tpiLnlMode}"
+>
+    <div class="back-to-shop" *ngIf="backToShope && inConfirmPage">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="routeToShop()">
+            <mon-icon iconSize="12" iconName="left" class="icon-left"> </mon-icon>
+            <span>{{languageStrings['primary.portal.applicationFlow.backToShop']}}</span>
+        </a>
+    </div>
+    <div class="back-to-shop" *ngIf="isSsoToShop && isTpi && tpiLnlMode && inConfirmPage">
+        <a href="javascript:void(0)" class="mon-btn-link" (click)="backToReview()">
+            <mon-icon iconSize="12" iconName="left" class="icon-left"> </mon-icon>
+            <span>{{languageStrings['primary.portal.tpi.appFlow.backToReview']}}</span>
+        </a>
+    </div>
+
+    <div class="header header-container" *ngIf="!isTpi">
+        <div *ngIf="!isDualPlanYear">
+            <h2 class="header-content">{{languageStrings['primary.portal.applicationFlow.applyCoverage']}}</h2>
+        </div>
+        <div *ngIf="isQleShop  && this.isQleDuringOeEnrollment">
+            <h2 class="header-content">
+                {{languageStrings['primary.portal.shop.dualPlanYear.lifeEventEnrollmentApply'].replace( "##planYearQLE##", this.qleYear)}}
+            </h2>
+        </div>
+        <div *ngIf="isOeShop && isQleDuringOeEnrollment">
+            <h2 class="header-content">
+                {{languageStrings['primary.portal.shop.dualPlanYear.openEnrollmentsApply'].replace( "##planYearOE##", this.oeYear )}}
+            </h2>
+        </div>
+        <div *ngIf="isOeShop && isQleAfterOeEnrollment">
+            <h2 class="header-content">
+                {{languageStrings['primary.portal.shop.dualPlanYear.lifeEventFutureEnrollmentApply'].replace( "##planYearQLE##", this.oeYear
+                )}}
+            </h2>
+        </div>
+
+        <div *ngIf="isQleShop && isQleAfterOeEnrollment">
+            <h2 class="header-content">
+                {{languageStrings['primary.portal.shop.dualPlanYear.lifeEventCurrentEnrollmentApply'].replace( "##planYearQLE##",
+                this.qleYear )}}
+            </h2>
+        </div>
+    </div>
+    <div *ngIf="tpiLnlMode" class="apply-coverage">{{languageStrings['primary.portal.tpiEnrollment.applyCoverage']}}</div>
+    <div [ngClass]="{'tpi-stepper dotted-border-bottom' : isTpi}" class="stepper-trigger-wrapper">
+        <button
+            matButton
+            class="stepperTrigger mon-btn-link"
+            id="stepperTrigger"
+            (click)="display = !display"
+            [ngClass]="{'arrow-up' : !display}"
+        >
+            <span class="selected-step-index"></span>
+            <span class="selected-step-label"></span>
+            <mon-icon class="icon-right" iconName="down" iconSize="10"></mon-icon>
+        </button>
+    </div>
+    <div class="columns">
+        <div
+            app-Overlaystepper="stepperTrigger"
+            stepperId="appFlowStepper"
+            class="sidenav-area"
+            [tpiLnlMode]="tpiLnlMode"
+            [ngClass]="{'shown': !display}"
+        >
+            <empowered-app-flow-sidenav
+                [applicationData]="applicationData"
+                [carrierIds]="carrierIds"
+                id="appFlowStepper"
+                (planChangeEvent)="onPlanChange($event)"
+            >
+            </empowered-app-flow-sidenav>
+        </div>
+        <div class="content-area">
+            <empowered-app-flow-main
+                *ngIf="actualStep === staticStep.NORMAL_STEP"
+                [planObject]="planObject"
+                [tpiSSODetails]="tpiSSODetails"
+            >
+            </empowered-app-flow-main>
+            <empowered-preliminary-statement
+                *ngIf="actualStep === staticStep.PRELIMINARY_STATEMENT"
+                [preliminaryStatementSections]="preliminaryStatementData"
+                [planObject]="planObject"
+                [cartIds]="cartIds"
+            ></empowered-preliminary-statement>
+            <empowered-signature-app
+                *ngIf="actualStep === staticStep.ONE_SIGNATURE"
+                [planObject]="planObject"
+                [showPreliminaryStatement]="showPreliminaryStatement"
+            >
+            </empowered-signature-app>
+
+            <div *ngIf="!isTpi" [ngClass]="{'tpi-app-flow-container': isPrPDAConfigEnabled}">
+                <ng-container *hasPermission="'core.member.create.form.pda'"
+                    ><empowered-pda-pr
+                        *ngIf="actualStep === staticStep.PDA && isPrPDAConfigEnabled"
+                        [tpiData]="data"
+                        [openAs]="PAGE"
+                        [flow]="APP_FLOW"
+                    ></empowered-pda-pr>
+                    <empowered-pda-form *ngIf="actualStep === staticStep.PDA && !isPrPDAConfigEnabled"> </empowered-pda-form>
+                </ng-container>
+            </div>
+
+            <div *ngIf="isTpi" [ngClass]="{'tpi-mode': isPrPDAConfigEnabled}">
+                <empowered-pda-pr
+                    *ngIf="actualStep === staticStep.PDA && isPrPDAConfigEnabled"
+                    [tpiData]="data"
+                    [openAs]="PAGE"
+                    [flow]="APP_FLOW"
+                ></empowered-pda-pr>
+                <empowered-pda-form *ngIf="actualStep === staticStep.PDA && !isPrPDAConfigEnabled"> </empowered-pda-form>
+            </div>
+            <empowered-ebs-payment *ngIf="actualStep === staticStep.EBS_PAYMENT" [ebsPaymentStatus]="false"></empowered-ebs-payment>
+            <empowered-payment *ngIf="actualStep === staticStep.AFLAC_ALWAYS" [reinstate]="isReinstate"></empowered-payment>
+            <empowered-direct-payment *ngIf="actualStep === staticStep.PAYMENT" [planId]="planId" [reinstate]="isReinstate">
+            </empowered-direct-payment>
+            <div *ngFor="let id of carrierIds">
+                <empowered-direct-payment
+                    *ngIf="actualStep === (staticStep.PAYMENT+'_'+id)"
+                    [planId]="planId"
+                    [reinstate]="isReinstate"
+                    [carrierId]="id"
+                >
+                </empowered-direct-payment>
+            </div>
+            <empowered-confirmation *ngIf="actualStep === staticStep.CONFIRMATION" [planObject]="planObject" [signRequest]="signRequest">
+            </empowered-confirmation>
+        </div>
+    </div>
+</div>
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>

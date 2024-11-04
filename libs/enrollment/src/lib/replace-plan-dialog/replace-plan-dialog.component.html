@@ -1,0 +1,29 @@
+<empowered-modal type="POPUP" size="LG">
+    <empowered-modal-header>
+        <span *ngIf="!data.isDualPlanYear">{{ languageStrings["primary.portal.shoppingCart.addReplace"] }}</span>
+        <span *ngIf="data.replacePlan">{{languageStrings['primary.portal.replacingPlan.previousSelection']}}</span>
+        <span *ngIf="data.planEdit">{{languageStrings['primary.portal.replacingPlan.planSettings']}}</span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <div *ngIf="!data.isDualPlanYear">
+            <button mat-flat-button class="mon-btn-primary" (click)="onReplace()">
+                {{languageStrings['primary.portal.common.replace']}}
+            </button>
+        </div>
+        <div *ngIf="data.isDualPlanYear">
+            <button mat-flat-button class="mon-btn-danger" (click)="onReplace()">
+                {{languageStrings['primary.portal.replacingPlan.addAndReplace']}}
+            </button>
+        </div>
+    </empowered-modal-footer>
+    <div class="content-area">
+        <p *ngIf="!data.isDualPlanYear">{{ "primary.portal.shoppingCart.replaceMessage" | replaceTag: { "#planname": data.planName } }}</p>
+        <p *ngIf="data.replacePlan">
+            {{ "primary.portal.replacingPlan.replacePreviousSelection" | replaceTag: { "##employeename##": this.employeeName,
+            "##productname##": this.productName } }}
+        </p>
+        <p *ngIf="data.planEdit">
+            {{ "primary.portal.replacingPlan.replacePlanSettings" | replaceTag: { "##employeename##": this.employeeName } }}
+        </p>
+    </div>
+</empowered-modal>

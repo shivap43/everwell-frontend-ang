@@ -1,0 +1,69 @@
+<h2 language="primary.portal.brandingColorForm.header"></h2>
+<p>{{ overview$ | async }}</p>
+
+<div class="container">
+    <div class="col-3">
+        <form [formGroup]="formatForm">
+            <mat-label language="primary.portal.brandingColorForm.labelColorFormat" #typeInputLabel></mat-label>
+            <mat-form-field>
+                <mat-select
+                    [disableOptionCentering]="true"
+                    formControlName="format"
+                    [attr.aria-label]="formatInputAriaLabel"
+                    aria-labelledby="typeInputLabel"
+                >
+                    <mat-option value="HEX" language="primary.portal.branding.format_input.hex_value"></mat-option>
+                    <mat-option value="RGB" language="primary.portal.branding.format_input.rgb_value"></mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </div>
+    <form [formGroup]="colorValueForm" class="branding_form-color_inputs" [ngClass]="{'IEBrowserMargin':isIE}">
+        <ng-container *ngIf="(format$ | async) === 'HEX'; else rgbSample">
+            <!--Hex Color input-->
+            <div class="col-3">
+                <mat-label language="primary.portal.brandingColorForm.labelColorCodeHex" #hexInputLabel></mat-label>
+                <empowered-hex-color-input formControlName="hexValue"> </empowered-hex-color-input>
+            </div>
+        </ng-container>
+        <ng-template #rgbSample>
+            <!--RGB Input-->
+            <div class="col-3 d-flex container">
+                <div class="col-4">
+                    <mat-label
+                        language="primary.portal.brandingColorForm.labelColorCodeR"
+                        [attr.aria-label]="rInputAriaLabel"
+                        #redValueInput
+                    ></mat-label>
+                    <mat-form-field class="rgbColor">
+                        <input matInput formControlName="rValue" aria-labelledby="redValueInput" />
+                    </mat-form-field>
+                </div>
+                <div class="col-4">
+                    <mat-label
+                        language="primary.portal.brandingColorForm.labelColorCodeG"
+                        [attr.aria-label]="gInputAriaLabel"
+                        #greenValueInput
+                    ></mat-label>
+                    <mat-form-field class="rgbColor">
+                        <input matInput formControlName="gValue" aria-labelledby="greenValueInput" />
+                    </mat-form-field>
+                </div>
+                <div class="col-4">
+                    <mat-label
+                        language="primary.portal.brandingColorForm.labelColorCodeB"
+                        [attr.aria-label]="bInputAriaLabel"
+                        #blueValueInput
+                    ></mat-label>
+                    <mat-form-field class="rgbColor">
+                        <input matInput formControlName="bValue" aria-labelledby="blueValueInput" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </ng-template>
+
+        <div aria-hidden="true" class="col-3 color-sample">
+            <div [ngStyle]="{'background-color': (sampleHex$ | async)}"></div>
+        </div>
+    </form>
+</div>

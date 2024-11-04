@@ -1,0 +1,29 @@
+@import "shared";
+
+.gray-toggle-background {
+    background: get("color.gray.200");
+    width: convert-unit(310px, "rem");
+    padding: convert-unit(10px, "rem") convert-unit(20px, "rem");
+    border: 1px solid get("color.gray.500");
+
+    .toggle-button-approve {
+        color: get("color.info.success");
+        &.mat-button-toggle-checked {
+            background: get("color.info.success");
+            color: get("color.white") !important;
+        }
+    }
+
+    .toggle-button-deny {
+        color: get("color.info.danger.500");
+
+        &.mat-button-toggle-checked {
+            background: get("color.info.danger.500");
+            color: get("color.white") !important;
+        }
+    }
+}
+
+.content-scroll {
+    height: calc(100vh - 220px);
+}

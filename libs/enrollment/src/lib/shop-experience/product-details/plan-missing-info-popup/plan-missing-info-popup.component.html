@@ -1,0 +1,90 @@
+<form [formGroup]="form">
+    <empowered-modal type="POPUP" size="LG">
+        <empowered-modal-header>
+            <h2 mat-dialog-title class="popup-header">
+                {{languageStrings["primary.portal.members.planMissing.header"]}}
+            </h2>
+            <p class="description">
+                {{languageStrings["primary.portal.members.planMissing.description"] | replaceTag: { "##planname##" :
+                data.productName } }}
+            </p>
+        </empowered-modal-header>
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings["primary.portal.members.planMissing.workStreetAddress"]}}
+            </mat-label>
+            <mat-form-field>
+                <input matInput formControlName="address1" type="text" />
+                <mat-error>
+                    <span
+                        *ngIf="form.controls.address1?.errors?.required"
+                        language="primary.portal.common.selectionRequired"
+                    >
+                    </span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-label class="mat-label">
+                {{languageStrings["primary.portal.members.planMissing.workStreetAddressOptional"]}}
+            </mat-label>
+            <mat-form-field>
+                <input matInput formControlName="address2" type="text" />
+                <mat-hint class="mat-hint"
+                    >{{languageStrings["primary.portal.members.planMissing.floorOrSuite"]}}</mat-hint
+                >
+            </mat-form-field>
+        </div>
+        <ng-container *ngIf="true">
+            <div class="d-md-flex">
+                <div class="field-wrapper-dropdown flex-item w-100 mon-mr-20">
+                    <mat-label class="mat-label" id="workStateLabel"
+                        >{{languageStrings["primary.portal.members.planMissing.workState"]}}</mat-label
+                    >
+                    <mat-form-field>
+                        <mat-select
+                            [placeholder]="languageStrings['primary.portal.common.select']"
+                            disableOptionCentering="true"
+                            formControlName="workState"
+                            aria-labelledby="workStateLabel"
+                        >
+                            <mat-option language="primary.portal.common.select" disabled></mat-option>
+                            <mat-option *ngFor="let state of employeeStates" [value]="state.abbreviation">
+                                {{state.abbreviation}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span
+                                *ngIf="form.controls.workState?.errors?.required"
+                                language="primary.portal.common.selectionRequired"
+                            >
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex-item w-100">
+                    <empowered-zip-code-input
+                        #zipInput
+                        [formControl]="form.controls.workZip"
+                        [stateControlValue]="stateControlValue$ | async"
+                        inputLabel="primary.portal.members.planMissing.workZip"
+                    >
+                        <mat-error
+                            *ngIf="form.controls.workZip?.errors?.required"
+                            language="secondary.portal.members.workValidationMsg.required"
+                        ></mat-error>
+                    </empowered-zip-code-input>
+                </div>
+            </div>
+        </ng-container>
+        <empowered-modal-footer>
+            <button class="mon-btn-primary" type="submit" mat-button (click)="onSubmit()">
+                {{languageStrings['primary.portal.common.save']}}
+            </button>
+        </empowered-modal-footer>
+    </empowered-modal>
+</form>
+<ng-template [ngIf]="showSpinner">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true"></empowered-mon-spinner>
+</ng-template>

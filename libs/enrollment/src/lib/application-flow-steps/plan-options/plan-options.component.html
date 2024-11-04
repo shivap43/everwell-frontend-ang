@@ -1,0 +1,190 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div id="coverageLevels">
+    <form [formGroup]="retainCurrentAmountForm" *ngIf="isRetainCurrentAmount && !isGhostRider">
+        <section class="section-container">
+            <div>
+                <p>{{languageStrings['primary.portal.applicationFlow.planOption.selectCurrentamount']}}</p>
+                <div class="response-block">
+                    <div class="response-type checkbox">
+                        <mat-checkbox
+                            formControlName="retainCurrentAmount"
+                            (change)="retainCurrentAmount($event.checked)"
+                            [disabled]="disableRetainCurrentAmount"
+                        >
+                            <span>{{languageStrings['primary.portal.applicationFlow.planOption.retainCurrentamount']}}</span>
+                        </mat-checkbox>
+                    </div>
+                    <div class="message-block">
+                        <mon-alert alertType="info" *ngIf="disableRetainCurrentAmount">
+                            <span>{{languageStrings['primary.portal.applicationFlow.planOption.retainCurrentAmountDisabled']}}</span>
+                        </mon-alert>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
+    <form [formGroup]="coverageLevelForm" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onSubmit()">
+        <section class="section-container">
+            <ng-container *ngFor="let step of steps ; let sectioncontainerindex=index;">
+                <div
+                    class="question-container"
+                    *ngIf="step.type === APPLICATION_STEPTYPE.PLAN_OPTIONS ||step.type === stepType.COVERAGELEVELCHOICE"
+                >
+                    <div class="question-block" id="coveragelevelchoicelbl{{sectioncontainerindex}}">
+                        <p *ngIf="step.coverageLevelLabel && !isGhostRider && !displayError">{{step.coverageLevelLabel}}</p>
+                        <p *ngIf="step.body" [innerHTML]="step.body"></p>
+                    </div>
+                    <div class="response-block" [hidden]="isGhostRider">
+                        <div class="response-type radio" [hidden]="enableEnrolledButton">
+                            <mat-radio-group
+                                (change)="updateBenefitAmountValues()"
+                                formControlName="coverageLevel"
+                                attr.aria-labelledby="coveragelevelchoicelbl{{sectioncontainerindex}}"
+                            >
+                                <mat-radio-button
+                                    *ngFor="let coverageLevelOption  of coverageLevelOptions"
+                                    [value]="coverageLevelOption.value"
+                                    [disabled]="coverageLevelOption.disable || disableSecondarySheRider"
+                                    attr.aria-labelledby="coveragelevelchoicelbl{{sectioncontainerindex}}"
+                                    [style.display]="coverageLevelOption.value && coverageLevelOption.viewValue == enrolled && isSingleCoverageLevel ? 'none': 'initial'"
+                                >
+                                    {{coverageLevelOption.viewValue}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <mat-error
+                                *ngIf="fieldErrorflag && coverageLevelForm.controls['coverageLevel'].invalid"
+                                language="primary.portal.common.requiredField"
+                            >
+                            </mat-error>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="question-container"
+                    *ngIf="(step.type === APPLICATION_STEPTYPE.PLAN_OPTIONS ||step.type === stepType.COVERAGELEVELCHOICE) && showBenefitAmount"
+                    [hidden]="isGhostRider || hideRiderBenefitAmount"
+                >
+                    <div class="question-block" id="benefitamountlbl{{sectioncontainerindex}}">
+                        <p *ngIf="step.benefitAmountLabel" [innerHtml]="step.benefitAmountLabel"></p>
+                    </div>
+                    <div class="response-block">
+                        <div class="response-type checkbox">
+                            <mat-form-field class="w-200">
+                                <mat-select
+                                    formControlName="coveragePrice"
+                                    disableOptionCentering="true"
+                                    aria-labelledby="benefitamountlbl{{sectioncontainerindex}}"
+                                    (selectionChange)="calculatePriceForDisplay()"
+                                >
+                                    <mat-option *ngFor="let price of benefitAmountOptions || priceOptions" [value]="price.value">
+                                        {{price.viewValue | currency }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error language="primary.portal.common.requiredField"> </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <!-- TODO: get static data from enum to compare tiltle/step -->
+                <div
+                    *ngIf="step.type === APPLICATION_STEPTYPE.TAX_STATUS"
+                    [hidden]="isGhostRider || coverageLevelForm?.controls['coverageLevel']?.value === declineCoverageLevelId "
+                >
+                    <div class="question-container">
+                        <!-- TODO: replace static content with language -->
+                        <div class="question-block" id="planOptionpreTax{{sectioncontainerindex}}">
+                            <p>{{languageStrings['primary.portal.applicationFlow.planOption.preTax']}}</p>
+                        </div>
+                        <div class="response-block">
+                            <div class="response-type radio">
+                                <mat-radio-group
+                                    formControlName="taxStatus"
+                                    attr.aria-labelledby="planOptionpreTax{{sectioncontainerindex}}"
+                                    [disabled]="taxStatusReadOnly"
+                                >
+                                    <mat-radio-button *ngFor="let taxOption  of taxOptions" [value]="taxOption.value">
+                                        {{taxOption.viewValue}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <mat-error
+                                    *ngIf="fieldErrorflag && coverageLevelForm.controls['taxStatus'].invalid"
+                                    language="primary.portal.common.requiredField"
+                                >
+                                </mat-error>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div
+                class="action-btns tpi-flow-border"
+                *ngIf="coverageLevelOptions.length"
+                [ngClass]="{'last-step': this.planObject.lastStep}"
+            >
+                <button
+                    button
+                    id="submitAppFlowForm"
+                    *ngIf="planObject.lastStep"
+                    class="mon-btn-primary submit-app-flow-form"
+                    type="submit"
+                    mat-flat-button
+                >
+                    <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.next']}}{{this.planObject.nextProduct}}
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextAflacAlways']}}
+                    </span>
+                    <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextBilling']}}
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextApplications']}}
+                    </span>
+                </button>
+                <button *ngIf="!planObject.lastStep" class="mon-btn-primary" type="submit" mat-flat-button>
+                    <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </section>
+    </form>
+</div>
+<div id="dependents">
+    <div *ngIf="dependentsAdditionRequired" class="dependents-section">
+        <mat-divider></mat-divider>
+        <section class="section-container">
+            <div class="section-header">
+                <h3>{{this.dependentsHeading | replaceTag : {"{dependenttype}":this.dependentsHeadingreplaceContent} }}</h3>
+            </div>
+
+            <div class="question-container">
+                <div class="question-block">{{dependentsMessage}}</div>
+            </div>
+            <div id="actionButtons" class="action-btns">
+                <button type="button" (click)="navigateToAddDependents()" class="btn-right mon-btn-primary" mat-flat-button>
+                    {{languageStrings['primary.portal.common.add']}} {{dependentsHeadingreplaceContent.toLowerCase()}}
+                </button>
+                <button
+                    *ngIf="!planObject.reinstate"
+                    type="button"
+                    (click)="scrollToCoverageLevel()"
+                    class="btn-right mon-btn-secondary mon-ml-20"
+                    mat-flat-button
+                >
+                    {{languageStrings['primary.portal.applicationFlow.planOption.changeCoverageLevel']}}
+                </button>
+            </div>
+        </section>
+    </div>
+</div>
+<div *ngIf="isNotProduction$|async">
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlow']}}</span>{{ this.planFlowId}}
+    <span>{{languageStrings['primary.portal.applicationFlow.debug.planFlowStep']}}</span>{{ this.planFlowStepId}}
+</div>

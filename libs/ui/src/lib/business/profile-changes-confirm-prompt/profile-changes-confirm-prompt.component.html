@@ -1,0 +1,20 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" fullScreen="false" *ngIf="false"> </empowered-mon-spinner>
+<empowered-modal type="POPUP" [showCancel]="true">
+    <empowered-modal-header>
+        <span language="primary.portal.confirm.applicant.profileMatch.profileUpdateInfo"></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-button class="mon-btn-primary" type="submit" (click)="onSubmit()">
+            <span language="primary.portal.common.confirm"></span>
+        </button>
+    </empowered-modal-footer>
+    <ng-container>
+        <span *ngIf="!isMMP" language="primary.portal.applicant.profileMatch.confirmMessage"></span>
+        <span *ngIf="isMMP" language="primary.portal.applicant.profileMatch.mmp.confirmMessage"></span>
+        <div>
+            <ul *ngFor="let control of data?.data">
+                <li>{{control}}</li>
+            </ul>
+        </div>
+    </ng-container>
+</empowered-modal>

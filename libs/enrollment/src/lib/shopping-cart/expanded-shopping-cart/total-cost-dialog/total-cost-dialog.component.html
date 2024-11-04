@@ -1,0 +1,56 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="false">
+    <empowered-modal-header
+        >{{"primary.portal.totalcost.newCost"| replaceTag: {"#payfreqlower": this.payFreqLower}
+        }}</empowered-modal-header
+    >
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" mat-raised-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>
+            {{languageStrings['primary.portal.totalcost.gotIt']}}
+        </button>
+    </empowered-modal-footer>
+    <div class="totalcost-container">
+        <div class="cart-total">
+            <div class="left-label">{{languageStrings['primary.portal.totalcost.cartTotal']}}</div>
+            <div class="right-value">
+                {{data.cartCost | currency}}<span>{{languageStrings['primary.portal.common.star']}}</span>
+            </div>
+        </div>
+        <div class="existing-coverage">
+            <div class="left-label">
+                {{languageStrings['primary.portal.totalcost.existingCoverage']}}
+                <span>
+                    <mon-icon
+                        iconName="Filled-info"
+                        iconSize="16"
+                        [richTooltip]="existingCoverageTooltip"
+                        matTooltipPosition="above"
+                        class="icon-primary"
+                    ></mon-icon>
+                </span>
+            </div>
+            <div class="right-value mon-pr-5">
+                <span>{{languageStrings['primary.portal.common.plus']}}</span>{{data.existingCost | currency}}
+            </div>
+        </div>
+        <div class="new-total">
+            <div class="total-label">
+                {{languageStrings['primary.portal.totalcost.newTotal']}}
+                <span>
+                    <mon-icon
+                        iconName="Filled-info"
+                        iconSize="16"
+                        [richTooltip]="totalCostTooltip"
+                        matTooltipPosition="above"
+                        class="icon-primary"
+                    ></mon-icon>
+                </span>
+            </div>
+            <div class="right-value mon-pr-5">
+                {{totalCost | currency}}<span class="pay-freq">{{payFreqLower}}</span>
+            </div>
+        </div>
+        <div class="instructions" *ngIf="data.isMember">
+            {{languageStrings['primary.portal.totalcost.duringEnrollment']}}
+        </div>
+    </div>
+</empowered-modal>

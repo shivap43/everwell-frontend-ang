@@ -1,0 +1,77 @@
+@import "shared";
+
+.bucket-plan-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: map-get($spacers, 30);
+
+    .bucket-plan-content {
+        padding-right: map-get($spacers, 20);
+        .bucket-plan-description {
+            font-size: convert-unit(16px, "rem");
+            margin-bottom: map-get($spacers, 20);
+        }
+
+        .plan-details {
+            font-size: convert-unit(16px, "rem");
+        }
+
+        .hsa-footer {
+            padding-top: convert-unit(83px, "rem");
+            font-size: convert-unit(12px, "rem");
+        }
+    }
+
+    .annual-contribution {
+        margin-bottom: map-get($spacers, 0);
+
+        span {
+            position: relative;
+            bottom: convert-unit(4px, "rem");
+        }
+    }
+
+    .range-contribution-hint {
+        line-height: convert-unit(14px, "rem");
+    }
+
+    .info-icon {
+        height: convert-unit(16px, "rem");
+        line-height: convert-unit(16px, "rem");
+        width: convert-unit(16px, "rem");
+        margin: 0 map-get($spacers, 15) 0 map-get($spacers, 5);
+        .infoicon {
+            margin: 0;
+        }
+    }
+
+    .pay-frequency {
+        display: flex;
+        flex-direction: column;
+        margin: map-get($spacers, 10) 0 map-get($spacers, 20) 0;
+        .amount {
+            @include fontFace("primary.bold");
+            font-size: convert-unit(18px, "rem");
+        }
+        .duration {
+            font-size: convert-unit(12px, "rem");
+        }
+    }
+
+    .bottom-wrapper {
+        padding-bottom: map-get($spacers, 30);
+        .bottom-button-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .d-flex {
+                > a {
+                    margin-top: map-get($spacers, 10);
+                    margin-right: map-get($spacers, 20);
+                }
+            }
+        }
+    }
+}

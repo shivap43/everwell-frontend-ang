@@ -1,0 +1,91 @@
+.select-state,
+.select-method,
+.select-job-class,
+.select-elimination-period,
+.select-rider,
+.select-benefit-amount {
+    border-radius: convert-unit(4px, "rem") !important;
+    border: convert-unit(1px, "rem") solid get("color.gray.600") !important;
+    position: absolute;
+    top: convert-unit(15px, "rem");
+    padding: convert-unit(20px, "rem") 0 0 convert-unit(20px, "rem");
+    overflow: hidden !important;
+}
+
+.select-state,
+.select-method,
+.select-job-class {
+    right: convert-unit(-15px, "rem");
+}
+
+.select-elimination-period,
+.select-rider,
+.select-benefit-amount {
+    right: convert-unit(-21px, "rem");
+}
+
+.select-state {
+    max-height: convert-unit(370px, "rem") !important;
+    width: convert-unit(253px, "rem");
+}
+
+.select-method {
+    width: convert-unit(290px, "rem");
+    max-width: initial !important;
+    overflow-y: scroll;
+}
+
+.select-job-class {
+    width: convert-unit(160px, "rem");
+    max-height: convert-unit(230px, "rem") !important;
+}
+
+.select-elimination-period {
+    width: convert-unit(166px, "rem");
+    max-height: convert-unit(230px, "rem") !important;
+}
+
+.select-rider {
+    max-height: convert-unit(263px, "rem") !important;
+    width: convert-unit(496px, "rem");
+    overflow-y: auto !important;
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    padding-right: 0;
+
+    .CustomCheckBox-Wrapper {
+        overflow: auto;
+        padding-left: convert-unit(20px, "rem");
+        padding-right: convert-unit(20px, "rem");
+    }
+}
+
+.select-benefit-amount {
+    width: convert-unit(155px, "rem");
+    // max-height: convert-unit(395px, "rem") !important;
+}
+
+.select-elimination-period,
+.select-rider,
+.select-benefit-amount {
+    margin-top: convert-unit(15px, "rem") !important;
+}
+
+.situs-group.mat-select-panel {
+    max-height: convert-unit(250px, "rem") !important;
+    width: convert-unit(330px, "rem");
+    max-width: inherit;
+    overflow-y: auto !important;
+    @include media-max("l") {
+        right: convert-unit(-178px, "rem");
+    }
+
+    .custom-radio {
+        max-height: initial;
+
+        .mon-alert {
+            margin: 0 map-get($spacers, 20) map-get($spacers, 20) 0;
+        }
+    }
+}

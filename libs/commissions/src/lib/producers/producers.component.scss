@@ -1,0 +1,80 @@
+@import "shared";
+.alert-wrapper {
+    margin-top: convert-unit(20px, "rem");
+    padding: 0 convert-unit(10px, "rem");
+}
+.producer-filter-wraper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    ::ng-deep .producer-wrapper {
+        width: convert-unit(200px, "rem");
+    }
+}
+
+.search-filter-wraper {
+    margin-bottom: 0px;
+
+    .filter-wrapper {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        padding-left: 0;
+
+        .prod-search-wrapper {
+            width: convert-unit(200px, "rem");
+        }
+
+        .mon-btn-secondary:focus {
+            ::ng-deep .cls-1 {
+                fill: get("color.primary.500") !important;
+            }
+        }
+    }
+}
+
+.prod-wrapper {
+    padding: 0px convert-unit(30px, "rem");
+
+    .mon-table-wraper {
+        td {
+            .mat-icon-button {
+                width: 16px;
+
+                .infoicon,
+                .icon-warning {
+                    margin: 0;
+                }
+            }
+
+            .cancel-invite {
+                color: get("color.primary.500");
+            }
+        }
+    }
+
+    h2 {
+        color: get("color.gray.700");
+        font-weight: normal;
+    }
+}
+
+::ng-deep .main-wrapper-div-tooltip-outer {
+    padding: convert-unit(3px, "rem");
+    display: flex;
+    flex-wrap: wrap;
+}
+::ng-deep .main-wrapper-div-tooltip-outer div {
+    padding: convert-unit(3px, "rem");
+    min-width: convert-unit(80px, "rem");
+}
+::ng-deep.main-wrapper-div-tooltip-outer-second .col-right {
+    margin-left: convert-unit(5px, "rem");
+}
+
+.paginator-wrapper {
+    .paginator-pages {
+        margin: map-get($spacers, 0) map-get($spacers, 5);
+    }
+}

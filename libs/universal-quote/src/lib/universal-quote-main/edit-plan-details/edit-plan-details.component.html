@@ -1,0 +1,91 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+
+<div class="info-modal" *ngIf="planSelection.type === edit">
+    <div class="modal-header">
+        <button mat-icon-button mat-dialog-close [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content class="flex-form-wrapper">
+        <h1 mat-dialog-title><span>{{languageStrings['primary.portal.quickQuote.editOrder']}}</span></h1>
+        <div cdkDropList class="plan-list" (cdkDropListDropped)="onDrop($event)">
+            <div class="plan-box" *ngFor="let plan of plans.planSelection" cdkDrag>
+                <div class="plan-custom-placeholder" *cdkDragPlaceholder></div>
+                <mon-icon class="icon-black" iconName="arrow-cross" [iconSize]="15"></mon-icon>
+                <div class="plan-text">{{plan.name}}</div>
+            </div>
+        </div>
+    </div>
+
+    <mat-dialog-actions class="dialog-footer">
+        <a
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            aria-label="Cancel adding note"
+            language="primary.portal.common.cancel"
+            (click)="closeDialog()"
+        ></a>
+        <button
+            mat-flat-button
+            class="mon-btn-primary"
+            type="button"
+            aria-label="Save note"
+            language="primary.portal.common.save"
+            (click)="updatePlanOrder()"
+        ></button>
+    </mat-dialog-actions>
+</div>
+
+<empowered-modal size="SM" type="POPUP" *ngIf="planSelection.type === emailType">
+    <empowered-modal-header>
+        <h2 mat-dialog-title>
+            <span>{{languageStrings['primary.portal.quickQuote.sendQuote']}} "{{planSelection.quoteTitle}}"</span>
+        </h2>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-flat-button class="mon-btn-primary" (click)="onSubmit(emailForm)">
+            {{languageStrings['primary.portal.createQuote.send']}}
+        </button>
+    </empowered-modal-footer>
+
+    <form [formGroup]="emailForm">
+        <div class="flex-form-wrapper">
+            <div>
+                <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.email']}}</mat-label>
+                <mat-form-field class="w-200">
+                    <input
+                        formControlName="emailName"
+                        type="text"
+                        matInput
+                        (blur)="updateEmail()"
+                        [attr.aria-label]="languageStrings['primary.portal.quickQuote.email']"
+                    />
+                    <mat-error>
+                        <span *ngIf="emailForm.controls['emailName'].hasError('required')">
+                            {{languageStrings['primary.portal.common.requiredField']}}</span
+                        >
+                        <span *ngIf="emailForm.controls['emailName'].hasError('pattern')">
+                            {{languageStrings['primary.portal.editPlanDetails.validEmailError']}}</span
+                        >
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-label class="mat-label" id="notesOptional"
+                    ><span>{{languageStrings['primary.portal.createQuote.notes']}}</span>
+                    <span class="optional-text">{{languageStrings['primary.portal.common.optional']}}</span></mat-label
+                >
+                <mat-form-field>
+                    <textarea
+                        formControlName="note"
+                        matInput
+                        (blur)="sendNote()"
+                        aria-labelledby="notesOptional"
+                    ></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+</empowered-modal>

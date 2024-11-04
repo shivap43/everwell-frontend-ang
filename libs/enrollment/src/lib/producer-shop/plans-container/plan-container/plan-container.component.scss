@@ -1,0 +1,149 @@
+@import "shared";
+
+$component: ".eb-plan";
+
+#{$component} {
+    ::ng-deep .mat-expansion-panel {
+        padding: 0;
+
+        &-body {
+            padding: 0;
+        }
+        &-header {
+            display: flex;
+            align-items: flex-start;
+            font-size: convert-unit(16px, "rem");
+            min-height: map-get($spacers, 50);
+            padding: map-get($spacers, 15) map-get($spacers, 15) map-get($spacers, 15) map-get($spacers, 30);
+            min-height: convert-unit(52px, "rem");
+            height: auto !important;
+
+            //Styles for disabled plans
+            &[aria-disabled="true"] {
+                color: get("color.black");
+                background-color: get("color.gray.100");
+
+                // for the mat-expansion indicator to displayed when it is disabled
+                .mat-expansion-indicator:disabled {
+                    position: absolute;
+                    right: convert-unit(55px, "rem");
+                }
+
+                .mat-content {
+                    .mat-expansion-panel-header-title {
+                        color: get("color.gray.700");
+                    }
+
+                    .tax-title {
+                        color: get("color.gray.700");
+                    }
+                }
+            }
+
+            .mat-content {
+                justify-content: space-between;
+            }
+
+            .mat-expansion-indicator {
+                position: absolute;
+                left: map-get($spacers, 15);
+                top: convert-unit(22px, "rem");
+                display: flex;
+            }
+
+            .mat-expansion-indicator::after {
+                margin-top: convert-unit(-2px, "rem");
+            }
+
+            .plan-response-update {
+                margin-left: map-get($spacers, 20);
+            }
+        }
+
+        &-header-description {
+            width: auto;
+            justify-content: flex-end;
+
+            .cart-status {
+                white-space: nowrap;
+                .mon-icon {
+                    margin: 0;
+                    padding: 0;
+                    height: map-get($spacers, 20);
+                    .mat-icon.mat-primary {
+                        vertical-align: text-bottom;
+                    }
+                }
+            }
+        }
+
+        &-header-description,
+        &-header-title {
+            display: flex;
+            align-items: flex-start;
+            color: get("color.black");
+            padding-left: map-get($spacers, 10);
+            width: auto;
+            > div {
+                width: auto;
+            }
+        }
+
+        &.mat-expanded {
+            border-left: convert-unit(1px, "rem") solid get("color.gray.500");
+            border-right: convert-unit(1px, "rem") solid get("color.gray.500");
+
+            .mat-expansion-panel {
+                &-header {
+                    border-bottom: convert-unit(1px, "rem") solid get("color.gray.500") !important;
+
+                    &-title {
+                        @include fontFace("primary.bold");
+                    }
+                }
+            }
+        }
+        .tax-title {
+            color: get("color.black");
+            white-space: nowrap;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            margin-left: map-get($spacers, 40);
+        }
+
+        .application-status {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            white-space: nowrap;
+
+            .icon-primary {
+                display: flex;
+                margin: 0 map-get($spacers, 5) 0 0;
+                height: map-get($spacers, 20);
+            }
+        }
+
+        .plan-ineligible-text {
+            margin-right: map-get($spacers, 5);
+        }
+
+        .mon-icon-button {
+            height: convert-unit(16px, "rem");
+            width: convert-unit(16px, "rem");
+            // TODO [Design]: line height should be 16px and have added padding to have proper alignment for mon-icon
+            line-height: map-get($spacers, 25);
+
+            .mat-button-wrapper {
+                .mon-icon {
+                    margin: 0;
+                }
+            }
+        }
+
+        .cart-icon {
+            display: flex;
+        }
+    }
+}

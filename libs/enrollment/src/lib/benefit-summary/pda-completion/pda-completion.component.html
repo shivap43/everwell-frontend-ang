@@ -1,0 +1,47 @@
+<empowered-modal type="POPUP">
+    <empowered-modal-header>
+        <h2>{{languageStrings['primary.portal.coverage.selectPDATitle']}}</h2>
+    </empowered-modal-header>
+
+    <form [formGroup]="pdaForm">
+        <div role="heading" class="mon-mt-0 mon-mb-20">{{languageStrings['primary.portal.coverage.pdaSelectionType']}}</div>
+        <mat-radio-group formControlName="enrollmentMethod" (change)="onClickEnrollmentMethod($event)">
+            <mat-radio-button
+                class="primary-radio"
+                [value]="enrollmentMethodType.FACE_TO_FACE"
+                [checked]="true"
+                *ngIf="!isTpi || enrollMethods.includes(enrollmentMethodType.FACE_TO_FACE)"
+            >
+                <span>{{languageStrings['primary.portal.coverage.pdaSelectionType.faceToFace']}}</span>
+            </mat-radio-button>
+            <mat-radio-button
+                class="primary-radio"
+                [value]="enrollmentMethodType.HEADSET"
+                *ngIf="!isTpi || enrollMethods.includes(enrollmentMethodType.HEADSET)"
+            >
+                <span>{{languageStrings['primary.portal.coverage.pdaSelectionType.headset']}}</span>
+            </mat-radio-button>
+            <mat-radio-button
+                class="primary-radio"
+                [value]="enrollmentMethodType.CALL_CENTER"
+                *ngIf="!isTpi || enrollMethods.includes(enrollmentMethodType.PIN_SIGNATURE) || enrollMethods.includes(enrollmentMethodType.CALL_CENTER)"
+            >
+                <span>{{languageStrings['primary.portal.coverage.pdaSelectionType.pinSignature']}}</span>
+            </mat-radio-button>
+            <mat-radio-button
+                class="primary-radio"
+                [value]="enrollmentMethodType.VIRTUAL_FACE_TO_FACE"
+                *ngIf="!isTpi || enrollMethods.includes(enrollmentMethodType.VIRTUAL_FACE_TO_FACE)"
+            >
+                <span>{{languageStrings['primary.portal.coverage.pdaSelectionType.virtualF2f']}}</span>
+            </mat-radio-button>
+        </mat-radio-group>
+    </form>
+
+    <empowered-modal-footer>
+        <button class="mon-btn-primary" mat-flat-button (click)="nextToPDACompletion()">
+            <span>{{languageStrings['primary.portal.common.next']}}</span>
+            <mon-icon class="icon-right" iconSize="12" iconName="right"></mon-icon>
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

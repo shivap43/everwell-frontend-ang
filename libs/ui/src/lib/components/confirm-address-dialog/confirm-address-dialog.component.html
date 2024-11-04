@@ -1,0 +1,197 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="info-modal" *ngIf="address">
+    <div class="modal-header">
+        <button mat-icon-button (click)="onCancel()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <form [formGroup]="addressForm" (ngSubmit)="checkMethodAndSubmit()">
+        <div mat-dialog-content>
+            <h2 mat-dialog-title>{{confirmAddressHeader}}</h2>
+            <p
+                class="confirm-message"
+                *ngIf="hasCifNumber && isStandaloneDemographicEnabled"
+                language="primary.portal.tpiEnrollment.addressChangeConfirmation"
+            ></p>
+            <mon-alert alertType="danger" *ngIf="addressForm.controls.email.errors?.emailConsentSent">
+                {{languageStrings['primary.portal.callCenter.applicantStatementValidation']}}
+            </mon-alert>
+            <div class="address-fields">
+                <div class="address">
+                    <mat-label class="mat-label" language="primary.portal.callCenter.streetAddress1"></mat-label>
+                    <mat-form-field>
+                        <input matInput formControlName="street1Control" (change)="setChecker()" />
+                        <mat-error *ngIf="showError && addressForm.controls['street1Control'].hasError('required')">
+                            {{languageStrings['primary.portal.callCenter.selectionRequired']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="address">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.callCenter.streetAddress2']}}<span class="optional-text"
+                            >{{languageStrings['primary.portal.common.optional']}}</span
+                        ></mat-label
+                    >
+
+                    <mat-form-field>
+                        <input matInput formControlName="street2Control" (change)="setChecker()" />
+                        <mat-hint>{{languageStrings['primary.portal.callCenter.aptUnit']}}</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="city-details">
+                <div class="city">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.callCenter.city']}}</mat-label>
+                    <mat-form-field>
+                        <input matInput formControlName="cityControl" (change)="setChecker()" />
+                        <mat-error *ngIf="showError && addressForm.controls['cityControl'].hasError('required')">
+                            {{languageStrings['primary.portal.callCenter.selectionRequired']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.controls['cityControl'].hasError('pattern')">
+                            {{languageStrings['primary.portal.common.city.patternError']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="state">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.callCenter.state']}}</mat-label>
+                    <mat-form-field>
+                        <mat-select formControlName="stateControl" (selectionChange)="employeeZipFlag = true; checkZipCode(zip.value)">
+                            <ng-container *ngIf="states$">
+                                <mat-option *ngFor="let state of states$ | async" [value]="state.abbreviation">
+                                    {{state.abbreviation}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-select>
+                        <mat-error *ngIf="showError && addressForm.controls['stateControl'].hasError('required')">
+                            {{languageStrings['primary.portal.callCenter.selectionRequired']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <span class="zip-code">
+                    <mat-label class="mat-label">{{languageStrings['primary.portal.callCenter.zipCode']}}</mat-label>
+                    <mat-form-field class="mon-mb-0">
+                        <input
+                            matInput
+                            formControlName="zipControl"
+                            maxlength="10"
+                            (blur)="checkZipCode($event.target.value)"
+                            #zip
+                            empoweredZipCodeFormat
+                            (change)="setChecker()"
+                        />
+                        <mat-error *ngIf="showError && addressForm.controls['zipControl'].hasError('required')">
+                            {{languageStrings['primary.portal.callCenter.selectionRequired']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.controls['zipControl'].hasError('zipMismatch')">
+                            {{languageStrings['primary.portal.census.manualEntry.zipErrorMsg']}}
+                        </mat-error>
+                    </mat-form-field>
+                    <p *ngIf="(showError && addressForm.controls['zipControl'].hasError('pattern')) || zipMismatchError">
+                        <mat-error>{{languageStrings['primary.portal.tpiConfirmAddress.invalidZip']}} </mat-error>
+                    </p>
+                </span>
+            </div>
+
+            <div
+                class="email-optional"
+                *ngIf="data.method === enrollmentMethodEnum.CALL_CENTER || data.method === enrollmentMethodEnum.PIN_SIGNATURE || (!data.method && currentEnrollmentData && (currentEnrollmentData.enrollmentMethod === enrollmentMethodEnum.CALL_CENTER || currentEnrollmentData.enrollmentMethod === enrollmentMethodEnum.PIN_SIGNATURE))"
+            >
+                <div class="email-block">
+                    <mat-label class="mat-label"
+                        >{{languageStrings['primary.portal.callCenter.emailStatement']}}
+                        <span *ngIf="hasConsent && !consentSent" class="optional-text"
+                            >{{languageStrings['primary.portal.common.optional']}}</span
+                        >
+                    </mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            type="text"
+                            formControlName="email"
+                            [disabled]="true"
+                            [attr.aria-label]="languageStrings['primary.portal.callCenter.emailStatement']"
+                        />
+                        <mat-hint>{{languageStrings['primary.portal.callCenter.applicantEmailAddress']}}</mat-hint>
+                        <mat-error
+                            *ngIf="addressForm.controls['email'].hasError('required') || addressForm.controls['email'].hasError('email')"
+                        >
+                            {{languageStrings['primary.portal.callCenter.invalidEmail']}}
+                        </mat-error>
+                        <mat-error *ngIf="addressForm.controls[EMAIL].hasError(EMAIL_CONSENT_SENT)">
+                            {{languageStrings['primary.portal.callCenter.applicantStatementValidation']}}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <button
+                    type="button"
+                    *ngIf="!consentSent"
+                    mat-flat-button
+                    class="mon-btn-secondary"
+                    color="primary"
+                    [disabled]="hasConsent"
+                    [attr.aria-label]="languageStrings['primary.portal.admin.send']"
+                    (click)="sendConsent()"
+                >
+                    <span>{{ languageStrings["primary.portal.admin.send"]}}</span>
+                </button>
+                <button
+                    *ngIf="consentSent"
+                    type="button"
+                    mat-flat-button
+                    class="mon-btn-success"
+                    [attr.aria-label]="languageStrings['primary.portal.coverage.sent']"
+                >
+                    <mon-icon class="tick-icon" iconName="check" [iconSize]="12"></mon-icon>
+                    <span>{{ languageStrings["primary.portal.coverage.sent"]}}</span>
+                </button>
+            </div>
+
+            <p class="email-consent" *ngIf="invalidEmail && !hasConsent" language="primary.portal.callCenter.emailConsent"></p>
+            <ng-container *configEnabled="VIRTUAL_FACE_TO_FACE_ENABLED">
+                <mon-alert *ngIf="isVirtualF2FInfoDisplay" alertType="info">
+                    <span language="primary.portal.enrollmentMethod.virtualFaceToFace"></span>
+                </mon-alert>
+                <mon-alert *ngIf="showWebexWarning" alertType="danger">
+                    <span language="primary.portal.enrollmentMethod.virtualFaceToFace.webexText"></span>
+                    <a target="_blank" [href]="webexMeetingLink"
+                        >{{languageStrings['primary.portal.enrollmentMethod.virtualFaceToFace.webexLink']}}</a
+                    >
+                </mon-alert>
+            </ng-container>
+            <div
+                class="acknowledge-txt"
+                *ngIf="data.method === enrollmentMethodEnum.HEADSET || (!data.method &&  currentEnrollmentData && currentEnrollmentData.enrollmentMethod === enrollmentMethodEnum.HEADSET)"
+            >
+                <mat-checkbox formControlName="acknowledgeControl">
+                    {{languageStrings['primary.portal.callCenter.acknowledge']}}
+                </mat-checkbox>
+                <mat-error *ngIf="showError && addressForm.controls['acknowledgeControl'].invalid">
+                    {{languageStrings['primary.portal.callCenter.consentstatement']}}
+                </mat-error>
+            </div>
+            <div
+                class="acknowledge-txt"
+                *ngIf="data.method === enrollmentMethodEnum.CALL_CENTER || data.method === enrollmentMethodEnum.PIN_SIGNATURE || (!data.method && currentEnrollmentData && (currentEnrollmentData.enrollmentMethod === enrollmentMethodEnum.CALL_CENTER || currentEnrollmentData.enrollmentMethod === enrollmentMethodEnum.PIN_SIGNATURE))"
+            >
+                <mat-checkbox formControlName="acknowledgeControl">
+                    {{languageStrings['primary.portal.enrollment.acknowledgement']}}
+                </mat-checkbox>
+                <mat-error *ngIf="showError && addressForm.controls['acknowledgeControl'].invalid">
+                    {{languageStrings['primary.portal.callCenter.consentstatement']}}
+                </mat-error>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a
+                href="javascript:void(0)"
+                class="mon-btn-link"
+                (click)="onCancel()"
+                aria-label="Cancel"
+                language="primary.portal.common.cancel"
+            ></a>
+            <button type="submit" mat-flat-button class="mon-btn-primary" language="primary.portal.callCenter.confirm"></button>
+        </mat-dialog-actions>
+    </form>
+</div>

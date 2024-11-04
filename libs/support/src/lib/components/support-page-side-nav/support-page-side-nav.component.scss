@@ -1,0 +1,48 @@
+@import "shared";
+.unplugged-wrapper {
+    .content-header {
+        margin: 0;
+        padding: map-get($spacers, 15) map-get($spacers, 30) map-get($spacers, 15);
+        font-size: convert-unit(28px, "rem");
+        @include fontFace("primary.regular");
+        border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+        background-color: get("color.gray.100");
+        color: get("color.gray.1000");
+    }
+
+    .flex-grid {
+        display: flex;
+        padding: map-get($spacers, 50) map-get($spacers, 30) 0;
+        margin-top: -29px;
+        .leftmenu-txt {
+            @include fontFace("primary.bold");
+            font-size: convert-unit(16px, "rem");
+            margin: map-get($spacers, 40) map-get($spacers, 40) 0 0;
+        }
+        .right-content {
+            flex: 1;
+            .softdoc {
+                font-size: convert-unit(28px, "rem");
+                padding-bottom: map-get($spacers, 20);
+                border-bottom: convert-unit(1px, "rem") solid get("color.gray.700");
+            }
+            .everwell {
+                font-size: convert-unit(28px, "rem");
+                padding: map-get($spacers, 30) 0 map-get($spacers, 20) 0;
+            }
+            .mon-btn-primary {
+                margin-top: map-get($spacers, 15);
+            }
+        }
+    }
+
+    .unplugged-leftnav {
+        margin-top: map-get($spacers, 50) !important;
+    }
+}
+.sid-nav-menu {
+    color: get("color.black");
+}
+.router-link-active {
+    @include fontFace("primary.bold");
+}

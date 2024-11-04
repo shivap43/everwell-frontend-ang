@@ -1,0 +1,35 @@
+@import "shared";
+
+.lnl-footer {
+    background-color: get("color.gray.800");
+    font-size: convert-unit(12px, "rem");
+    color: get("color.white");
+    display: flex;
+    padding: map-get($spacers, 20);
+    justify-content: space-between;
+    @include fontFace("primary.regular");
+
+    a {
+        color: get("color.white");
+        @include fontFace("primary.regular");
+    }
+
+    .content-left {
+        max-width: convert-unit(220px, "rem");
+
+        p {
+            line-height: convert-unit(16px, "rem");
+            margin-bottom: convert-unit(8px, "rem");
+        }
+    }
+
+    .content-right {
+        display: flex;
+        flex-basis: 65%;
+
+        p {
+            line-height: convert-unit(16px, "rem");
+            margin: map-get($spacers, 0);
+        }
+    }
+}

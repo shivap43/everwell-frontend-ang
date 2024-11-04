@@ -1,0 +1,68 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div
+    empoweredPermissions
+    permissions="[core.account.create.account,aflac.account.create]"
+    (perdirEmit)="checkuserPermissions($event)"
+></div>
+<button
+    *ngIf="canAddAccount && haveAccounts && !isCallCenterAgent && !isHybridUser"
+    (click)="addAccount()"
+    class="mon-btn-secondary btn-sm"
+    mat-button
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+</button>
+<button
+    *ngIf="canAddAccount && !haveAccounts && !isCallCenterAgent && !isHybridUser"
+    (click)="addAccount()"
+    class="mon-btn-primary"
+    mat-button
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+</button>
+<button
+    *ngIf="canImportAccount && (portal$|async) === 'producer' && haveAccounts && (!isCallCenterAgent||(isCallCenterAgent && isAgImport && isAGAllowed)) && !isHybridUser"
+    (click)="isAgImport?importAgAccount(): importAccount()"
+    class="mon-btn-secondary btn-sm"
+    mat-button
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+</button>
+<button
+    *ngIf="canImportAccount && (portal$|async) === 'producer' && !haveAccounts && (!isCallCenterAgent||(isCallCenterAgent && isAgImport && isAGAllowed)) && !isHybridUser"
+    (click)="isAgImport? importAgAccount(): importAccount()"
+    class="mon-btn-primary"
+    mat-button
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+</button>
+<button
+    *ngIf="isCallCenterAgent && (!isAgImport || !isAGAllowed) && !isHybridUser"
+    (click)="callCenterAddAccount()"
+    class="mon-btn-primary"
+    mat-button
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+</button>
+<button
+    class="primaryNav-link mon-btn-pulldown-wrapper"
+    [matMenuTriggerFor]="menu"
+    routerLinkActive="primaryNav-link--active"
+    class="mon-btn-secondary btn-sm pull-down-sm mat-flat-button"
+    mat-button
+    *ngIf="isHybridUser && !isCallCenterAgent"
+    [attr.aria-label]="languageStrings['primary.portal.accounts.addAccount']"
+>
+    {{languageStrings['primary.portal.accounts.addAccount']}}
+    <mat-icon class="mon-btn-pulldown-indicator" svgIcon="arrowDown" aria-hidden="true"></mat-icon>
+</button>
+<mat-menu #menu="matMenu" xPosition="before">
+    <div *ngFor="let item of menuItems; let i = index">
+        <a mat-menu-item (click)="decider(i)"> {{item}} </a>
+    </div>
+</mat-menu>

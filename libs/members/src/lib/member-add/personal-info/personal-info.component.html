@@ -1,0 +1,1152 @@
+<div>
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+    <mon-alert alertType="danger" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <form
+        (ngSubmit)="onSubmit(regiForm.getRawValue(),regiForm.valid)"
+        (keydown.enter)="$event.preventDefault()"
+        novalidate
+        [formGroup]="regiForm"
+    >
+        <fieldset>
+            <legend class="sr-only">{{langStrings['primary.portal.members.personalLabel.personInfo']}}</legend>
+            <div class="flex-form-wrapper">
+                <h2>{{langStrings['primary.portal.members.personalLabel.personInfo']}}</h2>
+
+                <div class="flex-form-item">
+                    <div formGroupName="name">
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="hideFieldElementSetting.firstName">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.firstName']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('firstName'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="firstName"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="readOnlyFieldElementSetting.firstName"
+                                            [attr.aria-label]="langStrings['primary.portal.members.personalLabel.firstName']"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('firstName').hasError('required')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('firstName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(regiForm.get('name').get('firstName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.firstNameMsg1'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('firstName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(regiForm.get('name').get('firstName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.firstNameMsg2'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.middleName">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.middleName']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('middleName'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="middleName"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="readOnlyFieldElementSetting.middleName"
+                                            attr.aria-label="{{langStrings['primary.portal.members.personalLabel.middleName']}} {{langStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('middleName').hasError('required')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error *ngIf="regiForm.controls.name.get('middleName').errors?.pattern as error">
+                                            <span
+                                                *ngIf="!nameWithHypenApostrophesValidation.test(error.actualValue); else hasHyphensApostrophes"
+                                                [language]="'secondary.portal.members.personalValidationMsg.middleName'"
+                                            >
+                                            </span>
+                                            <ng-template #hasHyphensApostrophes>
+                                                <span [language]="'secondary.portal.members.personalValidationMsg.lastNameMsg2'"> </span>
+                                            </ng-template>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.lastName">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.lastName']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('lastName'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="lastName"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="readOnlyFieldElementSetting.lastName"
+                                            attr.aria-label="{{langStrings['primary.portal.members.personalLabel.lastName']}} {{langStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('lastName').hasError('required')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('lastName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(regiForm.get('name').get('lastName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.lastNameMsg1'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('lastName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(regiForm.get('name').get('lastName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.lastNameMsg2'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.suffix">
+                                <div class="flex-item w-100">
+                                    <mat-label class="mat-label" id="memberSuffix">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.suffix']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('suffix'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        ></mat-label
+                                    >
+                                    <mat-form-field>
+                                        <mat-select
+                                            class="mon-input"
+                                            formControlName="suffix"
+                                            [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                            panelClass="select-drop-mini"
+                                            aria-label="memberSuffix"
+                                            [disabled]="readOnlyFieldElementSetting.suffix || disableFormFields"
+                                        >
+                                            <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                            <mat-option *ngFor="let item of suffixes" value="{{item}}" title="{{item}}">
+                                                {{item}}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('suffix').hasError('required')"
+                                            [language]="'secondary.portal.members.selectionRequired'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="d-md-flex flex-wrap">
+                            <ng-container *ngIf="hideFieldElementSetting.maidenName">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.maidenName']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('maidenName'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        >
+                                    </mat-label>
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="maidenName"
+                                            type="text"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="readOnlyFieldElementSetting.maidenName"
+                                            attr.aria-label="{{langStrings['primary.portal.members.personalLabel.maidenName']}} {{langStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('maidenName').hasError('required')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('maidenName').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(regiForm.get('name').get('maidenName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.maidenNameMsg1'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('maidenName').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(regiForm.get('name').get('maidenName').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.maidenNameMsg2'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="hideFieldElementSetting.nickname">
+                                <div class="flex-item">
+                                    <mat-label class="mat-label">
+                                        <span>{{langStrings['primary.portal.members.personalLabel.nickName']}}</span>
+                                        <span *ngIf="!(requiredFields && isRequiredField('nickName'))" class="optional-text"
+                                            >{{langStrings['primary.portal.common.optional']}}</span
+                                        ></mat-label
+                                    >
+                                    <mat-form-field>
+                                        <input
+                                            formControlName="nickname"
+                                            type="text"
+                                            class="mon-input"
+                                            matInput
+                                            [readonly]="readOnlyFieldElementSetting.nickname"
+                                            attr.aria-label="{{langStrings['primary.portal.members.personalLabel.nickName']}} {{langStrings['primary.portal.common.optional']}}"
+                                            (input)="isFormValueChange = true"
+                                        />
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('nickname').hasError('required')"
+                                            [language]="'secondary.portal.members.requiredField'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('nickname').hasError('pattern') && ! nameWithHypenApostrophesValidation.test(regiForm.get('name').get('nickname').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.nickNameMsg1'"
+                                        >
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="regiForm.get('name').get('nickname').hasError('pattern') &&  nameWithHypenApostrophesValidation.test(regiForm.get('name').get('nickname').value)"
+                                            [language]="'secondary.portal.members.personalValidationMsg.nickNameMsg2'"
+                                        >
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="userIsProducerAdmin">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.username']}}</span>
+                                    <span *ngIf="!regiForm.controls?.username?.validator({})?.required" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="username"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.username"
+                                        [attr.aria-label]="langStrings['primary.portal.members.personalLabel.username']"
+                                        (input)="isFormValueChange = true"
+                                        [maxlength]="USERNAME_MAX_LENGTH"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.controls?.username?.errors?.required"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error *ngIf="regiForm.controls?.username?.errors?.minlength">
+                                        <span class="sr-only">Error: </span>
+                                        {{langStrings['primary.portal.formPageQuestion.genericMinLengthValidation'].replace("#genericMinLen",
+                                        USERNAME_MIN_LENGTH) }}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.controls?.username?.errors?.pattern"
+                                        [language]="'secondary.portal.members.personalValidationMsg.usernamePattern'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.controls?.username?.errors?.apiError"
+                                        [language]="regiForm.controls.username.errors.apiError"
+                                    ></mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="flex-form-item">
+                    <ng-container *ngIf="hideFieldElementSetting.isPrimaryAddress">
+                        <div class="d-md-flex mon-mb-20">
+                            <mat-checkbox formControlName="isPrimaryAddress" (change)="checkCorrespondenceLocation($event)">
+                                <ng-container *ngIf="userIsProducerAdmin">
+                                    <span *ngIf="!isDirect">{{langStrings['primary.portal.members.workLabel.primaryAddressCheck']}}</span>
+                                    <span *ngIf="isDirect">{{langStrings['primary.portal.members.workLabel.customerPrimaryAddress']}}</span>
+                                </ng-container>
+                                <span *ngIf="!userIsProducerAdmin"
+                                    >{{langStrings['primary.portal.members.personalLabel.myPrimaryAddress']}}</span
+                                >
+                            </mat-checkbox>
+                        </div>
+                    </ng-container>
+                    <div formGroupName="address" class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.address1">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.streetAddress1']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('address1'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="address1"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.address1"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.streetAddress1']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address1').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address1').hasError('maxlength')"
+                                        [language]="'primary.portal.members.personalValidationMsg.maxlength100'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address1').hasError('pattern')"
+                                        [language]="'primary.portal.members.personalValidationMsg.streetAddress1'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.address2">
+                            <div class="flex-item w-250">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.streetAddress2']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('address2'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <input
+                                        formControlName="address2"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.address2"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.streetAddress2']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-hint>{{langStrings['primary.portal.members.personalLabel.AptOrUnit']}}</mat-hint>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address2').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address2').hasError('maxlength')"
+                                        [language]="'primary.portal.members.personalValidationMsg.maxlength100'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('address2').hasError('pattern')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.streetAddress2'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div formGroupName="address" class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.city">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.city']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('city'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="city"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.city"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.city']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('city').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('city').hasError('maxlength')"
+                                        [language]="'primary.portal.members.personalValidationMsg.maxlength100'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('city').hasError('pattern')"
+                                        [language]="'primary.portal.common.city.patternError'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.state">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label" id="memberState">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.state']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('state'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        (openedChange)="fetchCounty()"
+                                        class="mon-input"
+                                        formControlName="state"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.state || disableFormFields"
+                                        aria-labelledby="memberState"
+                                        (selectionChange)="checkZipCode()"
+                                        #stateInput
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option
+                                            *ngFor="let state of states"
+                                            value="{{state.abbreviation}}"
+                                            title="{{state.abbreviation}}"
+                                        >
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('state').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.zip">
+                            <div class="flex-item w-100">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.zip']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('zip'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="zip"
+                                        class="mon-input"
+                                        matInput
+                                        (blur)="enableCounty()"
+                                        (keyup)="checkZipCode()"
+                                        (paste)="numberValidation($event);"
+                                        (keypress)="numberValidation($event);"
+                                        maxlength="{{zipMaximumLength}}"
+                                        minlength="{{zipMinLength}}"
+                                        [readonly]="readOnlyFieldElementSetting.zip"
+                                        aria-label="zip-code"
+                                        (input)="isFormValueChange = true"
+                                        #zipInput
+                                        empoweredZipCodeFormat
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('zip').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('zip').hasError('pattern')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.zip'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('zip').hasError('mismatch')"
+                                        [language]="'secondary.portal.members.situsMistmatchError'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('zip').hasError('zipMismatch')"
+                                        [language]="'primary.portal.census.manualEntry.zipErrorMsg'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.countyId">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" id="memberCounty">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.county']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('countyId'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="countyId"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.countyId || regiForm.get('address').get('countyId').disabled  || isPartialEdit || isAflacReadOnly || disableFormFields"
+                                        aria-labelledby="memberCounty"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option *ngFor="let item of counties" value="{{item.id}}" title="{{item.id}}">
+                                            {{item.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('countyId').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.country">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" id="memberCountry">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.country']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('country'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="country"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.country || disableFormFields"
+                                        aria-labelledby="memberCountry"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option *ngFor="let item of countries" value="{{item}}" title="{{item}}"> {{item}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('address').get('country').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="flex-form-item">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.birthDate">
+                            <div class="flex-item">
+                                <mat-label class="mat-label" id="birthdate">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.birthdate']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('birthDate'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field class="mon-date-field">
+                                    <input
+                                        [matDatepicker]="picker"
+                                        formControlName="birthDate"
+                                        matInput
+                                        (dateInput)="checkBirthDate('input', $event)"
+                                        (dateChange)="checkBirthDate('change', $event)"
+                                        [readonly]="readOnlyFieldElementSetting.birthDate"
+                                        #datePickerInput
+                                        (keyup)="transform($event)"
+                                        [attr.aria-label]="langStrings['primary.portal.members.personalLabel.birthdate']"
+                                        (input)="isFormValueChange = true"
+                                        [disabled]="isPartialEdit || isAflacReadOnly"
+                                    />
+                                    <mat-hint>{{langStrings['primary.portal.members.personalLabel.dateFormat']}}</mat-hint>
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                        <mon-icon
+                                            matDatepickerToggleIcon
+                                            iconName="calendar-date"
+                                            (click)="picker.open()"
+                                            aria-labelledby="birthdate"
+                                        ></mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="isDateInvalid && !regiForm.controls['birthDate'].hasError('hireDateMisMatch')">
+                                        <span class="sr-only">Error: </span>
+                                        {{validateDate('birthDate', 'regiForm', datePickerInput.value)}}</mat-error
+                                    >
+                                    <mat-error
+                                        *ngIf="empAgeLimitError && !regiForm.controls['birthDate'].hasError('hireDateMisMatch')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.employeeAgeLimit'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.controls['birthDate'].hasError('hireDateMisMatch')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.birthAndHireDateDifference'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.controls['birthDate'].hasError('maxAgeError')"
+                                        [language]="'secondary.portal.census.manualEntry.employeeMaxAge'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.birthState">
+                            <div formGroupName="profile" class="flex-item w-130">
+                                <mat-label class="mat-label" id="memberBirthState">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.birthState']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('birthState'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    >
+                                </mat-label>
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="birthState"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.birthState || disableFormFields"
+                                        aria-labelledby="memberBirthState"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option
+                                            *ngFor="let state of states"
+                                            value="{{state.abbreviation}}"
+                                            title="{{state.abbreviation}}"
+                                        >
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('birthState').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <div class="d-flex" *ngIf="hideFieldElementSetting.ssn">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.member.ssn_itin"></span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('socialSecurityNumber'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="ssn"
+                                        class="mon-input"
+                                        matInput
+                                        (click)="ssnMaskingToggler(true)"
+                                        (focusout)="ssnMaskingToggler(false)"
+                                        (change)="maskSSN()"
+                                        [readonly]="readOnlyFieldElementSetting.ssn"
+                                        [maxLength]="ssnMaxLength"
+                                        attr.aria-label="{{langStrings['primary.portal.member.ssn_itin']}} {{langStrings['primary.portal.common.optional']}}"
+                                        empoweredSsnFormat
+                                        (input)="onSSNInputChange($event.target.value)"
+                                    />
+                                    <span
+                                        *ngIf="!isFullyVisible && regiForm.controls.ssn.value && regiForm.controls.ssn.valid && !isPartialEdit"
+                                        matSuffix
+                                    >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="isMaskedTrue"
+                                            (click)="ssnMaskingToggler(isMaskedTrue)"
+                                            class="nodec-link"
+                                            [attr.aria-label]="langStrings['primary.portal.common.show']"
+                                            >{{langStrings['primary.portal.common.show']}}</a
+                                        >
+                                        <a
+                                            href="javascript:void(0)"
+                                            *ngIf="!isMaskedTrue"
+                                            (click)="ssnMaskingToggler(isMaskedTrue)"
+                                            [attr.aria-label]="langStrings['primary.portal.common.hide']"
+                                            class="nodec-link"
+                                            >{{langStrings['primary.portal.common.hide']}}</a
+                                        >
+                                    </span>
+
+                                    <mat-error
+                                        *ngIf="regiForm.get('ssn').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.controls['ssn'].errors?.pattern && regiForm.controls['ssn'].value  && regiForm.controls['ssn'].value.length === 11"
+                                        [language]="'primary.portal.members.dependentValidationMsg.ssnMsg2'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf=" regiForm.controls['ssn'].value  && regiForm.controls['ssn'].value.length !== 11"
+                                        [language]="'primary.portal.members.dependentValidationMsg.ssnMsg1'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex-item" *ngIf="ssnConfirmationEnabled && regiForm.controls.confirmSSN">
+                                <mat-label class="mat-label">
+                                    <span language="primary.portal.members.ssn.confirm"></span>
+                                </mat-label>
+                                <empowered-ssn-input
+                                    formControlName="confirmSSN"
+                                    [regex]="validationRegex"
+                                    [allowPaste]="false"
+                                    [showToggle]="true"
+                                    [ariaLabel]="langStrings['primary.portal.members.ssn.confirm']"
+                                >
+                                    <mat-error
+                                        *ngIf="regiForm.controls.confirmSSN.errors?.required"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    ></mat-error>
+                                    <mat-error *ngIf="regiForm.controls.confirmSSN.errors?.invalid"
+                                        ><span [language]="'secondary.portal.members.ssn.errors.match'"></span>
+                                    </mat-error>
+                                </empowered-ssn-input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.heightFt">
+                            <div formGroupName="profile" class="flex-item">
+                                <mat-label class="mat-label" id="memberHeightFeet">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.heightFeet']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('height'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="heightFt"
+                                        [placeholder]="langStrings['primary.portal.common.selectFt']"
+                                        [disabled]="readOnlyFieldElementSetting.heightFt || disableFormFields"
+                                    >
+                                        <mat-option [value]="ftSelect">{{langStrings['primary.portal.common.selectFt']}}</mat-option>
+                                        <mat-option *ngFor="let height of heightFeets" [value]="height" title="{{height}}">
+                                            {{height}} {{langStrings['primary.portal.common.feet']}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm?.controls?.profile?.controls?.heightFt?.errors?.required"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm?.controls?.profile?.controls?.heightFt?.errors?.invalid"
+                                        [language]="'secondary.portal.applicationFlow.demographics.invalidHeight'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.heightInches">
+                            <div formGroupName="profile" class="flex-item">
+                                <mat-label class="mat-label" id="memberHeightInches">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.heightInches']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('height'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        formControlName="heightInches"
+                                        [placeholder]="langStrings['primary.portal.common.selectIn']"
+                                        [disabled]="readOnlyFieldElementSetting.heightInches || disableFormFields || isInchDisabled"
+                                        [value]="inchSelect"
+                                    >
+                                        <mat-option [attr.aria-label]="langStrings['primary.portal.common.selectIn']"
+                                            >{{langStrings['primary.portal.common.selectIn']}}</mat-option
+                                        >
+                                        <mat-option *ngFor="let height of heightInches" [value]="height" [title]="height">
+                                            {{height}} {{langStrings['primary.portal.common.inches']}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm?.controls?.profile?.controls?.heightInches?.errors?.required"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm?.controls?.profile?.controls?.heightInches?.errors?.invalid"
+                                        [language]="'secondary.portal.applicationFlow.demographics.invalidHeight'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.weight">
+                            <div formGroupName="profile" class="flex-item w-150">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.weight']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('weight'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="weight"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.weight"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.weight']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('weight').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm?.controls?.profile?.controls?.weight?.errors?.pattern"
+                                        [language]="'secondary.portal.members.personalValidationMsg.weight'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.ethnicity">
+                            <div formGroupName="profile" class="flex-item w-250">
+                                <mat-label class="mat-label" id="memberEthnicity">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.raceOrEthnicity']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('raceOrEthnicity'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="ethnicity"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.ethnicity || disableFormFields"
+                                        aria-labelledby="memberEthnicity"
+                                    >
+                                        <mat-option *ngFor="let item of ethnicities" value="{{item}}" title="{{item}}">
+                                            {{item}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('ethnicity').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.gender">
+                            <div class="flex-item w-120">
+                                <mat-label class="mat-label" id="memberGender">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.gender']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('gender'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="gender"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.gender || disableFormFields"
+                                        aria-labelledby="memberGender"
+                                    >
+                                        <mat-option
+                                            *ngIf="!(requiredFields && isRequiredField('gender'))"
+                                            value="{{UNKNOWN}}"
+                                            title="{{langStrings['primary.portal.members.personalLabel.select']}}"
+                                        >
+                                            {{langStrings['primary.portal.members.personalLabel.select']}}
+                                        </mat-option>
+                                        <mat-option *ngFor="let item of genders" value="{{item.value}}" title="{{item.for}}">
+                                            {{item.for}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('gender').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div formGroupName="profile" class="flex-form-item">
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.maritalStatus">
+                            <div class="flex-item w-175">
+                                <mat-label class="mat-label" id="memberMaritalStatus"
+                                    ><span>{{langStrings['primary.portal.members.personalLabel.martialStatus']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('martialStatus'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="maritalStatus"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.maritalStatus || disableFormFields"
+                                        aria-labelledby="memberMaritalStatus"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option *ngFor="let item of martialStatus" value="{{item}}" title="{{item}}">
+                                            {{item}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('maritalStatus').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.citizenship">
+                            <div class="flex-item w-120">
+                                <mat-label class="mat-label" id="memberCitizenship"
+                                    ><span>{{langStrings['primary.portal.members.personalLabel.citizenship']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('citizenship'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="citizenship"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.citizenship || disableFormFields"
+                                        aria-labelledby="memberCitizenship"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option *ngFor="let item of citizenshipOptions" value="{{item}}"> {{item}} </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('citizenship').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.driversLicenseNumber">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.driverLicense']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('driverLicense'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="driversLicenseNumber"
+                                        type="text"
+                                        class="mon-input"
+                                        matInput
+                                        [maxLength]="driverLicenseMaxLength"
+                                        (blur)="enableDriversLicenseState()"
+                                        [readonly]="readOnlyFieldElementSetting.driversLicenseNumber"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.driverLicense']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('driversLicenseNumber').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('driversLicenseNumber').hasError('pattern')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.driverLicense'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.driversLicenseState">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" id="memberDriversLicenseState">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.driverLicenseState']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('driverLicenseState'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="driversLicenseState"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        aria-labelledby="memberDriversLicenseState"
+                                        [disabled]="disableFormFields"
+                                    >
+                                        <mat-option>{{langStrings['primary.portal.members.personalLabel.select']}}</mat-option>
+                                        <mat-option
+                                            *ngFor="let state of states"
+                                            value="{{state.abbreviation}}"
+                                            title="{{state.abbreviation}}"
+                                        >
+                                            {{state.abbreviation}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('driversLicenseState').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.languagePreference">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" id="memberPreferredLanguage">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.preferredLanguage']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('preferredLanguage'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="languagePreference"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.languagePreference || disableFormFields"
+                                        [value]="defaultPreferredLang"
+                                        disableOptionCentering="true"
+                                        aria-labelledby="memberPreferredLanguage"
+                                    >
+                                        <mat-option *ngFor="let item of preferredLangOptions" value="{{item}}">
+                                            {{item | titlecase}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('languagePreference').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="d-md-flex flex-wrap">
+                        <ng-container *ngIf="hideFieldElementSetting.tobaccoStatus">
+                            <div class="flex-item w-200">
+                                <mat-label class="mat-label" id="memberTobaccoUser">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.tobaccoUser']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('tobaccoUser'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        class="mon-input"
+                                        formControlName="tobaccoStatus"
+                                        [placeholder]="langStrings['primary.portal.members.personalLabel.select']"
+                                        [disabled]="readOnlyFieldElementSetting.tobaccoStatus || disableFormFields"
+                                        aria-labelledby="memberTobaccoUser"
+                                    >
+                                        <mat-option *ngFor="let item of tobaccoUserOptions" value="{{item.name}}">
+                                            {{item.value}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('tobaccoStatus').hasError('required')"
+                                        [language]="'secondary.portal.members.selectionRequired'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="hideFieldElementSetting.medicareEligibility">
+                            <div class="flex-item mon-mt-20">
+                                <mat-checkbox
+                                    formControlName="medicareEligibility"
+                                    [disabled]="readOnlyFieldElementSetting.medicareEligibility"
+                                >
+                                    <span>{{langStrings['primary.portal.members.personalLabel.medicareEligibleCheck']}}</span>
+                                </mat-checkbox>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <ng-container *ngIf="hideFieldElementSetting.dependentOrder">
+                    <div class="flex-form-item" formGroupName="profile">
+                        <div class="d-md-flex flex-wrap">
+                            <div class="flex-item">
+                                <mat-label class="mat-label">
+                                    <span>{{langStrings['primary.portal.members.personalLabel.dependantUser']}}</span>
+                                    <span *ngIf="!(requiredFields && isRequiredField('dependantUser'))" class="optional-text"
+                                        >{{langStrings['primary.portal.common.optional']}}</span
+                                    ></mat-label
+                                >
+                                <mat-form-field>
+                                    <input
+                                        formControlName="dependentOrder"
+                                        class="mon-input"
+                                        matInput
+                                        [readonly]="readOnlyFieldElementSetting.dependentOrder"
+                                        attr.aria-label="{{langStrings['primary.portal.members.personalLabel.dependantUser']}} {{langStrings['primary.portal.common.optional']}}"
+                                        (input)="isFormValueChange = true"
+                                    />
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('dependentOrder').hasError('required')"
+                                        [language]="'secondary.portal.members.requiredField'"
+                                    >
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="regiForm.get('profile').get('dependentOrder').hasError('pattern')"
+                                        [language]="'secondary.portal.members.personalValidationMsg.dependantOrder'"
+                                    >
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+            <footer class="flex-form-footer fixed-position">
+                <button
+                    mat-flat-button
+                    type="button"
+                    class="mon-btn-secondary mon-mr-30"
+                    *ngIf="regiForm.dirty || isFormValueChange"
+                    (click)="revertForm()"
+                    [attr.aria-label]="langStrings['primary.portal.common.undoChanges']"
+                >
+                    {{langStrings['primary.portal.common.undoChanges']}}
+                </button>
+                <button
+                    *ngIf="isSaved && !isFormValueChange"
+                    type="button"
+                    mat-flat-button
+                    class="mon-btn-success"
+                    [attr.aria-label]="langStrings['primary.portal.common.saved']"
+                >
+                    <span><mon-icon class="check-icon" iconName="check" aria-label="check" [iconSize]="19"></mon-icon></span>
+                    <span>{{langStrings['primary.portal.common.saved']}}</span>
+                </button>
+                <ng-container *isRestricted="permissionEnum.MEMBER_RESTRICT_UPDATE">
+                    <button
+                        type="submit"
+                        *ngIf="!isSaved || isFormValueChange"
+                        mat-flat-button
+                        class="mon-btn-primary"
+                        attr.aria-label="Saved changes to profile"
+                        [disabled]="(isPartialEdit && !regiForm.controls['ssn'].value) || !(regiForm.dirty || isFormValueChange)"
+                    >
+                        {{ langStrings['primary.portal.common.save'] }}
+                    </button>
+                </ng-container>
+            </footer>
+        </fieldset>
+    </form>
+</div>

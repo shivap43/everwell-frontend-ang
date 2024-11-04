@@ -1,0 +1,413 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<div *ngIf="showData">
+    <form [formGroup]="quoteForm" class="quasi-modal">
+        <div class="modal-header">
+            <div>
+                <h2>{{languageStrings['primary.portal.quickQuote.generate']}}</h2>
+            </div>
+            <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+
+        <mat-dialog-content [hidden]="!dataLoaded">
+            <div class="content-wrapper">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.quoteTitle']}}</mat-label>
+
+                <div class="quote_edit">
+                    <mat-form-field class="w-200">
+                        <input formControlName="quoteName" type="text" matInput (blur)="updateTitle()" />
+                    </mat-form-field>
+                    <span class="edit_details"
+                        ><a (click)="openDialog()">{{languageStrings['primary.portal.quickQuote.editPlan']}}</a></span
+                    >
+                </div>
+
+                <br />
+
+                <div class="quote_div">
+                    <div class="carrier-logo">
+                        <img src="assets/images/1.png" alt="Logo" class="aflac_img" />
+                        <div class="div_content">
+                            <div>
+                                <p class="mon-mb-0">{{quoteTitle}}</p>
+                            </div>
+                            <span>{{languageStrings['primary.portal.quickQuote.rateQuote']}} </span>
+                            <span>{{producerName}}</span>
+                            <span> {{languageStrings['primary.portal.quickQuote.on']}} </span>
+                            <span>{{currentDate}}</span>
+                            <span>{{languageStrings['primary.portal.quickQuote.at']}} </span>
+                            <span> {{currentTime | date: 'mediumTime'}} . </span>
+                            <span> {{languageStrings['primary.portal.quickQuote.pleaseNote']}}</span>
+                            <span>{{settings.state}},</span>
+                            <span> {{settings.channel | titlecase}}</span>
+                            <span> {{languageStrings['primary.portal.quickQuote.premiumRates']}} </span>
+                            <span>{{settings.payFrequency}}</span>
+                            <span> {{languageStrings['primary.portal.quickQuote.industryClass']}} </span>
+                            <span>{{settings.riskClass}}.</span>
+                        </div>
+                    </div>
+                    <mat-divider class="mon-mt-30"></mat-divider><br />
+                    <div>
+                        <span> {{languageStrings['primary.portal.quickQuote.illustration']}} </span>
+                    </div>
+                    <mat-divider class="mon-mt-30"></mat-divider>
+                    <div *ngFor="let plan of selectedPlans">
+                        <div *ngIf="plan.planPriceSelection.length; else multiplePlanPriceSelections">
+                            <div class="plan-products-title">
+                                <div class="plan_logo">
+                                    <mon-icon
+                                        iconName="{{plan.product.name}}"
+                                        class="plan-icon"
+                                        [iconSize]="32"
+                                        [fetchedIconPath]="plan.iconPath"
+                                    ></mon-icon>
+                                </div>
+                                <div>
+                                    <h3 class="text-fade">{{plan.product.name}}</h3>
+                                    <h4>{{plan.name}}</h4>
+                                    <p class="plan-benefit-amount" *ngIf="benefitAmountObject.benefitAmountValue[plan.id]">
+                                        <span>{{languageStrings['primary.portal.tpi.shopReview.benefitAmount']}}</span>
+                                        {{benefitAmountObject.benefitAmountValue[plan.id] | currency : 'USD' : 'symbol' : '1.0'}}
+                                        <span *ngIf="plan.eliminationPeriodName"
+                                            >{{languageStrings['primary.portal.quote.separator']}}</span
+                                        >
+                                        <ng-container *ngIf="plan.eliminationPeriodName">
+                                            <span class="mon-pl-5"
+                                                >{{languageStrings['primary.portal.shoppingCart.planOfferings.expansion.eliminationPeriod']}}</span
+                                            >
+                                            {{plan.eliminationPeriodName}}
+                                        </ng-container>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="products-accordion-table-cntr" *ngIf="dataSource[plan.itemId?.toString() || plan.id?.toString()]">
+                                <mat-table
+                                    #table
+                                    [dataSource]="dataSource[plan.itemId?.toString() || plan.id?.toString()]"
+                                    class="products-accordion-table"
+                                >
+                                    <ng-container
+                                        *ngFor="let column of columns[plan.itemId?.toString() || plan.id?.toString()]"
+                                        [cdkColumnDef]="column.columnDef"
+                                    >
+                                        <mat-header-cell
+                                            *cdkHeaderCellDef
+                                            [ngClass]="{'products-accordion-table-hdr' : column.header,
+                                            'products-accordion-side-hdr' : !column.header,
+                                            'checked-plan': column.header? selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header : false}"
+                                            >{{ column.header ? coverageLevelObject[plan.itemId ? plan.itemId.toString() :
+                                            plan.id.toString()][column.header].name : '' }}
+                                        </mat-header-cell>
+                                        <mat-cell
+                                            *cdkCellDef="let row;"
+                                            [ngClass]="{'products-accordion-table-values' : column.header,
+                                            'products-accordion-side-hdr' : !column.header,
+                                            'checked-plan': column.header? selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header : false}"
+                                            >{{ column?.disable? "" :(column.header ? (column.cell(row) | currency) : column.cell(row)) }}
+                                        </mat-cell>
+                                        <mat-footer-cell
+                                            *matFooterCellDef
+                                            [ngClass]="{'products-accordion-table-ftr' : column.header,
+                                            'products-accordion-side-hdr' : !column.header,
+                                            'checked-plan': column.header? selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header : false}"
+                                        >
+                                            <ng-container
+                                                *ngTemplateOutlet="column?.disable ? disableTooltip : columnFooter;context: {column: column, plan: plan}"
+                                            ></ng-container>
+                                        </mat-footer-cell>
+                                    </ng-container>
+                                    <ng-template #disableTooltip>
+                                        <div>
+                                            <button
+                                                mat-icon-button
+                                                class="mon-ml-10"
+                                                [richTooltip]="this.languageStrings['primary.portal.quoteShop.knockout.reanswerMessageToolTip']"
+                                                matTooltipPosition="above"
+                                                matTooltipClass="pos-above"
+                                                *ngIf="plan.showDisableCoverageMsg"
+                                            >
+                                                <mon-icon iconName="Filled-info" class="infoicon icon-primary" [iconSize]="16"></mon-icon>
+                                            </button>
+                                        </div>
+                                    </ng-template>
+
+                                    <ng-template #columnFooter let-column="column" let-plan="plan" class="mon-pt-5">
+                                        <div *ngIf="!column.header" class="products-table-footer-hdr total_month">
+                                            <span language="primary.portal.shopQoute.totalPrice"></span
+                                            ><mat-hint>{{settings.payFrequency | lowercase}}</mat-hint>
+                                        </div>
+                                        <div
+                                            *ngIf="(column.header && totalCost[plan.itemId?.toString() || plan.id?.toString()][column.header]) || column.header"
+                                            class="products-table-footer-total"
+                                        >
+                                            <span *ngIf="totalCost[plan.itemId?.toString() || plan.id?.toString()][column.header]"
+                                                >{{ totalCost[plan.itemId?.toString() || plan.id?.toString()][column.header] | currency
+                                                }}</span
+                                            >
+                                            <span *ngIf="!totalCost[plan.itemId?.toString() || plan.id?.toString()][column.header]">-</span>
+                                        </div>
+                                    </ng-template>
+                                    <mat-header-row *matHeaderRowDef="displayedColumns[plan.itemId?.toString() || plan.id?.toString()]">
+                                    </mat-header-row>
+                                    <mat-row
+                                        *matRowDef="let row; columns: displayedColumns[plan.itemId?.toString() || plan.id?.toString()];"
+                                    >
+                                    </mat-row>
+                                    <mat-footer-row *matFooterRowDef="displayedColumns[plan.itemId?.toString() || plan.id?.toString()]">
+                                    </mat-footer-row>
+                                </mat-table>
+                            </div>
+                            <div class="plan-details-section">
+                                <p>
+                                    <a
+                                        *ngIf="showLink(plan.id, brochureConstant)"
+                                        href="javascript:void(0)"
+                                        (click)="openLink(plan.id, brochureConstant)"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.broucher']}}
+                                    </a>
+                                </p>
+                                <p>
+                                    <a
+                                        *ngIf="showLink(plan.id, videoConstant)"
+                                        href="javascript:void(0)"
+                                        (click)="openLink(plan.id, videoConstant)"
+                                    >
+                                        {{languageStrings['primary.portal.quickQuote.video']}}
+                                    </a>
+                                </p>
+                            </div>
+                            <mat-divider class="mon-mt-30"></mat-divider>
+                        </div>
+                        <ng-template #multiplePlanPriceSelections>
+                            <div
+                                *ngFor="let planWithMultipleSelections of dataSource[plan.itemId?.toString() || plan.id?.toString()]; let i=index"
+                            >
+                                <div class="plan-products-title" *ngIf="planWithMultipleSelections">
+                                    <div class="plan_logo">
+                                        <mon-icon
+                                            iconName="{{plan.product.name}}"
+                                            class="plan-icon"
+                                            [iconSize]="32"
+                                            [fetchedIconPath]="plan.iconPath"
+                                        ></mon-icon>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-fade">{{plan.product.name}}</h3>
+                                        <h4>{{plan.name}}</h4>
+                                        <p class="plan-benefit-amount">
+                                            <span>{{planWithMultipleSelections[0].tableHeaderName}}</span>
+                                            <span *ngIf="plan.eliminationPeriodName"
+                                                >{{languageStrings['primary.portal.quote.separator']}}</span
+                                            >
+                                            <ng-container *ngIf="plan.eliminationPeriodName">
+                                                <span class="mon-pl-5"
+                                                    >{{languageStrings['primary.portal.shoppingCart.planOfferings.expansion.eliminationPeriod']}}</span
+                                                >
+                                                {{plan.eliminationPeriodName}}
+                                            </ng-container>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="products-accordion-table-cntr benefit-amount-table" *ngIf="planWithMultipleSelections">
+                                    <span
+                                        [class]="benefitAmountBorderStyles[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId]"
+                                        language="primary.portal.coverage.benefitamount"
+                                    ></span>
+                                    <mat-table
+                                        #table
+                                        [dataSource]="planWithMultipleSelections"
+                                        multiTemplateDataRows
+                                        class="products-accordion-table"
+                                    >
+                                        <ng-container
+                                            *ngFor="let column of columns[plan.itemId?.toString() || plan.id.toString()][planWithMultipleSelections[0].tableId]"
+                                            [cdkColumnDef]="column.columnDef"
+                                        >
+                                            <mat-header-cell
+                                                *cdkHeaderCellDef
+                                                [ngClass]="{'products-accordion-table-hdr' : column.header,
+                                                'products-accordion-side-hdr' : !column.header,
+                                                'checked-plan': column.header && selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header}"
+                                                >{{ column.header ? coverageLevelObject[plan.itemId ? plan.itemId.toString() :
+                                                plan.id.toString()][planWithMultipleSelections[0].tableId][column.header].name : '' }}
+                                            </mat-header-cell>
+                                            <mat-cell
+                                                *cdkCellDef="let row;"
+                                                [ngClass]="{'products-accordion-table-values' : column.header,
+                                                'products-accordion-side-hdr' : !column.header,
+                                                'checked-plan': column.header && selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header}"
+                                                >{{ column?.disable? "" :(column.header ? (column.cell(row) | currency) : column.cell(row))
+                                                }}
+                                            </mat-cell>
+                                            <mat-footer-cell
+                                                *matFooterCellDef
+                                                [ngClass]="{'products-accordion-table-ftr' : column.header,
+                                                'products-accordion-side-hdr' : !column.header,
+                                                'checked-plan': column.header? selectedCoverageRadio[plan.itemId?.toString() || plan.id?.toString()] === column.header : false}"
+                                            >
+                                                <ng-container
+                                                    *ngTemplateOutlet="column?.disable ? disableTooltip : columnFooter;context: {column: column, plan: plan}"
+                                                ></ng-container>
+                                            </mat-footer-cell>
+                                        </ng-container>
+                                        <ng-container matColumnDef="riderTableData">
+                                            <mat-cell *matCellDef="let row">
+                                                <div *ngIf="row.riderTableData" class="rider-table-data">
+                                                    <mat-table [dataSource]="row.riderTableData">
+                                                        <ng-container
+                                                            *ngFor="let innerColumn of columns[plan.itemId?.toString() || plan.id.toString()][planWithMultipleSelections[0].tableId]"
+                                                            [cdkColumnDef]="innerColumn.columnDef"
+                                                        >
+                                                            <mat-cell
+                                                                *cdkCellDef="let innerRow"
+                                                                [ngClass]="{
+
+                                                                                                                                                                'products-accordion-table-values' : innerColumn.header,
+                                                                                                                                                                'products-accordion-side-hdr' : !innerColumn.header,
+                                                                                                                                                                'checked-plan': innerColumn.header? selectedCoverageRadio[plan.itemId ? plan.itemId.toString() : plan.id.toString()] === innerColumn.header : false,
+                                                                                                                                                                'rider-data' : !innerColumn.header,
+                                                                                                                                                                'row-align': row.riderTableData.indexOf(innerRow) > 0 && !innerColumn.header
+
+                                                                                                                                                            }"
+                                                            >
+                                                                {{ innerColumn?.disable? "" :(innerColumn.header ?
+                                                                (innerColumn.cell(innerRow) | currency) : innerColumn.cell(innerRow)) }}
+                                                            </mat-cell>
+                                                        </ng-container>
+                                                        <mat-row
+                                                            *matRowDef="let innerRow; columns: displayedColumns[plan.itemId?.toString() || plan.id.toString()][planWithMultipleSelections[0].tableId];"
+                                                        >
+                                                        </mat-row>
+                                                    </mat-table>
+                                                </div>
+                                            </mat-cell>
+                                        </ng-container>
+                                        <ng-template #disableTooltip>
+                                            <div>
+                                                <button
+                                                    mat-icon-button
+                                                    class="mon-ml-10"
+                                                    [richTooltip]="this.languageStrings['primary.portal.quoteShop.knockout.reanswerMessageToolTip']"
+                                                    matTooltipPosition="above"
+                                                    matTooltipClass="pos-above"
+                                                    *ngIf="plan.showDisableCoverageMsg"
+                                                >
+                                                    <mon-icon
+                                                        iconName="Filled-info"
+                                                        class="infoicon icon-primary"
+                                                        [iconSize]="16"
+                                                    ></mon-icon>
+                                                </button>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template #columnFooter let-column="column" let-plan="plan" class="mon-pt-5">
+                                            <div *ngIf="!column.header" class="products-table-footer-hdr total_month">
+                                                <span language="primary.portal.shopQoute.totalPrice"></span
+                                                ><mat-hint>{{settings.payFrequency | lowercase}}</mat-hint>
+                                            </div>
+                                            <div
+                                                *ngIf="(column.header && totalCostMultiSelectCov[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId][column.header]) || column.header"
+                                                class="products-table-footer-total"
+                                            >
+                                                <span
+                                                    *ngIf="totalCostMultiSelectCov[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId][column.header]"
+                                                    >{{ totalCostMultiSelectCov[plan.itemId ? plan.itemId.toString() :
+                                                    plan.id.toString()][planWithMultipleSelections[0].tableId][column.header] | currency
+                                                    }}</span
+                                                >
+                                                <span
+                                                    *ngIf="!totalCostMultiSelectCov[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId][column.header] && column.header"
+                                                    >-</span
+                                                >
+                                            </div>
+                                        </ng-template>
+                                        <mat-header-row
+                                            *matHeaderRowDef="displayedColumns[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId]"
+                                        >
+                                        </mat-header-row>
+                                        <mat-row
+                                            *matRowDef="let row; columns: displayedColumns[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId];"
+                                            [ngClass]="{'no-border': row?.riderTableData}"
+                                        >
+                                        </mat-row>
+                                        <mat-row *matRowDef="let element; columns: ['riderTableData']; when: isMultiplePrice"></mat-row>
+                                        <mat-footer-row
+                                            *matFooterRowDef="displayedColumns[plan.itemId?.toString() || plan.id?.toString()][planWithMultipleSelections[0].tableId]"
+                                        >
+                                        </mat-footer-row>
+                                    </mat-table>
+                                    <div class="footnote-cntr">
+                                        <p *ngIf="benefitAmountToolTips[plan.id]?.showRiderNotAvailableFootnote" class="footnote-txt">
+                                            {{languageStrings['primary.portal.quickQuote.multipleSelections.riderNotAvailable.note']}}
+                                            {{riderInEligibleAmountName}}
+                                        </p>
+                                        <p
+                                            *ngIf="benefitAmountToolTips[plan.id]?.fullAmountToolTip"
+                                            class="footnote-txt"
+                                            language="primary.portal.quickQuote.footNote.equalTo.baseBenefitAmount"
+                                        ></p>
+                                        <p
+                                            *ngIf="benefitAmountToolTips[plan.id]?.maxLimitToolTip"
+                                            class="footnote-txt"
+                                            language="primary.portal.quickQuote.footNote.limited.baseBenefitAmount"
+                                        >
+                                            {{benefitAmountToolTips[plan.id]?.maxLimit | currency : 'USD' : 'symbol' : '1.0'}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="plan-details-section" *ngIf="planWithMultipleSelections">
+                                    <p>
+                                        <a
+                                            *ngIf="showLink(plan.id, brochureConstant)"
+                                            href="javascript:void(0)"
+                                            (click)="openLink(plan.id, brochureConstant)"
+                                        >
+                                            {{languageStrings['primary.portal.quickQuote.broucher']}}
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a
+                                            *ngIf="showLink(plan.id, videoConstant)"
+                                            href="javascript:void(0)"
+                                            (click)="openLink(plan.id, videoConstant)"
+                                        >
+                                            {{languageStrings['primary.portal.quickQuote.video']}}
+                                        </a>
+                                    </p>
+                                </div>
+                                <mat-divider class="mon-mt-30" *ngIf="planWithMultipleSelections"></mat-divider>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <div mat-dialog-actions class="dialog-footer d-flex justify-content-between">
+            <a href="javascript:void(0)" (click)="closeForm()" mat-dialog-close>{{languageStrings['primary.portal.common.cancel']}}</a>
+            <div *hasPermission="'aflac.quote.read.download'">
+                <button
+                    type="button"
+                    class="mon-btn-secondary mon-mr-20"
+                    mat-flat-button
+                    *configEnabled="'general.enable.universal_quick_quote.view_pdf'"
+                    (click)="downloadQuickQuote()"
+                >
+                    <span>{{languageStrings['primary.portal.quickQuote.viewQuote']}}</span>
+                </button>
+                <button
+                    class="mon-btn-primary"
+                    mat-flat-button
+                    type="submit"
+                    *configEnabled="'general.enable.universal_quick_quote.send_quote'"
+                    (click)=" emailCartQuote()"
+                >
+                    <span>{{languageStrings['primary.portal.quickQuote.sendQuote']}}</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,55 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="false" *ngIf="isLoading"></empowered-mon-spinner>
+<h2 class="header-main">
+    <span>{{languageStrings['primary.portal.members.settings.notifications.title']}}</span>
+</h2>
+<div class="header-text">
+    <span>{{languageStrings['primary.portal.members.settings.notifications.header']}}</span>
+    <a [routerLink]="['../../household/profile']" [queryParams]="{tabId: 2}" routerLinkActive="router-link-active"
+        >{{languageStrings['primary.portal.members.settings.notifications.updateVerifyContact']}}</a
+    >
+</div>
+<form [formGroup]="notificationPreferenceForm" (ngSubmit)="onSubmit(notificationPreferenceForm)">
+    <div class="form-main">
+        <mat-radio-group aria-label="Select an option" formControlName="notificationPreference" class="d-md-flex flex-column">
+            <mat-radio-button value="EMAIL" class="mon-mb-10" [disabled]="!primaryEmail">
+                <ng-container *ngIf="primaryEmail; else noEmail">
+                    <span>
+                        {{languageStrings['primary.portal.members.contactLabel.notificationPreferences.primaryEmail']
+                        .replace("##primaryEmail", primaryEmail.email) }}
+                    </span>
+                </ng-container>
+                <ng-template #noEmail>
+                    <span language="primary.portal.members.contactLabel.notificationPreferences.noEmailListed"></span>
+                </ng-template>
+            </mat-radio-button>
+
+            <mat-radio-button value="PHONE" class="mon-mb-10" [disabled]="!primaryPhone?.isMobile">
+                <ng-container *ngIf="primaryPhone?.isMobile; else noMobile">
+                    <span>
+                        {{languageStrings['primary.portal.members.contactLabel.notificationPreferences.primaryPhone']
+                        .replace("##primaryPhoneNumber", primaryPhone.phoneNumber | mask: '000-000-0000') }}
+                    </span>
+                </ng-container>
+                <ng-template #noMobile>
+                    <span language="primary.portal.members.contactLabel.notificationPreferences.noMobileNumberListed"></span>
+                </ng-template>
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div class="form-footer">
+        <button *ngIf="isSaved" type="button" mat-flat-button class="mon-btn-success">
+            <span><mon-icon class="check-icon" iconName="check" [iconSize]="19"></mon-icon></span>
+            <span>{{languageStrings['primary.portal.common.saved']}}</span>
+        </button>
+        <button
+            *ngIf="!isSaved"
+            mat-flat-button
+            class="mon-btn-primary"
+            color="primary"
+            type="submit"
+            [disabled]="initialNotificationPreference === notificationPreferenceForm.controls['notificationPreference'].value"
+        >
+            {{languageStrings['primary.portal.members.settings.notifications.save']}}
+        </button>
+    </div>
+</form>

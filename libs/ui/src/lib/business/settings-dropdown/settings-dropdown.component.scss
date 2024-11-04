@@ -1,0 +1,92 @@
+@import "shared";
+
+$footer-margin-top-px: 15px;
+$footer-margin-bottom-px: 20px;
+$footer-line-height-px: 18px;
+$footer-font-size-px: 14px;
+$border-px: 1px;
+
+$footer-height-px: $footer-margin-top-px + $footer-margin-bottom-px + $footer-line-height-px;
+
+:host {
+    display: inline-block;
+}
+
+.settings-control {
+    &.enrollment-setting {
+        margin: 0 map-get($spacers, 10);
+    }
+
+    &.plan-setting {
+        border-right: 1px solid rgba(0, 0, 0, 0.25);
+        padding: convert-unit(10px, "rem") convert-unit(20px, "rem");
+    }
+
+    &.rate-sheet-setting {
+        margin: convert-unit(2px, "rem") convert-unit(10px, "rem");
+    }
+}
+
+.settings-cursor-disable {
+    cursor: not-allowed !important;
+}
+
+.settings-trigger {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &-value {
+        color: get("color.primary.500");
+    }
+
+    & > div {
+        font-size: 16px;
+        margin-right: map-get($spacers, 5);
+    }
+
+    &:first-child {
+        margin-left: 0;
+    }
+
+    .dropdown-arrow {
+        margin: 0 convert-unit(4px, "rem") convert-unit(4px, "rem") convert-unit(2px, "rem");
+        border: solid get("color.black");
+        border-width: 0 convert-unit(1px, "rem") convert-unit(1px, "rem") 0;
+        padding: convert-unit(3px, "rem");
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+
+    &.settings-cursor-default {
+        .settings-trigger-value {
+            color: get("color.gray.600");
+        }
+        cursor: not-allowed;
+    }
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    height: convert-unit($footer-height-px, "rem");
+    padding: convert-unit($footer-margin-top-px, "rem") map-get($spacers, 20) map-get($spacers, 20);
+
+    .mon-btn-link {
+        font-size: convert-unit($footer-font-size-px, "rem");
+    }
+
+    .reset-wrapper {
+        display: flex;
+
+        .reset {
+            color: get("color.black");
+        }
+    }
+
+    button {
+        line-height: convert-unit($footer-line-height-px, "rem");
+    }
+}

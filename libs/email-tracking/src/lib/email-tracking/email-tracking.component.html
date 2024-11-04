@@ -1,0 +1,84 @@
+<div class="email-tracking-wrapper" [hidden]="isLoading">
+    <h2 *ngIf="memberId">{{languageStrings["primary.portal.emailTracking.heading"]}}</h2>
+    <p class="email-sub-header">{{languageStrings["primary.portal.emailTracking.subHeading"]}}</p>
+    <div class="search-filter-wraper">
+        <div class="search-wrapper">
+            <mat-label class="mat-label">{{languageStrings["primary.portal.common.search"]}}</mat-label>
+            <mat-form-field>
+                <input matInput [formControl]="searchInput" type="text" (keyup.enter)="triggerSearch($event.target.value)" />
+                <mat-hint
+                    >{{languageStrings[memberId ? "primary.portal.emailTracking.table.searchHint.employee" :
+                    "primary.portal.emailTracking.table.searchHint.admin"]}}</mat-hint
+                >
+            </mat-form-field>
+        </div>
+        <div class="filter-wrapper">
+            <mat-label class="mat-label mon-label">{{languageStrings["primary.portal.common.filters"]}}</mat-label>
+            <div class="filter-sub-wrapper">
+                <div>
+                    <empowered-pill-filter-group [filterModels$]="filterModels$"></empowered-pill-filter-group>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-mask-wrapper" [ngClass]="{'grid-overlay' : (pillFilters?.filterOpen | async)}">
+        <div class="mon-table-wraper">
+            <table mat-table [dataSource]="dataSource" matSort>
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{languageStrings["primary.portal.emailTracking.table.column.type"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element?.type?.label}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="recipient">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{languageStrings["primary.portal.emailTracking.table.column.recipient"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element?.recipient?.value}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{languageStrings["primary.portal.emailTracking.table.column.date"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element?.date | date: 'MM/dd/yyyy'}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="subject">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{languageStrings["primary.portal.emailTracking.table.column.subject"]}}
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element?.subject}}</td>
+                </ng-container>
+                <ng-container matColumnDef="noResults">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="4" class="text-center result-not-found">
+                        <span
+                            >{{languageStrings["primary.portal.resources.resultNotFound"]}} {{searchInput.value ||
+                            noResultsFoundText}}</span
+                        >
+                    </th>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-header-row *matHeaderRowDef="['noResults']" [hidden]="dataSource.filteredData?.length > 0"></tr>
+            </table>
+        </div>
+        <div class="min-range-label" *ngIf="dataSource.filteredData?.length > 0 && dataSource.paginator?.getNumberOfPages() === 1">
+            <span *ngIf="dataSource.filteredData?.length > 1"
+                >{{"primary.portal.document.showingItems" | replaceTag: { "##length##": dataSource.filteredData?.length } }}</span
+            >
+            <span *ngIf="dataSource.filteredData?.length === 1"
+                >{{"primary.portal.document.showingItem" | replaceTag: { "##length##": dataSource.filteredData?.length } }}</span
+            >
+        </div>
+        <div [hidden]="dataSource.filteredData?.length === 0 || dataSource.paginator?.getNumberOfPages() === 1">
+            <empowered-paginator [data]="dataSource.filteredData"></empowered-paginator>
+        </div>
+    </div>
+    <div [hidden]="dataSource.data?.length > 0">
+        <p class="email-sub-header">{{languageStrings["primary.portal.emailTracking.subHeading.zeroState"]}}</p>
+    </div>
+</div>

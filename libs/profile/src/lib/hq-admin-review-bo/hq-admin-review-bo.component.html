@@ -1,0 +1,649 @@
+<form class="quasi-modal content-scroll">
+    <empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+    <div class="modal-header">
+        <div>
+            <mat-label>
+                {{ languageStrings["primary.portal.aflacGroup.reviewSubmit.label"] | replaceTag:
+                {"##planyearname##":latestPlanYearAflacGroup?.name} }}
+            </mat-label>
+            <h2 mat-dialog-title>{{languageStrings["primary.portal.aflacGroup.reviewSubmit.title"]}}</h2>
+        </div>
+        <button [attr.aria-label]="languageStrings['primary.portal.common.cancel']" mat-icon-button (click)="onSaveAndClose()">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+    <div>
+        <a matButton class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+            <span class="selected-step-index"></span>
+            <span class="selected-step-label"></span>
+            <mon-icon class="icon-right" iconName="down" [iconSize]="10"></mon-icon>
+        </a>
+    </div>
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div
+                app-Overlaystepper="stepperTrigger"
+                stepperId="hqAdminReview"
+                class="sidenav-area stepper-sidebar"
+                [ngClass]="{'shown': !display}"
+            >
+                <mat-vertical-stepper #verticalStepper id="hqAdminReview" [linear]="true" class="side-nav-stepper">
+                    <mat-step [completed]="completedStep>=STEPPER_DATA.ACCOUNT_INFO">
+                        <ng-template matStepLabel> {{languageStrings["primary.portal.profile.accountInfo.title"]}} </ng-template>
+                    </mat-step>
+                    <mat-step [completed]="completedStep>=STEPPER_DATA.PRODUCT_OFFERINGS">
+                        <ng-template matStepLabel> {{languageStrings["primary.portal.aflacGroup.offering.productOfferings"]}} </ng-template>
+                    </mat-step>
+                    <mat-step [completed]="completedStep>=STEPPER_DATA.PLAN_BROCHURES">
+                        <ng-template matStepLabel> {{languageStrings["primary.portal.aflacGroup.hqAdmin.planBrochures"]}} </ng-template>
+                    </mat-step>
+                    <ng-template matStepperIcon="done">
+                        <mon-icon iconSize="10" iconName="check"></mon-icon>
+                    </ng-template>
+                </mat-vertical-stepper>
+            </div>
+            <div class="stepper-content">
+                <div class="content-wrapper">
+                    <div *ngIf="verticalStepper?.selectedIndex === STEPPER_DATA.ACCOUNT_INFO">
+                        <ng-container *ngTemplateOutlet="accountInfo"></ng-container>
+                    </div>
+                    <div *ngIf="verticalStepper?.selectedIndex === STEPPER_DATA.PRODUCT_OFFERINGS">
+                        <ng-container *ngTemplateOutlet="productOffering"></ng-container>
+                    </div>
+                    <div *ngIf="verticalStepper?.selectedIndex === STEPPER_DATA.PLAN_BROCHURES">
+                        <ng-container *ngTemplateOutlet="planBrochures"></ng-container>
+                    </div>
+                    <!--account info starts-->
+                    <ng-template #accountInfo>
+                        <div class="account-info-alert" *ngIf="errorMessage">
+                            <mon-alert alertType="danger">
+                                <span>{{ errorMessage }}</span>
+                            </mon-alert>
+                        </div>
+                        <div class="account-info-wrapper">
+                            <h2 class="title">{{languageStrings["primary.portal.profile.accountInfo.title"]}}</h2>
+
+                            <h3 class="sub-title">{{languageStrings['primary.portal.aflacgroup.carrier.generalInfo']}}</h3>
+                            <div class="aflac-info">
+                                <div>
+                                    <mat-label class="mat-label"> {{languageStrings['primary.portal.aflacGroup.organization']}} </mat-label>
+                                    <div class="ag-data">{{aflacGroupInfo?.organization}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.organization" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                                <div>
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.aflacGroup.hqAdmin.agNumber']}}</mat-label
+                                    >
+                                    <div class="ag-data">{{aflacGroupInfo?.aflacGroupNumber}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.aflacGroupNumber" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                                <div>
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.aflacGroup.hqAdmin.agFileName']}}
+                                    </mat-label>
+                                    <div class="ag-data">{{aflacGroupInfo?.aflacGroupFileName}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.aflacGroupFileName" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                                <div>
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.aflacgroup.carrier.employeeIDType']}}
+                                    </mat-label>
+                                    <div class="ag-data">{{aflacGroupInfo?.employeeIdType}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.employeeIdType" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                                <div>
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.aflacgroup.carrier.situsState']}}
+                                    </mat-label>
+                                    <div class="ag-data">{{aflacGroupInfo?.situsState?.abbreviation}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.situsState?.name" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                                <div>
+                                    <mat-label class="mat-label">
+                                        {{languageStrings['primary.portal.aflacGroup.hqAdmin.hoursPerWeek']}}
+                                    </mat-label>
+                                    <div class="ag-data">{{aflacGroupInfo?.hoursPerWeek}}</div>
+                                    <div *ngIf="!aflacGroupInfo?.hoursPerWeek" class="ag-data">
+                                        {{languageStrings['primary.portal.profile.carriers.notAvailable']}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Agent Info || Starts -->
+                            <div *ngIf="aflacGroupInfo?.agents?.length" class="agent-info">
+                                <h3>{{languageStrings['primary.portal.aflacgroup.carrier.agentInfo']}}</h3>
+                                <table mat-table [dataSource]="agentInfoSource">
+                                    <!-- writingAgent Column -->
+                                    <ng-container matColumnDef="writingAgent">
+                                        <th mat-header-cell *matHeaderCellDef id="writingAgent">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.writingAgent']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.fullName}}</td>
+                                    </ng-container>
+
+                                    <!-- writingNumber Column -->
+                                    <ng-container matColumnDef="writingNumber">
+                                        <th mat-header-cell *matHeaderCellDef id="writingNumber">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.writingNumber']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.writingNumber}}</td>
+                                    </ng-container>
+
+                                    <!-- email Column -->
+                                    <ng-container matColumnDef="agentEmail">
+                                        <th mat-header-cell *matHeaderCellDef id="agentEmail">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.email']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.email}}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="agentInfoColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: agentInfoColumns;"></tr>
+                                </table>
+                            </div>
+
+                            <!-- Agent Info || Ends -->
+
+                            <!-- Billing Info || Starts -->
+                            <div *ngIf="aflacGroupInfo?.billingAccounts?.length" class="billing-acc-info">
+                                <h3>{{languageStrings['primary.portal.aflacgroup.carrier.billingAccountInfo']}}</h3>
+                                <table mat-table [dataSource]="billingInfoSource">
+                                    <!-- billingno Column -->
+                                    <ng-container matColumnDef="billingAccountNumber">
+                                        <th mat-header-cell *matHeaderCellDef id="billingAccountNumber">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.billingAccountNumber']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.accountNumber}}</td>
+                                    </ng-container>
+
+                                    <!-- deductionRegister Column -->
+                                    <ng-container matColumnDef="deductionRegister">
+                                        <th mat-header-cell *matHeaderCellDef id="deductionRegister">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.deductionRegister']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.deductionRegistrationDate}}</td>
+                                    </ng-container>
+
+                                    <!-- firstDeduction Column -->
+                                    <ng-container matColumnDef="firstDeduction">
+                                        <th mat-header-cell *matHeaderCellDef id="firstDeduction">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.firstDeduction']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.firstDeduction}}</td>
+                                    </ng-container>
+                                    <!--createdDate Column -->
+                                    <ng-container matColumnDef="createdOn">
+                                        <th mat-header-cell *matHeaderCellDef id="createdOn">
+                                            {{languageStrings['primary.portal.aflacgroup.carrier.createdOn']}}
+                                        </th>
+                                        <td mat-cell *matCellDef="let element">{{element.createDate}}</td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="billingAccountCols"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: billingAccountCols;"></tr>
+                                </table>
+                            </div>
+                            <!--Billing Info || Ends -->
+
+                            <!--Location info start here-->
+                            <div *ngIf="aflacGroupInfo?.locations" class="location-info">
+                                <h3>{{languageStrings['primary.portal.aflacgroup.carrier.locationInfo']}}</h3>
+                                <div class="location-info">
+                                    <mat-accordion class="accordion-default">
+                                        <div *ngFor="let location of aflacGroupInfo?.locations">
+                                            <mat-expansion-panel>
+                                                <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                                                    <mon-icon iconName="down" class="accordion-indicator" iconSize="10"> </mon-icon>
+                                                    <mat-panel-title>{{location.address.state}} {{location.locationName}} </mat-panel-title>
+                                                </mat-expansion-panel-header>
+
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.city']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.address.city}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.primaryContact']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.primaryContact}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.locationCode']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.locationCode}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.stateProvince']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.address.state}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.address1']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.address.address1}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.address2']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.address.address2}}</div>
+                                                </div>
+                                                <div class="address-info">
+                                                    <mat-label class="mat-label">
+                                                        {{languageStrings['primary.portal.aflacgroup.carrier.zipPostalCode']}}
+                                                    </mat-label>
+                                                    <div class="ag-data">{{location.address.zip}}</div>
+                                                </div>
+                                            </mat-expansion-panel>
+                                        </div>
+                                    </mat-accordion>
+                                </div>
+                                <!--Location info end here-->
+                            </div>
+                        </div>
+                    </ng-template>
+                    <!--account info ends-->
+
+                    <!--product offering starts-->
+                    <ng-template #productOffering>
+                        <div class="product-info-wrapper">
+                            <h2 class="title">{{languageStrings["primary.portal.aflacGroup.offering.productOfferings"]}}</h2>
+
+                            <div
+                                class="product-list"
+                                *ngFor="let productSpecificPlans of productOfferingSource; first as firstProductPanel"
+                            >
+                                <h3 class="sub-title">{{productSpecificPlans?.product?.name}}</h3>
+                                <mat-accordion class="accordion-default" [multi]="true">
+                                    <div *ngFor="let planObject of productSpecificPlans?.plans">
+                                        <mat-expansion-panel [expanded]="firstProductPanel">
+                                            <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                                                <mon-icon iconSize="10" iconName="down" class="accordion-indicator"> </mon-icon>
+                                                <mat-panel-title>
+                                                    {{ languageStrings["primary.portal.aflacGroup.offering.planDetails"] | replaceTag:
+                                                    {"##planname##":planObject.planChoice.plan.name,"##planid##": planObject.aflacPlanId} }}
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <div>
+                                                <div *ngIf="planObject?.pricingDetails?.riders?.length">
+                                                    {{languageStrings["primary.portal.aflacGroup.ridersIncludedInCoverage"]}}
+                                                </div>
+                                                <ul *ngFor="let riderPlan of planObject?.pricingDetails?.riders">
+                                                    <li>{{riderPlan.planName}}</li>
+                                                </ul>
+                                            </div>
+                                            <div>
+                                                <!-- coverageLevel plans -->
+                                                <ng-container *ngIf="!productSpecificPlans?.templateType">
+                                                    <table mat-table [dataSource]="planObject?.pricingDetails?.pricing">
+                                                        <!-- coverageLevel Column -->
+                                                        <ng-container matColumnDef="coverageLevel">
+                                                            <th mat-header-cell *matHeaderCellDef id="coverageLevel">
+                                                                {{languageStrings["primary.portal.tpiEnrollment.coverageLevel"]}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.coverageLevel.name }}</td>
+                                                        </ng-container>
+
+                                                        <!-- Annual premium amount ($) Column -->
+                                                        <ng-container matColumnDef="annualPrice">
+                                                            <th mat-header-cell *matHeaderCellDef id="annualPrice">
+                                                                {{languageStrings["primary.portal.aflacGroup.annualPriceAmount"]}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">
+                                                                {{(element.priceMonthly * NO_OF_MONTHS).toFixed(FRACTION_DIGIT) }}
+                                                            </td>
+                                                        </ng-container>
+                                                        <tr mat-header-row *matHeaderRowDef="pricingCols"></tr>
+                                                        <tr mat-row *matRowDef="let row; columns: pricingCols;"></tr>
+                                                    </table>
+                                                </ng-container>
+
+                                                <!-- TOBACCO_AGE_INDIVIDUAL plans -->
+                                                <ng-container
+                                                    *ngIf="productSpecificPlans?.templateType === PRICING_TEMPLATE.TOBACCO_INDIVIDUAL_AGE"
+                                                >
+                                                    <p>
+                                                        {{languageStrings["primary.portal.aflacGroup.offering.productNamePricing"] |
+                                                        replaceTag: {"##product##": ''} }}
+                                                    </p>
+                                                    <div class="flex-form-wrapper">
+                                                        <form
+                                                            [formGroup]="filtersForm"
+                                                            (ngSubmit)="onSubmit(planObject.planChoice.plan.id)"
+                                                        >
+                                                            <div class="pricing-details">
+                                                                <div class="flex-item">
+                                                                    <mat-label class="mat-label">
+                                                                        {{languageStrings["primary.portal.aflacGroup.offering.lblMember"]}}
+                                                                    </mat-label>
+                                                                    <mat-form-field>
+                                                                        <mat-select
+                                                                            [formControlName]="FilterFormControlNames.MEMBER_TYPE"
+                                                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                                            disableOptionCentering="true"
+                                                                            (selectionChange)="mapPlanDetailFilterOptions($event.value)"
+                                                                        >
+                                                                            <mat-option
+                                                                                *ngFor="let option of MemberFilterOptions"
+                                                                                [value]="option.value"
+                                                                            >
+                                                                                {{option.viewValue}}</mat-option
+                                                                            >
+                                                                        </mat-select>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="flex-item">
+                                                                    <mat-label class="mat-label">
+                                                                        {{languageStrings["primary.portal.editCoverage.tobaccoStatus"]}}
+                                                                    </mat-label>
+                                                                    <mat-form-field>
+                                                                        <mat-select
+                                                                            [formControlName]="FilterFormControlNames.TOBACCO_STATUS"
+                                                                            [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                                            disableOptionCentering="true"
+                                                                            [disabled]="tobaccoStatusDisable"
+                                                                        >
+                                                                            <mat-option
+                                                                                *ngFor="let option of tobaccoStatusFilterOptions"
+                                                                                [value]="option.value"
+                                                                            >
+                                                                                {{option.viewValue}}</mat-option
+                                                                            >
+                                                                        </mat-select>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="flex-item">
+                                                                    <mat-label class="mat-label">
+                                                                        {{languageStrings["primary.portal.shopQuote.label.age"]}}
+                                                                    </mat-label>
+                                                                    <div class="age-wrapper">
+                                                                        <mat-form-field>
+                                                                            <mat-select
+                                                                                [formControlName]="FilterFormControlNames.AGE"
+                                                                                [placeholder]="languageStrings['primary.portal.common.placeholderSelect']"
+                                                                                disableOptionCentering="true"
+                                                                                [disabled]="!ageFilterOptions.length"
+                                                                            >
+                                                                                <mat-option
+                                                                                    *ngFor="let option of ageFilterOptions"
+                                                                                    [value]="option.value"
+                                                                                >
+                                                                                    {{option.viewValue}}</mat-option
+                                                                                >
+                                                                            </mat-select>
+                                                                        </mat-form-field>
+                                                                        <button
+                                                                            #submit
+                                                                            mat-flat-button
+                                                                            class="mon-btn-search mon-btn-primary"
+                                                                            color="primary"
+                                                                            type="submit"
+                                                                            [attr.aria-label]="languageStrings['primary.portal.common.search']"
+                                                                        >
+                                                                            <mon-icon
+                                                                                class="mon-icon-search"
+                                                                                iconSize="25"
+                                                                                iconName="search"
+                                                                            ></mon-icon>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <button
+                                                        *ngIf="productPricingData.length >0"
+                                                        class="mon-btn-link"
+                                                        (click)="resetFilters()"
+                                                    >
+                                                        {{languageStrings["primary.portal.aflacGroup.clearSelections"]}}
+                                                    </button>
+                                                    <div class="alert-wrapper" *ngIf="showFilterSelectionAlert">
+                                                        <mon-alert alertType="danger">
+                                                            {{languageStrings["primary.portal.aflacGroup.dropdownSelectionRequired"]}}
+                                                        </mon-alert>
+                                                    </div>
+
+                                                    <div *ngIf="productPricingData.length >0">
+                                                        <empowered-ag-product-price-display-list
+                                                            [productDataSource]="this.productPricingData"
+                                                        >
+                                                        </empowered-ag-product-price-display-list>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-container
+                                                    *ngIf="productSpecificPlans?.templateType === PRICING_TEMPLATE.TOBACCO_AGE_RANGE"
+                                                >
+                                                    <table mat-table [dataSource]="tobaccoAgeRangeTemplate.tobaccoAgeRangePricing">
+                                                        <!-- tobaccoStatus Column -->
+                                                        <ng-container matColumnDef="tobaccoStatus">
+                                                            <th mat-header-cell *matHeaderCellDef id="tobaccoStatus">
+                                                                {{languageStrings['primary.portal.editCoverage.tobaccoStatus']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.statusName }}</td>
+                                                        </ng-container>
+                                                        <!-- age Column -->
+                                                        <ng-container matColumnDef="age">
+                                                            <th mat-header-cell *matHeaderCellDef id="age">
+                                                                {{languageStrings['primary.portal.quickQuote.age']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">
+                                                                {{element.minAge }}-{{element.maxAge }}
+                                                            </td>
+                                                        </ng-container>
+                                                        <!-- benefit Column -->
+                                                        <ng-container matColumnDef="benefitAmount">
+                                                            <th mat-header-cell *matHeaderCellDef id="benefitAmount">
+                                                                {{languageStrings['primary.portal.agProductPrice.benefitDollar']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.benefitAmount }}</td>
+                                                        </ng-container>
+                                                        <!-- Annual premium amount employee ($) Column -->
+                                                        <ng-container matColumnDef="annualPriceEmp">
+                                                            <th mat-header-cell *matHeaderCellDef id="annualPriceEmp">
+                                                                {{languageStrings['primary.portal.agProductPrice.annualPriceEmp']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">
+                                                                <ng-container *ngIf="element.empPremium">
+                                                                    {{(element.empPremium * NO_OF_MONTHS).toFixed(FRACTION_DIGIT) }}
+                                                                </ng-container>
+                                                            </td>
+                                                        </ng-container>
+                                                        <!-- Annual premium amount spouse ($) Column -->
+                                                        <ng-container matColumnDef="annualPriceSpouse">
+                                                            <th mat-header-cell *matHeaderCellDef id="annualPriceSpouse">
+                                                                {{languageStrings['primary.portal.agProductPrice.spousePremium']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">
+                                                                <ng-container *ngIf="element.spousePremium">
+                                                                    {{(element.spousePremium * NO_OF_MONTHS).toFixed(FRACTION_DIGIT) }}
+                                                                </ng-container>
+                                                            </td>
+                                                        </ng-container>
+
+                                                        <tr mat-header-row *matHeaderRowDef="tobaccoAgeRangeCols"></tr>
+                                                        <tr mat-row *matRowDef="let row; columns: tobaccoAgeRangeCols;"></tr></table
+                                                ></ng-container>
+                                                <!-- SALARY_RANGE plans -->
+                                                <ng-container *ngIf="productSpecificPlans?.templateType === PRICING_TEMPLATE.SALARY_RANGE">
+                                                    <table mat-table [dataSource]="salaryRangeTemplate">
+                                                        <!-- age Column -->
+                                                        <ng-container matColumnDef="age">
+                                                            <th mat-header-cell *matHeaderCellDef id="age">
+                                                                {{languageStrings['primary.portal.shopQuote.label.age']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">
+                                                                <ng-container *ngIf="element.minAge && element.minAge">
+                                                                    {{element.minAge }}-{{element.maxAge }}
+                                                                </ng-container>
+                                                            </td>
+                                                        </ng-container>
+                                                        <!-- MinimumEligibleSalary ($) Column -->
+                                                        <ng-container matColumnDef="minimumEligibleSalary">
+                                                            <th mat-header-cell *matHeaderCellDef id="minimumEligibleSalary">
+                                                                {{languageStrings['primary.portal.agProductPrice.minEligibleSalary']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.minEligibleSalary}}</td>
+                                                        </ng-container>
+                                                        <!-- benefit Column -->
+                                                        <ng-container matColumnDef="benefitAmount">
+                                                            <th mat-header-cell *matHeaderCellDef id="benefitAmount">
+                                                                {{languageStrings['primary.portal.agProductPrice.benefitDollar']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.benefitAmount }}</td>
+                                                        </ng-container>
+                                                        <!-- Annual premium amount employee ($) Column -->
+                                                        <ng-container matColumnDef="annualPriceEmp">
+                                                            <th mat-header-cell *matHeaderCellDef id="annualPriceEmp">
+                                                                {{languageStrings['primary.portal.agProductPrice.annualPriceEmp']}}
+                                                            </th>
+                                                            <td mat-cell *matCellDef="let element">{{element.annualPrice}}</td>
+                                                        </ng-container>
+
+                                                        <tr mat-header-row *matHeaderRowDef="salaryRangeCols"></tr>
+                                                        <tr mat-row *matRowDef="let row; columns: salaryRangeCols;"></tr>
+                                                    </table>
+                                                </ng-container>
+                                            </div>
+                                        </mat-expansion-panel>
+                                    </div>
+                                </mat-accordion>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <!--product offering Ends-->
+                    <!-- plan brochures starts -->
+                    <ng-template #planBrochures>
+                        <mon-alert alertType="danger" *ngIf="planBrochureError" class="account-info-error">
+                            <span>{{ planBrochureError }}</span>
+                        </mon-alert>
+                        <div class="plan-brochures">
+                            <h2 class="title">{{languageStrings["primary.portal.aflacGroup.hqAdmin.planBrochures"]}}</h2>
+
+                            <mat-accordion class="accordion-default" [multi]="true">
+                                <div *ngFor="let productSpecificPlans of productOfferingSource">
+                                    <mat-expansion-panel>
+                                        <mat-expansion-panel-header collapsedHeight="56px" expandedHeight="56px">
+                                            <mon-icon iconSize="10" iconName="down" class="accordion-indicator"> </mon-icon>
+                                            <mat-panel-title>
+                                                <div>
+                                                    <p>{{productSpecificPlans.product.name}}</p>
+                                                </div>
+
+                                                <div class="brochure-status">
+                                                    <ng-container
+                                                        *ngIf="productSpecificPlans?.plans?.length !== productSpecificPlans.uploadedDocuments"
+                                                    >
+                                                        <mon-icon iconSize="16" iconName="Filled-warning" class="icon-warning"></mon-icon>
+                                                        {{ languageStrings['primary.portal.aflacGroup.offering.productSpecificPlans'] |
+                                                        replaceTag: { "##plan1##" : productSpecificPlans.uploadedDocuments, "##plan2##" :
+                                                        productSpecificPlans?.plans?.length } }}
+                                                    </ng-container>
+                                                    <ng-container
+                                                        *ngIf="productSpecificPlans?.plans?.length === productSpecificPlans.uploadedDocuments"
+                                                    >
+                                                        <mon-icon class="icon-success" iconName="check" iconSize="16"> </mon-icon>
+                                                        {{languageStrings['primary.portal.aflacGroup.offering.productSpecificPlan'] |
+                                                        replaceTag: {"##plan##": productSpecificPlans?.plans?.length} }}
+                                                    </ng-container>
+                                                </div>
+                                            </mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <div *ngFor="let planObject of productSpecificPlans?.plans">
+                                            <p class="plan-name">
+                                                {{ languageStrings["primary.portal.aflacGroup.offering.planDetails"] | replaceTag:
+                                                {"##planname##":planObject.planChoice.plan.name,"##planid##": planObject.aflacPlanId} }}
+                                            </p>
+                                            <mat-label class="mat-label">
+                                                {{languageStrings['primary.portal.aflacGroup.offering.uploadPlan']}}
+                                            </mat-label>
+                                            <empowered-mon-upload
+                                                [hint]="true"
+                                                [hintText]="languageStrings['primary.portal.aflacGroup.offering.uploadPlanHint']"
+                                                [isFileViewable]="false"
+                                                [accept]="acceptableFormats"
+                                                (uploadFile)="validateFileAndUpload($event, planObject.planChoice.plan.id, planObject, productSpecificPlans)"
+                                                (cancelUpload)="cancelUpload($event, planObject)"
+                                                [files]="[planObject?.fileDetails?.file]"
+                                                [isSucess]="[planObject?.fileDetails?.isSuccess]"
+                                                [hasError]="[planObject?.fileDetails?.hasError]"
+                                                [uploadSucessStatus]="[planObject?.fileDetails?.uploadSuccessStatus]"
+                                                [uploadErrorStatus]="[planObject?.fileDetails?.uploadErrorStatus]"
+                                                [isProgressBarEnabled]="[planObject?.fileDetails?.isProgressBarEnabled]"
+                                                [isFileSelected]="[planObject?.fileDetails?.isFileSelected]"
+                                                [modeProgress]="planObject?.fileDetails?.modeProgress"
+                                                [isUploadingStarted]="planObject?.fileDetails?.isUploadingStarted"
+                                                [fileUploadPercentage]="planObject?.fileDetails?.fileUploadPercentage"
+                                            >
+                                            </empowered-mon-upload>
+                                        </div>
+                                    </mat-expansion-panel>
+                                </div>
+                            </mat-accordion>
+                        </div>
+                    </ng-template>
+                    <!-- plan brochures Ends -->
+                </div>
+                <mat-dialog-actions class="dialog-footer">
+                    <a href="javascript:void(0)" class="mon-btn-link" (click)="onSaveAndClose()"
+                        >{{languageStrings['primary.portal.common.cancel']}}</a
+                    >
+                    <div>
+                        <button
+                            mat-flat-button
+                            class="mon-btn-secondary"
+                            *ngIf="verticalStepper.selectedIndex > STEPPER_DATA.ACCOUNT_INFO"
+                            (click)="onBack()"
+                        >
+                            <mon-icon class="icon-left" iconName="left" iconSize="10"></mon-icon>
+                            <span>{{languageStrings['primary.portal.common.back']}}</span>
+                        </button>
+                        <button
+                            mat-flat-button
+                            class="mon-btn-secondary"
+                            *ngIf="verticalStepper.selectedIndex === STEPPER_DATA.PLAN_BROCHURES"
+                            (click)="onSaveAndClose(true)"
+                        >
+                            {{languageStrings['primary.portal.aflacGroup.offering.saveAndClose']}}
+                        </button>
+                        <button mat-flat-button (click)="onRequestChanges()" class="mon-btn-secondary">
+                            {{languageStrings['primary.portal.dashboard.adminApprovalChecklist.requestChanges']}}
+                        </button>
+                        <button
+                            mat-flat-button
+                            class="mon-btn-primary"
+                            *ngIf="verticalStepper.selectedIndex < STEPPER_DATA.PLAN_BROCHURES"
+                            (click)="onNext()"
+                        >
+                            <span>{{languageStrings['primary.portal.common.next']}}</span>
+                            <mon-icon class="icon-right" iconName="right" iconSize="10"></mon-icon>
+                        </button>
+                        <button
+                            mat-flat-button
+                            class="mon-btn-primary"
+                            *ngIf="verticalStepper.selectedIndex === STEPPER_DATA.PLAN_BROCHURES"
+                            (click)="onSubmitBrochures()"
+                        >
+                            {{languageStrings['primary.portal.common.submitBrochures']}}
+                        </button>
+                    </div>
+                </mat-dialog-actions>
+            </div>
+        </mat-dialog-content>
+    </div>
+</form>

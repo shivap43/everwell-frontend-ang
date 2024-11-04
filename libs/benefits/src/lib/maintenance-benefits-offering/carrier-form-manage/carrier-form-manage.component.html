@@ -1,0 +1,234 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="carrier-tab">
+    <div *ngIf="(inCompleteForms$|async)?.length>0">
+        <h3 class="sub-title">
+            {{languageStrings[languageBasePath + '.inProgress']}}
+        </h3>
+        <table mat-table [dataSource]="inCompleteForms$">
+            <!-- carrier Column -->
+            <ng-container matColumnDef="carrier">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.carrier']}}
+                </th>
+                <td mat-cell *matCellDef="let element">{{element?.carrierName}}</td>
+            </ng-container>
+
+            <!-- Form name Column -->
+            <ng-container matColumnDef="formName">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.formName']}}
+                </th>
+                <td mat-cell *matCellDef="let element">{{element?.formName}}</td>
+            </ng-container>
+
+            <!-- Date completed Column -->
+            <ng-container matColumnDef="dateCompleted">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.dateCompleted']}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span> {{element?.status?._dateCompleted | date: dateFormat}}</span>
+                </td></ng-container
+            >
+
+            <!-- Account approval Column -->
+            <ng-container matColumnDef="accountApproval">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.accountApproval']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <span [ngSwitch]="true">
+                        <span *ngSwitchCase="element?.status?._accountApprovalStatus === FormStatusEnum.APPROVED"
+                            ><mon-icon [iconSize]="16" iconName="check"></mon-icon
+                        ></span>
+                        <span
+                            *ngSwitchCase="element?.status?._accountApprovalStatus === FormStatusEnum.DENIED || element?.formStatus === FormStatusEnum.CANCELED"
+                            ><mon-icon [iconSize]="16" iconName="cross"></mon-icon
+                        ></span>
+                        <span *ngSwitchDefault>{{element?.status?._accountApprovalStatus | titlecase}}</span>
+                    </span>
+
+                    <a
+                        href="javascript:void(0)"
+                        *ngIf="statusesForTooltip.includes(element?.status?._accountApprovalStatus)"
+                    >
+                        <mon-icon
+                            [iconSize]="16"
+                            iconName="Filled-info"
+                            class="infoicon icon-primary"
+                            [richTooltip]="getTooltipTemplate(element.id, 'account', element.status)"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                        ></mon-icon
+                    ></a>
+                </td>
+            </ng-container>
+            <!-- Carrier approval Column -->
+            <ng-container matColumnDef="carrierApproval">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.carrierApproval']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <span [ngSwitch]="true">
+                        <span *ngSwitchCase="element?.status?._carrierApprovalStatus === FormStatusEnum.APPROVED"
+                            ><mon-icon [iconSize]="16" iconName="check"></mon-icon
+                        ></span>
+                        <span
+                            *ngSwitchCase="element?.status?._carrierApprovalStatus === FormStatusEnum.DENIED || element?.formStatus === FormStatusEnum.CANCELED"
+                            ><mon-icon [iconSize]="16" iconName="cross"></mon-icon
+                        ></span>
+                        <span *ngSwitchDefault>{{element?.status?._carrierApprovalStatus | titlecase}}</span>
+                    </span>
+                    <a
+                        href="javascript:void(0)"
+                        *ngIf="statusesForTooltip.includes(element?.status?._carrierApprovalStatus)"
+                    >
+                        <mon-icon
+                            [iconSize]="16"
+                            iconName="Filled-info"
+                            class="infoicon icon-primary"
+                            [richTooltip]="getTooltipTemplate(element.id, 'account', element.status)"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                        ></mon-icon
+                    ></a>
+                </td>
+            </ng-container>
+
+            <!-- Manage Column -->
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.manage']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <span [ngSwitch]="true" class="visible-on-row-hover">
+                        <span *ngSwitchDefault>
+                            <button
+                                class="mon-btn-link"
+                                (click)="openViewPDFModal(element)"
+                                [attr.aria-label]="languageStrings[languageBasePath + '.viewEdit']"
+                            >
+                                {{languageStrings["primary.portal.qle.viewLabel"]}}
+                            </button>
+                        </span>
+                    </span>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="carriersDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: carriersDisplayedColumns;"></tr>
+        </table>
+    </div>
+
+    <div *ngIf="(completeForms$|async)?.length>0">
+        <h3 class="sub-title">
+            {{languageStrings[languageBasePath + '.completed']}}
+        </h3>
+        <table mat-table [dataSource]="completeForms$">
+            <!-- carrier Column -->
+            <ng-container matColumnDef="carrier">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.carrier']}}
+                </th>
+                <td mat-cell *matCellDef="let element">{{element?.carrierName}}</td>
+            </ng-container>
+
+            <!-- Form name Column -->
+            <ng-container matColumnDef="formName">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.formName']}}
+                </th>
+                <td mat-cell *matCellDef="let element">{{element?.formName}}</td>
+            </ng-container>
+
+            <!-- Date completed Column -->
+            <ng-container matColumnDef="dateCompleted">
+                <th mat-header-cell *matHeaderCellDef>
+                    {{languageStrings[languageBasePath + '.dateCompleted']}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span [ngSwitch]="element">
+                        <span>{{element?.status?._dateCompleted | date: dateFormat}}</span>
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Account approval Column -->
+            <ng-container matColumnDef="accountApproval">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.accountApproval']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <span
+                        *ngIf="element?.formStatus === FormStatusEnum.APPROVED || element?.formStatus === FormStatusEnum.DENIED"
+                    >
+                        <span *ngIf="element?.formStatus === FormStatusEnum.APPROVED"
+                            ><mon-icon [iconSize]="16" iconName="check"></mon-icon
+                        ></span>
+                        <span
+                            *ngIf="element?.formStatus === FormStatusEnum.DENIED || element?.formStatus === FormStatusEnum.CANCELED"
+                            ><mon-icon [iconSize]="16" iconName="cross"></mon-icon
+                        ></span>
+                        <a href="javascript:void(0)">
+                            <mon-icon
+                                [iconSize]="16"
+                                iconName="Filled-info"
+                                class="infoicon icon-primary"
+                                [richTooltip]="getTooltipTemplate(element.id, 'account', element.status)"
+                                matTooltipPosition="above"
+                                matTooltipClass="pos-above"
+                            ></mon-icon
+                        ></a>
+                    </span>
+                </td>
+            </ng-container>
+            <!-- Carrier approval Column -->
+            <ng-container matColumnDef="carrierApproval">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.carrierApproval']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <span *ngIf="element?.formStatus === FormStatusEnum.APPROVED"
+                        ><mon-icon [iconSize]="16" iconName="check"></mon-icon
+                    ></span>
+                    <span
+                        *ngIf="element?.formStatus === FormStatusEnum.DENIED || element?.formStatus === FormStatusEnum.CANCELED"
+                        ><mon-icon [iconSize]="16" iconName="cross"></mon-icon
+                    ></span>
+                    <a href="javascript:void(0)"
+                        ><mon-icon
+                            [iconSize]="16"
+                            iconName="Filled-info"
+                            class="infoicon icon-primary"
+                            [richTooltip]="getTooltipTemplate(element.id, 'carrier', element.status)"
+                            matTooltipPosition="above"
+                            matTooltipClass="pos-above"
+                        ></mon-icon
+                    ></a>
+                </td>
+            </ng-container>
+
+            <!-- Manage Column -->
+            <ng-container matColumnDef="manage">
+                <th mat-header-cell *matHeaderCellDef class="text-center">
+                    {{languageStrings[languageBasePath + '.manage']}}
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <button
+                        class="mon-btn-link"
+                        *ngIf="element.id"
+                        (click)="openViewPDFModal(element)"
+                        [attr.aria-label]="languageStrings[languageBasePath + '.viewEdit']"
+                    >
+                        <span>
+                            {{languageStrings["primary.portal.qle.viewLabel"]}}
+                        </span>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="carriersDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: carriersDisplayedColumns;"></tr>
+        </table>
+    </div>
+</div>

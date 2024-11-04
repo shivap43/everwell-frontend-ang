@@ -1,0 +1,45 @@
+<h3>
+    <span [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_HEADER"></span>
+    <span>{{ category.name }}</span>
+</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <mat-label [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_LABEL_PRIMARY"></mat-label>
+            <mat-form-field>
+                <mat-select [formControl]="primaryAdminControl" [disableOptionCentering]="true" [attr.aria-label]="primaryAdminAria">
+                    <ng-container *ngFor="let admin of adminsAndAssignment$ | async">
+                        <mat-option *ngIf="0 === admin.selectedId || admin.selectedId == null" [value]="admin.id">
+                            {{ admin.name.firstName | titlecase }} {{ admin.name.lastName | titlecase }}
+                        </mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <ng-container #standardAdmins></ng-container>
+
+    <div class="row">
+        <ng-container *ngIf="this.canAddAdminRow; else cannotAddAdminRow">
+            <span class="col-4">
+                <button class="mon-btn-link" 
+                        (click)="addStandardAdmin()"
+                        [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_BUTTON_ADD_STANDARD">
+                </button>
+            </span>
+        </ng-container>
+        <ng-template #cannotAddAdminRow>
+            <span class="col-4">
+                <span [richTooltip]="cannotRemoveTooltip">
+                    <button class="mon-btn-link"
+                            [disabled]="!this.canAddAdminRow"
+                            (click)="addStandardAdmin()"
+                            [language]="MessageCenterLanguage.CATEGORY_ADMIN_ASSIGNMENT_BUTTON_ADD_STANDARD">
+                    </button>
+                </span>
+            </span>
+        </ng-template>
+    </div>
+</div>

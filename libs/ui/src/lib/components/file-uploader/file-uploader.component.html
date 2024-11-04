@@ -1,0 +1,57 @@
+<div>
+    <!--Label-->
+    <mat-label [attr.id]="internalId">{{ label$ | async }}</mat-label>
+
+    <ng-container *ngIf="allowedMimeTypes$ | async as allowedMimeTypes; else withoutMime">
+        <ngx-dropzone
+            #logoDropZone
+            [attr.aria-labelledby]="internalId"
+            [multiple]="allowMultipleUploads$ | async"
+            [accept]="allowedMimeTypes"
+            (change)="onFileUpload($event);"
+        >
+            <ngx-dropzone-label>
+                <p>{{dropzoneLabel$ | async}}</p>
+            </ngx-dropzone-label>
+        </ngx-dropzone>
+    </ng-container>
+    <ng-template #withoutMime>
+        <ngx-dropzone
+            #logoDropZone
+            [attr.aria-labelledby]="internalId"
+            [multiple]="allowMultipleUploads$ | async"
+            (change)="onFileUpload($event);"
+        >
+            <ngx-dropzone-label>
+                <p>{{dropzoneLabel$ | async}}</p>
+            </ngx-dropzone-label>
+        </ngx-dropzone>
+    </ng-template>
+    <!--Dropzone library-->
+
+    <!--Echo the hint-->
+    <ng-container *ngIf="hint$ | async as hint">
+        <mat-hint>{{ hint }}</mat-hint>
+    </ng-container>
+    <!--Displays the last uploaded file if it exists-->
+    <ng-container *ngIf="lastUploaded$ | async as lastUploaded">
+        <mat-hint>{{ lastUploaded }}</mat-hint>
+    </ng-container>
+
+    <!--List of the uploaded files-->
+    <ng-container *ngIf="uploads$ | async as uploads">
+        <empowered-file-row
+            *ngFor="let upload of uploads"
+            [uploadedFile]="upload"
+            [canDelete]="canDelete$ | async"
+            (delete)="deleteFile(upload)"
+        >
+        </empowered-file-row>
+    </ng-container>
+    <!--Test upload for images that need to have their dimensions checked-->
+    <span class="test-image" aria-hidden="true">
+        <ng-container *ngIf="testImage$ | async as testImage">
+            <img #testImageElem *ngIf="testImage.readData" alt="" [src]="testImage.readData" (load)="validateDimensions(testImage)" />
+        </ng-container>
+    </span>
+</div>

@@ -1,0 +1,73 @@
+@import "shared";
+
+.info-modal {
+    width: convert-unit(667px, "rem");
+    max-width: 100%;
+}
+
+.dialog-subtitle {
+    margin-bottom: map-get($spacers, 30);
+}
+
+.plan-list {
+    width: convert-unit(564px, "rem");
+    max-width: 100%;
+    display: block;
+    overflow: hidden;
+}
+
+.plan-box {
+    display: inline-flex;
+    padding: convert-unit(15px, "rem");
+    height: convert-unit(65px, "rem");
+    width: convert-unit(564px, "rem");
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: grab;
+    background: get("color.gray.200");
+    font-size: convert-unit(16px, "rem");
+    border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+}
+.cdk-drag-preview {
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+    border-top: convert-unit(1px, "rem") solid get("color.gray.600");
+    box-sizing: border-box;
+    box-shadow: convert-unit(0px, "rem") convert-unit(5px, "rem") convert-unit(5px, "rem") convert-unit(-3px, "rem")
+            rgba($color: get("color.black"), $alpha: 0.2),
+        convert-unit(0px, "rem") convert-unit(8px, "rem") convert-unit(10px, "rem") convert-unit(1px, "rem")
+            rgba($color: get("color.black"), $alpha: 0.14),
+        convert-unit(0px, "rem") convert-unit(3px, "rem") convert-unit(14px, "rem") convert-unit(2px, "rem")
+            rgba($color: get("color.black"), $alpha: 0.12);
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.plan-box:last-child {
+    border-bottom: convert-unit(1px, "rem") solid get("color.gray.600");
+}
+
+.plan-list.cdk-drop-list-dragging .plan-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.plan-list,
+.cdk-drop-list:active,
+.cdk-drop-list-dragging:active {
+    cursor: grab;
+}
+
+.plan-custom-placeholder {
+    background-color: get("color.white") !important;
+    border: dotted convert-unit(3px, "rem") get("color.gray.400");
+    min-height: convert-unit(65px, "rem");
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.plan-text {
+    flex: auto;
+    margin-left: map-get($spacers, 10);
+}

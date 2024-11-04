@@ -1,0 +1,67 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div class="info-modal">
+    <form [formGroup]="coverageChangeForm" (ngSubmit)="setUpdateCoverageRequest()">
+        <div class="modal-header">
+            <button
+                mat-icon-button
+                (click)="closeChangePopup()"
+                [attr.aria-label]="languageStrings['primary.portal.common.close']"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+
+        <div mat-dialog-content>
+            <h2 mat-dialog-title>{{languageStrings['primary.portal.editCoverage.whycoverageChanging']}}</h2>
+            <mat-label class="mat-label">{{languageStrings['primary.portal.editCoverage.changesMade']}}</mat-label>
+
+            <ul>
+                <li *ngFor="let data of data.changedFields">{{data}}</li>
+            </ul>
+            <div class="w-200">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.editCoverage.select']}}</mat-label>
+                <mat-form-field>
+                    <mat-select
+                        formControlName="changeReasons"
+                        placeholder="Change reason"
+                        (selectionChange)="checkSelectedOption($event.value)"
+                        [disableOptionCentering]="true"
+                    >
+                        <mat-option *ngFor="let reason of coverageChangingReasons" [value]="reason">
+                            {{reason}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formControl['changeReasons'].errors?.required">
+                        <span>{{languageStrings['primary.portal.editCoverage.selectionRequired']}}</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-label class="mat-label"
+                    >{{languageStrings['primary.portal.editCoverage.description']}}
+                    <span class="optional-text" *ngIf="isOptional"
+                        >{{languageStrings['primary.portal.common.optional']}}</span
+                    ></mat-label
+                >
+                <mat-form-field>
+                    <textarea
+                        matInput
+                        formControlName="description"
+                        [attr.aria-label]="languageStrings['primary.portal.classes.description']"
+                    ></textarea>
+                    <mat-error *ngIf="formControl['description'].errors?.required">
+                        <span>{{languageStrings['primary.portal.editCoverage.required']}}</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-dialog-actions class="dialog-footer">
+            <a mat-button class="mon-btn-link" (click)="closeChangePopup()"
+                >{{languageStrings['primary.portal.editCoverage.cancel']}}</a
+            >
+            <button mat-flat-button class="mon-btn-primary" type="submit">
+                {{languageStrings['primary.portal.editCoverage.save']}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

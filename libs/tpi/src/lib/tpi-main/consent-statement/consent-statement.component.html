@@ -1,0 +1,36 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="loadSpinner"></empowered-mon-spinner>
+<empowered-tpi-secondary-header> {{languageStrings['primary.portal.tpiEnrollment.consentStatement']}} </empowered-tpi-secondary-header>
+<div class="tpi-content">
+    <mon-alert *ngIf="invalidEnrollmentStateErrorMessage" class="message-block">
+        <span>{{ invalidEnrollmentStateErrorMessage }}</span>
+    </mon-alert>
+    <mon-alert alertType="danger" *ngIf="errorMessage" class="message-block">
+        <span>{{ errorMessage }}</span>
+    </mon-alert>
+    <p>{{languageStrings['primary.portal.headset.subtitle']}}</p>
+    <div [innerHtml]="consentContent"></div>
+</div>
+
+<empowered-tpi-footer class="tpi-footer">
+    <div>
+        <a
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            href="javascript:void(0)"
+            class="mon-btn-link"
+            mat-flat-button
+            (click)="onCancel()"
+        >
+            {{languageStrings['primary.portal.common.cancel']}}
+        </a>
+    </div>
+    <div>
+        <button
+            [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            mat-button
+            class="mon-btn-primary"
+            (click)="onContinue()"
+        >
+            {{languageStrings['primary.portal.common.iAgree']}}
+        </button>
+    </div>
+</empowered-tpi-footer>

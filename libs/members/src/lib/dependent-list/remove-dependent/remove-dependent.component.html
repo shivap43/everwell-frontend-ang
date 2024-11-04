@@ -1,0 +1,11 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="true">
+    <empowered-modal-header>
+        <span>{{ "primary.portal.members.removeDependentList.title"| replaceTag: { "#name": memberInfo.name } }}</span>
+    </empowered-modal-header>
+    <p language="primary.portal.members.removeDependent.content"></p>
+    <empowered-modal-footer class="empowered-footer">
+        <button [attr.aria-label]="remove" cdkFocusInitial class="mon-btn-danger" mat-dialog-close="true" mat-flat-button>
+            {{ remove }}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

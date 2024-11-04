@@ -1,0 +1,90 @@
+<empowered-modal type="POPUP" size="MD">
+    <empowered-modal-header>
+        <span
+            language="primary.portal.dashboard.adminApprovalChecklist.benefitDollars.editOffering.offeringAmount"
+        ></span>
+    </empowered-modal-header>
+    <empowered-modal-footer>
+        <button mat-flat-button class="mon-btn-primary" (click)="onSubmit()">
+            {{languageStrings['primary.portal.common.save']}}
+        </button>
+    </empowered-modal-footer>
+    <p language="primary.portal.dashboard.adminApprovalChecklist.benefitDollars.editOffering.headerMessage"></p>
+    <form [formGroup]="offeringForm">
+        <div class="d-md-flex" class="amount-form">
+            <div class="flex-item w-250">
+                <mat-radio-group
+                    class="contributionType"
+                    formControlName="contributionType"
+                    (change)="changeAmountType($event.value)"
+                    [attr.aria-label]="languageStrings['primary.portal.common.selectOption']"
+                >
+                    <mat-radio-button [value]="benefitDollars.FLAT_AMOUNT"
+                        ><mat-label class="mat-label">
+                            {{benefitDollars.AMOUNT_FLAT_PRICE}}
+                        </mat-label>
+
+                        <div *ngIf="amountTypeVal==benefitDollars.FLAT_AMOUNT">
+                            <mat-form-field class="example-full-width">
+                                <span matPrefix *ngIf="!displaySuffixPrefix">{{benefitDollars.DOLLAR}}</span>
+                                <input
+                                    type="number"
+                                    (keypress)="restrictNegativeValue($event)"
+                                    empoweredPreventPasteOnHtmlElements
+                                    required
+                                    [attr.aria-label]="languageStrings['primary.portal.dashboard.adminApprovalChecklist.benefitDollars.editOffering.offeringAmount']"
+                                    matInput
+                                    formControlName="amount"
+                                    (focus)="displaySuffixPrefix = !displaySuffixPrefix"
+                                    (blur)="displaySuffixPrefix = !displaySuffixPrefix"
+                                />
+                                <span matSuffix *ngIf="!displaySuffixPrefix">{{data.payFrequency?.name}}</span>
+                                <mat-error *ngIf="offeringForm.controls['amount'].hasError('required')"
+                                    >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                >
+                                <mat-error *ngIf="offeringForm.controls['amount'].hasError('min')"
+                                    >{{languageStrings['primary.portal.census.editEstimate.nonZero']}}</mat-error
+                                >
+                                <mat-error
+                                    *ngIf="offeringForm.controls['amount'].hasError('pattern') || offeringForm.controls['amount'].errors?.flagError"
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.addEditOffering.flatAmountValidation']}}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-button>
+                    <mat-radio-button [value]="benefitDollars.PERCENTAGE_AMOUNT"
+                        ><mat-label class="mat-label">
+                            {{benefitDollars.AMOUNT_PERCENTAGE}}
+                        </mat-label>
+
+                        <div *ngIf="amountTypeVal==benefitDollars.PERCENTAGE_AMOUNT">
+                            <mat-form-field class="example-full-width">
+                                <input
+                                    type="number"
+                                    (keypress)="restrictNegativeValue($event)"
+                                    empoweredPreventPasteOnHtmlElements
+                                    required
+                                    [attr.aria-label]="languageStrings['primary.portal.dashboard.adminApprovalChecklist.benefitDollars.editOffering.offeringAmount']"
+                                    matInput
+                                    formControlName="percentageAmount"
+                                    (focus)="displayPercentageSuffix = !displayPercentageSuffix"
+                                    (blur)="displayPercentageSuffix = !displayPercentageSuffix"
+                                />
+                                <span matSuffix *ngIf="!displayPercentageSuffix">{{benefitDollars.PERCENTAGE}}</span>
+                                <mat-error *ngIf="offeringForm.controls['percentageAmount'].hasError('required')"
+                                    >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                >
+                                <mat-error *ngIf="offeringForm.controls['percentageAmount'].hasError('min')"
+                                    >{{languageStrings['primary.portal.applicationFlow.beneficiary.percentCannotBeZero']}}</mat-error
+                                >
+                                <mat-error *ngIf="offeringForm.controls['percentageAmount'].hasError('max')"
+                                    >{{languageStrings['primary.portal.maintenanceBenefitsOffering.addEditOffering.percentageAmountValidation']}}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    </form>
+</empowered-modal>

@@ -1,0 +1,149 @@
+<empowered-planinfo-compact [application]="planObject?.application"></empowered-planinfo-compact>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<!-- TODO Need to remove hard coded values after getting confirmation on section names -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div
+    *ngIf="showComponents"
+    class="scroll-spy-element"
+    id="parentDiv"
+    scrollSpy
+    [spiedTags]="['DIV']"
+    (sectionChange)="updateStepper($event)"
+    #planDiv
+>
+    <div
+        *ngFor="let section of updatedPlanObject?.application.appData.sections; let i= index "
+        [id]="getSectionId(i)"
+        class="appflow-section"
+    >
+        <ng-container *ngIf="section.showSection">
+            <ng-container *ngFor="let step of section.steps; let j = index">
+                <div
+                    *ngIf="step.showStep && (!((step?.step[0]?.type === stepType.QUESTION) || (step?.step[0]?.type === stepType.TOBACCO) || (step?.step[0]?.type === stepType.REQUIREDDEMOGRAPHICS) || (step?.step[0]?.type === stepType.PLANOPTIONS) || (step?.step[0]?.type === stepType.COVERAGELEVELCHOICE) || section.title === 'Riders' || section.title === 'Paylogix') || (i<currentSectionIndex || i<=currentSectionIndex  && j <= currentStepIndex ))"
+                    class="section-step"
+                    [ngClass]="{'active-section':  (i<currentSectionIndex || i<=currentSectionIndex  && j <= currentStepIndex )}"
+                    [id]="getStepId(i,j)"
+                    [style.minHeight.px]="appStepDynamicHeight"
+                >
+                    <section class="section-container">
+                        <div class="section-header">
+                            <h3
+                                *ngIf="!(section.title === RIDERS_TITLE || section.title === BENEFICIARY_TITLE || section.title === PAYLOGIX)"
+                            >
+                                {{section.title}}
+                            </h3>
+                        </div>
+                    </section>
+                    <empowered-question
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.QUESTION && step.showStep"
+                    >
+                    </empowered-question>
+                    <empowered-plan-options
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        [tpiSSODetails]="tpiSSODetails"
+                        *ngIf="(step.step[0].type && step.step[0].type === stepType.PLANOPTIONS||step.step[0].type && step.step[0].type === stepType.COVERAGELEVELCHOICE )&& step.showStep"
+                    >
+                    </empowered-plan-options>
+                    <empowered-beneficiary
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.BENEFICIARIES && step.showStep"
+                    >
+                    </empowered-beneficiary>
+                    <empowered-tobacco
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.TOBACCO && step.showStep"
+                    >
+                    </empowered-tobacco>
+                    <empowered-conversion
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="step.step.length && (step.step[0].type === stepType.CONVERSION || step.step[0].type === stepType.ADDITION || step.step[0].type === stepType.DOWNGRADE) && step.showStep"
+                    >
+                    </empowered-conversion>
+                    <!-- fix me : un-comment demographic component after implementation -->
+                    <empowered-demographic
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.REQUIREDDEMOGRAPHICS && step.showStep"
+                    >
+                    </empowered-demographic>
+                    <empowered-riders
+                        [currentSectionIndex]="currentSectionIndex"
+                        [riderSectionBlur]="riderSectionBlur"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="section.title === 'Riders'"
+                    >
+                    </empowered-riders>
+                    <empowered-bucket-plan-flow
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.BUCKET && step.showStep"
+                    >
+                    </empowered-bucket-plan-flow>
+                    <empowered-text
+                        [planObject]="mapData(i,j)"
+                        *ngIf="(step?.step[0]?.type && step.step[0].type === stepType.TEXT || step?.step[0]?.type && step.step[0].type === stepType.CONFIRMATION) && step?.showStep"
+                    >
+                    </empowered-text>
+                    <empowered-reinstatement
+                        [currentSectionIndex]="currentSectionIndex"
+                        [tpiSSODetails]="tpiSSODetails"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="step.step.length && step.step[0].type === stepType.REINSTATEMENT && step.showStep"
+                    >
+                    </empowered-reinstatement>
+                    <empowered-dependents
+                        [currentSectionIndex]="currentSectionIndex"
+                        [tpiSSODetails]="tpiSSODetails"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j, section, step)"
+                        *ngIf="step.step[0].type && step.step[0].type === stepType.DEPENDENTSKAISER || step.step[0].type && step.step[0].type === stepType.DEPENDENTS"
+                    >
+                    </empowered-dependents>
+                    <empowered-occupation-class
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j)"
+                        *ngIf="step?.step[0]?.type && step.step[0].type === stepType.RISKCLASSOVERRIDE && step.showStep"
+                    >
+                    </empowered-occupation-class>
+                    <empowered-ag-group-information
+                        [currentSectionIndex]="currentSectionIndex"
+                        [currentStepIndex]="currentStepIndex"
+                        [planObject]="mapData(i,j)"
+                        *ngIf="step?.step[0]?.type && step.step[0].type === stepType.AG_LOCATION_DEDUCTION_FREQUENCY && step.showStep"
+                    >
+                    </empowered-ag-group-information>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+    <div>
+        <!-- Need clarification on this so commenting it temporarily -->
+        <!-- <button
+            *ngIf="updatedPlanObject.previousProduct"
+            class="mon-btn-secondary mon-mr-20 btn-prev-product"
+            type="button"
+            (click)="navigateToPreviousProduct()"
+            mat-flat-button
+        >
+            <mon-icon class="icon-right" iconName="left" [iconSize]="10"></mon-icon>
+            <span>Back: {{updatedPlanObject.previousProduct}}</span>
+        </button> -->
+    </div>
+</div>

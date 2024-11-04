@@ -1,0 +1,21 @@
+<empowered-modal type="POPUP" size="MD" [showCancel]="true">
+    <empowered-modal-header>
+        <span language="primary.portal.common.remove"></span>
+        <span> {{customerInfo.name}}</span>
+    </empowered-modal-header>
+    <p>
+        <span>{{customerInfo.name}} </span>
+        <span language="primary.portal.customer.customerRemoveDescription"></span>
+    </p>
+    <empowered-modal-footer class="empowered-footer">
+        <button
+            [attr.aria-label]="remove"
+            cdkFocusInitial
+            class="mon-btn-danger"
+            mat-dialog-close="true"
+            mat-flat-button
+        >
+            {{ remove }}
+        </button>
+    </empowered-modal-footer>
+</empowered-modal>

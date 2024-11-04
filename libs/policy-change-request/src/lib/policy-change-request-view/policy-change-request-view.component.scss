@@ -1,0 +1,70 @@
+// TODO: As per requirement, UI team can change scss
+
+@import "shared";
+
+.files-list {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: convert-unit(10px, "rem") auto;
+    background: #ffffff;
+    border: convert-unit(1px, "rem") dashed;
+    border-radius: convert-unit(12px, "rem");
+    padding: convert-unit(5px, "rem");
+    color: #1c8adb;
+}
+
+.files-list .delete-file {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.files-list .delete-file img {
+    width: convert-unit(30px, "rem");
+}
+
+.policyrequest {
+    &-view {
+        padding: convert-unit(20px, "rem") convert-unit(30px, "rem") 0 convert-unit(30px, "rem");
+
+        mat-label,
+        .mat-label {
+            width: 30%;
+        }
+    }
+
+    position: relative;
+
+    .closemodal {
+        position: absolute;
+        top: 0;
+        right: convert-unit(25px, "rem");
+
+        .mon-icon-close {
+            margin-top: convert-unit(40px, "rem");
+        }
+    }
+}
+
+.policy-table {
+    ::ng-deep {
+        .mat-row {
+            &:last-child {
+                .mat-cell {
+                    width: auto !important;
+                }
+            }
+        }
+    }
+}
+
+.changedescription {
+    max-width: convert-unit(420px, "rem");
+}
+
+.icon-warning {
+    position: relative;
+    top: convert-unit(3px, "rem");
+    margin: 0;
+}

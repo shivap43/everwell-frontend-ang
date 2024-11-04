@@ -1,0 +1,170 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isSpinnerLoading"></empowered-mon-spinner>
+<form [formGroup]="quoteForm" (ngSubmit)="downloadCartQuote()" class="quasi-modal">
+    <div class="modal-header">
+        <h2>{{languageStrings['primary.portal.quickQuote.generate']}}</h2>
+
+        <button mat-icon-button (click)="closeForm()" [attr.aria-label]="languageStrings['primary.portal.common.close']">
+            <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+        </button>
+    </div>
+
+    <div class="dialog-content">
+        <mat-dialog-content>
+            <div class="content-wrapper">
+                <mat-label class="mat-label">{{languageStrings['primary.portal.quickQuote.quoteTitle']}}</mat-label>
+
+                <div class="quote-edit-wrapper">
+                    <div class="quote-edit-field">
+                        <mat-form-field class="w-200">
+                            <input
+                                formControlName="quoteName"
+                                type="text"
+                                matInput
+                                (blur)="updateTitle()"
+                                [attr.aria-label]="languageStrings['primary.portal.quickQuote.quoteTitle']"
+                            />
+                            <mat-error *ngIf="!quoteForm.controls.quoteName.valid && quoteForm.controls.quoteName.touched">
+                                <span>{{languageStrings['primary.portal.common.requiredField']}}</span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="edit-details">
+                        <a (click)="openEditOrderDialog()">{{languageStrings['primary.portal.quickQuote.editPlan']}}</a>
+                    </div>
+                </div>
+
+                <div class="quote-div">
+                    <div class="carrier-logo">
+                        <img src="assets/images/1.png" alt="Logo" class="aflac-img" />
+                        <div class="div-content">
+                            <div>
+                                <p class="mon-mb-0">{{quoteTitle}}</p>
+                            </div>
+                            {{languageStrings['primary.portal.createQuote.quoteSubtitle1'].replace("##ProducerName##",producerName).replace(
+                            "##date##", currentDate?.toString()).replace("##time##",currentTime| date: 'mediumTime').replace("##state##",
+                            planSelection.stateName).replace("##period##",planSelection.payFrequency).replace("##occupationClass##",
+                            jobClassValue)}}
+                        </div>
+                    </div>
+
+                    <mat-divider class="mon-my-15"></mat-divider>
+                    <div>
+                        <span> {{languageStrings['primary.portal.createQuote.quoteSubtitle2']}} </span>
+                    </div>
+                    <mat-divider class="mon-mt-15"></mat-divider>
+                    <div *ngFor="let plan of planSelection.planSelection" class="selected-plans">
+                        <div class="product-description">
+                            <div class="product-logo">
+                                <mon-icon
+                                    [iconName]="plan.productName"
+                                    [iconSize]="30"
+                                    [fetchedIconPath]="plan.productImagePath"
+                                ></mon-icon>
+                            </div>
+                            <div class="product-title">
+                                <h3 class="text-fade">{{plan.productName}}</h3>
+                                <h4>{{plan.planName}}</h4>
+                                <p *ngIf="plan.benefitAmount">
+                                    <span>{{languageStrings['primary.portal.tpi.shopReview.benefitAmount']}}</span>
+                                    {{ plan.benefitAmount | currency : 'USD' : 'symbol' : '1.0'}}
+                                    <span *ngIf="plan.coverageLevelName" language="primary.portal.quote.separator"></span>
+                                    <ng-container *ngIf="plan.coverageLevelName">
+                                        <span
+                                            class="mon-pl-5"
+                                            language="primary.portal.shoppingCart.planOfferings.expansion.eliminationPeriod"
+                                        ></span>
+                                        {{plan.coverageLevelName}}
+                                    </ng-container>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="products-accordion-table-wrapper" *ngIf="!isSpinnerLoading">
+                            <table mat-table [dataSource]="dataSourceObj[plan.id]">
+                                <ng-container matColumnDef="planYear">
+                                    <th mat-header-cell *matHeaderCellDef class="w-300"></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.name}}
+                                        <ng-container *ngIf="element.benefitAmount"
+                                            >: {{element.benefitAmount | currency : 'USD' : 'symbol' : '1.0'}}</ng-container
+                                        >
+                                        <p *ngIf="element.name === languageStrings['primary.portal.common.total']" class="sub-header">
+                                            {{planSelection.payFrequency}}
+                                        </p>
+                                    </td>
+                                </ng-container>
+
+                                <!-- Individual Column -->
+                                <ng-container matColumnDef="enrollmentDate">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{dataSourceObj[plan.id][0].coverageName[0].id === ENROLLED_COVERAGE ?
+                                        languageStrings['primary.portal.createQuote.individual']: (dataSourceObj[plan.id][0].coverageName[0]
+                                        ? dataSourceObj[plan.id][0].coverageName[0].name : "")}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="text-right">{{element.coverageIndividual}}</td>
+                                </ng-container>
+
+                                <!-- Individual + spouse Column -->
+                                <ng-container matColumnDef="coverageDates">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{dataSourceObj[plan.id][0].coverageName[1] ? dataSourceObj[plan.id][0].coverageName[1].name : ""}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="text-right">{{element.coverageIndividualPlus}}</td>
+                                </ng-container>
+
+                                <!-- One Parent Family Column -->
+                                <ng-container matColumnDef="status">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{dataSourceObj[plan.id][0].coverageName[2] ? dataSourceObj[plan.id][0].coverageName[2].name : ""}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="text-right">{{element.coverageOneParent}}</td>
+                                </ng-container>
+
+                                <!-- Two Parent Family Column -->
+                                <ng-container matColumnDef="manage">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{dataSourceObj[plan.id][0].coverageName[3] ? dataSourceObj[plan.id][0].coverageName[3].name : ""}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="text-right">{{element.coverageTwoParent}}</td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="settingsDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: settingsDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                        <div class="plan-details-section">
+                            <p>
+                                <a *ngIf="showPlanDetails(plan.planId)" (click)="openBrochure(plan.planId)">
+                                    {{languageStrings['primary.portal.quickQuote.broucher']}}
+                                </a>
+                                <span *ngIf="outlineCoverage">{{languageStrings['primary.portal.notificationMember.seperator']}}</span>
+                                <a href="javascript:void(0)" *ngIf="outlineCoverage">
+                                    {{languageStrings['primary.portal.createQuote.outlineCoverage']}}
+                                </a>
+                            </p>
+                        </div>
+                        <mat-divider class="mon-mt-15"></mat-divider>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+    </div>
+
+    <div mat-dialog-actions class="dialog-footer">
+        <a href="javascript:void(0)" (click)="closeForm()" mat-dialog-close>{{languageStrings['primary.portal.common.cancel']}}</a>
+        <div>
+            <button type="submit" *hasPermission="'core.shoppingCart.read.download'" class="mon-btn-secondary mon-mr-20" mat-flat-button>
+                <span>{{languageStrings['primary.portal.quickQuote.viewQuote']}}</span>
+            </button>
+            <button
+                class="mon-btn-primary"
+                *hasPermission="'core.shoppingCart.create.email'"
+                (click)="emailCartQuote()"
+                mat-flat-button
+                type="button"
+            >
+                <span>{{languageStrings['primary.portal.quickQuote.sendQuote']}}</span>
+            </button>
+        </div>
+    </div>
+</form>

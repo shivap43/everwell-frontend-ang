@@ -1,0 +1,92 @@
+<!-- TODO Hardcode values should come from langauges -->
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="isLoading"></empowered-mon-spinner>
+<div class="review-complete-container">
+    <div class="mon-mb-20" *ngIf="errorResponse">
+        <mon-alert *ngIf="errorResponse" alertType="danger">
+            <span>{{errorMessage}}</span>
+        </mon-alert>
+    </div>
+
+    <h2>{{languageString['primary.portal.proposals.reviewComplete.mainHRTitle']}}</h2>
+    <p language="primary.portal.proposals.reviewComplete.subHRTitle"></p>
+
+    <div class="review-settings-container">
+        <div class="settings-header">
+            <h3>{{languageString['primary.portal.proposals.reviewComplete.settings']}}</h3>
+            <button mat-flat-button (click)="editSettings()" class="mon-btn-secondary btn-sm">
+                {{languageString['primary.portal.common.edit']}}
+            </button>
+        </div>
+        <p><strong language="primary.portal.proposals.reviewComplete.name"></strong> {{this.name}}</p>
+        <p>
+            <strong language="primary.portal.proposals.reviewComplete.deductionFrequency"></strong>
+            {{selectedDeductionFrequency}}
+        </p>
+        <p>
+            <strong language="primary.portal.proposals.reviewComplete.coverageStartDate"></strong>
+            {{this.coverageStartDate | date: 'MM/dd/yyyy'}}
+        </p>
+        <p><strong language="primary.portal.reviewSubmit.employeesTitle"></strong> {{this.censusEstimate}}</p>
+    </div>
+    <div class="review-settings-container">
+        <div class="settings-header">
+            <h3>
+                <strong>{{languageString['primary.portal.reviewSubmit.benefitsOffered']}}</strong>
+                <span language="primary.portal.proposals.reviewComplete.benefitsOfferedSection"></span>
+            </h3>
+            <div>
+                <button mat-flat-button class="mon-btn-secondary btn-sm pull-down-sm" [matMenuTriggerFor]="beforeMenu">
+                    <span>{{languageString['primary.portal.common.edit']}}</span>
+                    <mon-icon iconName="down" [iconSize]="8" class="icon-right"></mon-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button mat-menu-item language="primary.portal.reviewSubmit.benefitsOffered.products" (click)="editProducts()"></button>
+                    <button mat-menu-item language="primary.portal.reviewSubmit.benefitsOffered.plans" (click)="editPlans()"></button>
+                </mat-menu>
+            </div>
+        </div>
+        <ng-container *ngIf="(missingFlyerFeatureEnable$ | async) && (missingFlyerPlanNames$ | async).length > 0">
+            <mon-alert class="warning" alertType="warning" closeButton="true">
+                <div class="missingEmployerFlyer">
+                    <div>{{languageString['primary.portal.previewProposal.employerFlyerUnavailable']}}</div>
+                    <ul class="plan-list">
+                        <li *ngFor="let element of missingFlyerPlanNames$ | async">{{element}}</li>
+                    </ul>
+                    <div>{{languageString['primary.portal.previewProposal.ratesIncluded']}}</div>
+                </div>
+            </mon-alert>
+        </ng-container>
+        <mat-accordion>
+            <div *ngIf="plansPanelListSubject$.asObservable() | async as planPanelList">
+                <div class="mat-accordion-wrapper" *ngFor="let planPanel of plansPanelList;let i=index">
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title> {{planPanel.product.name}} | {{planPanel.carrier.name}} </mat-panel-title>
+                            <mat-panel-description>
+                                <p class="plan-count" *ngIf="planPanel.plans.length>1">
+                                    {{ "primary.portal.reviewSubmit.planCount" | replaceTag: { "#numberofplan": planPanel.plans.length } }}
+                                </p>
+                                <p class="plan-count" *ngIf="this.planPanel.plans.length<2">
+                                    {{ "primary.portal.reviewSubmit.planCountOne" | replaceTag: { "#numberofplan": planPanel.plans.length }
+                                    }}
+                                </p>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <table mat-table [dataSource]="planPanel.plans">
+                            <ng-container matColumnDef="plan">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titlePlan"></th>
+                                <td mat-cell *matCellDef="let element" [innerHTML]="element.plan.adminName"></td>
+                            </ng-container>
+                            <ng-container matColumnDef="state">
+                                <th mat-header-cell *matHeaderCellDef language="primary.portal.reviewSubmit.titleStates"></th>
+                                <td mat-cell *matCellDef="let element">{{displayValues(element.states)}}</td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </mat-expansion-panel>
+                </div>
+            </div>
+        </mat-accordion>
+    </div>
+</div>

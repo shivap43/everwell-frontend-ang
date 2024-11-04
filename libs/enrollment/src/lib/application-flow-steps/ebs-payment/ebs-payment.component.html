@@ -1,0 +1,83 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<section class="section-container">
+    <div class="section-subheader">
+        <h2>{{title}}</h2>
+    </div>
+    <mat-divider></mat-divider>
+    <ng-container>
+        <mon-alert
+            class="section"
+            alertType="success"
+            *ngIf="paymentPresent && !paymentRequired && !ebsPaymentFailed && successPaylogix"
+            closeButton="true"
+        >
+            <span>{{languageStrings['primary.portal.applicationFlow.ebs.successfulMsg']}}</span>
+        </mon-alert>
+        <mon-alert
+            class="section"
+            alertType="warning"
+            *ngIf="paymentPresent && !paymentRequired && ebsPaymentFailed && successPaylogix"
+            closeButton="true"
+        >
+            <span>{{languageStrings['primary.portal.applicationFlow.ebs.warningMsg']}}</span>
+        </mon-alert>
+        <mon-alert class="section" alertType="danger" *ngIf="!paymentPresent && paymentRequired">
+            <span>{{languageStrings['primary.portal.applicationFlow.ebs.mandatoryMsg']}}</span>
+        </mon-alert>
+        <mon-alert class="section" alertType="danger" *ngIf="!paymentPresent && paymentRequired && ebsPaymentFailed">
+            <span>{{languageStrings['primary.portal.applicationFlow.ebs.errorMsg']}}</span>
+        </mon-alert>
+        <div class="section" *ngIf="!paymentPresent">
+            <div>{{languageStrings['primary.portal.applicationFlow.ebs.firstTimeUser']}}</div>
+        </div>
+        <div class="section" *ngIf="paymentPresent">
+            <div>{{languageStrings['primary.portal.applicationFlow.ebs.successfulPage']}}</div>
+        </div>
+        <div class="section" *ngIf="!paymentPresent">
+            <button class="mon-btn-secondary" mat-flat-button (click)="gotoAflacEBS()">
+                <span>{{languageStrings["primary.portal.applicationFlow.ebs.modal.continue"]}}</span>
+                <mon-icon class="icon-primary" iconName="share-vector"></mon-icon>
+            </button>
+        </div>
+        <div class="section" *ngIf="paymentPresent">
+            <a (click)="gotoAflacEBS()">
+                <span>{{languageStrings["primary.portal.applicationFlow.ebs.link"]}}</span>
+                <mon-icon class="icon-primary icon-vertical-middle" iconName="share-vector" iconSize="15"></mon-icon>
+            </a>
+        </div>
+    </ng-container>
+    <mat-divider class="mon-mb-20"></mat-divider>
+    <div>
+        <!-- TODO Commented for now - Need to confirm before removing -->
+        <!-- <button
+             class="mon-btn-secondary mon-mb-20"
+             (click)="onBack()"
+             type="button"
+             mat-flat-button
+             *ngIf="!reinstate"
+         >
+             <mon-icon class="icon-left" iconName="left" [iconSize]="10"></mon-icon>
+             <span>{{languageStrings['primary.portal.common.back']}}</span>
+         </button> -->
+        <!-- TODO: Static text should come from language -->
+        <button
+            id="submitAppFlowForm"
+            type="submit"
+            class="mon-btn-primary submit-app-flow-form mon-ml-20 mon-mb-20"
+            mat-flat-button
+            (click)="onNext()"
+        >
+            <span *ngIf="hasDirectBilling">
+                {{languageStrings['primary.portal.common.next']}}:
+                {{languageStrings['primary.portal.applicationFlow.payments.billing']}}</span
+            >
+            <span *ngIf="!hasAflacAlways && !hasDirectBilling"
+                >{{languageStrings['primary.portal.applicationFlow.payments.nextFinishApplications']}}</span
+            >
+            <span *ngIf="hasAflacAlways && !hasDirectBilling"
+                >{{languageStrings['primary.portal.applicationFlow.payments.nextAflacAlways']}}</span
+            >
+            <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+        </button>
+    </div>
+</section>

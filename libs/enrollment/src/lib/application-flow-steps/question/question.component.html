@@ -1,0 +1,429 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<mon-alert *ngIf="hasApiError" alertType="danger">
+    <span>{{errorMessage}}</span>
+</mon-alert>
+<div [id]="divId">
+    <form [formGroup]="form" [empoweredFocusOnFirstInvalidField]="queryString" (ngSubmit)="onNext()">
+        <section class="section-container">
+            <div class="section-subheader">
+                <p [innerHTML]="stepsData[0].step.directions"></p>
+            </div>
+            <ng-container *ngFor="let stepData of stepsData; let stepdataindex =index;">
+                <div *ngIf="stepData.step.type=== QUESTION && stepData.showStep && stepData.step.question.inputType === inputType.TEXT">
+                    <div class="question-container">
+                        <div class="question-block">
+                            <div
+                                attr.id="{{divId}}{{stepdataindex}}"
+                                [innerHTML]="stepData.step.question.text.replace(regEx(replaceGlossary), '')
+                        .replace(regEx(replaceSalary), salary ? '<u><strong>' + (salary | currency) + '</u></strong>': replaceSalary)"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="stepData.step.type===QUESTION && stepData.showStep && stepData.step.question.inputType !== inputType.TEXT"
+                    [formGroupName]="stepData.step.question.id"
+                >
+                    <div class="question-container">
+                        <div class="question-block">
+                            <a href="javascript:void(0);" [attr.id]="stepData?.step?.question?.name"></a>
+                            <div
+                                attr.id="{{divId}}{{stepdataindex}}"
+                                [innerHTML]="stepData.step.question.text.replace(regEx(replaceGlossary), '')
+                        .replace(regEx(replaceSalary), salary ? '<u><strong>' + (salary | currency) + '</u></strong>': replaceSalary)"
+                            ></div>
+                        </div>
+                        <div class="response-block">
+                            <div *ngIf="stepData.step.question.inputType === inputType.RADIO" class="response-type radio">
+                                <mat-radio-group
+                                    attr.aria-labelledby="{{divId}}{{stepdataindex}}"
+                                    formControlName="element"
+                                    (change)="hideAndShowQuestions()"
+                                >
+                                    <!-- Radio buttons are being disabled if they are marked as readOnly and not required -->
+                                    <!-- Radio button "No" is checked by default for 2 questions that cannot be set based on the values we get in the data -->
+                                    <ng-container *ngFor="let option of stepData.step.question.options">
+                                        <mat-radio-button
+                                            *ngIf="option.showOption && option.value && !stepData.step.question.readOnly"
+                                            [value]="option.value"
+                                        >
+                                            <div [innerHTML]="option.label.replace(regEx(replaceGlossary), '')"></div>
+                                        </mat-radio-button>
+                                        <mat-radio-button
+                                            *ngIf="option.showOption && option.value && stepData.step.question.readOnly"
+                                            [disabled]="stepData.step.question.readOnly"
+                                            [checked]="option.preselected"
+                                            [value]="option.value"
+                                        >
+                                            <div [innerHTML]="option.label.replace(regEx(replaceGlossary), '')"></div>
+                                        </mat-radio-button>
+                                    </ng-container>
+                                </mat-radio-group>
+                                <mat-error
+                                    *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required') && showError"
+                                    aria-live="polite"
+                                >
+                                    {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                </mat-error>
+                            </div>
+
+                            <ng-container
+                                *ngIf="stepData.step.question.inputType === inputType.MULTI_INPUT && stepData.step.question.inputs.length"
+                                formArrayName="element"
+                            >
+                                <ng-container *ngFor="let inputs of stepData.step.question.inputs; let inputIndex = index;">
+                                    <div class="response-type input w-200">
+                                        <mat-form-field>
+                                            <input
+                                                class="mon-input"
+                                                [placeholder]="inputs.placeholderText"
+                                                matInput
+                                                type="text"
+                                                [maxlength]="inputs.maxLength"
+                                                [formControlName]="inputIndex"
+                                                [minlength]="inputs.minLength"
+                                                [readonly]="inputs.readOnly"
+                                                (keyup)="hideAndShowQuestions()"
+                                            />
+                                            <mat-error
+                                                *ngIf="form.controls[inputs.id]['controls']['element']['controls'][inputIndex].hasError('required')"
+                                            >
+                                                {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="form.controls[inputs.id]['controls']['element']['controls'][inputIndex].hasError('pattern')"
+                                            >
+                                                {{languageSecondStringsArray['secondary.portal.applicationFlow.question.invalidFormat']}}
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="form.controls[inputs.id]['controls']['element']['controls'][inputIndex].hasError('minlength')
+                                    && !form.controls[inputs.id]['controls']['element'].hasError('pattern')"
+                                            >
+                                                {{languageSecondStringsArray['secondary.portal.applicationFlow.question.minimumLength']}}
+                                            </mat-error>
+                                            <mat-error
+                                                *ngIf="form.controls[inputs.id]['controls']['element']['controls'][inputIndex].hasError('maxlength')
+                                    && !form.controls[stepData.step.question.id]['controls']['element']['controls'][inputIndex].hasError('pattern')"
+                                            >
+                                                {{languageSecondStringsArray['secondary.portal.applicationFlow.question.cannotExceed']}}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+
+                            <div class="response-type input w-200">
+                                <mat-form-field *ngIf="stepData.step.question.inputType === inputType.INPUT && !isAdditionalContribution">
+                                    <input
+                                        class="mon-input"
+                                        [placeholder]="stepData.step.question.placeholderText"
+                                        matInput
+                                        type="text"
+                                        [maxlength]="stepData.step.question.maxLength"
+                                        formControlName="element"
+                                        [minlength]="stepData.step.question.minLength"
+                                        [readonly]="stepData.step.question.readOnly"
+                                        (keyup)="hideAndShowQuestions()"
+                                        *ngIf="!showPin && stepData.step.question.format !== phoneFormat"
+                                        attr.aria-labelledby="{{divId}}{{stepdataindex}}"
+                                    />
+                                    <input
+                                        class="mon-input"
+                                        [placeholder]="stepData.step.question.placeholderText"
+                                        matInput
+                                        type="text"
+                                        formControlName="element"
+                                        (keyup)="hideAndShowQuestions()"
+                                        [disableControl]="pinFlag && stepData.step.question.placeholderText===enterPin"
+                                        *ngIf="showPin && stepData.step.question.format !== phoneFormat"
+                                    />
+                                    <input
+                                        class="mon-input"
+                                        matInput
+                                        [placeholder]="stepData.step.question.placeholderText"
+                                        type="text"
+                                        [maxlength]="phoneMaxLength"
+                                        formControlName="element"
+                                        (paste)="numberValidation($event)"
+                                        (keypress)="numberValidation($event)"
+                                        [readonly]="stepData.step.question.readOnly"
+                                        (keyup)="hideAndShowQuestions()"
+                                        *ngIf="stepData.step.question.format === phoneFormat"
+                                        empoweredPhoneNumberFormat
+                                    />
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.invalidFormat']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('minlength')
+                                    && !form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.minimumLength']}} {{showPin
+                                        ? 3 : stepData.step.question.minLength}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('maxlength')
+                                    && !form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.cannotExceed']}}
+                                    </mat-error>
+                                    <mat-hint
+                                        *ngIf="(stepData.step.question.placeholderText === initialsPlaceholder) && (isHeadSet || enrollmentMethod === enrollmentMethods.VIRTUAL_FACE_TO_FACE)"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.customerLater']}}
+                                    </mat-hint>
+                                </mat-form-field>
+                            </div>
+                            <ng-container *ngIf="stepData.step.question.inputType === inputType.INPUT && isAdditionalContribution">
+                                <div class="response-block inline">
+                                    <div class="response-type input">
+                                        <mat-form-field class="d-md-flex">
+                                            <input
+                                                matInput
+                                                type="text"
+                                                formControlName="additionalContribution"
+                                                (paste)="numberValidation($event);"
+                                                (keyup)="getMonthlyContribution(stepData.step.question.id)"
+                                                [readonly]="stepData.step.question.readOnly"
+                                            />
+                                            <span matPrefix>$&nbsp;</span>
+                                            <mat-hint>
+                                                {{ languageStrings['primary.portal.applicationFlow.bucketPlanFlow.betweenLimit']|replaceTag:
+                                                { "##minlimit##" : additionalContributionMinLimit, '##maxlimit##'
+                                                :additionalContributionMaxLimit } }}</mat-hint
+                                            >
+                                            <mat-error
+                                                *ngIf="form.controls[stepData.step.question.id]['controls']['additionalContribution'].hasError('required')"
+                                                >{{languageStrings['primary.portal.common.requiredField']}}</mat-error
+                                            >
+                                            <mat-error
+                                                *ngIf="form.controls[stepData.step.question.id]['controls']['additionalContribution'].hasError('limitError')
+                                            && !form.controls[stepData.step.question.id]['controls']['additionalContribution'].hasError('required')"
+                                            >
+                                                {{
+                                                languageStrings['primary.portal.applicationFlow.bucketPlanFlow.mustBeBetweenLimit']|replaceTag:
+                                                { "##minlimit##" : additionalContributionMinLimit, '##maxlimit##'
+                                                :additionalContributionMaxLimit } }}
+                                            </mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div
+                                        class="mon-mt-10"
+                                        *ngIf="!form.controls[stepData.step.question.id]['controls']['additionalContribution'].hasError('limitError') && !form.controls[stepData.step.question.id]['controls']['additionalContribution'].hasError('required')"
+                                    >
+                                        <span *ngIf="monthlyContribution" class="weekly-contribution-bold"
+                                            >= {{monthlyContribution | currency}} {{payFrequency.name}}</span
+                                        >
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <div class="response-type input w-200">
+                                <mat-form-field class="mon-date-field" *ngIf="stepData.step.question.inputType === inputType.DATEPICKER">
+                                    <input
+                                        *ngIf="stepData.step.question.type === dateType.ALL"
+                                        [matDatepicker]="datePicker"
+                                        formControlName="element"
+                                        matInput
+                                        empoweredDateTransform
+                                        (change)="hideAndShowQuestions()"
+                                    />
+                                    <input
+                                        [min]="todaysDate"
+                                        *ngIf="stepData.step.question.type === dateType.FUTURE"
+                                        [matDatepicker]="datePicker"
+                                        formControlName="element"
+                                        matInput
+                                        empoweredDateTransform
+                                        (change)="hideAndShowQuestions()"
+                                    />
+                                    <input
+                                        [max]="todaysDate"
+                                        *ngIf="stepData.step.question.type === dateType.PAST"
+                                        [min]="maxDateForAge"
+                                        [matDatepicker]="datePicker"
+                                        formControlName="element"
+                                        matInput
+                                        empoweredDateTransform
+                                        (change)="hideAndShowQuestions()"
+                                    />
+                                    <mat-datepicker #datePicker></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix (click)="datePicker.open()" [for]="datePicker">
+                                        <mon-icon iconName="calendar-date" [iconSize]="20" matDatepickerToggleIcon> </mon-icon>
+                                    </mat-datepicker-toggle>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.invalidFormat']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('past')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.pastDate']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('future')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.futureDate']}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="response-type textarea w-500">
+                                <mat-form-field *ngIf="stepData.step.question.inputType === inputType.TEXTAREA" rows="5">
+                                    <textarea
+                                        formControlName="element"
+                                        [placeholder]="stepData.step.question.placeholderText"
+                                        matInput
+                                        class="mon-input"
+                                        [readonly]="stepData.step.question.readOnly"
+                                        [maxlength]="stepData.step.question.maxLength"
+                                        [minlength]="stepData.step.question.minLength"
+                                        (keyup)="hideAndShowQuestions()"
+                                    ></textarea>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.invalidFormat']}}
+                                    </mat-error>
+                                    <mat-error
+                                        *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('minlength')
+                  && !form.controls[stepData.step.question.id]['controls']['element'].hasError('pattern')"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.minimumLength']}}
+                                        {{stepData.step.question.minLength}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="response-type checkbox">
+                                <div *ngIf="stepData.step.question.inputType === inputType.CHECKBOX" formArrayName="element">
+                                    <div
+                                        *ngFor="let option of getShowedOptions(stepData.step.question.options); let i=index"
+                                        attr.aria-labelledby="{{divId}}{{stepdataindex}}"
+                                        tabindex="0"
+                                    >
+                                        <mat-checkbox
+                                            *ngIf="option.showOption && option.value"
+                                            (change)="hideAndShowQuestions()"
+                                            [value]="option.value"
+                                            [formControlName]="i"
+                                        >
+                                            <div [innerHTML]="option.label.replace(regEx(replaceGlossary), '')"></div>
+                                        </mat-checkbox>
+                                    </div>
+                                    <mat-error
+                                        *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required') && showError"
+                                    >
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                </div>
+                            </div>
+
+                            <div class="response-type select-menu w-200">
+                                <mat-form-field *ngIf="stepData.step.question.inputType === inputType.SELECT">
+                                    <mat-select
+                                        formControlName="element"
+                                        [disabled]="stepData.step.question.readOnly"
+                                        (selectionChange)="hideAndShowQuestions()"
+                                        disableOptionCentering="true"
+                                        [attr.ariaLabelledby]="getStepDataIndex(stepdataindex)"
+                                    >
+                                        <ng-container *ngFor="let option of stepData.step.question.options">
+                                            <mat-option *ngIf="option.showOption && option.value" [value]="option.value">
+                                                <div [innerHTML]="option.label.replace(regEx(replaceGlossary), '')"></div>
+                                            </mat-option>
+                                        </ng-container>
+                                    </mat-select>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="response-type select-menu w-200">
+                                <mat-form-field *ngIf="stepData.step.question.inputType === inputType.MULTISELECT">
+                                    <mat-select
+                                        formControlName="element"
+                                        [disabled]="stepData.step.question.readOnly"
+                                        (selectionChange)="hideAndShowQuestions()"
+                                        disableOptionCentering="true"
+                                        multiple
+                                        [attr.ariaLabelledby]="getStepDataIndex(stepdataindex)"
+                                    >
+                                        <ng-container *ngFor="let option of stepData.step.question.options">
+                                            <mat-option *ngIf="option.showOption && option.value" [value]="option.value">
+                                                <div [innerHTML]="option.label.replace(regEx(replaceGlossary), '')"></div>
+                                            </mat-option>
+                                        </ng-container>
+                                    </mat-select>
+                                    <mat-error *ngIf="form.controls[stepData.step.question.id]['controls']['element'].hasError('required')">
+                                        {{languageSecondStringsArray['secondary.portal.applicationFlow.question.selectionRequired']}}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="action-btns" [ngClass]="{'last-step': this.planObject.lastStep}">
+                <button
+                    id="submitAppFlowForm"
+                    *ngIf="planObject.lastStep"
+                    class="mon-btn-primary submit-app-flow-form"
+                    type="submit"
+                    mat-flat-button
+                >
+                    <span *ngIf="this.planObject.lastStep && this.planObject.nextProduct"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.next']}}{{this.planObject.nextProduct}}
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && hasAflacAlways && !fromDirect && !hasEBSBilling"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextAflacAlways']}}
+                    </span>
+                    <span *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && (fromDirect || hasEBSBilling)"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextBilling']}}
+                    </span>
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling && showPreliminaryStatement"
+                        >{{languageStrings['primary.portal.applicationFlow.nextPreliminaryStatement']}}</span
+                    >
+                    <span
+                        *ngIf="this.planObject.lastStep && !this.planObject.nextProduct && !hasAflacAlways && !fromDirect && !hasEBSBilling && !showPreliminaryStatement"
+                        >{{languageStrings['primary.portal.applicationFlow.planOption.nextApplications']}}
+                    </span>
+                </button>
+                <button *ngIf="!planObject.lastStep" class="mon-btn-primary" type="submit" mat-flat-button>
+                    <span *ngIf="!this.planObject.lastStep" language="primary.portal.common.next"></span>
+                    <mon-icon class="icon-right" iconName="right" [iconSize]="10"></mon-icon>
+                </button>
+            </div>
+        </section>
+    </form>
+</div>
+
+<div [id]="getKnockOutId()" class="question-knockout" *ngIf="isKnockout">
+    <h3 *ngIf="knockoutHeading" [innerHTML]="knockoutHeading"></h3>
+    <div class="margin-bottom" *ngFor="let knockoutData of knockoutDataList">
+        <p [innerHTML]="knockoutData.text" class="knock-out-text"></p>
+        <a *ngIf="knockoutData.stepLink" [innerHTML]="knockoutData.stepLink" (click)="handleBackToStepLink(knockoutData)"></a>
+    </div>
+    <div class="action-btns">
+        <button class="mon-px-30 btn-right mon-btn-primary mon-mr-20" (click)="handleKnockOut()" mat-flat-button type="button">
+            <span *ngIf="!selfServiceReplacementButtonText && !selfServiceReplacementBtnReturnToShop"
+                >{{ languageStrings[ "primary.portal.applicationFlow.planOption.discardAndContinue" ]}}</span
+            >
+            <span *ngIf="selfServiceReplacementButtonText"
+                >{{ languageStrings[ "primary.portal.applicationFlow.planOption.removeAndContinue" ]}}</span
+            >
+            <span *ngIf="selfServiceReplacementBtnReturnToShop"
+                >{{ languageStrings[ "primary.portal.applicationFlow.planOption.removeAndReturnToShop" ]}}</span
+            >
+        </button>
+        <button (click)="onKnockOutBack()" class="btn-left mon-btn-secondary" mat-flat-button type="button">
+            <span language="primary.portal.common.back"></span>
+        </button>
+    </div>
+</div>
+<div *ngIf="isNotProduction$|async">
+    <span language="primary.portal.applicationFlow.debug.planFlow"></span>{{ this.planFlowId}}
+    <span language="primary.portal.applicationFlow.debug.planFlowStep"></span>{{ this.planFlowStepId}}
+</div>

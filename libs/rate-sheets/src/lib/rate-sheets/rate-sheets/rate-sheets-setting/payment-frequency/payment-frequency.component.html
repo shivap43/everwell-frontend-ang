@@ -1,0 +1,9 @@
+<form [formGroup]="form">
+    <ng-container *ngIf="paymentFrequencies$ | async as paymentFrequencies">
+        <mat-radio-group class="plan-radio-group" formControlName="selectedPaymentFrequency">
+            <mat-radio-button class="plan-radio-button" *ngFor="let paymentFrequency of paymentFrequencies" [value]="paymentFrequency.name">
+                {{paymentFrequency.name}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </ng-container>
+</form>

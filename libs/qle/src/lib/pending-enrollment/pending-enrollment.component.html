@@ -1,0 +1,62 @@
+<div *ngIf="this.data.editLifeEvent">
+    <empowered-pending-qle></empowered-pending-qle>
+</div>
+
+<div class="layout-header-2column" *ngIf="!this.data.editLifeEvent">
+    <div class="header">
+        <h2 class="header-content">
+            <span mat-dialog-title>{{languageStrings['primary.portal.qle.pendingEnrollment.title']}}</span>
+            <button
+                mat-icon-button
+                (click)="closeForm()"
+                [attr.aria-label]="languageStrings['primary.portal.common.cancel']"
+            >
+                <mon-icon class="mon-icon-close" iconSize="25" iconName="close"></mon-icon>
+            </button>
+        </h2>
+    </div>
+    <div>
+        <a matButton class="stepperTrigger mon-btn-link" id="stepperTrigger" (click)="display = !display">
+            <span class="selected-step-index"></span>
+            <span class="selected-step-label"></span>
+            <mon-icon class="icon-right" iconName="down" [iconSize]="10"></mon-icon>
+        </a>
+    </div>
+    <div class="columns">
+        <div
+            app-Overlaystepper="stepperTrigger"
+            stepperId="pendingEnrollment"
+            class="sidenav-area"
+            [ngClass]="{'shown': !display}"
+        >
+            <mat-vertical-stepper
+                id="pendingEnrollment"
+                class="side-nav-stepper"
+                linear="true"
+                #progressIndicator
+                (selectionChange)="onSelectionChange($event)"
+            >
+                <mat-step [completed]="completedStep>=1">
+                    <ng-template matStepLabel>
+                        <span language="primary.portal.accountPendingEnrollments.reviewLifeEvent"></span>
+                    </ng-template>
+                </mat-step>
+                <mat-step *ngFor="let data of this.enrollmentData; let i=index" [completed]="completedStep>=i+2">
+                    <ng-template matStepLabel>{{data.plan.product.name}}</ng-template>
+                </mat-step>
+                <ng-template matStepperIcon="done">
+                    <mon-icon [iconSize]="10" iconName="check"></mon-icon>
+                </ng-template>
+            </mat-vertical-stepper>
+        </div>
+        <div class="content-area">
+            <empowered-pending-qle class="quasi-modal" *ngIf="this.step === 0"></empowered-pending-qle>
+            <empowered-approval-denial-enrollments
+                [selectedIndex]="progressIndicator.selectedIndex"
+                [enrollment]="enrollment"
+                *ngIf="this.step > 0"
+            >
+            </empowered-approval-denial-enrollments>
+        </div>
+    </div>
+</div>

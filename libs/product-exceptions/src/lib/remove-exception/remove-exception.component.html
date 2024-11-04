@@ -1,0 +1,56 @@
+<empowered-mon-spinner [enableSpinner]="true" backdrop="true" *ngIf="showSpinner"></empowered-mon-spinner>
+<div *ngIf="exceptionData" class="info-modal">
+    <form class="end-date-form" [formGroup]="endDateForm" (ngSubmit)="submit.focus(); removePlan();">
+        <div class="modal-header">
+            <button [attr.aria-label]="languageStrings['primary.portal.common.close']" mat-icon-button (click)="closeView()" type="button">
+                <mon-icon class="mon-icon-close" [iconSize]="25" iconName="close"></mon-icon>
+            </button>
+        </div>
+
+        <mat-dialog-content>
+            <h1 mat-dialog-title>{{languageStrings["primary.portal.productExceptions.removeException.header"]}}</h1>
+            <div *ngIf="!isVasException">
+                <p *ngIf="isFutureDate || exceptionData.enrolledCount === 0">
+                    {{"primary.portal.productExceptions.removeException.exceptionRemoved" | replaceTag: {"##planname##":
+                    exceptionData.plan?.name} }}
+                </p>
+
+                <div *ngIf="!isFutureDate && exceptionData.enrolledCount > 0">
+                    <p>
+                        {{"primary.portal.productExceptions.removeException.priorEnrollmentsRetained" | replaceTag: {"##planname##":
+                        exceptionData.plan.name} }}
+                    </p>
+                </div>
+            </div>
+            <div *ngIf="isVasException">
+                <p *ngIf="!isCoverageDateVAS && (exceptionData.enrolledCount > 0)">
+                    {{languageStrings["primary.portal.productExceptions.removeException.hasEnroll"]}}
+                </p>
+                <p
+                    *ngIf="noPlanYear && (!exceptionData.enrolledCount || (exceptionData.enrolledCount && exceptionData.enrolledCount === 0))"
+                >
+                    {{"primary.portal.productExceptions.removeException.availability" | replaceTag: {"##vasexception##": data.element?.name}
+                    }}
+                </p>
+                <p
+                    *ngIf="(!noPlanYear) && !exceptionData.enrolledCount ||
+                 (exceptionData.enrolledCount && exceptionData.enrolledCount === 0)"
+                >
+                    {{"primary.portal.productExceptions.removeException.noEnroll" | replaceTag: {"##vasexception##": data.element?.name} }}
+                </p>
+                <p *ngIf="isCoverageDateVAS && (exceptionData.enrolledCount > 0)">
+                    {{"primary.portal.productExceptions.removeException.priorEnrollmentCancel" | replaceTag: {"##vasexception##":
+                    data.element?.name} }}
+                </p>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialog-footer justify-content-between">
+            <button mat-button class="mon-btn-link" (click)="closeView()" type="button">
+                {{languageStrings["primary.portal.common.cancel"]}}
+            </button>
+            <button [disabled]="isDisabled" class="mon-btn-danger" mat-flat-button type="submit" #submit>
+                {{languageStrings["primary.portal.common.remove"]}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>

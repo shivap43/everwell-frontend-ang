@@ -1,0 +1,76 @@
+@import "shared";
+
+.mon-spinner {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .spinner-backdrop {
+        background-color: rgba($color: get("color.white"), $alpha: 0.6);
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    .mat-spinner-wrapper {
+        width: convert-unit(120px, "rem");
+        height: convert-unit(120px, "rem");
+        background-color: get("color.white");
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1205;
+        border: convert-unit(5px, "rem") solid rgba($color: get("color.black"), $alpha: 0.2);
+        border-radius: convert-unit(10px, "rem");
+    }
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+.mon-spinner-shop {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .spinner-backdrop {
+        background-color: rgba($color: get("color.white"), $alpha: 0.6);
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    .mat-spinner-wrapper {
+        width: convert-unit(120px, "rem");
+        height: convert-unit(120px, "rem");
+        background-color: transparent !important;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1205;
+    }
+}
